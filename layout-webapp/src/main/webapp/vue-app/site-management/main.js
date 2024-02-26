@@ -17,6 +17,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+import './initComponents.js';
+
 // get overridden components if exists
 if (extensionRegistry) {
   const components = extensionRegistry.loadComponents('siteManagement');
@@ -27,25 +29,25 @@ if (extensionRegistry) {
   }
 }
 
-Vue.use(Vuetify);
-const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
-
 const appId = 'siteManagement';
 
 //getting language of the PLF
 const lang = eXo?.env.portal.language || 'en';
 
 //should expose the locale ressources as REST API
-const urls = [`${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteManagementPortlet-${lang}.json`,
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigationPortlet-${lang}.json`];
+const urls = [
+  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteManagement-${lang}.json`,
+  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigation-${lang}.json`
+];
 
 export function init() {
-  exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
-    // init Vue app when locale ressources are ready
-    Vue.createApp({
-      template: `<site-management id="${appId}"/>`,
-      vuetify,
-      i18n},
-    `#${appId}`, 'site-management');
-  });
+  exoi18n.loadLanguageAsync(lang, urls)
+    .then(i18n => {
+      // init Vue app when locale ressources are ready
+      Vue.createApp({
+        template: `<site-management id="${appId}"/>`,
+        vuetify: Vue.prototype.vuetifyOptions,
+        i18n},
+      `#${appId}`, 'site-management');
+    });
 }

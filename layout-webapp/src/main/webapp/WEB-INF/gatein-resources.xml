@@ -35,24 +35,10 @@
   <!-- SiteManagement skins -->
   <portlet-skin>
     <application-name>layout</application-name>
-    <portlet-name>SiteManagementPortlet</portlet-name>
+    <portlet-name>SiteManagement</portlet-name>
     <skin-name>Enterprise</skin-name>
     <css-path>/skin/css/siteManagement.css</css-path>
   </portlet-skin>
-
-  <portal-skin>
-    <skin-name>Enterprise</skin-name>
-    <skin-module>commonLayoutComponents</skin-module>
-    <css-path>/skin/css/common/Style.css</css-path>
-    <css-priority>11</css-priority>
-  </portal-skin>
-
-  <portal-skin>
-    <skin-name>Enterprise</skin-name>
-    <skin-module>navigationWebsiteLayout</skin-module>
-    <css-path>/skin/css/navigationWebsiteLayout.css</css-path>
-    <css-priority>11</css-priority>
-  </portal-skin>
 
   <module>
     <name>commonLayoutComponents</name>
