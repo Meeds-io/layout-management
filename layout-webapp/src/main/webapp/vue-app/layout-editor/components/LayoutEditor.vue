@@ -17,28 +17,7 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <div v-if="siteNavigationDrawerOpened">
-    <site-navigation-drawer />
-    <manage-permissions-drawer />
-    <site-navigation-node-drawer />
-    <site-navigation-element-drawer />
-  </div>
+  <v-app>
+    Layout Editor Placeholder
+  </v-app>
 </template>
-<script>
-export default {
-  data () {
-    return {
-      siteNavigationDrawerOpened: false,
-    };
-  },
-  created() {
-    document.addEventListener('open-site-navigation-drawer', event => this.openSiteNavigationDrawer(event.detail));
-  },
-  methods: {
-    openSiteNavigationDrawer(data) {
-      this.siteNavigationDrawerOpened = true;
-      this.$nextTick().then(() => this.$root.$emit('open-site-navigation-drawer', data));
-    }
-  }
-};
-</script>

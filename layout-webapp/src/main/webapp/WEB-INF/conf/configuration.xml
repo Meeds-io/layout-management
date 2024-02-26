@@ -26,6 +26,5 @@
 
   <import>war:/conf/layout/portal-configuration.xml</import>
   <import>war:/conf/layout/dynamic-container-configuration.xml</import>
-  <import>war:/conf/layout/navigation-categories-configuration.xml</import>
 
 </configuration>
