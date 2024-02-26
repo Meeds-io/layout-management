@@ -21,7 +21,7 @@ import './initComponents.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('siteNavigation');
+  const components = extensionRegistry.loadComponents('layoutEditor');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -29,38 +29,22 @@ if (extensionRegistry) {
   }
 }
 
-extensionRegistry.registerComponent('manageSpaceActions', 'manage-space-actions', {
-  id: 'manage-space-actions',
-  vueComponent: Vue.options.components['site-navigation-button'],
-  rank: 20,
-});
-
-extensionRegistry.registerComponent('manageSpaceDrawers', 'manage-space-drawers', {
-  id: 'manage-space-drawers',
-  vueComponent: Vue.options.components['site-navigation-drawers-actions'],
-  rank: 20,
-});
-
-Vue.use(Vuetify);
-const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
-
-const appId = 'siteNavigation';
+const appId = 'layoutEditor';
 
 //getting language of the PLF
-const lang = eXo && eXo.env.portal.language || 'en';
+const lang = eXo?.env.portal.language || 'en';
 
 //should expose the locale ressources as REST API
-const urls = [`${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigationPortlet-${lang}.json`];
+const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.LayoutEditor-${lang}.json`;
 
-exoi18n.loadLanguageAsync(lang, urls);
-
-export function init(canManageSiteNavigation) {
-  exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
-    // init Vue app when locale ressources are ready
-    Vue.createApp({
-      template: `<site-navigation id="${appId}" :can-manage-site-navigation="${canManageSiteNavigation}"/>`,
-      vuetify,
-      i18n},
-    `#${appId}`, 'site-navigation');
-  });
+export function init() {
+  exoi18n.loadLanguageAsync(lang, url)
+    .then(i18n =>
+      // init Vue app when locale ressources are ready
+      Vue.createApp({
+        template: `<layout-editor id="${appId}"/>`,
+        vuetify: Vue.prototype.vuetifyOptions,
+        i18n},
+      `#${appId}`, 'site-management')
+    );
 }
