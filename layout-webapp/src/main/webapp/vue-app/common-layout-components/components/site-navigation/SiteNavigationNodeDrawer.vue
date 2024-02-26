@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <div>
@@ -282,7 +284,7 @@ export default {
       isValidInputs: true,
       nodeIdRules: [
         value => {
-          const isNodeExisting = this.navigationNode.children.find(node => node.name === value);
+          const isNodeExisting = this.navigationNode?.children?.find?.(node => node.name === value);
           if (value != null && (/\s+/.test(value) || /[^a-zA-Z0-9_-]/.test(value) || /[\u0300-\u036f]/.test(value.normalize('NFD')))){
             return this.$t('siteNavigation.unauthorizedCharacters.error.message');
           } else if (isNodeExisting) {
@@ -467,9 +469,8 @@ export default {
     openTargetPage(pageData) {
       if (pageData?.pageRef) {
         if (pageData?.pageType === 'PAGE' && pageData?.createdPage && pageData?.openEditLayout) {
-          const uiPageId = $('.UIPage').attr('id').split('UIPage-')[1];
           const createdPage = pageData.createdPage;
-          return this.$siteNavigationService.editLayout(uiPageId, createdPage.key.name, createdPage.key.site.typeName, createdPage.key.site.name, `${this.navigationNode.uri}/${this.nodeId}`, this.navigationNode.siteKey.typeName, this.navigationNode.siteKey.name);
+          return this.$siteNavigationService.editLayout(createdPage.storageId || createdPage.id, `${this.navigationNode.uri}/${this.nodeId}`);
         } else {
           let targetPageUrl ;
           if (pageData?.pageType === 'LINK' ) {
