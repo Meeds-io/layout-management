@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-menu
@@ -225,13 +227,13 @@ export default {
     },
   },
   created() {
-    $(document).on('mousedown', () => {
+    document.onmousedown = () => {
       if (this.displayActionMenu) {
         window.setTimeout(() => {
           this.displayActionMenu = false;
         },200);
       }
-    });
+    };
   },
   methods: {
     moveUpNode() {
@@ -264,8 +266,8 @@ export default {
       }, redirectionTime);
     },
     editLayout() {
-      const uiPageId = $('.UIPage').attr('id').split('UIPage-')[1];
-      return this.$siteNavigationService.editLayout(uiPageId, this.pageName, this.pageSiteType, this.pageSiteName, this.nodeUri, this.nodeSiteType, this.nodeSiteName);    
+      const pageId = document.querySelector('.UIPage').getAttribute('id').split('UIPage-')[1];
+      return this.$siteNavigationService.editLayout(pageId, this.nodeUri);
     },
     openManagePermissionsDrawer(){
       this.$root.$emit('open-manage-permissions-drawer', JSON.parse(JSON.stringify(this.navigationNode)));
@@ -278,7 +280,7 @@ export default {
     },
     pasteNode() {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(navNode => navNode.name === this.nodeToPaste.name);
+        const index = this?.navigationNode?.children?.findIndex?.(navNode => navNode.name === this.nodeToPaste.name);
         if (index !== -1) {
           this.$root.$emit('alert-message', this.$t('siteNavigation.label.pasteNode.error'), 'error');
           return;
