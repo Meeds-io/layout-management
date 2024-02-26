@@ -1,18 +1,20 @@
 /*
- * Copyright (C) 2023 eXo Platform SAS.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
+ * This file is part of the Meeds project (https://meeds.io/).
+ * 
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 export function deleteNode(nodeId, delay) {
@@ -40,18 +42,12 @@ export function undoDeleteNode(nodeId) {
   });
 }
 
-export function editLayout(uiPageId, pageName, pageSiteType, pageSiteName, nodeUri, nodeSiteType, nodeSiteName) {
-  return fetch(`${eXo.env.server.createPortalURL(uiPageId, 'EditAnyPage', true)}&pageName=${pageName}&pageSiteType=${pageSiteType}&pageSiteName=${pageSiteName}`, {
-    method: 'GET',
-    credentials: 'include',
-  }).then(resp => {
-    if (!resp?.ok) {
-      throw new Error(resp.status);
-    } else {
-      const targetPageUrl = `/portal${nodeSiteType === 'group' ? '/g' : ''}/${nodeSiteName.replaceAll('/', ':')}/${nodeUri}`;
-      window.location.href = targetPageUrl;
-    }
-  });
+export function editLayout(pageId, nodeUri) {
+  const formData = new FormData();
+  formData.append('pageId', pageId || '');
+  formData.append('nodeUri', nodeUri);
+  const params = new URLSearchParams(formData).toString();
+  window.open(`${eXo.env.portal.context}/${eXo.env.portal.portalName}/layout-editor?${params}&showMaxWindow=true&hideSharedLayout=true`, '_blank');
 }
 
 export function moveNode(nodeId, destinationParentId, previousNodeId) {
