@@ -17,16 +17,17 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import SiteNavigation from './components/SiteNavigation.vue';
-import SiteNavigationButton from './components/SiteNavigationButton.vue';
-import SiteNavigationDrawersActions from './components/SiteNavigationDrawersActions.vue';
+import * as siteNavigationService from './js/siteNavigationService.js';
+import * as siteManagementService from './js/siteManagementService.js';
 
-const components = {
-  'site-navigation': SiteNavigation,
-  'site-navigation-button': SiteNavigationButton,
-  'site-navigation-drawers-actions': SiteNavigationDrawersActions
-};
+if (!Vue.prototype.$siteNavigationService) {
+  window.Object.defineProperty(Vue.prototype, '$siteNavigationService', {
+    value: siteNavigationService,
+  });
+}
 
-for (const key in components) {
-  Vue.component(key, components[key]);
+if (!Vue.prototype.$siteManagementService) {
+  window.Object.defineProperty(Vue.prototype, '$siteManagementService', {
+    value: siteManagementService,
+  });
 }
