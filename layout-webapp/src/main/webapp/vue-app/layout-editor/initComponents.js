@@ -17,25 +17,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import SiteManagement from './components/SiteManagement.vue';
-import SitesList from './components/SitesList.vue';
-import SiteCard from './components/SiteCard.vue';
-import SiteCardMenu from './components/SiteCardMenu.vue';
-import SitePropertiesDrawer from './components/SitePropertiesDrawer.vue';
-import SiteBannerSelector from './components/SiteBannerSelector.vue';
-import SiteToolbar from './components/SiteToolbar.vue';
-import SiteTemplateDrawer from './components/SiteTemplateDrawer.vue';
-
+import LayoutEditor from './components/LayoutEditor.vue';
 
 const components = {
-  'site-management': SiteManagement,
-  'site-management-sites-list': SitesList,
-  'site-management-site-card': SiteCard,
-  'site-management-site-card-menu': SiteCardMenu,
-  'site-properties-drawer': SitePropertiesDrawer ,
-  'site-management-banner-selector': SiteBannerSelector ,
-  'site-management-toolbar': SiteToolbar ,
-  'site-template-drawer': SiteTemplateDrawer ,
+  'layout-editor': LayoutEditor,
 };
 
 for (const key in components) {
