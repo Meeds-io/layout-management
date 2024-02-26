@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-flex id="siteNavigationsPagesSuggesterAutoComplete">
@@ -37,8 +39,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       dense
       flat
       required
+      attach
       @update:search-input="searchTerm = $event"
-      attach>
+      @blur="$refs.selectPage.isFocused = false">
       <template slot="no-data">
         <v-list-item class="pa-0">
           <v-list-item-title
@@ -69,7 +72,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </span>
   </v-flex>
 </template>
-
 <script>
 export default {
   model: {
@@ -144,11 +146,6 @@ export default {
       this.pages = [];
       this.searchTerm = ' ';
     },
-  },
-  mounted() {
-    $('#siteNavigationsPagesSuggesterAutoComplete input').on('blur', () => {
-      this.$refs.selectPage.isFocused = false;
-    });
   },
   created() {
     this.$root.$on('set-selected-page', this.emitSelectedValue);

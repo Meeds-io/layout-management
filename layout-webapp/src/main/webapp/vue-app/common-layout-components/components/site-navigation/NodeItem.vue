@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <div class="d-contents">
@@ -257,7 +259,7 @@ export default {
     },
     moveUpChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(navigationNode => navigationNode.id === navigationNodeId);
+        const index = this.navigationNode?.children?.findIndex?.(navigationNode => navigationNode.id === navigationNodeId);
         if (index !== -1) {
           const previousNodeId = index > 1 ? this.navigationNode.children[index - 2].id : null;
           this.$siteNavigationService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
@@ -269,7 +271,7 @@ export default {
     },
     moveDownChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(navigationNode => navigationNode.id === navigationNodeId);
+        const index = this.navigationNode?.children?.findIndex?.(navigationNode => navigationNode.id === navigationNodeId);
         if (index !== -1) {
           const previousNodeId = this.navigationNode.children[index + 1].id;
           this.$siteNavigationService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
@@ -280,7 +282,7 @@ export default {
     },
     deleteChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(child => child.id === navigationNodeId);
+        const index = this.navigationNode?.children?.findIndex?.(child => child.id === navigationNodeId);
         if (index >= 0) {
           this.navigationNode.children.splice(index, 1);
         }
