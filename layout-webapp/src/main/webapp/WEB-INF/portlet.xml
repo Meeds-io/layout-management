@@ -33,7 +33,7 @@
       <mime-type>text/html</mime-type>
     </supports>
     <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.SiteNavigationPortlet</resource-bundle>
+    <resource-bundle>locale.portlet.SiteNavigation</resource-bundle>
     <portlet-info>
       <title>site navigation</title>
       <keywords>site navigation Management</keywords>
@@ -41,7 +41,7 @@
   </portlet>
 
    <portlet>
-    <portlet-name>SiteManagementPortlet</portlet-name>
+    <portlet-name>SiteManagement</portlet-name>
     <display-name>Site Management Portlet</display-name>
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
     <init-param>
@@ -52,7 +52,7 @@
       <mime-type>text/html</mime-type>
     </supports>
     <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.SiteManagementPortlet</resource-bundle>
+    <resource-bundle>locale.portlet.SiteManagement</resource-bundle>
     <portlet-info>
       <title>site management</title>
       <keywords>site management</keywords>
