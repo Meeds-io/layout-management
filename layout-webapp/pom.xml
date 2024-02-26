@@ -103,8 +103,6 @@
               <includes>
                 <include>siteNavigation.less</include>
                 <include>siteManagement.less</include>
-                <include>common/Style.less</include>
-                <include>navigationWebsiteLayout.less</include>
               </includes>
             </configuration>
             <goals>
