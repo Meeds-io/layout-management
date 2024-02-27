@@ -17,8 +17,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import * as siteNavigationService from './js/siteNavigationService.js';
-import * as siteManagementService from './js/siteManagementService.js';
+import * as siteManagementService from './js/SiteManagementService.js';
+import * as siteNavigationService from './js/SiteNavigationService.js';
+import * as sitePageService from './js/SitePageService.js';
 
 if (!Vue.prototype.$siteNavigationService) {
   window.Object.defineProperty(Vue.prototype, '$siteNavigationService', {
@@ -29,5 +30,11 @@ if (!Vue.prototype.$siteNavigationService) {
 if (!Vue.prototype.$siteManagementService) {
   window.Object.defineProperty(Vue.prototype, '$siteManagementService', {
     value: siteManagementService,
+  });
+}
+
+if (!Vue.prototype.$sitePageService) {
+  window.Object.defineProperty(Vue.prototype, '$sitePageService', {
+    value: sitePageService,
   });
 }
