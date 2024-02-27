@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     getPageTemplates() {
-      return this.$siteNavigationService.getPageTemplates()
+      return this.$sitePageService.getPageTemplates()
         .then(pageTemplates => {
           this.pageTemplates = pageTemplates || [];
         });

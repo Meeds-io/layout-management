@@ -159,7 +159,7 @@ export default {
       if (this.allSites || (!this.allSites && this.siteType && this.siteName)) {
         this.loadingSuggestions = true;
         this.pages = [];
-        this.$siteNavigationService.getPages(this.siteType, this.siteName, this.searchTerm)
+        this.$sitePageService.getPages(this.siteType, this.siteName, this.searchTerm)
           .then(pages => this.pages = pages)
           .finally(() => this.loadingSuggestions = false);
       }

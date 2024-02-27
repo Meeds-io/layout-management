@@ -405,7 +405,7 @@ export default {
       };
       if (this.editMode) {
         const pageRef = pageData?.pageRef ||  (this.nodeType === 'pageOrLink' ? this.navigationNode.pageKey?.ref || `${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey?.name}` : '');
-        this.$siteNavigationService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
+        this.$siteNavigationService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
           .then(() => {
             this.openTargetPage(pageData);
             this.$root.$emit('refresh-navigation-nodes');
@@ -415,7 +415,7 @@ export default {
             this.close();
           });
       } else {
-        this.$siteNavigationService.createNode(this.navigationNode.id, previousNodeId, this.nodeLabel, this.nodeId, this.nodeIcon, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels, pageData?.pageRef, pageData?.pageRef && pageData?.nodeTarget || 'SAME_TAB')
+        this.$siteNavigationService.createNode(this.navigationNode.id, previousNodeId, this.nodeLabel, this.nodeId, this.nodeIcon, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.pageRef, pageData?.pageRef && pageData?.nodeTarget || 'SAME_TAB')
           .then(() => {
             this.openTargetPage(pageData);
             this.$root.$emit('refresh-navigation-nodes');
@@ -468,9 +468,8 @@ export default {
     },
     openTargetPage(pageData) {
       if (pageData?.pageRef) {
-        if (pageData?.pageType === 'PAGE' && pageData?.createdPage && pageData?.openEditLayout) {
-          const createdPage = pageData.createdPage;
-          return this.$siteNavigationService.editLayout(createdPage.storageId || createdPage.id, `${this.navigationNode.uri}/${this.nodeId}`);
+        if (pageData?.pageType === 'PAGE' && pageData?.pageRef && pageData?.openEditLayout) {
+          return this.$sitePageService.editPageLayout(this.nodeId, pageData?.pageRef);
         } else {
           let targetPageUrl ;
           if (pageData?.pageType === 'LINK' ) {
