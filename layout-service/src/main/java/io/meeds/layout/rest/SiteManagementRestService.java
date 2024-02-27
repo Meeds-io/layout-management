@@ -22,34 +22,38 @@ package io.meeds.layout.rest;
 import java.util.List;
 import java.util.Locale;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
 import org.gatein.api.Portal;
 import org.gatein.api.Util;
 import org.gatein.api.site.Site;
 import org.gatein.api.site.SiteId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.rest.http.PATCH;
-import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.social.rest.api.EntityBuilder;
+import org.exoplatform.social.rest.entity.SiteEntity;
 
+import io.meeds.layout.rest.model.PermissionUpdateModel;
+import io.meeds.layout.rest.model.SiteCreateModel;
+import io.meeds.layout.rest.model.SiteUpdateModel;
 import io.meeds.layout.utils.SiteManagementUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,186 +63,154 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
-@Path("v1/sites")
-@Tag(name = "v1/sites", description = "Managing sites")
-public class SiteManagementRestService implements ResourceContainer {
+@RestController
+@RequestMapping("sites")
+@Tag(name = "sites", description = "Managing sites")
+public class SiteManagementRestService {
 
-  private static final Log LOG = ExoLogger.getLogger(SiteManagementRestService.class);
+  private static final Log        LOG = ExoLogger.getLogger(SiteManagementRestService.class);
 
-  private static final String[] DEFAULT_PORTAL_ACCESS_PERMISSIONS = {"*:/platform/administrators"};
+  @Autowired
+  private Portal                  portal;
 
-  private static final String DEFAULT_PORTAL_EDIT_PERMISSIONS = "manager:/platform/administrators";
+  @Autowired
+  private LayoutService           layoutService;
 
-  private Portal           portal;
-
-  private LayoutService    layoutService;
+  @Autowired
   private UserPortalConfigService userPortalConfigService;
 
-  public SiteManagementRestService(Portal portal, LayoutService layoutService, UserPortalConfigService userPortalConfigService) {
-    this.portal = portal;
-    this.layoutService = layoutService;
-    this.userPortalConfigService = userPortalConfigService;
-  }
+  @Autowired
+  private UserACL                 userAcl;
 
-  @DELETE
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @DeleteMapping("{siteType}/{siteName}")
+  @Secured("users")
   @Operation(summary = "Delete a site", method = "GET", description = "This deletes the given site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response deleteSite(@Parameter(description = "site type")
-  @QueryParam("siteType")
-  String siteType,
-                             @Parameter(description = "site name")
-                             @QueryParam("siteName")
-                             String siteName) {
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public void deleteSite(
+                         @Parameter(description = "site type")
+                         @PathVariable("siteType")
+                         String siteType,
+                         @Parameter(description = "site name")
+                         @PathVariable("siteName")
+                         String siteName) {
     try {
       SiteId siteId = Util.from(new SiteKey(siteType, siteName));
       Site site = portal.getSite(siteId);
       if (!SiteManagementUtils.canEditSite(site)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
       portal.removeSite(siteId);
-      return Response.ok().build();
     } catch (Exception e) {
       LOG.error("Error when deleting the site with name {} and type {}", siteName, siteType, e);
-      return Response.serverError().build();
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @PUT
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @PutMapping("{siteType}/{siteName}")
+  @Secured("users")
   @Operation(summary = "update a site", method = "PUT", description = "This updates the given site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response updateSite(@Context
-  HttpServletRequest request,
-                             @Parameter(description = "site type")
-                             @QueryParam("siteType")
-                             String siteType,
-                             @Parameter(description = "site name")
-                             @QueryParam("siteName")
-                             String siteName,
-                             @Parameter(description = "site Label")
-                             @QueryParam("siteLabel")
-                             String siteLabel,
-                             @Parameter(description = "site description")
-                             @QueryParam("siteDescription")
-                             String siteDescription,
-                             @Parameter(description = "site displayed in meta site")
-                             @QueryParam("displayed")
-                             boolean displayed,
-                             @Parameter(description = "site display order")
-                             @QueryParam("displayOrder")
-                             int displayOrder,
-                             @Parameter(description = "site banner UploadId")
-                             @QueryParam("bannerUploadId")
-                             String bannerUploadId,
-                             @Parameter(description = "if site banner has been removed")
-                             @DefaultValue("false")
-                             @QueryParam("bannerRemoved")
-                             boolean bannerRemoved,
-                             @Parameter(description = "Used to retrieve the site label and description in the requested language")
-                             @QueryParam("lang")
-                             String lang) {
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public SiteEntity updateSite(
+                               HttpServletRequest request,
+                               @Parameter(description = "site type")
+                               @PathVariable("siteType")
+                               String siteType,
+                               @Parameter(description = "site name")
+                               @PathVariable("siteName")
+                               String siteName,
+                               @RequestBody
+                               SiteUpdateModel updateModel) {
     try {
       SiteId siteId = Util.from(new SiteKey(siteType, siteName));
       Site site = portal.getSite(siteId);
       if (!SiteManagementUtils.canEditSite(site)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
-      PortalConfig portalConfig = layoutService.getPortalConfig(new SiteKey(siteType, siteName));
-      portalConfig.setDescription(siteDescription);
-      portalConfig.setLabel(siteLabel);
-      portalConfig.setDisplayed(displayed);
-      portalConfig.setDisplayOrder(displayed ? displayOrder : 0);
-      if (bannerRemoved && portalConfig.getBannerFileId() != 0) {
+      PortalConfig portalConfig =
+                                layoutService.getPortalConfig(new SiteKey(siteType, siteName));
+      portalConfig.setDescription(updateModel.getSiteDescription());
+      portalConfig.setLabel(updateModel.getSiteLabel());
+      portalConfig.setDisplayed(updateModel.isDisplayed());
+      portalConfig.setDisplayOrder(updateModel.isDisplayed() ? updateModel.getDisplayOrder() : 0);
+      if (updateModel.isBannerRemoved() && portalConfig.getBannerFileId() != 0) {
         layoutService.removeSiteBanner(siteName);
         portalConfig.setBannerFileId(0);
-      } else if (StringUtils.isNotBlank(bannerUploadId)) {
-        portalConfig.setBannerUploadId(bannerUploadId);
+      } else if (StringUtils.isNotBlank(updateModel.getBannerUploadId())) {
+        portalConfig.setBannerUploadId(updateModel.getBannerUploadId());
       }
       layoutService.save(portalConfig);
-      return Response.ok(EntityBuilder.buildSiteEntity(portalConfig, request, false, null, false, false, false, getLocale(lang)))
-                     .build();
+      return EntityBuilder.buildSiteEntity(portalConfig, request, false, null, false, false, false, getLocale(request));
     } catch (Exception e) {
-      LOG.error("Error when updating the site with name {} and type {}", siteName, siteType, e);
-      return Response.serverError().build();
+      LOG.warn("Error when updating the site {}", updateModel, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @Path("/permissions")
-  @PATCH
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
-  @Operation(summary = "Update a page access and edit permission", method = "PATCH", description = "This updates the given page access and edit permission")
+  @PatchMapping(value = "{siteType}/{siteName}/permissions", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @Secured("users")
+  @Operation(summary = "Update a page access and edit permission", method = "PATCH",
+             description = "This updates the given page access and edit permission")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Page permissions updated"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "404", description = "Page not found"),
-      @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response updateSitePermissions(@Context
-  HttpServletRequest request,
-                                        @Parameter(description = "Site type", required = true)
-                                        @QueryParam("siteType")
-                                        String siteType,
-                                        @Parameter(description = "Site name", required = true)
-                                        @QueryParam("siteName")
-                                        String siteName,
-                                        @Parameter(description = "Site new edit permission", required = true)
-                                        @QueryParam("editPermission")
-                                        String editPermission,
-                                        @Parameter(description = "Site new access permissions", required = true)
-                                        @QueryParam("accessPermissions")
-                                        String accessPermissions,
-                                        @Parameter(description = "Used to retrieve the site label and description in the requested language")
-                                        @QueryParam("lang")
-                                        String lang) {
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "404", description = "Page not found"),
+                          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public SiteEntity updateSitePermissions(
+                                          HttpServletRequest request,
+                                          @Parameter(description = "site type")
+                                          @PathVariable("siteType")
+                                          String siteType,
+                                          @Parameter(description = "site name")
+                                          @PathVariable("siteName")
+                                          String siteName,
+                                          @Parameter(description = "Site permission model", required = true)
+                                          @RequestBody
+                                          PermissionUpdateModel permissionUpdateModel) {
     try {
-      if (StringUtils.isBlank(siteName) || StringUtils.isBlank(siteType)) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-      }
       SiteId siteId = Util.from(new SiteKey(siteType, siteName));
       Site site = portal.getSite(siteId);
       if (site == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
       }
       if (!SiteManagementUtils.canEditSite(site)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
-      if (!StringUtils.isBlank(editPermission)) {
-        site.setEditPermission(Util.from(editPermission));
+      if (!StringUtils.isBlank(permissionUpdateModel.getEditPermission())) {
+        site.setEditPermission(Util.from(permissionUpdateModel.getEditPermission()));
       }
-      if (!StringUtils.isBlank(accessPermissions)) {
-        List<String> accessPermissionsList = List.of(accessPermissions.split(",")).stream().distinct().toList();
+      if (!StringUtils.isBlank(permissionUpdateModel.getAccessPermissions())) {
+        List<String> accessPermissionsList = List.of(permissionUpdateModel.getAccessPermissions().split(","))
+                                                 .stream()
+                                                 .distinct()
+                                                 .toList();
         site.setAccessPermission(Util.from(accessPermissionsList));
       }
       portal.saveSite(site);
       PortalConfig portalConfig = layoutService.getPortalConfig(new SiteKey(siteType, siteName));
-      return Response.ok(EntityBuilder.buildSiteEntity(portalConfig, request, false, null, false, false, false, getLocale(lang)))
-                     .build();
+      return EntityBuilder.buildSiteEntity(portalConfig, request, false, null, false, false, false, getLocale(request));
     } catch (Exception e) {
-      LOG.error("Error when updating site permissions with name {} and type {}", siteName, siteType, e);
-      return Response.serverError().build();
+      LOG.error("Error when updating site permissions {}", permissionUpdateModel, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @POST
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("administrators")
+  @PostMapping
+  @Secured("users")
   @Operation(summary = "create a site", method = "POST", description = "This create a new site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response createSite(@Context
-  HttpServletRequest request, @Parameter(description = "site to create", required = true)
-  PortalConfig portalConfig,
-                             @Parameter(description = "site layout template", required = true)
-                             @QueryParam("siteTemplate")
-                             String siteTemplate,
-                             @Parameter(description = "Used to retrieve the site label and description in the requested language")
-                             @QueryParam("lang")
-                             String lang) {
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public SiteEntity createSite(
+                               HttpServletRequest request,
+                               @Parameter(description = "site to create", required = true)
+                               @RequestBody
+                               SiteCreateModel createModel) {
+    if (!SiteManagementUtils.canAddSite()) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+    PortalConfig portalConfig = createModel.getPortalConfig();
+    String siteTemplate = createModel.getSiteTemplate();
     try {
       userPortalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TYPE, portalConfig.getName(), siteTemplate);
       PortalConfig createdPortalConfig = layoutService.getPortalConfig(portalConfig.getName());
@@ -246,28 +218,28 @@ public class SiteManagementRestService implements ResourceContainer {
       createdPortalConfig.setLabel(portalConfig.getLabel());
       createdPortalConfig.setDisplayed(portalConfig.isDisplayed());
       createdPortalConfig.setDisplayOrder(portalConfig.isDisplayed() ? portalConfig.getDisplayOrder() : 0);
-      createdPortalConfig.setAccessPermissions(DEFAULT_PORTAL_ACCESS_PERMISSIONS);
-      createdPortalConfig.setEditPermission(DEFAULT_PORTAL_EDIT_PERMISSIONS);
+      createdPortalConfig.setAccessPermissions(new String[] { userAcl.getAdminGroups() });
+      createdPortalConfig.setEditPermission(userAcl.getAdminGroups());
       if (StringUtils.isNotBlank(portalConfig.getBannerUploadId())) {
         createdPortalConfig.setBannerUploadId(portalConfig.getBannerUploadId());
       }
       layoutService.save(createdPortalConfig);
-      return Response.ok(EntityBuilder.buildSiteEntity(layoutService.getPortalConfig(portalConfig.getName()),
-                                                       request,
-                                                       false,
-                                                       null,
-                                                       false,
-                                                       false,
-                                                       false,
-                                                       getLocale(lang)))
-                     .build();
+      return EntityBuilder.buildSiteEntity(layoutService.getPortalConfig(portalConfig.getName()),
+                                           request,
+                                           false,
+                                           null,
+                                           false,
+                                           false,
+                                           false,
+                                           getLocale(request));
     } catch (Exception e) {
       LOG.error("Error when creating the site with name {} and type {}", portalConfig.getName(), e);
-      return Response.serverError().build();
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-    private Locale getLocale(String lang) {
-        return StringUtils.isBlank(lang) ? null : Locale.forLanguageTag(lang);
-    }
+  private Locale getLocale(HttpServletRequest request) {
+    return request.getLocale();
+  }
+
 }

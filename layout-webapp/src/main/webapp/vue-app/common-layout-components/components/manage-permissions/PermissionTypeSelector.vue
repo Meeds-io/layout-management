@@ -70,24 +70,30 @@ export default {
   watch: {
     membershipType() {
       this.$emit('membership-type-changed', this.membershipType);
-    }
+    },
+    showMenu() {
+      if (this.showMenu) {
+        document.addEventListener('mousedown', this.closeMenu);
+      } else {
+        document.removeEventListener('mousedown', this.closeMenu);
+      }
+    },
   },
   created() {
-    document.onmousedown = () => {
-      if (this.showMenu) {
-        window.setTimeout(() => {
-          this.showMenu = false;
-        }, 200);
-      }
-    };
     this.getMembershipTypes();
   },
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.closeMenu);
+  },
   methods: {
+    closeMenu() {
+      window.setTimeout(() => {
+        this.showMenu = false;
+      },200);
+    },
     getMembershipTypes() {
-      return this.$siteNavigationService.getMembershipTypes()
-        .then(membershipTypes => {
-          this.membershipTypes = membershipTypes || [];
-        });
+      return this.$siteManagementService.getMembershipTypes()
+        .then(membershipTypes => this.membershipTypes = membershipTypes || []);
     },
     getMembershipTypeLabel(membershipType){
       if (!this.$t(`siteNavigation.label.membershipType.${membershipType}`).includes('siteNavigation.label')) {
