@@ -20,273 +20,174 @@
 package io.meeds.layout.rest;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.apache.commons.lang3.StringUtils;
-import org.gatein.api.Portal;
-import org.gatein.api.page.PageQuery;
-import org.picocontainer.Startable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.PageType;
-import org.exoplatform.portal.mop.SiteKey;
-import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.State;
-import org.exoplatform.portal.mop.Utils;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.DescriptionService;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
-import org.exoplatform.portal.mop.storage.utils.MOPUtils;
-import org.exoplatform.portal.page.PageTemplateService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
-import org.exoplatform.services.rest.http.PATCH;
-import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
-import org.exoplatform.webui.core.model.SelectItemOption;
 
+import io.meeds.common.ContainerTransactional;
+import io.meeds.layout.rest.model.NavigationCreateModel;
+import io.meeds.layout.rest.model.NavigationUpdateModel;
 import io.meeds.layout.rest.model.NodeLabelRestEntity;
+import io.meeds.layout.rest.util.EntityBuilder;
 import io.meeds.layout.utils.SiteNavigationUtils;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
-@Path("v1/siteNavigation")
-@Tag(name = "v1/siteNavigation", description = "Managing site navigation")
-public class SiteNavigationRestService implements ResourceContainer, Startable {
-  private static final Log         LOG                         = ExoLogger.getLogger(SiteNavigationRestService.class);
+@RestController
+@RequestMapping("navigations")
+@Tag(name = "navigations", description = "Managing site navigation")
+public class SiteNavigationRestService {
 
-  private final NavigationService  navigationService;
+  private static final String     NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND = "Node data with node id is not found";
 
-  private ScheduledExecutorService scheduledExecutor;
+  private static final Log        LOG                                 = ExoLogger.getLogger(SiteNavigationRestService.class);
 
-  private final PortalContainer    container;
+  @Autowired
+  private NavigationService       navigationService;
 
-  private LayoutService            layoutService;
+  @Autowired
+  private LayoutService           layoutService;
 
-  private PageTemplateService      pageTemplateService;
+  @Autowired
+  private DescriptionService      descriptionService;
 
-  private Portal                   portal;
+  private final Map<Long, String> navigationNodeToDeleteQueue         = new HashMap<>();
 
-  private UserPortalConfigService  userPortalConfigService;
-
-  private DescriptionService       descriptionService;
-
-  private final Map<Long, String>  navigationNodeToDeleteQueue = new HashMap<>();
-
-  public SiteNavigationRestService(NavigationService navigationService,
-                                   PortalContainer container,
-                                   LayoutService layoutService,
-                                   PageTemplateService pageTemplateService,
-                                   Portal portal,
-                                   UserPortalConfigService userPortalConfigService,
-                                   DescriptionService descriptionService) {
-    this.navigationService = navigationService;
-    this.container = container;
-    this.layoutService = layoutService;
-    this.pageTemplateService = pageTemplateService;
-    this.portal = portal;
-    this.userPortalConfigService = userPortalConfigService;
-    this.descriptionService = descriptionService;
-  }
-
-  @POST
-  @Path("node")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
+  @PostMapping
+  @Secured("users")
   @Operation(summary = "Create a navigation node", method = "POST", description = "This creates the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "navigation node created"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "404", description = "Node not found"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to create the navigation node"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response createNode(@Parameter(description = "navigation node id")
-  @QueryParam("parentNodeId")
-  Long parentNodeId,
-                             @Parameter(description = "previous node id")
-                             @QueryParam("previousNodeId")
-                             Long previousNodeId,
-                             @Parameter(description = "node label")
-                             @QueryParam("nodeLabel")
-                             String nodeLabel,
-                             @Parameter(description = "node id")
-                             @QueryParam("nodeId")
-                             String nodeId,
-                             @Parameter(description = "isVisible")
-                             @QueryParam("isVisible")
-                             boolean isVisible,
-                             @Parameter(description = "isScheduled")
-                             @QueryParam("isScheduled")
-                             boolean isScheduled,
-                             @Parameter(description = "startScheduleDate")
-                             @QueryParam("startScheduleDate")
-                             Long startScheduleDate,
-                             @Parameter(description = "endScheduleDate")
-                             @QueryParam("endScheduleDate")
-                             Long endScheduleDate,
-                             @Parameter(description = "page reference")
-                             @QueryParam("pageRef")
-                             String pageRef,
-                             @Parameter(description = "node target")
-                             @QueryParam("target")
-                             String target,
-                             @RequestBody(description = "node labels", required = true)
-                             NodeLabelRestEntity nodeLabelRestEntity,
-                             @Parameter(description = "isPasteMode")
-                             @QueryParam("isPasteMode")
-                             boolean isPasteMode,
-                             @Parameter(description = "node icon")
-                             @QueryParam("icon")
-                             String icon) {
-
-    if (parentNodeId == null || StringUtils.isBlank(nodeLabel) || StringUtils.isBlank(nodeId) || nodeLabelRestEntity == null) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-    }
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "404", description = "Node not found"),
+                          @ApiResponse(responseCode = "401", description = "User not authorized to create the navigation node"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public NodeData createNode(// NOSONAR
+                             @RequestBody
+                             NavigationCreateModel createModel) {
     try {
-      NodeData parentNodeData = navigationService.getNodeById(parentNodeId);
+      NodeData parentNodeData = navigationService.getNodeById(createModel.getParentNodeId());
       if (parentNodeData == null) {
-        return Response.status(Response.Status.NOT_FOUND).entity("Node data with parent node id is not found").build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node data with parent node id is not found");
       }
       Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       if (!SiteNavigationUtils.canEditNavigation(currentIdentity, parentNodeData)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
       Map<Locale, State> nodeLabels = new HashMap<>();
-      if (nodeLabelRestEntity.getLabels() != null) {
-        nodeLabel = null;
-        nodeLabelRestEntity.getLabels().entrySet().forEach(label -> {
+      if (createModel.getLabels() != null) {
+        createModel.getLabels().entrySet().forEach(label -> {
           State state = new State(label.getValue(), null);
           nodeLabels.put(new Locale(label.getKey()), state);
         });
       }
       NodeState nodeState;
       long now = System.currentTimeMillis();
-      if (isVisible && isScheduled && startScheduleDate != null && endScheduleDate != null) {
-        if (startScheduleDate > endScheduleDate) {
-          return Response.status(Response.Status.BAD_REQUEST)
-                         .entity("end schedule date must be after start schedule date")
-                         .build();
-        } else if (now > startScheduleDate && !isPasteMode) {
-          return Response.status(Response.Status.BAD_REQUEST).entity("start schedule date must be after current date").build();
+      if (createModel.isVisible()
+          && createModel.isScheduled()
+          && createModel.getStartScheduleDate() != null
+          && createModel.getEndScheduleDate() != null) {
+        if (createModel.getStartScheduleDate() > createModel.getEndScheduleDate()) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "end schedule date must be after start schedule date");
+        } else if (now > createModel.getStartScheduleDate() && !createModel.isPasteMode()) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "start schedule date must be after current date");
         } else {
-          nodeState = new NodeState(nodeLabel,
-                                    icon,
-                                    startScheduleDate,
-                                    endScheduleDate,
+          nodeState = new NodeState(createModel.getNodeLabel(),
+                                    createModel.getIcon(),
+                                    createModel.getStartScheduleDate(),
+                                    createModel.getEndScheduleDate(),
                                     Visibility.TEMPORAL,
-                                    StringUtils.isBlank(pageRef) ? null : PageKey.parse(pageRef),
+                                    StringUtils.isBlank(createModel.getPageRef()) ? null :
+                                                                                  PageKey.parse(createModel.getPageRef()),
                                     null,
-                                    target,
+                                    createModel.getTarget(),
                                     System.currentTimeMillis());
         }
       } else {
-        nodeState = new NodeState(nodeLabel,
-                                  icon,
+        nodeState = new NodeState(createModel.getNodeLabel(),
+                                  createModel.getIcon(),
                                   -1,
                                   -1,
-                                  isVisible ? Visibility.DISPLAYED : Visibility.HIDDEN,
-                                  StringUtils.isBlank(pageRef) ? null : PageKey.parse(pageRef),
+                                  createModel.isVisible() ? Visibility.DISPLAYED : Visibility.HIDDEN,
+                                  StringUtils.isBlank(createModel.getPageRef()) ? null : PageKey.parse(createModel.getPageRef()),
                                   null,
-                                  target,
+                                  createModel.getTarget(),
                                   System.currentTimeMillis());
       }
-      NodeData[] nodeData = navigationService.createNode(parentNodeId, previousNodeId, nodeId, nodeState);
+      NodeData[] nodeData = navigationService.createNode(createModel.getParentNodeId(),
+                                                         createModel.getPreviousNodeId(),
+                                                         createModel.getNodeId(),
+                                                         nodeState);
       descriptionService.setDescriptions(nodeData[1].getId(), nodeLabels);
-      return Response.ok().entity(nodeData).build();
+      return nodeData[1];
+    } catch (ResponseStatusException e) {
+      throw e;
     } catch (Exception e) {
-      LOG.error("Error when creating a new navigation node", e);
-      return Response.serverError().entity(e.getMessage()).build();
+      LOG.warn("Error when creating a new navigation node {}", createModel, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @PUT
-  @Path("node")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
+  @PutMapping("{nodeId}")
+  @Secured("users")
   @Operation(summary = "Update a navigation node", method = "PUT", description = "This updates the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "navigation node updated"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "404", description = "Node not found"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to update the navigation node"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response updateNode(@Parameter(description = "navigation node id")
-  @QueryParam("nodeId")
-  Long nodeId,
-                             @Parameter(description = "node label")
-                             @QueryParam("nodeLabel")
-                             String nodeLabel,
-                             @Parameter(description = "pageRef")
-                             @QueryParam("pageRef")
-                             String pageRef,
-                             @Parameter(description = "node target")
-                             @QueryParam("target")
-                             String target,
-                             @Parameter(description = "isVisible")
-                             @QueryParam("isVisible")
-                             boolean isVisible,
-                             @Parameter(description = "isScheduled")
-                             @QueryParam("isScheduled")
-                             boolean isScheduled,
-                             @Parameter(description = "startScheduleDate")
-                             @QueryParam("startScheduleDate")
-                             Long startScheduleDate,
-                             @Parameter(description = "endScheduleDate")
-                             @QueryParam("endScheduleDate")
-                             Long endScheduleDate,
-                             @RequestBody(description = "node labels", required = true)
-                             NodeLabelRestEntity nodeLabelRestEntity,
-                             @Parameter(description = "node icon")
-                             @QueryParam("icon")
-                             String icon) {
-    if (nodeId == null || StringUtils.isBlank(nodeLabel) || nodeLabelRestEntity == null) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-    }
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "404", description = "Node not found"),
+                          @ApiResponse(responseCode = "401", description = "User not authorized to update the navigation node"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public void updateNode( // NOSONAR
+                         @Parameter(description = "navigation node id")
+                         @PathVariable("nodeId")
+                         Long nodeId,
+                         @RequestBody
+                         NavigationUpdateModel updateModel) {
     try {
       NodeData nodeData = navigationService.getNodeById(nodeId);
       if (nodeData == null) {
-        return Response.status(Response.Status.NOT_FOUND).entity("Node data with node id is not found").build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND);
       }
       PageKey pageKey = null;
-      if (!StringUtils.isBlank(pageRef)) {
-        PageContext pageContext = layoutService.getPageContext(PageKey.parse(pageRef));
+      if (!StringUtils.isBlank(updateModel.getPageRef())) {
+        PageContext pageContext = layoutService.getPageContext(PageKey.parse(updateModel.getPageRef()));
         if (pageContext == null) {
-          return Response.status(Response.Status.NOT_FOUND).entity("Page context with page reference is not found").build();
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page context with page reference is not found");
         } else {
           pageKey = pageContext.getKey();
         }
@@ -294,140 +195,117 @@ public class SiteNavigationRestService implements ResourceContainer, Startable {
 
       Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       if (!SiteNavigationUtils.canEditNavigation(currentIdentity, nodeData)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
       Map<Locale, State> nodeLabels = new HashMap<>();
-      if (nodeLabelRestEntity.getLabels() != null) {
-        nodeLabel = null;
-        nodeLabelRestEntity.getLabels().entrySet().forEach(label -> {
+      if (updateModel.getLabels() != null) {
+        updateModel.getLabels().entrySet().forEach(label -> {
           State state = new State(label.getValue(), null);
           nodeLabels.put(new Locale(label.getKey()), state);
         });
       }
       NodeState nodeState;
       long now = System.currentTimeMillis();
-      if (isVisible && isScheduled && startScheduleDate != null && endScheduleDate != null) {
-        if (startScheduleDate > endScheduleDate) {
-          return Response.status(Response.Status.BAD_REQUEST)
-                         .entity("end schedule date must be after start schedule date")
-                         .build();
-        } else if (now > startScheduleDate) {
-          return Response.status(Response.Status.BAD_REQUEST).entity("start schedule date must be after current date").build();
+      if (updateModel.isVisible() && updateModel.isScheduled()
+          && updateModel.getStartScheduleDate() != null
+          && updateModel.getEndScheduleDate() != null) {
+        if (updateModel.getStartScheduleDate() > updateModel.getEndScheduleDate()) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "end schedule date must be after start schedule date");
+        } else if (now > updateModel.getStartScheduleDate()) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "start schedule date must be after current date");
         } else {
-          nodeState = new NodeState(nodeLabel,
-                                    icon,
-                                    startScheduleDate,
-                                    endScheduleDate,
+          nodeState = new NodeState(updateModel.getNodeLabel(),
+                                    updateModel.getIcon(),
+                                    updateModel.getStartScheduleDate(),
+                                    updateModel.getEndScheduleDate(),
                                     Visibility.TEMPORAL,
                                     pageKey,
                                     null,
-                                    target,
+                                    updateModel.getTarget(),
                                     System.currentTimeMillis());
         }
       } else {
-        nodeState = new NodeState(nodeLabel,
-                                  icon,
+        nodeState = new NodeState(updateModel.getNodeLabel(),
+                                  updateModel.getIcon(),
                                   -1,
                                   -1,
-                                  isVisible ? Visibility.DISPLAYED : Visibility.HIDDEN,
+                                  updateModel.isVisible() ? Visibility.DISPLAYED : Visibility.HIDDEN,
                                   pageKey,
                                   null,
-                                  target,
+                                  updateModel.getTarget(),
                                   System.currentTimeMillis());
       }
       descriptionService.setDescriptions(String.valueOf(nodeId), nodeLabels);
       navigationService.updateNode(nodeId, nodeState);
-      return Response.ok().build();
+    } catch (ResponseStatusException e) {
+      throw e;
     } catch (Exception e) {
-      LOG.error("Error when updating a navigation node", e);
-      return Response.serverError().entity(e.getMessage()).build();
+      LOG.warn("Error when updating a navigation node", e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @DELETE
-  @Path("node/{nodeId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
+  @DeleteMapping("{nodeId}")
+  @Secured("users")
   @Operation(summary = "Delete a navigation node ", method = "DELETE", description = "This deletes the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "navigation node deleted"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "404", description = "Node not found"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to delete the navigation node"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response deleteNode(@Context
-  HttpServletRequest request,
-                             @Parameter(description = "Node id", required = true)
-                             @PathParam("nodeId")
-                             Long nodeId,
-                             @Parameter(description = "Time to effectively delete navigation node", required = false)
-                             @QueryParam("delay")
-                             long delay) {
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "404", description = "Node not found"),
+                          @ApiResponse(responseCode = "401", description = "User not authorized to delete the navigation node"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public void deleteNode(
+                         HttpServletRequest request,
+                         @Parameter(description = "Node id", required = true)
+                         @PathVariable("nodeId")
+                         Long nodeId,
+                         @Parameter(description = "Time to effectively delete navigation node", required = false)
+                         @RequestParam("delay")
+                         long delay) {
     try {
-      if (nodeId == null) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("Node id is mandatory").build();
-      }
       NodeData nodeData = navigationService.getNodeById(nodeId);
       if (nodeData == null) {
-        return Response.status(Response.Status.NOT_FOUND).entity("Node data with node id is not found").build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND);
       }
       Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       if (!SiteNavigationUtils.canEditNavigation(currentIdentity, nodeData)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
 
+      navigationNodeToDeleteQueue.put(nodeId, currentIdentity.getUserId());
       if (delay > 0) {
-        navigationNodeToDeleteQueue.put(nodeId, currentIdentity.getUserId());
-        scheduledExecutor.schedule(() -> {
-          if (navigationNodeToDeleteQueue.containsKey(nodeId)) {
-            ExoContainerContext.setCurrentContainer(container);
-            RequestLifeCycle.begin(container);
-            try {
-              navigationNodeToDeleteQueue.remove(nodeId);
-              navigationService.deleteNode(nodeId);
-            } catch (Exception e) {
-              LOG.warn("Error when deleting the navigation node with id {}", nodeId, e);
-            } finally {
-              RequestLifeCycle.end();
-            }
-          }
-        }, delay, TimeUnit.SECONDS);
+        CompletableFuture.delayedExecutor(delay, TimeUnit.SECONDS).execute(() -> deleteNode(nodeId));
       } else {
-        navigationNodeToDeleteQueue.remove(nodeId);
-        navigationService.deleteNode(nodeId);
+        deleteNode(nodeId);
       }
-      return Response.ok().build();
     } catch (Exception e) {
-      LOG.error("Error when deleting the navigation node with id {}", nodeId, e);
-      return Response.serverError().entity(e.getMessage()).build();
+      LOG.warn("Error when deleting the navigation node with id {}", nodeId, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @Path("node/{nodeId}/undoDelete")
-  @POST
-  @RolesAllowed("users")
-  @Operation(summary = "Undo delete a navigation node if not yet effectively deleted", method = "POST", description = "This undo deletes the given navigation node if not yet effectively deleted")
+  @PostMapping("{nodeId}/undoDelete")
+  @Secured("users")
+  @Operation(summary = "Undo delete a navigation node if not yet effectively deleted", method = "POST",
+             description = "This undo deletes the given navigation node if not yet effectively deleted")
   @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "404", description = "Node not found"),
-      @ApiResponse(responseCode = "403", description = "Forbidden operation"),
-      @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response undoDeleteNode(@Context
-  HttpServletRequest request,
-                                 @Parameter(description = "Node identifier", required = true)
-                                 @PathParam("nodeId")
-                                 Long nodeId) {
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "404", description = "Node not found"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden operation"),
+                          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public void undoDeleteNode(
+                             HttpServletRequest request,
+                             @Parameter(description = "Node identifier", required = true)
+                             @PathVariable("nodeId")
+                             Long nodeId) {
     try {
-      if (nodeId == null) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("Node id is mandatory").build();
-      }
       NodeData nodeData = navigationService.getNodeById(nodeId);
       if (nodeData == null) {
-        return Response.status(Response.Status.NOT_FOUND).entity("Node data with node id is not found").build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND);
       }
       Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       if (!SiteNavigationUtils.canEditNavigation(currentIdentity, nodeData)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
 
       if (navigationNodeToDeleteQueue.containsKey(nodeId)) {
@@ -437,330 +315,119 @@ public class SiteNavigationRestService implements ResourceContainer, Startable {
           LOG.warn("User {} attempts to cancel deletion of navigation node deleted by user {}",
                    authenticatedUser,
                    originalModifierUser);
-          return Response.status(Response.Status.FORBIDDEN).build();
+          throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         navigationNodeToDeleteQueue.remove(nodeId);
-        return Response.noContent().build();
       } else {
-        return Response.status(Response.Status.BAD_REQUEST)
-                       .entity("Node with id {} was already deleted or isn't planned to be deleted" + nodeId)
-                       .build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
       }
+    } catch (ResponseStatusException e) {
+      throw e;
     } catch (Exception e) {
-      LOG.error("Error when undo deleting the navigation node with id {}", nodeId, e);
-      return Response.serverError().build();
+      LOG.warn("Error when undo deleting the navigation node with id {}", nodeId, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @Path("node/{nodeId}/labels")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response getNodeLabels(@Context
-  HttpServletRequest request,
-                                @Parameter(description = "Node id", required = true)
-                                @PathParam("nodeId")
-                                Long nodeId) {
-    try {
-      Map<Locale, State> nodeLabels = descriptionService.getDescriptions(String.valueOf(nodeId));
-      NodeLabelRestEntity nodeLabelRestEntity = EntityBuilder.toNodeLabelRestEntity(nodeLabels);
-      return Response.ok().entity(nodeLabelRestEntity).build();
-    } catch (Exception e) {
-      LOG.error("Error when retrieving node labels", e);
-      return Response.serverError().build();
-    }
-  }
-
-  @PATCH
-  @Path("/node/move")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
+  @PatchMapping(value = "/{nodeId}/move", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @Secured("users")
   @Operation(summary = "Move a navigation node", method = "PATCH", description = "This moves the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "401", description = "User not authorized to move the navigation node"),
-      @ApiResponse(responseCode = "404", description = "Node not found") })
-  public Response moveNode(@Parameter(description = "node id")
-  @QueryParam("nodeId")
-  Long nodeId,
-                           @Parameter(description = "destination parent id")
-                           @QueryParam("destinationParentId")
-                           Long destinationParentId,
-                           @Parameter(description = "previous id")
-                           @QueryParam("previousNodeId")
-                           Long previousNodeId) {
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "401", description = "User not authorized to move the navigation node"),
+                          @ApiResponse(responseCode = "404", description = "Node not found") })
+  public void moveNode(
+                       @Parameter(description = "node id")
+                       @PathVariable("nodeId")
+                       Long nodeId,
+                       @Parameter(description = "destination parent id")
+                       @RequestParam(name = "destinationParentId", required = false)
+                       Long destinationParentId,
+                       @Parameter(description = "previous id")
+                       @RequestParam(name = "previousNodeId", required = false)
+                       Long previousNodeId) {
     try {
-      if (nodeId == null) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("Node id is mandatory").build();
-      }
       NodeData nodeData = navigationService.getNodeById(nodeId);
       if (nodeData == null) {
-        return Response.status(Response.Status.NOT_FOUND).entity("Node data with node id is not found").build();
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND);
       }
       Identity currentIdentity = ConversationState.getCurrent().getIdentity();
       if (!SiteNavigationUtils.canEditNavigation(currentIdentity, nodeData)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
       }
       long parentId = Long.parseLong(nodeData.getParentId());
       if (destinationParentId == null) {
         destinationParentId = parentId;
       }
       navigationService.moveNode(nodeId, parentId, destinationParentId, previousNodeId);
-      return Response.ok().build();
     } catch (Exception e) {
-      LOG.error("Error when moving the navigation node with id {}", nodeId, e);
-      return Response.serverError().build();
+      LOG.warn("Error when moving the navigation node with id {}", nodeId, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @Path("/page/permissions")
-  @PATCH
-  @RolesAllowed("users")
-  @Operation(summary = "Update a page access and edit permission", method = "PATCH", description = "This updates the given page access and edit permission")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Page permissions updated"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "404", description = "Page not found"),
-      @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response updatePagePermissions(@Context
-  HttpServletRequest request,
-                                        @Parameter(description = "Page reference", required = true)
-                                        @QueryParam("pageRef")
-                                        String pageRef,
-                                        @Parameter(description = "Page new edit permission", required = true)
-                                        @QueryParam("editPermission")
-                                        String editPermission,
-                                        @Parameter(description = "Page new access permissions", required = true)
-                                        @QueryParam("accessPermissions")
-                                        String accessPermissions) {
-    try {
-      if (StringUtils.isBlank(pageRef) || StringUtils.isBlank(editPermission) || StringUtils.isBlank(accessPermissions)) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-      }
-      PageContext pageContext = layoutService.getPageContext(PageKey.parse(pageRef));
-      if (pageContext == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      if (!SiteNavigationUtils.canEditPage(pageContext)) {
-        return Response.status(Response.Status.UNAUTHORIZED).build();
-      }
-      PageState pageState = pageContext.getState();
-      List<String> accessPermissionsList = List.of(accessPermissions.split(",")).stream().distinct().toList();
-      pageContext.setState(new PageState(pageState.getDisplayName(),
-                                         pageState.getDescription(),
-                                         pageState.getShowMaxWindow(),
-                                         pageState.getFactoryId(),
-                                         accessPermissionsList,
-                                         editPermission,
-                                         pageState.getMoveAppsPermissions(),
-                                         pageState.getMoveContainersPermissions(),
-                                         pageState.getType(),
-                                         pageState.getLink()));
-      layoutService.save(pageContext);
-      return Response.ok().build();
-    } catch (Exception e) {
-      LOG.error("Error when updating page permissions with reference {}", pageRef, e);
-      return Response.serverError().build();
-    }
-  }
-
-  @Path("/page/templates")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @Operation(summary = "Retrieve page templates", method = "GET", description = "This retrieves page templates")
+  @GetMapping("{nodeId}")
+  @Secured("users")
+  @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response getPageTemplates(@Context
-  HttpServletRequest httpRequest) {
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public NodeData getNode(
+                          HttpServletRequest request,
+                          @Parameter(description = "Node id", required = true)
+                          @PathVariable("nodeId")
+                          Long nodeId) {
     try {
-      Locale locale = httpRequest.getLocale();
-      List<SelectItemOption<String>> pageTemplates = pageTemplateService.getPageTemplates();
-      return Response.ok().entity(EntityBuilder.toPageTemplateRestEntities(pageTemplates, locale)).build();
+      NodeData nodeData = navigationService.getNodeById(nodeId);
+      if (nodeData == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      } else if (!SiteNavigationUtils.canViewNavigation(nodeData)) {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+      }
+      return nodeData;
+    } catch (ResponseStatusException e) {
+      throw e;
     } catch (Exception e) {
-      LOG.error("Error when retrieving page templates", e);
-      return Response.serverError().build();
+      LOG.error("Error when retrieving node {}", nodeId, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @Path("/pages")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @Operation(summary = "Retrieve pages", method = "GET", description = "This retrieves pages")
+  @GetMapping("{nodeId}/labels")
+  @Secured("users")
+  @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response getPages(@Context
-  HttpServletRequest httpRequest,
-                           @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER")
-                           @QueryParam("siteType")
-                           String siteType,
-                           @Parameter(description = "Portal site name")
-                           @QueryParam("siteName")
-                           String siteName,
-                           @Parameter(description = "page display name")
-                           @QueryParam("pageDisplayName")
-                           String pageDisplayName) {
+                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  public NodeLabelRestEntity getNodeLabels(
+                                           HttpServletRequest request,
+                                           @Parameter(description = "Node id", required = true)
+                                           @PathVariable("nodeId")
+                                           Long nodeId) {
     try {
-      org.gatein.api.site.SiteType selectedSiteType = null;
-      if (!StringUtils.isBlank(siteType)) {
-        selectedSiteType = MOPUtils.convertSiteType(SiteType.valueOf(siteType.toUpperCase()));
+      NodeData nodeData = navigationService.getNodeById(nodeId);
+      if (nodeData == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      } else if (!SiteNavigationUtils.canViewNavigation(nodeData)) {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
       }
-      PageQuery pageQuery = new PageQuery.Builder().withSiteType(selectedSiteType)
-                                                   .withSiteName(siteName)
-                                                   .withDisplayName(pageDisplayName)
-                                                   .build();
-      List<org.gatein.api.page.Page> pages = portal.findPages(pageQuery);
-      return Response.ok().entity(pages).build();
+      Map<Locale, State> nodeLabels = descriptionService.getDescriptions(String.valueOf(nodeId));
+      return EntityBuilder.toNodeLabelRestEntity(nodeLabels);
+    } catch (ResponseStatusException e) {
+      throw e;
     } catch (Exception e) {
-      LOG.error("Error when retrieving pages", e);
-      return Response.serverError().build();
+      LOG.error("Error when retrieving node {} labels", nodeId, e);
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
-  @Path("/page")
-  @POST
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @Operation(summary = "Create a page", method = "POST", description = "This creates the page")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "page created"),
-      @ApiResponse(responseCode = "400", description = "Invalid query input"),
-      @ApiResponse(responseCode = "500", description = "Internal server error") })
-  public Response createPage(@Parameter(description = "page name", required = true)
-  @QueryParam("pageName")
-  String pageName,
-                             @Parameter(description = "page name", required = true)
-                             @QueryParam("pageTitle")
-                             String pageTitle,
-                             @Parameter(description = "page site type", required = true)
-                             @QueryParam("pageSiteType")
-                             String pageSiteType,
-                             @Parameter(description = "page site name", required = true)
-                             @QueryParam("pageSiteName")
-                             String pageSiteName,
-                             @Parameter(description = "Page Type : GROUP, PAGE OR LINK", required = true)
-                             @QueryParam("pageType")
-                             String pageType,
-                             @Parameter(description = "link")
-                             @QueryParam("link")
-                             String link,
-                             @Parameter(description = "page template : blank , normal, analytics ...")
-                             @QueryParam("pageTemplate")
-                             String pageTemplate) {
-    if (StringUtils.isBlank(pageName) || StringUtils.isBlank(pageTitle) || StringUtils.isBlank(pageType)
-        || StringUtils.isBlank(pageSiteName) || StringUtils.isBlank(pageSiteType)) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-    }
-    try {
-      pageName = pageName + "_" + UUID.randomUUID();
-      Page page;
-      if (PageType.PAGE.equals(PageType.valueOf(pageType))) {
-        if (StringUtils.isBlank(pageTemplate)) {
-          return Response.status(Response.Status.BAD_REQUEST).entity("pageTemplate param is mandatory for PAGE pageType").build();
-        }
-        page = userPortalConfigService.createPageTemplate(pageTemplate, pageSiteType, pageSiteName);
-      } else {
-        page = new Page(pageSiteType, pageSiteName, pageName);
+  @ContainerTransactional
+  public void deleteNode(long nodeId) {
+    if (navigationNodeToDeleteQueue.containsKey(nodeId)) {
+      try {
+        navigationService.deleteNode(nodeId);
+      } finally {
+        navigationNodeToDeleteQueue.remove(nodeId);
       }
-      page.setName(pageName);
-      page.setTitle(pageTitle);
-      page.setType(pageType);
-      page.setLink(PageType.LINK.equals(PageType.valueOf(pageType)) ? link : null);
-      setDefaultPermission(page, new SiteKey(pageSiteType, pageSiteName));
-      PageState pageState = Utils.toPageState(page);
-      layoutService.save(new PageContext(page.getPageKey(), pageState), page);
-      PageContext createdPage = layoutService.getPageContext(page.getPageKey());
-      return Response.ok().entity(createdPage).build();
-    } catch (Exception e) {
-      LOG.error("Error when creating a new page", e);
-      return Response.serverError().entity(e.getMessage()).build();
-    }
-  }
-  
-  @Path("/page")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @Operation(summary = "Retrieve page by reference", method = "GET", description = "This retrieves page by reference")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response getPageByRef(@Context
-  HttpServletRequest httpRequest,
-                                @Parameter(description = "page reference", required = true)
-                                @QueryParam("pageRef")
-                                String pageRef) {
-    try {
-      if (StringUtils.isBlank(pageRef)) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-      }
-      return Response.ok().entity(layoutService.getPageContext(PageKey.parse(pageRef))).build();
-    } catch (Exception e) {
-      LOG.error("Error when retrieving page with reference {} ", pageRef, e);
-      return Response.serverError().build();
-    }
-  }
-  
-  @Path("/page/link")
-  @PATCH
-  @Produces(MediaType.APPLICATION_JSON)
-  @RolesAllowed("users")
-  @Operation(summary = "Update page link", method = "GET", description = "This updates page link")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-      @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Response updatePageLink(@Context
-  HttpServletRequest httpRequest,
-                                 @Parameter(description = "page display name", required = true)
-                                 @QueryParam("pageRef")
-                                 String pageRef,
-                                 @Parameter(description = "page new Link")
-                                 @QueryParam("link")
-                                 String link) {
-    try {
-      if (StringUtils.isBlank(pageRef) || StringUtils.isBlank(link)) {
-        return Response.status(Response.Status.BAD_REQUEST).entity("params are mandatory").build();
-      }
-      PageContext pageContext = layoutService.getPageContext(PageKey.parse(pageRef));
-      PageState pageState = pageContext.getState();
-      pageContext.setState(new PageState(pageState.getDisplayName(),
-                                         pageState.getDescription(),
-                                         pageState.getShowMaxWindow(),
-                                         pageState.getFactoryId(),
-                                         pageState.getAccessPermissions(),
-                                         pageState.getEditPermission(),
-                                         pageState.getMoveAppsPermissions(),
-                                         pageState.getMoveContainersPermissions(),
-                                         pageState.getType(),
-                                         link));
-      layoutService.save(pageContext);
-      return Response.ok().build();
-    } catch (Exception e) {
-      LOG.error("Error when updating  page link with reference {} ", pageRef, e);
-      return Response.serverError().build();
     }
   }
 
-  private void setDefaultPermission(Page page, SiteKey siteKey) {
-    if (SiteType.PORTAL.equals(siteKey.getType())) {
-      page.setAccessPermissions(new String[] { UserACL.EVERYONE });
-      page.setEditPermission("*:/platform/administrators");
-    } else if (SiteType.GROUP.equals(siteKey.getType())) {
-      String siteName = siteKey.getName().startsWith("/") ? siteKey.getName() : "/" + siteKey.getName();
-      page.setAccessPermissions(new String[] { "*:" + siteName });
-      page.setEditPermission("manager:" + siteName);
-    }
-  }
-  @Override
-  public void start() {
-    scheduledExecutor = Executors.newScheduledThreadPool(1);
-  }
-
-  @Override
-  public void stop() {
-    if (scheduledExecutor != null) {
-      scheduledExecutor.shutdown();
-    }
-  }
 }

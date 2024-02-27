@@ -21,16 +21,16 @@
     v-model="displayActionMenu"
     transition="slide-x-reverse-transition"
     :right="!$vuetify.rtl"
+    class="px-0 mx-2 overflow-visible"
     offset-x
-    offset-y
-    class="px-0 mx-2 overflow-visible">
+    offset-y>
     <template #activator="{ on, attrs }">
       <v-btn
         v-show="hover"
         v-bind="attrs"
         icon
         v-on="on">
-        <v-icon>mdi-dots-vertical</v-icon>
+        <v-icon size="16" class="icon-default-color">fas fa-ellipsis-v</v-icon>
       </v-btn>
     </template>
     <v-list class="pa-0" dense>
@@ -204,6 +204,12 @@ export default {
     nodeLabels: {}
   }),
   computed: {
+    pageRef() {
+      if (this.navigationNode?.pageKey) {
+        return this.navigationNode.pageKey.ref || `${this.navigationNode.pageKey.site.typeName}::${this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
+      }
+      return null;
+    },
     pageName() {
       return this.navigationNode?.pageKey?.name;
     },
@@ -216,6 +222,9 @@ export default {
     nodeUri() {
       return this.navigationNode?.uri;
     },
+    nodeId() {
+      return this.navigationNode?.id;
+    },
     nodeSiteType() {
       return this.navigationNode?.siteKey?.typeName;
     },
@@ -223,19 +232,27 @@ export default {
       return this.navigationNode?.siteKey?.name;
     },
     canEditPage() {
-      return this.navigationNode?.canEditPage;
+      return this.navigationNode?.canEditPage && this.pageRef;
     },
   },
-  created() {
-    document.onmousedown = () => {
+  watch: {
+    displayActionMenu() {
       if (this.displayActionMenu) {
-        window.setTimeout(() => {
-          this.displayActionMenu = false;
-        },200);
+        document.addEventListener('mousedown', this.closeMenu);
+      } else {
+        document.removeEventListener('mousedown', this.closeMenu);
       }
-    };
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.closeMenu);
   },
   methods: {
+    closeMenu() {
+      window.setTimeout(() => {
+        this.displayActionMenu = false;
+      },200);
+    },
     moveUpNode() {
       this.$root.$emit('moveup-node', this.navigationNode.id);
     },
@@ -266,8 +283,7 @@ export default {
       }, redirectionTime);
     },
     editLayout() {
-      const pageId = document.querySelector('.UIPage').getAttribute('id').split('UIPage-')[1];
-      return this.$siteNavigationService.editLayout(pageId, this.nodeUri);
+      return this.$sitePageService.editPageLayout(this.nodeId, this.pageRef);
     },
     openManagePermissionsDrawer(){
       this.$root.$emit('open-manage-permissions-drawer', JSON.parse(JSON.stringify(this.navigationNode)));
@@ -311,7 +327,7 @@ export default {
           };
         })
         .then(() => {
-          this.$siteNavigationService.createNode(navigationNodeId, null, nodeToPaste.label, nodeToPaste.name, visible, isScheduled, startScheduleDate, endScheduleDate, this.nodeLabels, pageRef, nodeToPaste.target, isPasteMode)
+          this.$siteNavigationService.createNode(navigationNodeId, null, nodeToPaste.label, nodeToPaste.name, nodeToPaste.icon, visible, isScheduled, startScheduleDate, endScheduleDate, this.nodeLabels?.labels, pageRef, nodeToPaste.target, isPasteMode)
             .then(navigationNodes => {
               if (nodeToPaste.children.length > 0) {
                 nodeToPaste.children.forEach(children => {
