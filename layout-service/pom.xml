@@ -35,28 +35,12 @@
   <properties>
     <rest.api.doc.title>Layout Rest APIs</rest.api.doc.title>
     <rest.api.doc.version>1.0</rest.api.doc.version>
-    <rest.api.doc.description>Layout addon used Rest endpoints</rest.api.doc.description>
+    <rest.api.doc.description>Layout Rest endpoints</rest.api.doc.description>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.exoplatform.commons</groupId>
-      <artifactId>commons-component-common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.gatein.portal</groupId>
-      <artifactId>exo.portal.component.api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.social</groupId>
-      <artifactId>social-component-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.exoplatform.social</groupId>
       <artifactId>social-component-service</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
