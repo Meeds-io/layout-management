@@ -21,6 +21,7 @@ package io.meeds.layout.utils;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.navigation.NodeData;
@@ -54,6 +55,19 @@ public class SiteNavigationUtils {
         || currentIdentity.isMemberOf(PLATFORM_ADMINISTRATORS_GROUP, MANAGER_MEMBERSHIP_NAME))
         && (userACL.hasEditPermissionOnPortal(siteKey.getTypeName(), siteKey.getName(), sitePortalConfig.getEditPermission())
             || userACL.hasEditPermissionOnNavigation(siteKey));
+  }
+
+  public static boolean canViewNavigation(NodeData nodeData) {
+    SiteKey siteKey = nodeData.getSiteKey();
+    LayoutService layoutService = CommonsUtils.getService(LayoutService.class);
+    PortalConfig sitePortalConfig = layoutService.getPortalConfig(siteKey);
+    Page page = null;
+    if (nodeData.getState().getPageRef() != null) {
+      page = layoutService.getPage(nodeData.getState().getPageRef());
+    }
+    UserACL userACL = CommonsUtils.getService(UserACL.class);
+    return userACL.hasAccessPermission(sitePortalConfig)
+           && (page == null || userACL.hasPermission(page));
   }
 
   public static boolean canEditPage(PageContext pageContext) {

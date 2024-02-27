@@ -146,16 +146,24 @@ export default {
       return this.site.canEdit;
     },
   },
-  created() {
-    document.onmousedown = () => {
+  watch: {
+    displayActionMenu() {
       if (this.displayActionMenu) {
-        window.setTimeout(() => {
-          this.displayActionMenu = false;
-        }, 200);
+        document.addEventListener('mousedown', this.closeMenu);
+      } else {
+        document.removeEventListener('mousedown', this.closeMenu);
       }
-    };
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.closeMenu);
   },
   methods: {
+    closeMenu() {
+      window.setTimeout(() => {
+        this.displayActionMenu = false;
+      },200);
+    },
     openSiteNavigationDrawer() {
       const params = {
         siteName: this.site.name,
