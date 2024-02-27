@@ -178,7 +178,7 @@ export default {
       this.editMode = editMode;
       if (editMode && this.navigationNode?.pageKey) {
         const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
-        this.$siteNavigationService.getPageByRef(pageRef).then((page) => {
+        this.$sitePageService.getPage(pageRef).then((page) => {
           this.selectedPage = page.state;
           this.selectedPage.displayName = page.state.displayName || page.key.name;
           this.pageToEdit = page;
@@ -236,7 +236,7 @@ export default {
           'pageType': this.elementType
         });
       } else {
-        this.$siteNavigationService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate || null)
+        this.$sitePageService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate || null)
           .then((createdPage) => {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             this.$root.$emit('save-node-with-page', {
@@ -272,7 +272,7 @@ export default {
     },
     updatePageLink() {
       const pageRef = this.pageToEdit?.key?.ref || `${this.pageToEdit?.key.site.typeName}::${this.pageToEdit?.key.site.name}::${this.pageToEdit?.key.name}`;
-      this.$siteNavigationService.updatePageLink(pageRef, this.link)
+      this.$sitePageService.updatePageLink(pageRef, this.link)
         .then(() => {
           this.$root.$emit('save-node-with-page', {
             'pageRef': pageRef,

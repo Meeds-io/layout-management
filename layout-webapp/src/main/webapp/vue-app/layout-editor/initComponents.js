@@ -19,8 +19,20 @@
 
 import LayoutEditor from './components/LayoutEditor.vue';
 
+import Toolbar from './components/toolbar/Toolbar.vue';
+import SaveButton from './components/toolbar/actions/SaveButton.vue';
+
+import Content from './components/content/Content.vue';
+import Container from './components/content/Container.vue';
+import Section from './components/content/Section.vue';
+
 const components = {
   'layout-editor': LayoutEditor,
+  'layout-editor-toolbar': Toolbar,
+  'layout-editor-toolbar-save-button': SaveButton,
+  'layout-editor-content': Content,
+  'layout-editor-container': Container,
+  'layout-editor-section': Section,
 };
 
 for (const key in components) {
