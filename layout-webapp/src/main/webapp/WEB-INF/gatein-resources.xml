@@ -143,6 +143,9 @@
         <module>commonVueComponents</module>
       </depends>
       <depends>
+        <module>commonLayoutComponents</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>
