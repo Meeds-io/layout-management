@@ -26,7 +26,9 @@
         :page="page"
         :node="node"
         :node-labels="nodeLabels" />
-      <layout-editor-content :page="page" />
+      <layout-editor-content
+        :page="page"
+        :layout="layout" />
     </div>
   </v-app>
 </template>
@@ -34,6 +36,7 @@
 export default {
   data: () => ({
     page: null,
+    layout: null,
     node: null,
     nodeLabels: null,
   }),
@@ -53,8 +56,10 @@ export default {
       immediate: true,
       handler() {
         if (this.pageRef) {
-          this.$sitePageService.getPage(this.pageRef)
+          this.$pageLayoutService.getPage(this.pageRef)
             .then(page => this.page = page);
+          this.$pageLayoutService.getPageLayout(this.pageRef)
+            .then(pageLayout => this.layout = pageLayout);
         }
       },
     },
@@ -62,12 +67,17 @@ export default {
       immediate: true,
       handler() {
         if (this.nodeId) {
-          this.$siteNavigationService.getNode(this.nodeId)
+          this.$navigationLayoutService.getNode(this.nodeId)
             .then(node => this.node = node);
-          this.$siteNavigationService.getNodeLabels(this.nodeId)
+          this.$navigationLayoutService.getNodeLabels(this.nodeId)
             .then(nodeLabels => this.nodeLabels = nodeLabels);
         }
       },
+    },
+    layout(newVal, oldVal) {
+      if (!oldVal && newVal) {
+        this.$root.$applicationLoaded();
+      }
     },
   },
   methods: {

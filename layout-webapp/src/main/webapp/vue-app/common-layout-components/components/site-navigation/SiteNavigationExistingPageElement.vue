@@ -41,7 +41,7 @@
       :all-sites="allSites"
       class="mb-6" />
     <site-navigation-page-suggester
-      v-model="selectedPage"
+      :page="selectedPage"
       :all-sites="allSites"
       :site-type="selectedSiteNavigation?.siteType"
       :site-name="selectedSiteNavigation?.name" />
@@ -71,9 +71,6 @@ export default {
     },
   },
   watch: {
-    selectedPage(){
-      this.$root.$emit('existing-page-selected', this.selectedPage);
-    },
     allSites(){
       this.selectedSiteNavigation = null;
     },

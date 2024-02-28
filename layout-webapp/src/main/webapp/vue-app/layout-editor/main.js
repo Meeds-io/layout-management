@@ -18,6 +18,7 @@
  */
 
 import './initComponents.js';
+import './extensions.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
@@ -44,7 +45,19 @@ export function init() {
       Vue.createApp({
         template: `<layout-editor id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
-        i18n},
-      `#${appId}`, 'site-management')
+        i18n,
+        data: {
+          containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
+          editPage: true,
+        },
+        created() {
+          document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
+        },
+        methods: {
+          refreshContainerTypes() {
+            this.containerTypes = extensionRegistry.loadExtensions('layout-editor', 'container');
+          },
+        },
+      }, `#${appId}`, 'Layout Editor')
     );
 }

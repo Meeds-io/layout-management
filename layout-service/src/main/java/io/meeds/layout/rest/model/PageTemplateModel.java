@@ -7,6 +7,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
@@ -18,23 +19,17 @@
  */
 package io.meeds.layout.rest.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class PageCreateModel {
+@NoArgsConstructor
+@AllArgsConstructor
+public class PageTemplateModel {
 
-  private String pageName;
+  private String  label;
 
-  private String pageTitle;
-
-  private String pageSiteType;
-
-  private String pageSiteName;
-
-  private String pageType;
-
-  private String link;
-
-  private String pageTemplate;
+  private String  value;
 
 }
