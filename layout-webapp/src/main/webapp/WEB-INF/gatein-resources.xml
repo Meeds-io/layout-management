@@ -146,6 +146,9 @@
         <module>commonLayoutComponents</module>
       </depends>
       <depends>
+        <module>vueDraggable</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>

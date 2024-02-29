@@ -49,6 +49,8 @@ export function init() {
         data: {
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           editPage: true,
+          draggedContainer: null,
+          draggedSection: null,
         },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);

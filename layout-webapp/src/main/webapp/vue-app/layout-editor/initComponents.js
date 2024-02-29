@@ -27,7 +27,6 @@ import Content from './components/content/Content.vue';
 import SectionBorderMenu from './components/content/common/SectionBorderMenu.vue';
 import ContainerExtension from './components/content/common/ContainerExtension.vue';
 import ContainerBase from './components/content/common/ContainerBase.vue';
-import ContainerChildren from './components/content/common/ContainerChildren.vue';
 
 import Page from './components/content/container/Page.vue';
 import Container from './components/content/container/Container.vue';
@@ -41,7 +40,6 @@ const components = {
   'layout-editor-content': Content,
   'layout-editor-container-container-extension': ContainerExtension,
   'layout-editor-container-container-base': ContainerBase,
-  'layout-editor-container-container-children': ContainerChildren,
   'layout-editor-container-page': Page,
   'layout-editor-container-container': Container,
   'layout-editor-container-row': Row,

@@ -1,3 +1,23 @@
+<!--
+
+ This file is part of the Meeds project (https://meeds.io/).
+
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
 <template>
   <layout-editor-container-container-extension
     :container="layoutToEdit" />
@@ -64,10 +84,10 @@ export default {
         if (this.layout) {
           const layout = JSON.parse(JSON.stringify(this.layout));
           if (!layout.children?.length) {
-            layout.children = [this.newParent()];
-            this.addSection(layout);
+            this.newParent(layout);
           }
           this.layoutToEdit = layout;
+          this.addSection(0, 12);
         } else {
           this.layoutToEdit = null;
         }
@@ -76,33 +96,36 @@ export default {
   },
   created() {
     this.$root.$on('layout-save-page', this.save);
+    this.$root.$on('layout-add-section', this.addSection);
   },
   methods: {
     save() {
       // TODO
     },
-    newParent() {
-      const vuetifyAppContainer = this.newContainer('system:/groovy/portal/webui/container/UIContainer.gtmpl', 'VuetifyApp');
-      const vAppContainer = this.newContainer('system:/groovy/portal/webui/container/UIContainer.gtmpl', 'v-application v-application--is-ltr v-application--wrap singlePageApplication');
-      vuetifyAppContainer.children.push(vAppContainer);
-      return vuetifyAppContainer;
+    newParent(layout) {
+      const vuetifyAppContainer = this.newContainer('system:/groovy/portal/webui/container/UIContainer.gtmpl', 'VuetifyApp', layout);
+      this.newContainer('system:/groovy/portal/webui/container/UIContainer.gtmpl', 'v-application v-application--is-ltr v-application--wrap singlePageApplication', vuetifyAppContainer);
     },
-    addSection(layout) {
-      const parentContainer = layout?.children?.[0]?.children?.[0];
+    addSection(index, cols) {
+      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
       if (!parentContainer?.cssClass?.includes?.('v-application')) {
         return;
       }
-      const row = this.newContainer('system:/groovy/portal/webui/container/UIVRowContainer.gtmpl', null, parentContainer);
-      for (let index = 0; index < 12; index++) {
+      const row = this.newContainer('system:/groovy/portal/webui/container/UIVRowContainer.gtmpl', null, parentContainer, index);
+      for (let i = 0; i < cols; i++) {
         this.newContainer('system:/groovy/portal/webui/container/UIVColContainer.gtmpl', 'col-12 col-sm-6 col-md-4 col-lg-3 py-0 aspect-ratio-1', row);
       }
     },
-    newContainer(template, cssClass, parentContainer) {
+    newContainer(template, cssClass, parentContainer, index) {
       const container = JSON.parse(JSON.stringify(this.containerModel));
       container.template = template;
       container.cssClass = cssClass;
+      container.storageId = parseInt(Math.random() * 10000);
+      container.id = container.storageId;
+      container.name = container.storageId;
       if (parentContainer) {
-        parentContainer.children.push(container);
+        container.parentId = parentContainer.storageId;
+        parentContainer.children.splice(index || 0, 0, container);
       }
       return container;
     },
