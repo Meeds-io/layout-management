@@ -37,9 +37,7 @@ export function createSite(siteName, siteTemplate, siteLabel, siteDescription, d
     },
     body: JSON.stringify(createModel),
   }).then((resp) => {
-    if (resp?.ok) {
-      return resp.json();
-    } else {
+    if (!resp?.ok) {
       throw new Error('Error when creating site');
     }
   });
@@ -77,7 +75,7 @@ export function deleteSite(siteType, siteName) {
     method: 'DELETE',
     credentials: 'include',
   }).then(resp => {
-    if (!resp || !resp.ok) {
+    if (!resp?.ok) {
       throw new Error('Error when deleting site');
     }
   });
@@ -96,7 +94,7 @@ export function updateSitePermissions(siteType, siteName, editPermission, access
     }),
   }).then((resp) => {
     if (!resp?.ok) {
-      throw new Error(resp.status);
+      throw new Error('Error when updating site permissions');
     }
   });
 }
@@ -106,10 +104,10 @@ export function getMembershipTypes() {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
-    if (!resp?.ok) {
-      throw new Error('Error when retrieving membership types');
-    } else {
+    if (resp?.ok) {
       return resp.json();
+    } else {
+      throw new Error('Error when retrieving membership types');
     }
   });
 }

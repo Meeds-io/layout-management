@@ -67,7 +67,7 @@ export default {
       this.$refs.deleteSiteConfirmDialog.open();
     },
     deleteSite() {
-      return this.$siteManagementService.deleteSite(this.siteToDelete.siteType, this.siteToDelete.name)
+      return this.$siteLayoutService.deleteSite(this.siteToDelete.siteType, this.siteToDelete.name)
         .then(() => {
           this.$root.$emit('refresh-sites');
         });}

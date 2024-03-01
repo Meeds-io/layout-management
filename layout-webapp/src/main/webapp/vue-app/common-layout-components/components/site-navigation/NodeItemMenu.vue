@@ -265,7 +265,7 @@ export default {
       const message = this.$t('siteNavigation.label.deleteSuccess');
       const undoMessage = this.$t('siteNavigation.label.undoDelete');
       const undoMessageSuccess = this.$t('siteNavigation.deleteCanceled');
-      this.$siteNavigationService.deleteNode(this.navigationNode.id, deleteDelay)
+      this.$navigationLayoutService.deleteNode(this.navigationNode.id, deleteDelay)
         .then(() => {
           document.dispatchEvent(new CustomEvent('alert-message', {detail: {
             alertType: 'success',
@@ -283,7 +283,7 @@ export default {
       }, redirectionTime);
     },
     editLayout() {
-      return this.$sitePageService.editPageLayout(this.nodeId, this.pageRef);
+      return this.$pageLayoutService.editPageLayout(this.nodeId, this.pageRef);
     },
     openManagePermissionsDrawer(){
       this.$root.$emit('open-manage-permissions-drawer', JSON.parse(JSON.stringify(this.navigationNode)));
@@ -303,7 +303,7 @@ export default {
         } 
       }
       if (this.pasteMode === 'Cut') {
-        this.$siteNavigationService.moveNode(this.nodeToPaste.id, this.navigationNode.id, null).then(() => {
+        this.$navigationLayoutService.moveNode(this.nodeToPaste.id, this.navigationNode.id, null).then(() => {
           this.$root.$emit('refresh-navigation-nodes');
         });
       } else if (this.pasteMode === 'Copy') {
@@ -320,19 +320,17 @@ export default {
       const startScheduleDate = nodeToPaste.startPublicationTime !== -1 ? new Date(nodeToPaste.startPublicationTime) : null;
       const endScheduleDate = nodeToPaste.endPublicationTime !== -1 ? new Date(nodeToPaste.endPublicationTime) : null;
       const isPasteMode = true;
-      this.$siteNavigationService.getNodeLabels(nodeToPaste.id)
+      this.$navigationLayoutService.getNodeLabels(nodeToPaste.id)
         .then(data => {
           this.nodeLabels = {
             labels: data.labels
           };
         })
         .then(() => {
-          this.$siteNavigationService.createNode(navigationNodeId, null, nodeToPaste.label, nodeToPaste.name, nodeToPaste.icon, visible, isScheduled, startScheduleDate, endScheduleDate, this.nodeLabels?.labels, pageRef, nodeToPaste.target, isPasteMode)
-            .then(navigationNodes => {
+          this.$navigationLayoutService.createNode(navigationNodeId, null, nodeToPaste.label, nodeToPaste.name, nodeToPaste.icon, visible, isScheduled, startScheduleDate, endScheduleDate, this.nodeLabels?.labels, pageRef, nodeToPaste.target, isPasteMode)
+            .then(createdNode => {
               if (nodeToPaste.children.length > 0) {
-                nodeToPaste.children.forEach(children => {
-                  this.pasteCopiedNode(navigationNodes[1].id, children);
-                });
+                nodeToPaste.children.forEach(children => this.pasteCopiedNode(createdNode.id, children));
               }
             })
             .finally(() => {
@@ -342,7 +340,7 @@ export default {
 
     },
     undoDeleteNode(nodeId, successMsg) {
-      return this.$siteNavigationService.undoDeleteNode(nodeId)
+      return this.$navigationLayoutService.undoDeleteNode(nodeId)
         .then(() => {
           this.$root.$emit('refresh-navigation-nodes');
           this.$root.$emit('close-alert-message');
