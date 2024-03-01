@@ -19,11 +19,46 @@
 
 -->
 <template>
-  <v-btn
-    class="d-flex align-center"
-    color="primary"
-    elevation="0"
-    @click="$root.$emit('layout-save-page')">
-    <span class="text-none">{{ $t('layout.save') }}</span>
-  </v-btn>
+  <KeepAlive>
+    <component
+      v-if="containerType"
+      :is="containerType"
+      :container="container"
+      :index="index"
+      :length="length"
+      :context="context" />
+  </KeepAlive>
 </template>
+<script>
+export default {
+  props: {
+    container: {
+      type: Object,
+      default: null,
+    },
+    index: {
+      type: Number,
+      default: null,
+    },
+    length: {
+      type: Number,
+      default: null,
+    },
+    context: {
+      type: String,
+      default: null,
+    },
+  },
+  computed: {
+    containerType() {
+      const extension = this.container && this.$root.containerTypes.find(ext => ext?.isValid?.(this.container));
+      return extension?.containerType;
+    },
+    params() {
+      return {
+        container: this.container,
+      };
+    },
+  },
+};
+</script>

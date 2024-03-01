@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,37 +36,46 @@ import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
-import io.meeds.layout.rest.model.NodeLabelRestEntity;
-import io.meeds.layout.rest.model.PageTemplateRestEntity;
-import io.meeds.layout.utils.SiteNavigationUtils;
+import io.meeds.layout.model.NodeLabel;
+import io.meeds.layout.rest.model.PageTemplateModel;
+import io.meeds.layout.service.LayoutI18NService;
 
 public class EntityBuilder {
 
   private EntityBuilder() {
   }
 
-  public static List<PageTemplateRestEntity> toPageTemplateRestEntities(List<SelectItemOption<String>> pageTemplates, Locale userLocal) {
-    return pageTemplates.stream().map(pageTemplate -> toPageTemplateRestEntity(pageTemplate, userLocal)).toList();
+  public static List<PageTemplateModel> toPageTemplateModel(List<SelectItemOption<String>> pageTemplates,
+                                                                   LayoutI18NService layoutI18NService,
+                                                                   Locale locale) {
+    return pageTemplates.stream()
+                        .filter(Objects::nonNull)
+                        .map(pageTemplate -> new PageTemplateModel(layoutI18NService.getLabel(pageTemplate.getLabel(),
+                                                                                              locale),
+                                                                   pageTemplate.getValue()))
+                        .toList();
   }
 
-  public static NodeLabelRestEntity toNodeLabelRestEntity(Map<Locale, State> nodeLabels) {
+  public static NodeLabel toNodeLabel(Map<Locale, State> nodeLabels) {
     LocaleConfigService localeConfigService = CommonsUtils.getService(LocaleConfigService.class);
-    Locale defaultLocale = localeConfigService.getDefaultLocaleConfig() == null ? Locale.ENGLISH
-                                                                                : localeConfigService.getDefaultLocaleConfig()
-                                                                                                     .getLocale();
+    Locale defaultLocale = localeConfigService.getDefaultLocaleConfig() == null ? Locale.ENGLISH :
+                                                                                localeConfigService.getDefaultLocaleConfig()
+                                                                                                   .getLocale();
     String defaultLanguage = defaultLocale.getLanguage();
     Map<String, String> supportedLanguages =
-                                           localeConfigService.getLocalConfigs() == null ? Collections.singletonMap(defaultLocale.getLanguage(),
-                                                                                                                    defaultLocale.getDisplayName())
-                                                                                         : localeConfigService.getLocalConfigs()
-                                                                                                              .stream()
-                                                                                                              .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
-                                                                                                                                                          "ma"))
-                                                                                                              .collect(Collectors.toMap(LocaleConfig::getLocaleName,
-                                                                                                                                        localeConfig -> localeConfig.getLocale()
-                                                                                                                                                                    .getDisplayName()));
+                                           localeConfigService.getLocalConfigs()
+                                               == null ?
+                                                       Collections.singletonMap(defaultLocale.getLanguage(),
+                                                                                defaultLocale.getDisplayName()) :
+                                                       localeConfigService.getLocalConfigs()
+                                                                          .stream()
+                                                                          .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
+                                                                                                                      "ma"))
+                                                                          .collect(Collectors.toMap(LocaleConfig::getLocaleName,
+                                                                                                    localeConfig -> localeConfig.getLocale()
+                                                                                                                                .getDisplayName()));
     Map<String, String> localized = new HashMap<>();
-    NodeLabelRestEntity nodeLabelRestEntity = new NodeLabelRestEntity();
+    NodeLabel nodeLabelRestEntity = new NodeLabel();
     if (nodeLabels != null && nodeLabels.size() != 0) {
       for (Map.Entry<Locale, State> entry : nodeLabels.entrySet()) {
         Locale locale = entry.getKey();
@@ -82,11 +92,4 @@ public class EntityBuilder {
     return nodeLabelRestEntity;
   }
 
-  private static PageTemplateRestEntity toPageTemplateRestEntity(SelectItemOption<String> pageTemplate, Locale userLocal) {
-    if (pageTemplate == null) {
-      return null;
-    }
-    return new PageTemplateRestEntity(SiteNavigationUtils.getI18NLabel(userLocal, pageTemplate.getLabel()),
-                                      pageTemplate.getValue());
-  }
 }
