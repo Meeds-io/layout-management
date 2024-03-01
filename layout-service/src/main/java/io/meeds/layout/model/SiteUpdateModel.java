@@ -16,31 +16,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.rest.model;
-
-import java.util.Map;
+package io.meeds.layout.model;
 
 import lombok.Data;
 
 @Data
-public class NavigationUpdateModel {
+public class SiteUpdateModel {
 
-  private String              nodeLabel;
+  private String  siteLabel;
 
-  private String              pageRef;
+  private String  siteDescription;
 
-  private String              target;
+  private boolean displayed;
 
-  private boolean             visible;
+  private int     displayOrder;
 
-  private boolean             scheduled;
+  private String  bannerUploadId;
 
-  private Long                startScheduleDate;
-
-  private Long                endScheduleDate;
-
-  private String              icon;
-
-  private Map<String, String> labels;
+  private boolean bannerRemoved;
 
 }

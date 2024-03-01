@@ -183,7 +183,7 @@ export default {
         });
       }
       const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
-      return this.$sitePageService.updatePagePermissions(pageRef, pageEditPermission, pageAccessPermissions)
+      return this.$pageLayoutService.updatePagePermissions(pageRef, pageEditPermission, pageAccessPermissions)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteNavigation.label.updatePermission.success'), 'success');
           this.$root.$emit('refresh-navigation-nodes');
@@ -211,7 +211,7 @@ export default {
           }
         });
       }
-      return this.$siteManagementService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermissionChanged && siteEditPermission || null, this.accessPermissionChanged && siteAccessPermissions || null)
+      return this.$siteLayoutService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermissionChanged && siteEditPermission || null, this.accessPermissionChanged && siteAccessPermissions || null)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteManagement.label.updatePermission.success'), 'success');
           this.$root.$emit('refresh-sites');

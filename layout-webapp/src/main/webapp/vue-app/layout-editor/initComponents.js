@@ -23,16 +23,31 @@ import Toolbar from './components/toolbar/Toolbar.vue';
 import SaveButton from './components/toolbar/actions/SaveButton.vue';
 
 import Content from './components/content/Content.vue';
-import Container from './components/content/Container.vue';
-import Section from './components/content/Section.vue';
+
+import SectionBorderMenu from './components/content/common/SectionBorderMenu.vue';
+import ContainerExtension from './components/content/common/ContainerExtension.vue';
+import ContainerBase from './components/content/common/ContainerBase.vue';
+
+import Page from './components/content/container/Page.vue';
+import Container from './components/content/container/Container.vue';
+import Row from './components/content/container/Row.vue';
+import Column from './components/content/container/Column.vue';
+
+import EditSectionDrawer from './components/content/drawer/EditSectionDrawer.vue';
 
 const components = {
   'layout-editor': LayoutEditor,
   'layout-editor-toolbar': Toolbar,
   'layout-editor-toolbar-save-button': SaveButton,
   'layout-editor-content': Content,
-  'layout-editor-container': Container,
-  'layout-editor-section': Section,
+  'layout-editor-container-container-extension': ContainerExtension,
+  'layout-editor-container-container-base': ContainerBase,
+  'layout-editor-container-page': Page,
+  'layout-editor-container-container': Container,
+  'layout-editor-container-row': Row,
+  'layout-editor-container-column': Column,
+  'layout-editor-section-border-menu': SectionBorderMenu,
+  'layout-editor-section-edit-drawer': EditSectionDrawer,
 };
 
 for (const key in components) {

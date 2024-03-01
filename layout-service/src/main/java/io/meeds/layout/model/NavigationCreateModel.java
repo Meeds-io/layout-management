@@ -7,7 +7,6 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
@@ -17,19 +16,39 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.rest.model;
+package io.meeds.layout.model;
 
-import lombok.AllArgsConstructor;
+import java.util.Map;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PageTemplateRestEntity {
+public class NavigationCreateModel {
 
-  private String  label;
+  private Long                parentNodeId;
 
-  private String  value;
+  private Long                previousNodeId;
+
+  private String              nodeLabel;
+
+  private String              nodeId;
+
+  private boolean             visible;
+
+  private boolean             scheduled;
+
+  private Long                startScheduleDate;
+
+  private Long                endScheduleDate;
+
+  private String              pageRef;
+
+  private String              target;
+
+  private boolean             isPasteMode;
+
+  private String              icon;
+
+  private Map<String, String> labels;
 
 }

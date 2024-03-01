@@ -115,7 +115,7 @@ export default {
         const index = this.navigationNodes.findIndex(navigationNode => navigationNode.id === navigationNodeId);
         if (index !== -1) {
           const previousNodeId = index >1 ? this.navigationNodes[index - 2].id : null;
-          this.$siteNavigationService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
+          this.$navigationLayoutService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
             this.$root.$emit('refresh-navigation-nodes');
           });
         }
@@ -127,7 +127,7 @@ export default {
         const index = this.navigationNodes.findIndex(navigationNode => navigationNode.id === navigationNodeId);
         if (index !== -1) {
           const previousNodeId = this.navigationNodes[index + 1].id;
-          this.$siteNavigationService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
+          this.$navigationLayoutService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
             this.$root.$emit('refresh-navigation-nodes');
           });
         }
