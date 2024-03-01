@@ -20,8 +20,10 @@
 -->
 <template>
   <v-card
-    class="d-flex align-center no-border-radius px-4"
+    class="d-flex align-center no-border-radius border-box-sizing absolute-vertical-center t-0 px-4"
     height="57"
+    min-width="100vw"
+    width="100vw"
     flat>
     <v-icon class="icon-default-color">fa-pager</v-icon>
     <span class="px-2">{{ $t('layout.editPageName', {0: pageName}) }}</span>
@@ -49,6 +51,9 @@ export default {
     pageName() {
       return this.nodeLabels?.labels && (this.nodeLabels.labels[eXo.env.portal.language] || this.nodeLabels.labels[this.defaultLanguage]) || this.page?.title;
     },
-  }
+  },
+  mounted() {
+    document.querySelector('#layoutTopBarContentChildren').append(this.$el);
+  },
 };
 </script>
