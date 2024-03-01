@@ -16,17 +16,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.rest.model;
-
-import org.exoplatform.portal.config.model.PortalConfig;
+package io.meeds.layout.model;
 
 import lombok.Data;
 
 @Data
-public class SiteCreateModel {
+public class PageCreateModel {
 
-  private String       siteTemplate;
+  private String   pageName;
 
-  private PortalConfig portalConfig;
+  private String   pageTitle;
 
+  private String   pageSiteType;
+
+  private String   pageSiteName;
+
+  private String   pageType;
+
+  private String   link;
+
+  private String   pageTemplate;
+
+  private String   editPermission;
+
+  private String[] accessPermissions;
 }
