@@ -19,24 +19,21 @@
 
 -->
 <template>
-  <div :class="cssClass">
+  <div class="position-relative layout-section">
     <layout-editor-container-container-base
       :container="container"
       :index="index"
       :length="length"
+      :preview="preview"
       type="section"
       class="row mx-n3 border-box-sizing"
+      force-draggable
       @hovered="hoverSection = $event" />
-    <v-hover v-if="$root.editPage">
+    <v-hover v-if="!preview">
       <div
+        v-if="!preview"
         slot-scope="{ hover }"
-        :style="{
-          top: '-22px',
-          right: '-24px',
-          bottom: '-4px',
-          left: '-24px',
-        }"
-        class="position-absolute pa-3">
+        class="layout-section-border">
         <div class="position-relative full-height full-width">
           <layout-editor-section-border-menu
             :hover="hover || hoverSection || movingSection"
@@ -64,16 +61,15 @@ export default {
       type: Number,
       default: null,
     },
+    preview: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     hoverSection: false,
     movingSection: false,
   }),
-  computed: {
-    cssClass() {
-      return this.$root.editPage && 'position-relative' || null;
-    },
-  },
   watch: {
     movingSection() {
       this.$root.draggedContainerType = this.movingSection && 'section' || null;

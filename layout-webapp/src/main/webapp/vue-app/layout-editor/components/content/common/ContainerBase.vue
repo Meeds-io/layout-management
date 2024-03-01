@@ -20,35 +20,13 @@
 -->
 <template>
   <v-hover v-model="hover">
-    <div
-      v-if="children.length <= 1"
-      :id="id"
-      :class="cssClass"
-      :style="cssStyle">
-      <slot v-if="$slots.content" name="content"></slot>
-      <div
-        v-if="noChildren"
-        class="d-flex align-center justify-center full-width full-height position-relative grey-background mb-5">
-        <template>{{ id }}</template>
-      </div>
-      <layout-editor-container-container-extension
-        v-for="(child, i) in children"
-        :key="child.storageId"
-        :container="child"
-        :parent-id="storageId"
-        :index="i"
-        :length="children.length" />
-    </div>
     <draggable
-      v-else
+      v-if="draggable"
       v-model="children"
       :id="id"
       :class="cssClass"
       :style="cssStyle"
-      :animation="200"
-      :options="{group: !disableGroup}"
-      handle=".draggHandler"
-      ghost-class="ghost-card"
+      :options="dragOptions"
       item-key="storageId"
       class="z-index-two"
       @start="startMoving"
@@ -59,8 +37,28 @@
         :container="child"
         :parent-id="container.storageId"
         :index="i"
-        :length="children.length" />
+        :length="children.length"
+        :class="draggableContainerClass" />
     </draggable>
+    <div
+      v-else
+      :id="id"
+      :class="cssClass"
+      :style="cssStyle">
+      <slot v-if="$slots.content" name="content"></slot>
+      <div
+        v-if="noChildren"
+        class="d-flex align-center justify-center full-width full-height position-relative grey-background">
+        <template>{{ id }}</template>
+      </div>
+      <layout-editor-container-container-extension
+        v-for="(child, i) in children"
+        :key="child.storageId"
+        :container="child"
+        :parent-id="storageId"
+        :index="i"
+        :length="children.length" />
+    </div>
   </v-hover>
 </template>
 <script>
@@ -86,6 +84,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    preview: {
+      type: Boolean,
+      default: false,
+    },
+    forceDraggable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     hover: false,
@@ -96,17 +102,26 @@ export default {
     id() {
       return this.container?.id || this.storageId;
     },
+    containerChildren() {
+      return this.container.children;
+    },
+    childrenSize() {
+      return this.children.length;
+    },
+    noChildren() {
+      return !this.childrenSize;
+    },
     storageId() {
       return this.container?.storageId;
-    },
-    cssClass() {
-      return `${this.container.cssClass} ${this.children.length > 1 && 'v-draggable position-relative' || ''}`;
     },
     height() {
       return this.container.height;
     },
     width() {
       return this.container.width;
+    },
+    draggable() {
+      return !this.preview && (this.children.length > 1 || this.forceDraggable);
     },
     cssStyle() {
       if (!this.height && !this.width) {
@@ -122,14 +137,23 @@ export default {
         return style;
       }
     },
-    containerChildren() {
-      return this.container.children;
+    cssClass() {
+      return `${this.container.cssClass} ${this.draggable && 'v-draggable position-relative' || ''} ${this.noChildren && 'draggable position-relative pb-5' || ''}`;
     },
-    disableGroup() {
-      return this.$root.draggedContainerType === 'section';
+    draggableContainerClass() {
+      return `draggable-container-${this.storageId}`;
     },
-    noChildren() {
-      return !this.children.length;
+    dragOptions() {
+      return {
+        group: {
+          name: this.type,
+        },
+        draggable: `.${this.draggableContainerClass}`,
+        animation: 200,
+        ghostClass: 'layout-moving-ghost-container',
+        chosenClass: 'layout-moving-chosen-container',
+        handle: '.draggable',
+      };
     },
   },
   watch: {
@@ -143,6 +167,11 @@ export default {
     containerChildren() {
       if (JSON.stringify(this.containerChildren) !== JSON.stringify(this.children)) {
         this.refreshChildren();
+      }
+    },
+    children() {
+      if (JSON.stringify(this.container.children) !== JSON.stringify(this.children)) {
+        this.$root.$emit('layout-children-size-updated', this.container, this.children, this.index, this.type);
       }
     },
   },

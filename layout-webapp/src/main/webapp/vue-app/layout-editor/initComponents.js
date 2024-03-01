@@ -33,6 +33,8 @@ import Container from './components/content/container/Container.vue';
 import Row from './components/content/container/Row.vue';
 import Column from './components/content/container/Column.vue';
 
+import EditSectionDrawer from './components/content/drawer/EditSectionDrawer.vue';
+
 const components = {
   'layout-editor': LayoutEditor,
   'layout-editor-toolbar': Toolbar,
@@ -45,6 +47,7 @@ const components = {
   'layout-editor-container-row': Row,
   'layout-editor-container-column': Column,
   'layout-editor-section-border-menu': SectionBorderMenu,
+  'layout-editor-section-edit-drawer': EditSectionDrawer,
 };
 
 for (const key in components) {

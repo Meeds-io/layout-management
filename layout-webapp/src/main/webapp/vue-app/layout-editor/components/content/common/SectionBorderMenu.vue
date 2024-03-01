@@ -19,7 +19,10 @@
 
 -->
 <template>
-  <div v-show="hover || open" class="absolute-full-size border-color-thin-grey-opacity2 border-radius">
+  <div
+    v-show="displayBorder"
+    :class="moving && 'layout-section-moving' || 'layout-section-hover'"
+    class="absolute-full-size border-radius">
     <v-slide-y-transition>
       <div v-if="open" class="position-relative full-width full-height">
         <div class="absolute-horizontal-center t-0 z-index-two mt-n4">
@@ -78,9 +81,9 @@
               <v-btn
                 v-on="on"
                 v-bind="attrs"
-                class=""
                 height="32"
                 width="32"
+                class="draggable"
                 icon
                 @mousedown="$emit('move-start')">
                 <v-icon size="24">fa-arrows-alt</v-icon>
@@ -126,6 +129,9 @@ export default {
     },
     draggedContainer() {
       return this.$root.draggedContainer;
+    },
+    displayBorder() {
+      return this.open || (this.hover || this.draggedContainer);
     },
   },
   watch: {

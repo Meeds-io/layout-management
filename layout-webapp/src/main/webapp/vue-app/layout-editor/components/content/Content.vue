@@ -19,8 +19,12 @@
 
 -->
 <template>
-  <layout-editor-container-container-extension
-    :container="layoutToEdit" />
+  <div>
+    <layout-editor-container-container-extension
+      :container="layoutToEdit" />
+    <layout-editor-section-edit-drawer
+      ref="sectionEditDrawer" />
+  </div>
 </template>
 <script>
 export default {
@@ -97,6 +101,8 @@ export default {
   created() {
     this.$root.$on('layout-save-page', this.save);
     this.$root.$on('layout-add-section', this.addSection);
+    this.$root.$on('layout-edit-section', this.editSection);
+    this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
   },
   methods: {
     save() {
@@ -115,6 +121,26 @@ export default {
       for (let i = 0; i < cols; i++) {
         this.newContainer('system:/groovy/portal/webui/container/UIVColContainer.gtmpl', 'col-12 col-sm-6 col-md-4 col-lg-3 py-0 aspect-ratio-1', row);
       }
+    },
+    handleSectionUpdated(container, children, index, type) {
+      container.children = children;
+      if (type === 'section' && !container.children?.length) {
+        window.setTimeout(() => this.removeSection(index), 500);
+      }
+    },
+    removeSection(index) {
+      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
+      if (!parentContainer?.cssClass?.includes?.('v-application')) {
+        return;
+      }
+      parentContainer.children.splice(index, 1);
+    },
+    editSection(index) {
+      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
+      if (!parentContainer?.cssClass?.includes?.('v-application')) {
+        return;
+      }
+      this.$refs.sectionEditDrawer.open(parentContainer.children[index], index);
     },
     newContainer(template, cssClass, parentContainer, index) {
       const container = JSON.parse(JSON.stringify(this.containerModel));

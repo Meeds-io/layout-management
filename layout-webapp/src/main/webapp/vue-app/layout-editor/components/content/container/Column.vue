@@ -23,6 +23,7 @@
     :container="container"
     :index="index"
     :length="length"
+    :preview="preview"
     class="col" />
 </template>
 <script>
@@ -39,6 +40,10 @@ export default {
     length: {
       type: Number,
       default: null,
+    },
+    preview: {
+      type: Boolean,
+      default: false,
     },
   },
 };

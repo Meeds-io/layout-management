@@ -25,7 +25,8 @@
       :is="containerType"
       :container="container"
       :index="index"
-      :length="length" />
+      :length="length"
+      :preview="preview" />
   </KeepAlive>
 </template>
 <script>
@@ -42,6 +43,10 @@ export default {
     length: {
       type: Number,
       default: null,
+    },
+    preview: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
