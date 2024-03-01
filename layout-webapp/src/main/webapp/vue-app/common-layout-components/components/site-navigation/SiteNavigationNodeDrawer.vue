@@ -405,25 +405,23 @@ export default {
       };
       if (this.editMode) {
         const pageRef = pageData?.pageRef ||  (this.nodeType === 'pageOrLink' ? this.navigationNode.pageKey?.ref || `${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey?.name}` : '');
-        this.$siteNavigationService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
+        this.$navigationLayoutService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
           .then(() => {
             this.openTargetPage(pageData);
             this.$root.$emit('refresh-navigation-nodes');
-          })
-          .finally(() => {
             this.$root.$emit('close-add-element-drawer');
             this.close();
-          });
+          })
+          .catch(() => this.$root.$emit('alert-message', this.$t('siteNavigation.errorUpdatingNode'), 'error'));
       } else {
-        this.$siteNavigationService.createNode(this.navigationNode.id, previousNodeId, this.nodeLabel, this.nodeId, this.nodeIcon, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.pageRef, pageData?.pageRef && pageData?.nodeTarget || 'SAME_TAB')
-          .then(() => {
-            this.openTargetPage(pageData);
+        this.$navigationLayoutService.createNode(this.navigationNode.id, previousNodeId, this.nodeLabel, this.nodeId, this.nodeIcon, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.pageRef, pageData?.pageRef && pageData?.nodeTarget || 'SAME_TAB')
+          .then(createdNode => {
+            this.openTargetPage(pageData, createdNode.id);
             this.$root.$emit('refresh-navigation-nodes');
-          })
-          .finally(() => {
             this.$root.$emit('close-add-element-drawer');
             this.close();
-          });
+          })
+          .catch(() => this.$root.$emit('alert-message', this.$t('siteNavigation.errorCreatingNode'), 'error'));
       }
     },
     openAddElementDrawer() {
@@ -445,7 +443,7 @@ export default {
       this.$refs.translationDrawer.open();
     },
     getNodeLabels() {
-      this.$siteNavigationService.getNodeLabels(this.navigationNode.id)
+      this.$navigationLayoutService.getNodeLabels(this.navigationNode.id)
         .then(data => {
           if (this.editMode && data.labels != null) {
             this.valuesPerLanguage = data.labels;
@@ -466,10 +464,10 @@ export default {
       this.labels = this.valuesPerLanguage;
       this.nodeLabel = this.valuesPerLanguage[eXo.env.portal.language];
     },
-    openTargetPage(pageData) {
+    openTargetPage(pageData, nodeId) {
       if (pageData?.pageRef) {
         if (pageData?.pageType === 'PAGE' && pageData?.pageRef && pageData?.openEditLayout) {
-          return this.$sitePageService.editPageLayout(this.nodeId, pageData?.pageRef);
+          return this.$pageLayoutService.editPageLayout(nodeId || this.nodeId, pageData?.pageRef);
         } else {
           let targetPageUrl ;
           if (pageData?.pageType === 'LINK' ) {

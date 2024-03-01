@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     getPageTemplates() {
-      return this.$sitePageService.getPageTemplates()
+      return this.$pageLayoutService.getPageTemplates()
         .then(pageTemplates => {
           this.pageTemplates = pageTemplates || [];
         });

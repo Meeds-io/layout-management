@@ -92,7 +92,7 @@ export default {
       },200);
     },
     getMembershipTypes() {
-      return this.$siteManagementService.getMembershipTypes()
+      return this.$siteLayoutService.getMembershipTypes()
         .then(membershipTypes => this.membershipTypes = membershipTypes || []);
     },
     getMembershipTypeLabel(membershipType){

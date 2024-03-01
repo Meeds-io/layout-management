@@ -295,7 +295,7 @@ export default {
     updateSite() {
       this.loading = true;
       this.$refs.sitePropertiesDrawer.startLoading();
-      return this.$siteManagementService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.displayed, this.displayed && this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
+      return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.displayed, this.displayed && this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'label', this.siteTitleTranslations))
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'description', this.siteDescriptionTranslations))
         .then(() => {
@@ -320,7 +320,7 @@ export default {
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
       this.$refs.sitePropertiesDrawer.startLoading();
-      return this.$siteManagementService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, this.displayed, this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
+      return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, this.displayed, this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
         .then((site) =>{
           this.siteId = site.siteId;
           if (this.siteTitleTranslations.length) {

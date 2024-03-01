@@ -159,14 +159,13 @@ export default {
     },
     disabled() {
       return !this.isValidForm || this.isLinkElement && !this.link || this.elementType === 'existingPage' && !this.selectedPage || false;
-    }
+    },
   },
   created() {
     this.$root.$on('open-add-element-drawer', this.open);
     this.$root.$on('close-add-element-drawer', this.close);
     this.$root.$on('page-template-changed', this.changePageTemplate);
     this.$root.$on('existing-page-selected', this.changeSelectedPage);
-
   },
   methods: {
     open(elementName, elementTitle, navigationNode, editMode) {
@@ -178,20 +177,23 @@ export default {
       this.editMode = editMode;
       if (editMode && this.navigationNode?.pageKey) {
         const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
-        this.$sitePageService.getPage(pageRef).then((page) => {
-          this.selectedPage = page.state;
-          this.selectedPage.displayName = page.state.displayName || page.key.name;
-          this.pageToEdit = page;
-          this.elementType = page.state?.type === 'LINK' && 'LINK' || 'existingPage';
-          this.link = page?.state?.link;
-          this.$nextTick().then(() => {
-            this.$refs.siteNavigationAddElementDrawer.open();
-            this.$nextTick()
-              .then(() => {
-                this.$root.$emit('set-selected-page', page.state);
-              });
+        this.$pageLayoutService.getPage(pageRef)
+          .then((page) => {
+            this.selectedPage = {
+              pageRef,
+              displayName: page.state.displayName || page.key.name,
+            };
+            this.pageToEdit = page;
+            this.elementType = page.state?.type === 'LINK' && 'LINK' || 'existingPage';
+            this.link = page?.state?.link;
+            this.$nextTick().then(() => {
+              this.$refs.siteNavigationAddElementDrawer.open();
+              this.$nextTick()
+                .then(() => {
+                  this.$root.$emit('set-selected-page', page.state);
+                });
+            });
           });
-        });
       } else {
         this.$refs.siteNavigationAddElementDrawer.open();
       }
@@ -229,14 +231,14 @@ export default {
     },
     createElement() {
       if (this.elementType === 'existingPage') {
-        const pageRef = this.selectedPage?.pageContext?.key?.ref || `${this.selectedPage?.pageContext?.key.site.typeName}::${this.selectedPage?.pageContext?.key.site.name}::${this.selectedPage?.pageContext?.key.name}`;
+        const pageRef = this.selectedPage?.pageRef;
         this.$root.$emit('save-node-with-page', {
           'pageRef': pageRef,
           'nodeTarget': this.target,
           'pageType': this.elementType
         });
       } else {
-        this.$sitePageService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate || null)
+        this.$pageLayoutService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate || null)
           .then((createdPage) => {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             this.$root.$emit('save-node-with-page', {
@@ -262,7 +264,7 @@ export default {
       } else if (this.elementType === 'PAGE') {
         this.createElement();
       } else if (this.elementType === 'existingPage') {
-        const pageRef = this.selectedPage?.pageContext?.key?.ref || `${(this.selectedPage?.pageContext?.key?.site.typeName || this.pageToEdit?.key.site.typeName)}::${(this.selectedPage?.pageContext?.key?.site.name || this.pageToEdit?.key.site.name)}::${(this.selectedPage?.pageContext?.key?.name || this.pageToEdit?.key.name)}`;
+        const pageRef = this.selectedPage?.pageRef;
         this.$root.$emit('save-node-with-page', {
           'pageRef': pageRef,
           'nodeTarget': this.target,
@@ -272,7 +274,7 @@ export default {
     },
     updatePageLink() {
       const pageRef = this.pageToEdit?.key?.ref || `${this.pageToEdit?.key.site.typeName}::${this.pageToEdit?.key.site.name}::${this.pageToEdit?.key.name}`;
-      this.$sitePageService.updatePageLink(pageRef, this.link)
+      this.$pageLayoutService.updatePageLink(pageRef, this.link)
         .then(() => {
           this.$root.$emit('save-node-with-page', {
             'pageRef': pageRef,

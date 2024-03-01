@@ -111,10 +111,23 @@ export function getPage(pageRef) {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
-    if (!resp?.ok) {
-      throw new Error('Error when retrieving page');
-    } else {
+    if (resp?.ok) {
       return resp.json();
+    } else {
+      throw new Error('Error when retrieving page');
+    }
+  });
+}
+
+export function getPageLayout(pageRef) {
+  return fetch(`/layout/rest/pages/${pageRef}/layout`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when retrieving page layout');
     }
   });
 }
