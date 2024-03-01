@@ -16,39 +16,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.rest.model;
+package io.meeds.layout.model;
 
-import java.util.Map;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class NavigationCreateModel {
+public class PageModel {
 
-  private Long                parentNodeId;
+  private String pageRef;
 
-  private Long                previousNodeId;
-
-  private String              nodeLabel;
-
-  private String              nodeId;
-
-  private boolean             visible;
-
-  private boolean             scheduled;
-
-  private Long                startScheduleDate;
-
-  private Long                endScheduleDate;
-
-  private String              pageRef;
-
-  private String              target;
-
-  private boolean             isPasteMode;
-
-  private String              icon;
-
-  private Map<String, String> labels;
+  private String displayName;
 
 }

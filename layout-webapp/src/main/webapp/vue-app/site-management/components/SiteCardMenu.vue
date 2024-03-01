@@ -177,7 +177,7 @@ export default {
       this.$root.$emit('open-site-properties-drawer', this.site);
     },
     editSiteLayout() {
-      this.$siteManagementService.editSiteLayout(this.site.name, this.site.type);
+      this.$siteLayoutService.editSiteLayout(this.site.name, this.site.type);
     }
   }
 };

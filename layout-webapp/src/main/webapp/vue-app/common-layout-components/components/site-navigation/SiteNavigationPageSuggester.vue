@@ -20,7 +20,7 @@
   <v-flex id="siteNavigationsPagesSuggesterAutoComplete">
     <v-autocomplete
       ref="selectPage"
-      v-model="page"
+      v-model="selectedPage"
       :placeholder="suggesterLabels.placeholder"
       :items="items"
       :loading="loadingSuggestions"
@@ -74,10 +74,6 @@
 </template>
 <script>
 export default {
-  model: {
-    prop: 'page',
-    event: 'change'
-  },
   props: {
     page: {
       type: Object,
@@ -99,6 +95,7 @@ export default {
   data() {
     return {
       pages: [],
+      selectedPage: null,
       searchTerm: null,
       loadingSuggestions: false,
       startSearchAfterInMilliseconds: 300,
@@ -115,10 +112,10 @@ export default {
       };
     },
     items() {
-      this.pages.forEach(page => {
-        page.displayName = page.displayName || page.name;
-      });
-      return this.pages.slice();
+      return this.pages.slice().map(page => ({
+        displayName: page?.state?.displayName || page?.state?.name,
+        pageRef: `${page?.key?.site?.typeName}::${page?.key?.site?.name}::${page?.key?.name}`,
+      }));
     },
   },
   watch: {
@@ -131,18 +128,28 @@ export default {
         }
       }
     },
-    page() {
-      this.$emit('change', this.page);
+    page: {
+      immediate: true,
+      handler() {
+        if (this.page?.pageRef && this.selectedPage?.pageRef !== this.page?.pageRef) {
+          this.selectedPage = this.page;
+        } else if (!this.page && this.selectedPage) {
+          this.selectedPage = null;
+        }
+      },
+    },
+    selectedPage() {
+      this.$root.$emit('existing-page-selected', this.selectedPage);
     },
     siteType() {
-      this.page = null;
+      this.selectedPage = null;
     },
     allSites() {
-      this.page = null;
+      this.selectedPage = null;
       this.searchTerm = ' ';
     },
     siteName() {
-      this.page = null;
+      this.selectedPage = null;
       this.pages = [];
       this.searchTerm = ' ';
     },
@@ -152,14 +159,13 @@ export default {
   },
   methods: {
     remove() {
-      this.page = null;
-      this.$emit('change', this.page);
+      this.selectedPage = null;
     },
     searchPages() {
       if (this.allSites || (!this.allSites && this.siteType && this.siteName)) {
         this.loadingSuggestions = true;
         this.pages = [];
-        this.$sitePageService.getPages(this.siteType, this.siteName, this.searchTerm)
+        this.$pageLayoutService.getPages(this.siteType, this.siteName, this.searchTerm)
           .then(pages => this.pages = pages)
           .finally(() => this.loadingSuggestions = false);
       }
@@ -175,8 +181,8 @@ export default {
       }, this.endTypingKeywordTimeout);
     },
     emitSelectedValue(value) {
-      this.page = value;
-      this.pages.push(this.page);
+      this.selectedPage = value;
+      this.pages.push(this.selectedPage);
     },
   }
 };
