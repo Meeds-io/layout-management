@@ -35,7 +35,7 @@
         v-for="(child, i) in children"
         :key="child.storageId"
         :container="child"
-        :parent-id="container.storageId"
+        :parent-id="storageId"
         :index="i"
         :length="children.length"
         :class="draggableContainerClass" />
@@ -48,15 +48,8 @@
       <slot v-if="$slots.content" name="content"></slot>
       <div
         v-if="noChildren"
-        class="d-flex align-center justify-center full-width full-height position-relative grey-background">
-        <v-fade-transition v-if="hover && context === 'edit-section' && length > 1 && type !== 'section'">
-          <v-btn
-            :title="$t('layout.deleteContainer')"
-            icon
-            @click="$root.$emit('layout-delete-container', container, index, context)">
-            <v-icon size="58" color="error">fa-trash</v-icon>
-          </v-btn>
-        </v-fade-transition>
+        :style="colorStyle"
+        class="d-flex align-center justify-center full-width full-height position-relative">
       </div>
       <layout-editor-container-container-extension
         v-for="(child, i) in children"
@@ -121,6 +114,9 @@ export default {
     },
     storageId() {
       return this.container?.storageId;
+    },
+    colorStyle() {
+      return `background-color: ${this.container.color};`;
     },
     height() {
       return this.container.height;
@@ -194,7 +190,13 @@ export default {
       this.dragged = false;
     },
     refreshChildren() {
-      this.children = this.container?.children;
+      if (!this.context) {
+        this.children = this.container?.children;
+      } else if (this.container?.children?.length || this.children?.length) {
+        window.setTimeout(() => {
+          this.children = this.container?.children;
+        }, 50);
+      }
     },
     hasUnit(length) {
       return Number.isNaN(Number(length));
