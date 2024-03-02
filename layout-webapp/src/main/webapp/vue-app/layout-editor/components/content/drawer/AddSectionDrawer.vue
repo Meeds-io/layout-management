@@ -26,7 +26,7 @@
     right
     disable-pull-to-refresh>
     <template #title>
-      {{ $t('layout.editSectionTitle', {0: index + 1}) }}
+      {{ $t('layout.addSectionTitle') }}
     </template>
     <template v-if="drawer" #content>
       <v-card class="pa-4" flat>
@@ -112,7 +112,7 @@
           </div>
           <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pt-2 px-2">
             <layout-editor-container-container-extension
-              :container="sectionPreviewContainer"
+              :container="section"
               :context="context"
               style="zoom: 0.3" />
           </div>
@@ -121,15 +121,6 @@
     </template>
     <template #footer>
       <div class="d-flex">
-        <v-btn
-          v-if="length > 1"
-          color="error"
-          outlined
-          elevation="0"
-          class="ignore-vuetify-classes"
-          @click="removeSection">
-          <span class="text-none">{{ $t('layout.delete') }}</span>
-        </v-btn>
         <v-spacer />
         <v-btn
           class="btn"
@@ -137,7 +128,6 @@
           <span class="text-none">{{ $t('layout.cancel') }}</span>
         </v-btn>
         <v-btn
-          :disabled="!modified"
           class="btn btn-primary ms-4"
           @click="apply">
           <span class="text-none">{{ $t('layout.apply') }}</span>
@@ -149,25 +139,14 @@
 <script>
 export default {
   data: () => ({
-    context: 'edit-section',
-    originalSection: null,
+    context: 'add-section',
+    parentContainer: null,
     section: null,
     drawer: false,
     rows: 0,
     cols: 0,
     index: null,
-    length: 0,
   }),
-  computed: {
-    sectionPreviewContainer() {
-      const section = JSON.parse(JSON.stringify(this.section));
-      section.children.forEach(c => c.children = []);
-      return section;
-    },
-    modified() {
-      return JSON.stringify(this.section) !== JSON.stringify(this.originalSection);
-    },
-  },
   watch: {
     rows(newVal, oldVal) {
       if (!this.drawer) {
@@ -206,13 +185,12 @@ export default {
     },
   },
   methods: {
-    open(section, index, length) {
-      this.section = JSON.parse(JSON.stringify(section));
-      this.originalSection = JSON.parse(JSON.stringify(section));
+    open(parentContainer, index) {
+      this.parentContainer = parentContainer;
       this.index = index;
-      this.length = length;
-      this.rows = this.section.rowsCount;
-      this.cols = this.section.colsCount;
+      this.rows = 1;
+      this.cols = 4;
+      this.section = this.$layoutUtils.newSection(null, null, this.rows, this.cols);
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     removeSection() {
@@ -228,7 +206,7 @@ export default {
       this.cols = this.$layoutUtils.colValues[index - 1];
     },
     apply() {
-      this.$root.$emit('layout-replace-section', this.index, this.section);
+      this.parentContainer.children.splice(this.index || 0, 0, this.section);
       this.close();
     },
     close() {
