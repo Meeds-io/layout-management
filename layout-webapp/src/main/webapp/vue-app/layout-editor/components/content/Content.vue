@@ -22,6 +22,8 @@
   <div>
     <layout-editor-container-container-extension
       :container="layoutToEdit" />
+    <layout-editor-section-add-drawer
+      ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
       ref="sectionEditDrawer" />
   </div>
@@ -40,6 +42,7 @@ export default {
   },
   data: () => ({
     layoutToEdit: null,
+    isCompatible: false,
   }),
   watch: {
     layout: {
@@ -49,9 +52,12 @@ export default {
           const layout = JSON.parse(JSON.stringify(this.layout));
           if (!layout.children?.length) {
             this.newParent(layout);
+            this.layoutToEdit = layout;
+            this.initSection(0, 3, 4);
+          } else {
+            this.layoutToEdit = layout;
           }
-          this.layoutToEdit = layout;
-          this.addSection(0, 3, 4);
+          this.isCompatible = this.$layoutUtils.parseLayout(layout);
         } else {
           this.layoutToEdit = null;
         }
@@ -77,36 +83,38 @@ export default {
       }
     },
     newParent(layout) {
-      const vuetifyAppContainer = this.$layoutUtils.newContainer('system:/groovy/portal/webui/container/UIContainer.gtmpl', 'VuetifyApp', layout);
-      this.$layoutUtils.newContainer('system:/groovy/portal/webui/container/UIContainer.gtmpl', 'v-application v-application--is-ltr v-application--wrap singlePageApplication', vuetifyAppContainer);
+      const vuetifyAppContainer = this.$layoutUtils.newContainer(this.$layoutUtils.simpleContainerTemplate, 'VuetifyApp', layout);
+      this.$layoutUtils.newContainer(this.$layoutUtils.simpleContainerTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication', vuetifyAppContainer);
     },
-    addSection(index, rows, cols) {
-      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
-      if (!parentContainer?.cssClass?.includes?.('v-application')) {
-        return;
+    initSection(index, rows, cols) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        this.$layoutUtils.newSection(parentContainer, index, rows, cols);
       }
-      this.$layoutUtils.newSection(parentContainer, index, rows, cols);
+    },
+    addSection(index) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        this.$refs.sectionAddDrawer.open(parentContainer, index);
+      }
     },
     removeSection(index) {
-      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
-      if (!parentContainer?.cssClass?.includes?.('v-application')) {
-        return;
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        parentContainer.children.splice(index, 1);
       }
-      parentContainer.children.splice(index, 1);
     },
     replaceSection(index, section) {
-      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
-      if (!parentContainer?.cssClass?.includes?.('v-application')) {
-        return;
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        parentContainer.children.splice(index, 1, section);
       }
-      parentContainer.children.splice(index, 1, section);
     },
     editSection(index) {
-      const parentContainer = this.layoutToEdit?.children?.[0]?.children?.[0];
-      if (!parentContainer?.cssClass?.includes?.('v-application')) {
-        return;
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
       }
-      this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
     },
   },
 };
