@@ -17,8 +17,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export const colValues = [1, 2, 3, 4, 6, 12];
 export const breakpoints = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+export const currentBreakpoint = 'xl';
+export const simpleTemplate = 'system:/groovy/portal/webui/container/UIContainer.gtmpl';
+export const gridTemplate = 'system:/groovy/portal/webui/container/UIVGridContainer.gtmpl';
+export const cellTemplate = 'system:/groovy/portal/webui/container/UIVCellContainer.gtmpl';
 
 export const containerModel = {
   // Used to add a specific id to the container on display
@@ -61,178 +65,6 @@ export const containerModel = {
   children: [],
 };
 
-export const currentBreakpoint = 'xl';
-
-export const simpleContainerTemplate = 'system:/groovy/portal/webui/container/UIContainer.gtmpl';
-export const rowContainerTemplate = 'system:/groovy/portal/webui/container/UIVRowContainer.gtmpl';
-export const colContainerTemplate = 'system:/groovy/portal/webui/container/UIVColContainer.gtmpl';
-
-export function addColumns(section, diffCols) {
-  if (!diffCols) {
-    return;
-  }
-  diffCols = Math.abs(diffCols);
-  const gridCols = section.colsCount;
-  const newGridCols = gridCols + diffCols;
-  if (colValues.indexOf(newGridCols) < 0) {
-    throw new Error(`${newGridCols} isn't compatible with grid system`);
-  }
-
-  const cells = JSON.parse(JSON.stringify(section.children));
-  const rows = extractRows(cells);
-  rows.forEach(row => {
-    row.forEach(cell => breakpoints.forEach(b => {
-      cell.breakpoints[b] *=  gridCols / newGridCols;
-    }));
-    for (let i = 0; i < diffCols; i++) {
-      const cell = newCell(null, null, newGridCols);
-      row.push(cell);
-    }
-  });
-
-  const children = [];
-  rows.forEach(row => row.forEach(c => children.push(c)));
-  // Update colsCount of designated section
-  applyGridStyle({children});
-  Object.assign(section, {
-    colsCount: newGridCols,
-    children,
-  });
-}
-
-export function removeColumns(section, diffCols) {
-  diffCols = Math.abs(diffCols);
-  if (!diffCols) {
-    return;
-  }
-  const gridCols = section.colsCount;
-  const cellSpan = 12 / gridCols;
-  const newGridCols = gridCols - diffCols;
-  if (colValues.indexOf(newGridCols) < 0) {
-    throw new Error(`${newGridCols} isn't compatible with grid system`);
-  }
-
-  const cells = JSON.parse(JSON.stringify(section.children));
-  const rows = extractRows(cells);
-
-  const expectedSpan = 12 - diffCols * cellSpan;
-  rows.forEach(row => {
-    while (row.slice().reduce((sum, c) => sum += c.breakpoints[currentBreakpoint], 0) > expectedSpan) {
-      const lastCell = row[row.length - 1];
-      if (lastCell) {
-        if (lastCell.breakpoints[currentBreakpoint] <= cellSpan) {
-          // Remove last cell
-          row.splice(row.length - 1, 1);
-        } else {
-          // Reduce Colspan of cell
-          breakpoints
-            .forEach(b => {
-              lastCell.breakpoints[b] = lastCell.breakpoints[b] - cellSpan;
-              if (lastCell.breakpoints[b] < 0) {
-                lastCell.breakpoints[b] = 0;
-              }
-            });
-        }
-      }
-    }
-    row.forEach(cell => breakpoints.forEach(b => {
-      cell.breakpoints[b] *=  gridCols / newGridCols;
-    }));
-  });
-
-  const children = [];
-  rows.forEach(row => row.forEach(c => children.push(c)));
-  // Update colsCount of designated section
-  applyGridStyle({children});
-  Object.assign(section, {
-    colsCount: newGridCols,
-    children,
-  });
-}
-
-export function addRows(section, diffRows) {
-  if (!diffRows) {
-    return;
-  }
-  const gridCols = section.colsCount;
-  const cells = JSON.parse(JSON.stringify(section.children));
-  const rows = extractRows(cells);
-  for (let i = 0; i < diffRows; i++) {
-    const row = [];
-    for (let j = 0; j < gridCols; j++) {
-      const cell = newCell(null, null, section.colsCount);
-      row.push(cell);
-    }
-    rows.push(row);
-  }
-  const children = [];
-  rows.forEach(row => row.forEach(c => children.push(c)));
-  // Update colsCount of designated section
-  applyGridStyle({children});
-  Object.assign(section, {
-    rowsCount: rows.length,
-    children,
-  });
-}
-
-export function removeRows(section, diffRows) {
-  if (!diffRows) {
-    return;
-  }
-  diffRows = Math.abs(diffRows);
-  const cells = JSON.parse(JSON.stringify(section.children));
-  const rows = extractRows(cells);
-  rows.splice(rows.length - diffRows, diffRows);
-
-  const children = [];
-  rows.forEach(row => row.forEach(c => children.push(c)));
-  // Update colsCount of designated section
-  applyGridStyle({children});
-  Object.assign(section, {
-    rowsCount: rows.length,
-    children,
-  });
-}
-
-export function newSection(parentContainer, index, rows, cols) {
-  rows = rows || 1;
-  cols = cols || 4;
-  const section = newContainer('system:/groovy/portal/webui/container/UIVRowContainer.gtmpl', null, parentContainer, index);
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      newCell(section, index, cols);
-    }
-  }
-  section.rowsCount = rows;
-  section.colsCount = cols;
-  return section;
-}
-
-export function newCell(section, index, cols) {
-  const span = 12 / cols;
-  const container = newContainer('system:/groovy/portal/webui/container/UIVColContainer.gtmpl',
-    `col-${span} py-0 aspect-ratio-1`,
-    section,
-    index);
-  parseCell(container);
-  return container;
-}
-
-export function newContainer(template, cssClass, parentContainer, index) {
-  const container = JSON.parse(JSON.stringify(containerModel));
-  container.template = template;
-  container.cssClass = cssClass;
-  container.storageId = parseInt(Math.random() * 65536);
-  container.color = `#${parseInt(256 - Math.random() * 128).toString(16)}${parseInt(256 - Math.random() * 128).toString(16)}${parseInt(256 - Math.random() * 128).toString(16)}`;
-  container.id = container.storageId;
-  container.name = container.storageId;
-  if (parentContainer) {
-    container.parentId = parentContainer.storageId;
-    parentContainer.children.splice(index || 0, 0, container);
-  }
-  return container;
-}
-
 export function getParentContainer(layout) {
   const parentContainer = layout?.children?.[0]?.children?.[0];
   if (!parentContainer?.cssClass?.includes?.('v-application')) {
@@ -242,13 +74,19 @@ export function getParentContainer(layout) {
   }
 }
 
-export function parseLayout(layout) {
+export function newParentContainer(layout) {
+  const vuetifyAppContainer = newContainer(simpleTemplate, 'VuetifyApp', layout, 0);
+  const parent = newContainer(simpleTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication', vuetifyAppContainer, 0);
+  newSection(parent, 0, 3, 4);
+}
+
+export function parseSections(layout) {
   const parentContainer = getParentContainer(layout);
   if (parentContainer) {
-    const compatible = parentContainer.children.every(c => c.template === rowContainerTemplate);
+    const compatible = parentContainer.children.every(c => c.template === gridTemplate);
     if (compatible) {
       try {
-        parentContainer.children.forEach(parseRow);
+        parentContainer.children.forEach(parseSection);
       } catch (e) {
         console.debug(e); // eslint-disable-line no-console
         return false;
@@ -260,42 +98,231 @@ export function parseLayout(layout) {
   }
 }
 
-function parseRow(rowContainer) {
-  if (!rowContainer.children.length) {
+export function getSection(layout, id) {
+  const parentContainer = getParentContainer(layout);
+  return parentContainer?.children?.find?.(c => c.storageId === id);
+}
+
+export function newSection(parentContainer, index, rows, cols) {
+  rows = rows || 1;
+  cols = cols || 4;
+  const section = newContainer(
+    gridTemplate,
+    null,
+    parentContainer,
+    index || 0);
+  applyBreakpointValues(section, rows, cols);
+  applyGridStyle(section);
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      newCell(section, 0, 1, 1);
+    }
+  }
+  // Compute cell indexes
+  parseMatrix(section);
+  return section;
+}
+
+export function addRows(section, diffRows) {
+  if (!diffRows) {
     return;
   }
-  rowContainer.children.forEach(parseCell);
-  const cellsCount = rowContainer.children.reduce((sum, c) => sum += c.breakpoints[currentBreakpoint], 0);
-  rowContainer.rowsCount = parseInt(cellsCount / 12);
-  rowContainer.colsCount = 12 / Math.min(...rowContainer.children.map(c => c.breakpoints[currentBreakpoint]));
+  diffRows = Math.abs(diffRows);
+  const sectionToModify = JSON.parse(JSON.stringify(section));
+  for (let i = 0; i < section.colsCount; i++) {
+    for (let j = 0; j < diffRows; j++) {
+      newCell(sectionToModify, sectionToModify.children.length, 1, 1);
+    }
+  }
+  sectionToModify.rowsCount += diffRows;
+  applyBreakpointValues(sectionToModify, sectionToModify.rowsCount, sectionToModify.colsCount);
+  applyGridStyle(sectionToModify);
+  Object.assign(section, sectionToModify);
+}
+
+export function addColumns(section, diffCols) {
+  if (!diffCols) {
+    return;
+  }
+  diffCols = Math.abs(diffCols);
+  const sectionToModify = JSON.parse(JSON.stringify(section));
+  const children = sectionToModify.children.slice();
+  let colsCount = 0;
+  let added = 0;
+  for (let i = 0; i < children.length; i++) {
+    const index = i + added;
+    colsCount += sectionToModify.children[index].colsCount;
+    if ((colsCount % sectionToModify.colsCount) === 0) {
+      for (let j = 0; j < diffCols; j++) {
+        newCell(sectionToModify, index + 1, 1, 1);
+        added++;
+      }
+    }
+  }
+  sectionToModify.colsCount += diffCols;
+  applyBreakpointValues(sectionToModify, sectionToModify.rowsCount, sectionToModify.colsCount);
+  applyGridStyle(sectionToModify);
+  Object.assign(section, sectionToModify);
+}
+
+export function removeRows(section, diffRows) {
+  if (!diffRows) {
+    return;
+  }
+  diffRows = Math.abs(diffRows);
+  const matrix = parseMatrix(section);
+  for (let i = 0; i < diffRows; i++) {
+    for (let j = 0; j < section.colsCount; j++) {
+      const cell = getCell(section, section.rowsCount - i - 1, j, matrix);
+      breakpoints.forEach(b => {
+        if (cell.rowBreakpoints[b]) {
+          cell.rowBreakpoints[b]--;
+        }
+      });
+    }
+  }
+  const sectionToModify = JSON.parse(JSON.stringify(section));
+  sectionToModify.rowsCount -= diffRows;
+  filterChildren(sectionToModify);
+  applyBreakpointValues(sectionToModify, sectionToModify.rowsCount, sectionToModify.colsCount);
+  applyGridStyle(sectionToModify);
+  Object.assign(section, sectionToModify);
+}
+
+export function removeColumns(section, diffCols) {
+  diffCols = Math.abs(diffCols);
+  if (!diffCols) {
+    return;
+  }
+  diffCols = Math.abs(diffCols);
+  const matrix = parseMatrix(section);
+  for (let i = 0; i < diffCols; i++) {
+    for (let j = 0; j < section.rowsCount; j++) {
+      const cell = getCell(section, j, section.colsCount - i - 1, matrix);
+      breakpoints.forEach(b => {
+        if (cell.colBreakpoints[b]) {
+          cell.colBreakpoints[b]--;
+        }
+      });
+    }
+  }
+  const sectionToModify = JSON.parse(JSON.stringify(section));
+  sectionToModify.colsCount -= diffCols;
+  filterChildren(sectionToModify);
+  applyBreakpointValues(sectionToModify, sectionToModify.rowsCount, sectionToModify.colsCount);
+  applyGridStyle(sectionToModify);
+  Object.assign(section, sectionToModify);
+}
+
+export function refreshCellIndexes(section) {
+  parseSectionMatrix(section, parseMatrix(section));
+  applyBreakpointValues(section, section.rowsCount, section.colsCount);
+  applyGridStyle(section);
+}
+
+export function resizeCell(section, cell, rowIndex, colIndex) {
+  const matrix = parseMatrix(section);
+  for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
+    for (let col = cell.colIndex; col < (cell.colIndex + cell.colsCount); col++) {
+      matrix[row][col] = null;
+    }
+  }
+  for (let row = cell.rowIndex; row <= rowIndex; row++) {
+    for (let col = cell.colIndex; col <= colIndex; col++) {
+      matrix[row][col] = cell;
+    }
+  }
+  parseSectionMatrix(section, matrix);
+  applyGridStyle(section);
+}
+
+function newCell(section, index, rows, cols) {
+  const container = newContainer(cellTemplate,
+    null,
+    (index === 0 || index) && section || null,
+    index);
+  applyBreakpointValues(container, rows, cols);
+  applyGridStyle(container);
+  return container;
+}
+
+function newContainer(template, cssClass, parentContainer, index) {
+  const container = JSON.parse(JSON.stringify(containerModel));
+  container.template = template;
+  container.cssClass = cssClass || '';
+  container.storageId = parseInt(Math.random() * 65536);
+  container.color = `#${parseInt(256 - Math.random() * 128).toString(16)}${parseInt(256 - Math.random() * 128).toString(16)}${parseInt(256 - Math.random() * 128).toString(16)}`;
+  container.id = container.storageId;
+  container.name = container.storageId;
+  if (parentContainer && (index || index === 0)) {
+    container.parentId = parentContainer.storageId;
+    parentContainer.children.splice(index || 0, 0, container);
+  }
+  return container;
+}
+
+function parseSection(section) {
+  if (section.template !== gridTemplate || !section.children.length) {
+    return;
+  }
+  section.children.forEach(parseCell);
+
+  section.colBreakpoints = parseBreakpointClasses(section, 'grid-cols');
+  section.rowBreakpoints = parseBreakpointClasses(section, 'grid-rows');
+  section.colsCount = section.colBreakpoints[currentBreakpoint];
+  section.rowsCount = section.rowBreakpoints[currentBreakpoint];
+  // Compute cell indexes
+  parseMatrix(section);
+}
+
+function parseCell(colContainer) {
+  if (colContainer.template !== cellTemplate) {
+    throw Error(`Container template '${colContainer.template}' not compatible. Fallback to old editor.`);
+  }
+  colContainer.colBreakpoints = parseBreakpointClasses(colContainer, 'grid-cell-colspan');
+  colContainer.rowBreakpoints = parseBreakpointClasses(colContainer, 'grid-cell-rowspan');
+  colContainer.colsCount = colContainer.colBreakpoints[currentBreakpoint];
+  colContainer.rowsCount = colContainer.rowBreakpoints[currentBreakpoint];
 }
 
 function applyGridStyle(container) {
   container.children.forEach(applyGridStyle);
-  if (!container.cssClass?.length) {
-    return;
-  } else {
-    let cssClasses = container.cssClass || '';
-    const colClasses = cssClasses.match(/(^| )col-((sm|md|lg|xl)-)?[0-9]{1,2}/g);
-    if (colClasses?.length) {
-      colClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
-    }
-    if (container.breakpoints) {
-      cssClasses = cssClasses.replace(/  +/g, ' ');
-      breakpoints.forEach(b => cssClasses += ` col${b !== 'xs' && `-${  b}` || ''}-${container.breakpoints[b]}`);
-      container.cssClass = cssClasses;
-    }
+  if (container.template === gridTemplate) {
+    applyBreakpointClasses(container, 'grid-rows', 'grid-cols');
+  } else if (container.template === cellTemplate) {
+    applyBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
   }
 }
 
-function parseCell(colContainer) {
-  if (colContainer.template !== colContainerTemplate) {
-    throw Error(`Container template '${colContainer.template}' not compatible. Fallback to old editor.`);
+function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
+  let cssClasses = container.cssClass || '';
+
+  const colClasses = cssClasses.match(new RegExp(`(^| )${colClassPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
+  // Remove old Classes
+  if (colClasses?.length) {
+    colClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
   }
-  const colClasses = colContainer.cssClass.match(/(^| )col-((sm|md|lg|xl)-)?[0-9]{1,2}/g);
-  if (!colClasses.length) {
-    throw Error(`Container CSS classes '${colContainer.cssClass}' not compatible. Fallback to old editor.`);
+  // Apply new Classes
+  cssClasses = cssClasses.replace(/  +/g, ' ');
+  if (container.colBreakpoints) {
+    breakpoints.forEach(b => cssClasses += ` ${colClassPrefix}${b !== 'xs' && `-${  b}` || ''}-${container.colBreakpoints[b]}`);
   }
+
+  const rowClasses = cssClasses.match(new RegExp(`(^| )${rowClassPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
+  // Remove old Classes
+  if (rowClasses?.length) {
+    rowClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
+  }
+  // Apply new Classes
+  if (container.rowBreakpoints) {
+    breakpoints.forEach(b => cssClasses += ` ${rowClassPrefix}${b !== 'xs' && `-${  b}` || ''}-${container.rowBreakpoints[b]}`);
+  }
+  container.cssClass = cssClasses;
+}
+
+function parseBreakpointClasses(container, classPrefix) {
+  const classes = container.cssClass.match(new RegExp(`(^| )${classPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
   const bp = {
     xs: 0,
     sm: 0,
@@ -304,13 +331,15 @@ function parseCell(colContainer) {
     xl: 0,
   };
   breakpoints.forEach(b => {
-    const prefix = b === 'xs' ?  'col-' : `col-${b}-`;
-    const colClass = colClasses.find(c => c.match(`${prefix}[0-9]{1,2}`)?.length);
-    if (colClass) {
-      const colCount = Number(colClass.replace(prefix, ''));
-      if (!Number.isNaN(colCount)) {
-        bp[b] = colCount;
+    const prefix = b === 'xs' ?  `${classPrefix}-` : `${classPrefix}-${b}-`;
+    const aClass = classes.find(c => c.match(`${prefix}[0-9]{1,2}`)?.length);
+    if (aClass) {
+      const span = Number(aClass.replace(prefix, ''));
+      if (!Number.isNaN(span)) {
+        bp[b] = span;
       }
+    } else {
+      bp[b] = 1;
     }
   });
   bp.xl = bp.xl || bp.lg || bp.md || bp.sm || bp.xs;
@@ -318,27 +347,114 @@ function parseCell(colContainer) {
   bp.md = bp.md || bp.sm || bp.xs;
   bp.sm = bp.sm || bp.xs;
   if (bp.xl) {
-    colContainer.breakpoints = bp;
+    return bp;
   } else {
-    throw Error(`Container CSS classes '${colContainer.cssClass}' not compatible. Fallback to old editor.`);
+    throw Error(`CSS classes '${container.cssClass}' not compatible. Fallback to old editor.`);
   }
 }
 
-function extractRows(cells) {
-  const rows = [];
-  let rowCols = 0;
-  if (cells.length) {
-    let row = [];
-    cells.forEach(cell => {
-      if (!row.length) {
-        rows.push(row);
-      }
-      row.push(cell);
-      rowCols += cell.breakpoints[currentBreakpoint];
-      if (rowCols % 12 === 0) {
-        row = [];
-      }
-    });
+function applyBreakpointValues(container, rows, cols) {
+  if (!container.colBreakpoints) {
+    container.colBreakpoints = {};
   }
-  return rows;
+  if (!container.rowBreakpoints) {
+    container.rowBreakpoints = {};
+  }
+  breakpoints.forEach(b => {
+    container.colBreakpoints[b] = cols;
+    container.rowBreakpoints[b] = rows;
+  });
+  container.colsCount = container.colBreakpoints[currentBreakpoint];
+  container.rowsCount = container.rowBreakpoints[currentBreakpoint];
+}
+
+function filterChildren(section) {
+  section.children = section.children.filter(c => {
+    const colSpan = breakpoints.reduce((sum, b) => sum += c.colBreakpoints[b], 0);
+    const rowSpan = breakpoints.reduce((sum, b) => sum += c.rowBreakpoints[b], 0);
+    return colSpan && rowSpan;
+  });
+}
+
+function getCell(section, rowIndex, colIndex, matrix) {
+  if (!matrix) {
+    matrix = parseMatrix(section);
+  }
+  return matrix[rowIndex][colIndex];
+}
+
+function parseMatrix(section) {
+  const matrix = {};
+  for (let i = 0; i < section.rowsCount; i++) {
+    matrix[i] = {};
+    for (let j = 0; j < section.colsCount; j++) {
+      matrix[i][j] = null;
+    }
+  }
+  let rowIndex = 0;
+  let colIndex = 0;
+  section.children.forEach(cell => {
+    cell.rowIndex = -1;
+    cell.colIndex = -1;
+  });
+  section.children.forEach(cell => {
+    while (matrix[rowIndex][colIndex]) {
+      colIndex++;
+      if ((colIndex % section.colsCount) === 0) {
+        colIndex = 0;
+        rowIndex++;
+      }
+    }
+    cell.rowIndex = rowIndex;
+    cell.colIndex = colIndex;
+    for (let row = 0; row < cell.rowsCount; row++) {
+      for (let col = 0; col < cell.colsCount; col++) {
+        if (cell.rowIndex + row < section.rowsCount
+            && cell.colIndex + col < section.colsCount) {
+          matrix[cell.rowIndex + row][cell.colIndex + col] = cell;
+        }
+      }
+    }
+    colIndex = cell.colIndex + cell.colsCount;
+    if ((colIndex % section.colsCount) === 0) {
+      colIndex = 0;
+      rowIndex++;
+    }
+  });
+  return matrix;
+}
+
+function parseSectionMatrix(section, matrix) {
+  const children = [];
+  for (let row = 0; row < section.rowsCount; row++) {
+    for (let col = 0; col < section.colsCount; col++) {
+      let cell = matrix[row][col];
+      if (!cell) {
+        cell = newCell(null, 0, 1, 1);
+        matrix[row][col] = cell;
+      }
+      if (!children.find(c => c.storageId === cell.storageId)) {
+        children.push(cell);
+        cell.rowIndex = row;
+        cell.colIndex = col;
+        cell.rowsCount = 0;
+        for (let i = row; i < section.rowsCount; i++) {
+          if (matrix[i]?.[col]?.storageId === cell.storageId) {
+            cell.rowsCount++;
+          }
+        }
+        cell.colsCount = 0;
+        for (let j = col; j < section.colsCount; j++) {
+          if (matrix[row]?.[j]?.storageId === cell.storageId) {
+            cell.colsCount++;
+          }
+        }
+        breakpoints.forEach(b => {
+          cell.rowBreakpoints[b] = cell.rowsCount;
+          cell.colBreakpoints[b] = cell.colsCount;
+        });
+      }
+    }
+  }
+  Object.assign(section, {children});
 }
