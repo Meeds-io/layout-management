@@ -28,95 +28,11 @@
     <template #title>
       {{ $t('layout.editSectionTitle', {0: index + 1}) }}
     </template>
-    <template v-if="drawer" #content>
+    <template v-if="drawer && section" #content>
       <v-card class="pa-4" flat>
-        <div v-show="rows && cols">
-          <span class="my-0 subtitle-1 text-color font-weight-bold">{{ $t('layout.chooseSectionDisplay') }}</span>
-          <div class="d-flex my-2">
-            <div class="flex-grow-0 flex-shrink-0 align-start">
-              <span class="subtitle-1 text-color">{{ $t('layout.row') }}</span>
-            </div>
-            <v-card
-              class="flex-grow-1 flex-shrink-1 align-end ms-auto mt-4"
-              max-width="80%"
-              flat>
-              <v-slider
-                v-model="rows"
-                :thumb-size="24"
-                :min="1"
-                :max="12"
-                thumb-label="always">
-                <template #prepend>
-                  <v-btn
-                    :disabled="rows === 1"
-                    class="me-n2 mt-n1"
-                    icon
-                    fab
-                    x-small
-                    @click="rows--">
-                    <v-icon class="pt-2px">fa-minus</v-icon>
-                  </v-btn>
-                </template>
-                <template #append>
-                  <v-btn
-                    :disabled="rows === 12"
-                    class="ms-n2 mt-n1"
-                    icon
-                    fab
-                    x-small
-                    @click="rows++">
-                    <v-icon class="pt-2px">fa-plus</v-icon>
-                  </v-btn>
-                </template>
-              </v-slider>
-            </v-card>
-          </div>
-          <div class="d-flex my-2">
-            <div class="flex-grow-0 flex-shrink-0 align-start">
-              <span class="subtitle-1 text-color">{{ $t('layout.column') }}</span>
-            </div>
-            <v-card
-              class="flex-grow-1 flex-shrink-1 align-end ms-auto"
-              max-width="80%"
-              flat>
-              <v-slider
-                v-model="cols"
-                :thumb-size="24"
-                :min="1"
-                :max="12"
-                thumb-label="always">
-                <template #prepend>
-                  <v-btn
-                    :disabled="cols === 1"
-                    class="me-n2 mt-n1"
-                    icon
-                    fab
-                    x-small
-                    @click="decrementCols">
-                    <v-icon class="pt-2px">fa-minus</v-icon>
-                  </v-btn>
-                </template>
-                <template #append>
-                  <v-btn
-                    :disabled="cols === 12"
-                    class="ms-n2 mt-n1"
-                    fab
-                    icon
-                    x-small
-                    @click="incrementCols">
-                    <v-icon class="pt-2px">fa-plus</v-icon>
-                  </v-btn>
-                </template>
-              </v-slider>
-            </v-card>
-          </div>
-          <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pt-2 px-2">
-            <layout-editor-container-container-extension
-              :container="sectionPreviewContainer"
-              :context="context"
-              style="zoom: 0.3" />
-          </div>
-        </div>
+        <layout-editor-section-grid-editor
+          :section="section"
+          context="edit-section" />
       </v-card>
     </template>
     <template #footer>
@@ -153,56 +69,21 @@ export default {
     originalSection: null,
     section: null,
     drawer: false,
-    rows: 0,
-    cols: 0,
     index: null,
     length: 0,
   }),
   computed: {
     sectionPreviewContainer() {
-      const section = JSON.parse(JSON.stringify(this.section));
-      section.children.forEach(c => c.children = []);
-      return section;
+      if (this.section) {
+        const section = JSON.parse(JSON.stringify(this.section));
+        section.children.forEach(c => c.children = []);
+        return section;
+      } else {
+        return null;
+      }
     },
     modified() {
-      return JSON.stringify(this.section) !== JSON.stringify(this.originalSection);
-    },
-  },
-  watch: {
-    rows(newVal, oldVal) {
-      if (!this.drawer) {
-        return;
-      }
-      const diff = newVal - oldVal;
-      if (!diff) {
-        return;
-      } else if (diff > 0) {
-        this.$layoutUtils.addRows(this.section, diff);
-      } else {
-        this.$layoutUtils.removeRows(this.section, diff);
-      }
-    },
-    cols() {
-      if (!this.drawer) {
-        return;
-      }
-      const diff = this.cols - this.section.colsCount;
-      if (!diff) {
-        return;
-      }
-      if (this.$layoutUtils.colValues.indexOf(this.cols) < 0) {
-        if (diff > 0) {
-          const index = this.$layoutUtils.colValues.indexOf(this.section.colsCount);
-          this.cols = this.$layoutUtils.colValues[index + 1];
-        } else {
-          const index = this.$layoutUtils.colValues.indexOf(this.section.colsCount);
-          this.cols = this.$layoutUtils.colValues[index - 1];
-        }
-      } else if (diff > 0) {
-        this.$layoutUtils.addColumns(this.section, diff);
-      } else {
-        this.$layoutUtils.removeColumns(this.section, diff);
-      }
+      return this.section && JSON.stringify(this.section.children) !== JSON.stringify(this.originalSection.children);
     },
   },
   methods: {
@@ -211,21 +92,11 @@ export default {
       this.originalSection = JSON.parse(JSON.stringify(section));
       this.index = index;
       this.length = length;
-      this.rows = this.section.rowsCount;
-      this.cols = this.section.colsCount;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     removeSection() {
       this.close();
       this.$root.$emit('layout-remove-section', this.index);
-    },
-    incrementCols() {
-      const index = this.$layoutUtils.colValues.indexOf(this.cols);
-      this.cols = this.$layoutUtils.colValues[index + 1];
-    },
-    decrementCols() {
-      const index = this.$layoutUtils.colValues.indexOf(this.cols);
-      this.cols = this.$layoutUtils.colValues[index - 1];
     },
     apply() {
       this.$root.$emit('layout-replace-section', this.index, this.section);
@@ -233,6 +104,7 @@ export default {
     },
     close() {
       this.$refs.drawer.close();
+      this.section = null;
     },
   },
 };
