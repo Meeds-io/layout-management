@@ -45,19 +45,19 @@ export default {
     isCompatible: false,
   }),
   watch: {
+    layoutToEdit() {
+      this.$root.layout = this.layoutToEdit;
+    },
     layout: {
       immediate: true,
       handler() {
         if (this.layout) {
           const layout = JSON.parse(JSON.stringify(this.layout));
           if (!layout.children?.length) {
-            this.newParent(layout);
-            this.layoutToEdit = layout;
-            this.initSection(0, 3, 4);
-          } else {
-            this.layoutToEdit = layout;
+            this.$layoutUtils.newParentContainer(layout);
           }
-          this.isCompatible = this.$layoutUtils.parseLayout(layout);
+          this.layoutToEdit = layout;
+          this.isCompatible = this.$layoutUtils.parseSections(layout);
         } else {
           this.layoutToEdit = null;
         }
@@ -71,25 +71,25 @@ export default {
     this.$root.$on('layout-remove-section', this.removeSection);
     this.$root.$on('layout-replace-section', this.replaceSection);
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
+    this.$root.$on('layout-cell-resize', this.handleCellMerge);
   },
   methods: {
     save() {
       // TODO
     },
+    handleCellMerge(parentId, container, targetCellRowIndex, targetCellColIndex) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === parentId);
+      if (section) {
+        this.$layoutUtils.mergeCell(section, container, targetCellRowIndex, targetCellColIndex);
+      } else {
+        console.warn(`Can't find section with id ${parentId}`); // eslint-disable-line no-console
+      }
+    },
     handleSectionUpdated(container, children, index, type) {
       container.children = children;
       if (type === 'section' && !container.children?.length) {
         window.setTimeout(() => this.removeSection(index), 500);
-      }
-    },
-    newParent(layout) {
-      const vuetifyAppContainer = this.$layoutUtils.newContainer(this.$layoutUtils.simpleContainerTemplate, 'VuetifyApp', layout);
-      this.$layoutUtils.newContainer(this.$layoutUtils.simpleContainerTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication', vuetifyAppContainer);
-    },
-    initSection(index, rows, cols) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        this.$layoutUtils.newSection(parentContainer, index, rows, cols);
       }
     },
     addSection(index) {
