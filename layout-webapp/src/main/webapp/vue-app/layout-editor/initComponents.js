@@ -24,9 +24,10 @@ import SaveButton from './components/toolbar/actions/SaveButton.vue';
 
 import Content from './components/content/Content.vue';
 
-import SectionBorderMenu from './components/content/common/SectionBorderMenu.vue';
 import ContainerExtension from './components/content/common/ContainerExtension.vue';
 import ContainerBase from './components/content/common/ContainerBase.vue';
+import SectionBorderMenu from './components/content/common/SectionBorderMenu.vue';
+import SectionGridEditor from './components/content/common/SectionGridEditor.vue';
 
 import Page from './components/content/container/Page.vue';
 import Container from './components/content/container/Container.vue';
@@ -48,6 +49,7 @@ const components = {
   'layout-editor-container-row': Row,
   'layout-editor-container-column': Column,
   'layout-editor-section-border-menu': SectionBorderMenu,
+  'layout-editor-section-grid-editor': SectionGridEditor,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-section-add-drawer': AddSectionDrawer,
 };

@@ -28,7 +28,7 @@
       :style="cssStyle"
       :options="dragOptions"
       item-key="storageId"
-      class="z-index-two"
+      class="position-relative z-index-two"
       @start="startMoving"
       @end="endMoving">
       <layout-editor-container-container-extension
@@ -38,19 +38,17 @@
         :parent-id="storageId"
         :index="i"
         :length="children.length"
-        :class="draggableContainerClass" />
+        :class="draggableContainerClass"
+        :cell-height="cellHeight"
+        :cell-width="cellWidth"
+        @move-start="$emit('move-start')" />
     </draggable>
     <div
       v-else
       :id="id"
       :class="cssClass"
       :style="cssStyle">
-      <slot v-if="$slots.content" name="content"></slot>
-      <div
-        v-if="noChildren"
-        :style="colorStyle"
-        class="d-flex align-center justify-center full-width full-height position-relative">
-      </div>
+      <slot name="content"></slot>
       <layout-editor-container-container-extension
         v-for="(child, i) in children"
         :key="child.storageId"
@@ -58,7 +56,9 @@
         :parent-id="storageId"
         :index="i"
         :length="children.length"
-        :context="context" />
+        :context="context"
+        :cell-height="cellHeight"
+        :cell-width="cellWidth" />
     </div>
   </v-hover>
 </template>
@@ -93,11 +93,34 @@ export default {
       type: String,
       default: null,
     },
+    cellHeight: {
+      type: Number,
+      default: () => 0,
+    },
+    cellWidth: {
+      type: Number,
+      default: () => 0,
+    },
+    colsCount: {
+      type: Number,
+      default: () => 0,
+    },
   },
   data: () => ({
     hover: false,
-    dragged: false,
     children: [],
+    dragged: false,
+    resize: false,
+    resizeX: 0,
+    resizeY: 0,
+    resizeHeight: 0,
+    resizeWidth: 0,
+    originalX: 0,
+    originalY: 0,
+    originalHeight: 0,
+    originalWidth: 0,
+    cellCols: 0,
+    cellRows: 0,
   }),
   computed: {
     id() {
@@ -115,17 +138,11 @@ export default {
     storageId() {
       return this.container?.storageId;
     },
-    colorStyle() {
-      return `background-color: ${this.container.color};`;
-    },
     height() {
       return this.container.height;
     },
     width() {
       return this.container.width;
-    },
-    draggable() {
-      return !this.context && (this.children.length > 1 || this.forceDraggable);
     },
     cssStyle() {
       if (!this.height && !this.width) {
@@ -142,16 +159,16 @@ export default {
       }
     },
     cssClass() {
-      return `${this.container.cssClass} ${this.draggable && 'v-draggable position-relative' || ''} ${this.noChildren && 'draggable position-relative pb-5' || ''}`;
+      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative pb-5' || ''}`;
+    },
+    draggable() {
+      return !this.context && (this.children.length > 1 || this.forceDraggable);
     },
     draggableContainerClass() {
       return `draggable-container-${this.storageId}`;
     },
     dragOptions() {
       return {
-        group: {
-          name: this.type,
-        },
         draggable: `.${this.draggableContainerClass}`,
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
@@ -164,10 +181,6 @@ export default {
     hover() {
       this.$emit('hovered', this.hover);
     },
-    dragged() {
-      this.$root.draggedContainer = this.dragged && this.storageId || null;
-      this.$root.$emit('layout-move-container', this.dragged, this.storageId);
-    },
     containerChildren() {
       if (JSON.stringify(this.containerChildren) !== JSON.stringify(this.children)) {
         this.refreshChildren();
@@ -178,17 +191,15 @@ export default {
         this.$root.$emit('layout-children-size-updated', this.container, this.children, this.index, this.type);
       }
     },
+    dragged() {
+      this.$root.draggedContainer = this.dragged && this.storageId || null;
+      this.$root.$emit('layout-move-container', this.dragged, this.storageId, this.parentId);
+    },
   },
   created() {
     this.refreshChildren();
   },
   methods: {
-    startMoving() {
-      this.dragged = true;
-    },
-    endMoving() {
-      this.dragged = false;
-    },
     refreshChildren() {
       if (!this.context) {
         this.children = this.container?.children;
@@ -200,6 +211,12 @@ export default {
     },
     hasUnit(length) {
       return Number.isNaN(Number(length));
+    },
+    startMoving() {
+      this.dragged = true;
+    },
+    endMoving() {
+      this.dragged = false;
     },
   },
 };

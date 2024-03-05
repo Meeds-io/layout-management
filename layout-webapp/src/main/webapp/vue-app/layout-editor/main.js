@@ -50,8 +50,19 @@ export function init() {
         data: {
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           editPage: true,
+          layout: null,
           draggedContainer: null,
           draggedSection: null,
+          resizeDimensions: null,
+          resizeParentId: null,
+        },
+        computed: {
+          resizeMouseX() {
+            return this.resizeDimensions && (this.resizeDimensions.x + this.resizeDimensions.width);
+          },
+          resizeMouseY() {
+            return this.resizeDimensions && (this.resizeDimensions.y + this.resizeDimensions.height);
+          },
         },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
