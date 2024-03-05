@@ -19,16 +19,24 @@
 
 -->
 <template>
-  <div class="position-relative layout-section">
+  <div
+    ref="section"
+    class="position-relative layout-section">
     <layout-editor-container-container-base
+      ref="container"
       :container="container"
       :index="index"
       :length="length"
       :context="context"
+      :moving="movingChildren"
+      :cell-height="cellHeight"
+      :cell-width="cellWidth"
+      :cols-count="colsCount"
+      :rows-count="rowsCount"
       type="section"
-      class="row mx-n3 border-box-sizing"
       force-draggable
-      @hovered="hoverSection = $event" />
+      @hovered="hoverSection = $event"
+      @move-start="movingChildren = true" />
     <v-hover v-if="!context">
       <div
         v-if="!context"
@@ -69,23 +77,121 @@ export default {
   data: () => ({
     hoverSection: false,
     movingSection: false,
+    movingChildren: false,
+    resizingCell: null,
+    mouseX: 0,
+    sectionWidth: 0,
+    sectionX: 0,
+    sectionY: 0,
   }),
+  computed: {
+    cellWidth() {
+      return this.sectionWidth && this.colsCount && this.sectionWidth / this.colsCount;
+    },
+    cellHeight() {
+      return this.cellWidth;
+    },
+    colsCount() {
+      return this.container?.colsCount;
+    },
+    rowsCount() {
+      return this.container?.rowsCount;
+    },
+    resizingCellColIndex() {
+      return this.resizingCell?.colIndex;
+    },
+    resizingCellRowIndex() {
+      return this.resizingCell?.rowIndex;
+    },
+    mouseCellColIndex() {
+      return Math.max(
+        Math.min(
+          Math.ceil((this.mouseX - this.sectionX) / this.cellWidth) - 1,
+          this.colsCount - 1
+        ),
+        this.resizingCellColIndex
+      );
+    },
+    mouseCellRowIndex() {
+      return Math.max(
+        Math.min(
+          Math.ceil((this.mouseY - this.sectionY) / this.cellHeight) - 1,
+          this.rowsCount - 1
+        ),
+        this.resizingCellRowIndex
+      );
+    },
+  },
   watch: {
     movingSection() {
       this.$root.draggedContainerType = this.movingSection && 'section' || null;
     },
+    colsCount() {
+      this.refreshDimensions();
+    },
+    rowsCount() {
+      this.refreshDimensions();
+    },
   },
   created() {
     this.$root.$on('layout-move-container', this.handleMoving);
+    this.$root.$on('layout-cell-resize-start', this.handleCellResizeStart);
+    this.$root.$on('layout-cell-resize-end', this.handleCellResizeEnd);
+  },
+  mounted() {
+    if (!this.context) {
+      window.addEventListener('resize', this.refreshDimensions);
+      document.querySelector('.page-scroll-content').addEventListener('scroll', this.refreshDimensions);
+    }
+    this.refreshDimensions();
   },
   beforeDestroy() {
     this.$root.$off('layout-move-container', this.handleMoving);
+    this.$root.$off('layout-cell-resize-start', this.handleCellResizeStart);
+    this.$root.$off('layout-cell-resize-end', this.handleCellResizeEnd);
+    if (!this.context) {
+      window.removeEventListener('resize', this.refreshDimensions);
+      document.querySelector('.page-scroll-content').removeEventListener('scroll', this.refreshDimensions);
+    }
   },
   methods: {
-    handleMoving(moving) {
+    handleMoving(moving, storageId, sectionId) {
       if (this.movingSection && !moving) {
         this.movingSection = false;
+      } else if (sectionId === this.container.storageId) {
+        window.setTimeout(() => {
+          this.$layoutUtils.refreshCellIndexes(this.container);
+        }, 300);
       }
+    },
+    refreshDimensions() {
+      window.setTimeout(() => {
+        const dimensions = this.$refs.section.getBoundingClientRect();
+        this.sectionWidth = dimensions.width;
+        this.sectionX = dimensions.x;
+        this.sectionY = dimensions.y;
+      }, 300);
+    },
+    handleCellResizeStart(sectionId, cell) {
+      if (sectionId !== this.container.storageId) {
+        return;
+      }
+      this.resizingCell = cell;
+      this.$refs.container.$el.addEventListener('mousemove', this.handleMouseMove);
+    },
+    handleCellResizeEnd(sectionId) {
+      if (sectionId !== this.container.storageId) {
+        return;
+      }
+      this.$layoutUtils.resizeCell(this.container, this.resizingCell, this.mouseCellRowIndex, this.mouseCellColIndex);
+      this.$refs.container.$el.removeEventListener('mousemove', this.handleMouseMove);
+      this.resizingCell = null;
+      this.mouseX = 0;
+      this.mouseY = 0;
+    },
+    handleMouseMove(event) {
+      this.mouseX = event.x;
+      this.mouseY = event.y;
     },
   },
 };
