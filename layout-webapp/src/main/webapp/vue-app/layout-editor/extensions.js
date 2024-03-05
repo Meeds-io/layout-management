@@ -33,14 +33,14 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 10,
-  type: 'row',
-  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIVRowContainer.gtmpl'),
+  type: 'grid',
+  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIVGridContainer.gtmpl'),
   containerType: 'layout-editor-container-row',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 10,
-  type: 'column',
-  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIVColContainer.gtmpl'),
+  type: 'grid-cell',
+  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIVCellContainer.gtmpl'),
   containerType: 'layout-editor-container-column',
 });

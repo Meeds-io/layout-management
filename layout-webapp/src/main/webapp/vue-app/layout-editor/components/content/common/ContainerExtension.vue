@@ -19,15 +19,19 @@
 
 -->
 <template>
-  <KeepAlive>
-    <component
-      v-if="containerType"
-      :is="containerType"
-      :container="container"
-      :index="index"
-      :length="length"
-      :context="context" />
-  </KeepAlive>
+  <component
+    v-if="containerType"
+    :is="containerType"
+    :container="container"
+    :index="index"
+    :parent-id="parentId"
+    :length="length"
+    :context="context"
+    :cell-height="cellHeight"
+    :cell-width="cellWidth"
+    :rows-count="rowsCount"
+    :cols-count="colsCount"
+    @move-start="$emit('move-start')" />
 </template>
 <script>
 export default {
@@ -44,8 +48,28 @@ export default {
       type: Number,
       default: null,
     },
+    parentId: {
+      type: String,
+      default: null,
+    },
     context: {
       type: String,
+      default: null,
+    },
+    cellHeight: {
+      type: String,
+      default: null,
+    },
+    cellWidth: {
+      type: String,
+      default: null,
+    },
+    rowsCount: {
+      type: Number,
+      default: null,
+    },
+    colsCount: {
+      type: Number,
       default: null,
     },
   },
