@@ -20,6 +20,7 @@
 import * as siteLayoutService from './js/SiteLayoutService.js';
 import * as navigationLayoutService from './js/NavigationLayoutService.js';
 import * as pageLayoutService from './js/PageLayoutService.js';
+import * as applicationLayoutService from './js/ApplicationLayoutService.js';
 
 if (!Vue.prototype.$navigationLayoutService) {
   window.Object.defineProperty(Vue.prototype, '$navigationLayoutService', {
@@ -36,5 +37,11 @@ if (!Vue.prototype.$siteLayoutService) {
 if (!Vue.prototype.$pageLayoutService) {
   window.Object.defineProperty(Vue.prototype, '$pageLayoutService', {
     value: pageLayoutService,
+  });
+}
+
+if (!Vue.prototype.$applicationLayoutService) {
+  window.Object.defineProperty(Vue.prototype, '$applicationLayoutService', {
+    value: applicationLayoutService,
   });
 }

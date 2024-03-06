@@ -28,31 +28,21 @@
     :cell-height="cellHeight"
     :cell-width="cellWidth"
     :style="cellStyle"
-    class="px-3"
+    class="position-relative"
     @hovered="hover = $event">
     <template #content>
-      <div
-        v-if="isResizeHover"
-        class="position-absolute full-width full-height test-dimensions">
-        <div class="position-relative full-width full-height">
-          <div class="position-absolute t-0 l-0 mt-n6 display-1">
-            <span class="green--text">{{ parseInt(dimensionsX0) }}</span>,
-            <span class="red--text">{{ parseInt(dimensionsY0) }}</span>
-          </div>
-        </div>
-      </div>
       <div
         v-if="resize"
         :style="resizeCellStyle"
         class="position-absolute secondary-border-color"></div>
       <div
-        v-if="noChildren"
+        v-if="hasApplication"
         ref="resizeContent"
         :style="resizeStyle"
-        :class="resizeClass">
+        class="d-flex position-absolute">
         <div
           v-if="!context && length > 1"
-          class="position-relative d-flex align-center justify-center full-width full-height">
+          class="position-relative flex-grow-1 d-flex align-center justify-center full-width">
           <v-fade-transition>
             <div v-show="hover || resize">
               <v-btn
@@ -88,20 +78,20 @@
                 @mousedown="resizeStart">
                 <v-icon :size="iconSize" class="icon-default-color">fa-expand-alt</v-icon>
               </v-btn>
-              <div
-                v-if="resize && resizeMouseX"
-                class="position-absolute z-index-two resize-dimensions r-0 b-0 mb-10 mr-10">
-                <div class="position-relative full-width full-height">
-                  <div class="position-absolute b-0 r-0 mr-10 display-1">
-                    <span class="green--text">{{ parseInt(resizeMouseX) }}</span>,
-                    <span class="red--text">{{ parseInt(resizeMouseY) }}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </v-fade-transition>
         </div>
       </div>
+      <v-hover v-else>
+        <v-card
+          slot-scope="hoverScope"
+          :class="{
+            'opacity-5': hoverScope.hover || selected,
+          }"
+          class="grey-background full-width full-height"
+          flat
+          @click="$root.$emit('layout-cell-add-application', parentId, container)" />
+      </v-hover>
     </template>
   </layout-editor-container-container-base>
 </template>
@@ -173,8 +163,8 @@ export default {
     childrenSize() {
       return this.children.length;
     },
-    noChildren() {
-      return !this.childrenSize;
+    hasApplication() {
+      return this.childrenSize > 0;
     },
     storageId() {
       return this.container?.storageId;
@@ -195,18 +185,12 @@ export default {
         'box-sizing': this.resize && 'content-box' || 'border-box',
         'border': this.resize && '2px solid var(--allPagesPrimaryColor)' || 'none',
         'opacity': this.resize && '0.7' || '1',
-        'min-height': `${this.cellHeight - 20}px`,
-        'min-width': `${this.cellWidth - 24}px`,
+        'min-height': `${Math.min(this.minHeight, this.resizeHeight || 900)}px`,
+        'min-width': `${Math.min(this.minWidth, this.resizeWidth || 900)}px`,
         'height': this.resize && `${this.resizeHeight - 4}px` || '100%',
         'width': this.resize && `${this.resizeWidth - 4}px` || '100%',
         'z-index': this.resize && '1000' || '0',
         'user-select': 'none',
-      };
-    },
-    resizeClass() {
-      return {
-        'position-absolute': this.resize,
-        'position-relative': !this.resize,
       };
     },
     resizeMouseX() {
@@ -233,14 +217,21 @@ export default {
     rowSpan() {
       return this.container.rowsCount;
     },
+    minWidth() {
+      return (this.cellHeight * this.colSpan) - 20;
+    },
     minHeight() {
-      return (this.cellHeight * this.rowSpan) - 20;
+      return (this.cellHeight * this.rowSpan);
     },
     cellStyle() {
       return {
         'min-height': `${this.minHeight - 20}px`,
-        'min-width': `${this.cellWidth - 24}px`,
+        'max-height': `${this.minHeight - 20}px`,
+        'min-width': `${this.minWidth}px`,
       };
+    },
+    selected() {
+      return this.$root.selectedCells?.find?.(c => c.storageId === this.container.storageId);
     },
   },
   watch: {

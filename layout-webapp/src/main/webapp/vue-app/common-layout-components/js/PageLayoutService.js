@@ -132,6 +132,19 @@ export function getPageLayout(pageRef) {
   });
 }
 
+export function getApplicationRender(nodeId, portletName, portletStorageId) {
+  return fetch(`/layout/rest/pages/${nodeId}/${portletName}/preview${portletStorageId?.length && `?storageId=${portletStorageId}` || ''}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when retrieving application preview');
+    }
+  });
+}
+
 export function getPageTemplates() {
   return fetch('/layout/rest/pages/templates', {
     method: 'GET',

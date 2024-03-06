@@ -31,12 +31,22 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.State;
+import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.NodeLabel;
+import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.model.PageTemplateModel;
 import io.meeds.layout.service.LayoutI18NService;
 
@@ -46,8 +56,8 @@ public class EntityBuilder {
   }
 
   public static List<PageTemplateModel> toPageTemplateModel(List<SelectItemOption<String>> pageTemplates,
-                                                                   LayoutI18NService layoutI18NService,
-                                                                   Locale locale) {
+                                                            LayoutI18NService layoutI18NService,
+                                                            Locale locale) {
     return pageTemplates.stream()
                         .filter(Objects::nonNull)
                         .map(pageTemplate -> new PageTemplateModel(layoutI18NService.getLabel(pageTemplate.getLabel(),
@@ -90,6 +100,33 @@ public class EntityBuilder {
     nodeLabelRestEntity.setDefaultLanguage(defaultLanguage);
     nodeLabelRestEntity.setSupportedLanguages(supportedLanguages);
     return nodeLabelRestEntity;
+  }
+
+  public static LayoutModel toLayoutModel(Page page, LayoutService layoutService) {
+    convertApplications(page, layoutService);
+    return new LayoutModel(page);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void convertApplications(ModelObject object, LayoutService layoutService) {
+    if (object instanceof Container container) {
+      if (container.getChildren() != null) {
+        container.getChildren().forEach(m -> convertApplications(m, layoutService));
+      }
+    } else if (object instanceof Application application) { // NOSONAR
+      convertApplication(application, layoutService);
+    }
+  }
+
+  private static void convertApplication(Application<Portlet> application, LayoutService layoutService) {
+    ApplicationState<Portlet> state = application.getState();
+
+    // Marshal application state
+    if (!(state instanceof TransientApplicationState)) { // NOSONAR
+      state = new TransientApplicationState<>(layoutService.getId(state),
+                                              layoutService.load(state, ApplicationType.PORTLET));
+      application.setState(state);
+    }
   }
 
 }

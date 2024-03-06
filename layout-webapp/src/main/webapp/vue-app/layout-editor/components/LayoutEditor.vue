@@ -30,6 +30,7 @@
         :node-labels="nodeLabels" />
       <layout-editor-content
         :page="page"
+        :node="node"
         :layout="layout" />
     </div>
   </v-app>
@@ -69,6 +70,7 @@ export default {
       immediate: true,
       handler() {
         if (this.nodeId) {
+          this.$root.nodeId = this.nodeId;
           this.$navigationLayoutService.getNode(this.nodeId)
             .then(node => this.node = node);
           this.$navigationLayoutService.getNodeLabels(this.nodeId)

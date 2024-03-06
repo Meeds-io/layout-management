@@ -73,5 +73,6 @@ export function init() {
           },
         },
       }, `#${appId}`, 'Layout Editor')
-    );
+    )
+    .finally(() => Vue.prototype.$utils.includeExtensions('LayoutEditorExtension'));
 }

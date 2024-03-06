@@ -159,7 +159,7 @@ export default {
       }
     },
     cssClass() {
-      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative pb-5' || ''}`;
+      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     draggable() {
       return !this.context && (this.children.length > 1 || this.forceDraggable);

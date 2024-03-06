@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
@@ -50,6 +49,8 @@ import lombok.SneakyThrows;
 
 @Service
 public class PageLayoutService {
+
+  private static final String     PAGE_NOT_ACCESSIBLE_MESSAGE = "Page with ref %s isn't accessible for user %s";
 
   @Autowired
   private LayoutService           layoutService;
@@ -85,20 +86,20 @@ public class PageLayoutService {
                              String username) throws ObjectNotFoundException, IllegalAccessException {
     PageContext page = layoutService.getPageContext(pageKey);
     if (page == null) {
-      throw new ObjectNotFoundException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     } else if (!aclService.canViewPage(pageKey, username)) {
-      throw new IllegalAccessException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     }
     return page;
   }
 
-  public Container getPageLayout(PageKey pageKey,
-                                 String username) throws ObjectNotFoundException, IllegalAccessException {
+  public Page getPageLayout(PageKey pageKey,
+                            String username) throws ObjectNotFoundException, IllegalAccessException {
     Page page = layoutService.getPage(pageKey);
     if (page == null) {
-      throw new ObjectNotFoundException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     } else if (!aclService.canViewPage(pageKey, username)) {
-      throw new IllegalAccessException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     }
     return page;
   }

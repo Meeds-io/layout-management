@@ -26,12 +26,18 @@
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
       ref="sectionEditDrawer" />
+    <layout-editor-application-drawer
+      ref="applicationDrawer" />
   </div>
 </template>
 <script>
 export default {
   props: {
     page: {
+      type: Object,
+      default: null,
+    },
+    node: {
       type: Object,
       default: null,
     },
@@ -72,10 +78,30 @@ export default {
     this.$root.$on('layout-replace-section', this.replaceSection);
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
     this.$root.$on('layout-cell-resize', this.handleCellMerge);
+    this.$root.$on('layout-cell-add-application', this.handleOpenAddApplicationDrawer);
+    this.$root.$on('layout-add-application', this.handleAddApplication);
   },
   methods: {
     save() {
       // TODO
+    },
+    handleOpenAddApplicationDrawer(sectionId, container) {
+      this.$root.selectedSectionId = sectionId;
+      this.$root.selectedCells = [container];
+      this.$refs.applicationDrawer.open();
+    },
+    handleAddApplication(application) {
+      const firstCell = this.$root.selectedCells[0];
+      try {
+        if (this.$root.selectedCells.length > 1) {
+          const lastCell = this.$root.selectedCells[this.$root.selectedCells.length - 1];
+          this.handleCellMerge(this.$root.selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
+        }
+        this.$layoutUtils.newApplication(firstCell, application);
+      } finally {
+        this.$root.selectedSectionId = null;
+        this.$root.selectedCells = null;
+      }
     },
     handleCellMerge(parentId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);

@@ -65,8 +65,27 @@ export const containerModel = {
   children: [],
 };
 
+export const applicationModel = {
+  storageId: null,
+  id: null,
+  title: null,
+  icon: null,
+  description: null,
+  showInfoBar: false,
+  showApplicationState: false,
+  showApplicationMode: true,
+  theme: null,
+  width: null,
+  height: null,
+  preferences: {},
+  accessPermissions: ['Everyone'],
+};
+
 export function getParentContainer(layout) {
-  const parentContainer = layout?.children?.[0]?.children?.[0];
+  if (!layout.children) {
+    layout.children = [];
+  }
+  const parentContainer = layout.children[0]?.children?.[0];
   if (!parentContainer?.cssClass?.includes?.('v-application')) {
     return;
   } else {
@@ -83,6 +102,9 @@ export function newParentContainer(layout) {
 export function parseSections(layout) {
   const parentContainer = getParentContainer(layout);
   if (parentContainer) {
+    if (!parentContainer.children) {
+      parentContainer.children = [];
+    }
     const compatible = parentContainer.children.every(c => c.template === gridTemplate);
     if (compatible) {
       try {
@@ -100,7 +122,7 @@ export function parseSections(layout) {
 
 export function getSection(layout, id) {
   const parentContainer = getParentContainer(layout);
-  return parentContainer?.children?.find?.(c => c.storageId === id);
+  return parentContainer?.children.find(c => c.storageId === id);
 }
 
 export function newSection(parentContainer, index, rows, cols) {
@@ -108,7 +130,7 @@ export function newSection(parentContainer, index, rows, cols) {
   cols = cols || 4;
   const section = newContainer(
     gridTemplate,
-    null,
+    'grid-gap-cols-5 grid-gap-rows-5',
     parentContainer,
     index || 0);
   applyBreakpointValues(section, rows, cols);
@@ -122,6 +144,20 @@ export function newSection(parentContainer, index, rows, cols) {
   // Compute cell indexes
   parseMatrix(section);
   return section;
+}
+
+export function newApplication(parentContainer, appFromRegistry) {
+  const application = JSON.parse(JSON.stringify(applicationModel));
+  application.storageId = parseInt(Math.random() * 65536);
+  application.randomId = application.storageId;
+  application.contentId = appFromRegistry.contentId;
+  application.title = appFromRegistry.displayName;
+  application.showApplicationMode = true;
+  if (!parentContainer.children) {
+    parentContainer.children.push(application);
+  } else {
+    parentContainer.children = [application];
+  }
 }
 
 export function addRows(section, diffRows) {
@@ -217,12 +253,16 @@ function newContainer(template, cssClass, parentContainer, index) {
   container.template = template;
   container.cssClass = cssClass || '';
   container.storageId = parseInt(Math.random() * 65536);
-  container.color = `#${parseInt(256 - Math.random() * 128).toString(16)}${parseInt(256 - Math.random() * 128).toString(16)}${parseInt(256 - Math.random() * 128).toString(16)}`;
+  container.randomId = container.storageId;
   container.id = container.storageId;
   container.name = container.storageId;
   if (parentContainer && (index || index === 0)) {
     container.parentId = parentContainer.storageId;
-    parentContainer.children.splice(index || 0, 0, container);
+    if (parentContainer.children) {
+      parentContainer.children.splice(index || 0, 0, container);
+    } else {
+      parentContainer.children = [container];
+    }
   }
   return container;
 }
@@ -231,7 +271,11 @@ function parseSection(section) {
   if (section.template !== gridTemplate || !section.children.length) {
     return;
   }
-  section.children.forEach(parseCell);
+  if (section.children) {
+    section.children.forEach(parseCell);
+  } else {
+    section.children = [];
+  }
 
   section.colBreakpoints = parseBreakpointClasses(section, 'grid-cols');
   section.rowBreakpoints = parseBreakpointClasses(section, 'grid-rows');
@@ -252,8 +296,8 @@ function parseCell(colContainer) {
 }
 
 function applyGridStyle(container) {
-  container.children.forEach(applyGridStyle);
   if (container.template === gridTemplate) {
+    container.children.forEach(applyGridStyle);
     applyBreakpointClasses(container, 'grid-rows', 'grid-cols');
   } else if (container.template === cellTemplate) {
     applyBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
