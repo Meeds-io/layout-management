@@ -99,11 +99,17 @@
         </v-slider>
       </v-card>
     </div>
-    <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pt-2 px-2">
-      <layout-editor-container-container-extension
-        :container="sectionPreviewContainer"
-        :context="context"
-        style="zoom: 0.3" />
+    <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pa-2">
+      <div
+        v-if="updateGrid"
+        :class="gridClass"
+        class="d-grid grid-gap-cols-1 grid-gap-rows-1">
+        <div
+          v-for="i in length"
+          :key="i"
+          :id="`grid-cell-${i}`"
+          class="grey-background opacity-5 aspect-ratio-1"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -122,12 +128,12 @@ export default {
   data: () => ({
     rows: 0,
     cols: 0,
+    length: 0,
+    updateGrid: false,
   }),
   computed: {
-    sectionPreviewContainer() {
-      const section = JSON.parse(JSON.stringify(this.section));
-      section.children.forEach(c => c.children = []);
-      return section;
+    gridClass() {
+      return `grid-cols-${this.cols} grid-rows-${this.rows}`;
     },
   },
   watch: {
@@ -140,6 +146,7 @@ export default {
       } else {
         this.$layoutUtils.removeRows(this.section, diff);
       }
+      this.refreshGrid();
     },
     cols(newVal, oldVal) {
       const diff = this.cols - this.section.colsCount;
@@ -150,11 +157,24 @@ export default {
       } else {
         this.$layoutUtils.removeColumns(this.section, diff);
       }
+      this.refreshGrid();
     },
   },
   created() {
     this.rows = this.section.rowsCount;
     this.cols = this.section.colsCount;
   },
+  mounted() {
+    this.refreshGrid();
+  },
+  methods: {
+    refreshGrid() {
+      this.updateGrid = false;
+      window.setTimeout(() => {
+        this.length = this.rows * this.cols;
+        this.updateGrid = true;
+      }, 50);
+    },
+  }
 };
 </script>

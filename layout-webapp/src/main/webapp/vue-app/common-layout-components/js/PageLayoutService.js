@@ -29,18 +29,33 @@ export function getPages(siteType, siteName, pageDisplayName) {
     formData.append('pageDisplayName', pageDisplayName);
   }
   const params = new URLSearchParams(formData).toString();
-
   return fetch(`/layout/rest/pages?${params}`, {
     method: 'GET',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json'
-    },
   }).then(resp => {
     if (resp?.ok) {
       return resp.json();
     } else {
       throw new Error('Error when retrieving pages');
+    }
+  });
+}
+
+export function updatePageLayout(pageRef, pageLayout) {
+  return fetch(`/layout/rest/pages/${pageRef}/layout`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      children: pageLayout.children,
+    }),
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error(resp.status);
     }
   });
 }
@@ -149,9 +164,6 @@ export function getPageTemplates() {
   return fetch('/layout/rest/pages/templates', {
     method: 'GET',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json'
-    },
   }).then(resp => {
     if (!resp?.ok) {
       throw new Error('Error when retrieving page templates');

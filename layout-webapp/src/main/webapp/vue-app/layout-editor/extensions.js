@@ -48,6 +48,6 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 10,
   type: 'application',
-  isValid: container => !container.template && container.contentId?.includes?.('/'),
+  isValid: container => !container.template && (container.contentId?.includes?.('/') || container.storageId),
   containerType: 'layout-editor-container-application',
 });

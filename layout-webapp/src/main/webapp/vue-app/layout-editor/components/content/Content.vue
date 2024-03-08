@@ -61,11 +61,10 @@ export default {
           const layout = JSON.parse(JSON.stringify(this.layout));
           if (!layout.children?.length) {
             this.$layoutUtils.newParentContainer(layout);
+            this.saveDraft(layout);
+          } else {
+            this.setLayout(layout);
           }
-          this.layoutToEdit = layout;
-          this.isCompatible = this.$layoutUtils.parseSections(layout);
-        } else {
-          this.layoutToEdit = null;
         }
       },
     },
@@ -85,6 +84,12 @@ export default {
     save() {
       // TODO
     },
+    saveDraft(layout) {
+      const layoutToUpdate = JSON.parse(JSON.stringify(layout || this.layoutToEdit));
+      this.cleanStorageId(layoutToUpdate);
+      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
+        .then(layout => this.setLayout(layout));
+    },
     handleOpenAddApplicationDrawer(sectionId, container) {
       this.$root.selectedSectionId = sectionId;
       this.$root.selectedCells = [container];
@@ -97,7 +102,9 @@ export default {
           const lastCell = this.$root.selectedCells[this.$root.selectedCells.length - 1];
           this.handleCellMerge(this.$root.selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
         }
-        this.$layoutUtils.newApplication(firstCell, application);
+        const cell = this.$layoutUtils.getCell(this.layoutToEdit, firstCell.storageId);
+        this.$layoutUtils.newApplication(cell, application);
+        this.saveDraft();
       } finally {
         this.$root.selectedSectionId = null;
         this.$root.selectedCells = null;
@@ -140,6 +147,30 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       if (parentContainer) {
         this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
+      }
+    },
+    cleanStorageId(container) {
+      if (container.randomId) {
+        container.storageId = null;
+      }
+      if (container.children?.length) {
+        container.children.forEach(this.cleanStorageId);
+      }
+    },
+    setLayout(layout) {
+      this.initContainer(layout);
+      this.isCompatible = this.$layoutUtils.parseSections(layout);
+      if (this.layoutToEdit) {
+        Object.assign(this.layoutToEdit, layout);
+      } else {
+        this.layoutToEdit = layout;
+      }
+    },
+    initContainer(container) {
+      if (container.children) {
+        container.children.forEach(this.initContainer);
+      } else {
+        container.children = [];
       }
     },
   },

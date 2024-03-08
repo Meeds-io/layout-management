@@ -18,18 +18,29 @@
  */
 package io.meeds.layout.rest.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.ApplicationType;
+import org.exoplatform.portal.config.model.CloneApplicationState;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
@@ -94,6 +105,7 @@ public class LayoutModel {
   // Specific to page
   private String                    editPermission;
 
+  @JsonProperty(access = Access.READ_ONLY)
   private PageKey                   pageKey;
 
   private String                    ownerType;
@@ -112,7 +124,7 @@ public class LayoutModel {
     init(model);
   }
 
-  private void init(ModelObject model) {
+  private void init(ModelObject model) { // NOSONAR
     if (model instanceof Container container) {
       this.id = container.getId();
       this.storageId = container.getStorageId();
@@ -155,18 +167,99 @@ public class LayoutModel {
       this.showApplicationState = application.getShowApplicationState();
       this.showApplicationMode = application.getShowApplicationMode();
       this.accessPermissions = application.getAccessPermissions();
+
       @SuppressWarnings("unchecked")
-      TransientApplicationState<Portlet> state = (TransientApplicationState<Portlet>) application.getState();
-      this.contentId = state.getContentId();
-      Portlet portlet = state.getContentState();
-      if (portlet != null) {
-        this.preferences = new HashMap<>();
-        for (Preference preference : portlet) {
-          this.preferences.put(preference.getName(), preference.getValues());
+      ApplicationState<Portlet> state = application.getState();
+      if (state instanceof PersistentApplicationState<Portlet> persistentState) {
+        this.storageId = persistentState.getStorageId();
+      } else if (state instanceof CloneApplicationState<Portlet> persistentState) {
+        this.storageId = persistentState.getStorageId();
+      } else if (state instanceof TransientApplicationState<Portlet> transientState) {
+        this.contentId = transientState.getContentId();
+        Portlet portlet = transientState.getContentState();
+        if (portlet != null) {
+          this.preferences = new HashMap<>();
+          for (Preference preference : portlet) {
+            this.preferences.put(preference.getName(), preference.getValues());
+          }
+        } else {
+          this.preferences = Collections.emptyMap();
         }
       } else {
-        this.preferences = Collections.emptyMap();
+        throw new IllegalStateException("Application should either has a persistent or transient state");
       }
+    }
+  }
+
+  public Page toPage() {
+    Page page = new Page(storageId);
+    ArrayList<ModelObject> pageContainers = this.children.stream()
+                                                         .map(LayoutModel::toModelObject)
+                                                         .collect(Collectors.toCollection(ArrayList::new));
+    page.setChildren(pageContainers);
+    return page;
+  }
+
+  public static ModelObject toModelObject(LayoutModel layoutModel) {
+    if (StringUtils.isNotBlank(layoutModel.template)) {
+      Container container = new Container(layoutModel.getStorageId());
+      container.setId(layoutModel.getId());
+      container.setStorageName(layoutModel.getStorageName());
+      container.setName(layoutModel.getName());
+      container.setIcon(layoutModel.getIcon());
+      container.setTemplate(layoutModel.getTemplate());
+      container.setFactoryId(layoutModel.getFactoryId());
+      container.setTitle(layoutModel.getTitle());
+      container.setDescription(layoutModel.getDescription());
+      container.setWidth(layoutModel.getWidth());
+      container.setHeight(layoutModel.getHeight());
+      container.setCssClass(layoutModel.getCssClass());
+      container.setProfiles(layoutModel.getProfiles());
+      container.setAccessPermissions(layoutModel.getAccessPermissions());
+      container.setMoveAppsPermissions(layoutModel.getMoveAppsPermissions());
+      container.setMoveContainersPermissions(layoutModel.getMoveContainersPermissions());
+      if (layoutModel.getChildren() != null) {
+        container.setChildren(layoutModel.getChildren()
+                                         .stream()
+                                         .map(LayoutModel::toModelObject)
+                                         .collect(Collectors.toCollection(ArrayList::new)));
+      }
+      return container;
+    } else { // NOSONAR
+      Application<Portlet> application = new Application<>(ApplicationType.PORTLET,
+                                                           layoutModel.getStorageId());
+      application.setId(layoutModel.getId());
+      application.setStorageName(layoutModel.getStorageName());
+      application.setIcon(layoutModel.getIcon());
+      application.setTitle(layoutModel.getTitle());
+      application.setDescription(layoutModel.getDescription());
+      application.setWidth(layoutModel.getWidth());
+      application.setHeight(layoutModel.getHeight());
+      application.setShowInfoBar(layoutModel.isShowInfoBar());
+      application.setShowApplicationState(layoutModel.isShowApplicationState());
+      application.setShowApplicationMode(layoutModel.isShowApplicationMode());
+      application.setAccessPermissions(layoutModel.getAccessPermissions());
+
+      ApplicationState<Portlet> state;
+      if (StringUtils.isNotBlank(layoutModel.getStorageId())) {
+        state = new PersistentApplicationState<>(layoutModel.getStorageId());
+      } else if (StringUtils.isNotBlank(layoutModel.getContentId())) {
+        TransientApplicationState<Portlet> transientState = new TransientApplicationState<>(layoutModel.getContentId());
+        transientState.setOwnerId(layoutModel.getOwnerId());
+        transientState.setOwnerType(layoutModel.getOwnerType());
+        if (MapUtils.isNotEmpty(layoutModel.getPreferences())) {
+          Portlet portlet = new Portlet();
+          transientState.setContentState(portlet);
+          layoutModel.getPreferences()
+                     .entrySet()
+                     .forEach(p -> portlet.putPreference(new Preference(p.getKey(), p.getValue(), false)));
+        }
+        state = transientState;
+      } else {
+        throw new IllegalStateException("Application should either has a storageId or a contentId");
+      }
+      application.setState(state);
+      return application;
     }
   }
 

@@ -25,21 +25,22 @@
     :index="index"
     :length="length"
     :context="context"
-    :cell-height="cellHeight"
-    :cell-width="cellWidth"
+    :cell-height="targetCellHeight"
+    :cell-width="targetCellWidth"
     :style="cellStyle"
     class="position-relative"
     @hovered="hover = $event">
     <template #content>
       <div
-        v-if="resize"
+        v-if="resize && targetCellHeight && targetCellWidth"
         :style="resizeCellStyle"
         class="position-absolute secondary-border-color"></div>
       <div
         v-if="hasApplication"
         ref="resizeContent"
+        :class="hover && 'grey-background opacity-5'"
         :style="resizeStyle"
-        class="d-flex position-absolute">
+        class="d-flex position-absolute z-index-two">
         <div
           v-if="!context && length > 1"
           class="position-relative flex-grow-1 d-flex align-center justify-center full-width">
@@ -88,6 +89,8 @@
           :class="{
             'opacity-5': hoverScope.hover || selected,
           }"
+          :min-width="minWidth"
+          :min-height="minHeight"
           class="grey-background full-width full-height"
           flat
           @click="$root.$emit('layout-cell-add-application', parentId, container)" />
@@ -148,8 +151,7 @@ export default {
     originalWidth: 0,
     cellCols: 0,
     cellRows: 0,
-    targetCellRowIndex: 0,
-    targetCellColIndex: 0,
+    targetCellComputing: 0,
     targetCellHeight: 0,
     targetCellWidth: 0,
     resizeInterval: null,
@@ -161,13 +163,19 @@ export default {
       return this.container.children;
     },
     childrenSize() {
-      return this.children.length;
+      return this.children?.length || 0;
     },
     hasApplication() {
       return this.childrenSize > 0;
     },
     storageId() {
       return this.container?.storageId;
+    },
+    rowIndex() {
+      return this.container?.rowIndex;
+    },
+    colIndex() {
+      return this.container?.colIndex;
     },
     iconSize() {
       return 24;
@@ -179,17 +187,20 @@ export default {
         'z-index': this.resize && '1050' || '0',
       };
     },
+    heightGap() {
+      return this.container?.gap?.v || 0;
+    },
+    widthGap() {
+      return this.container?.gap?.h || 0;
+    },
     resizeStyle() {
       return {
         'background-color': this.container.color,
         'box-sizing': this.resize && 'content-box' || 'border-box',
         'border': this.resize && '2px solid var(--allPagesPrimaryColor)' || 'none',
         'opacity': this.resize && '0.7' || '1',
-        'min-height': `${Math.min(this.minHeight, this.resizeHeight || 900)}px`,
-        'min-width': `${Math.min(this.minWidth, this.resizeWidth || 900)}px`,
         'height': this.resize && `${this.resizeHeight - 4}px` || '100%',
         'width': this.resize && `${this.resizeWidth - 4}px` || '100%',
-        'z-index': this.resize && '1000' || '0',
         'user-select': 'none',
       };
     },
@@ -218,20 +229,26 @@ export default {
       return this.container.rowsCount;
     },
     minWidth() {
-      return (this.cellHeight * this.colSpan) - 20;
+      return (this.cellWidth * this.colSpan);
     },
     minHeight() {
-      return (this.cellHeight * this.rowSpan);
+      return (this.cellWidth * this.rowSpan);
     },
     cellStyle() {
       return {
         'min-height': `${this.minHeight - 20}px`,
         'max-height': `${this.minHeight - 20}px`,
-        'min-width': `${this.minWidth}px`,
+        'min-width': `${this.minWidth - 20}px`,
       };
     },
     selected() {
       return this.$root.selectedCells?.find?.(c => c.storageId === this.container.storageId);
+    },
+    mouseCellRowIndex() {
+      return this.$root.mouseCellRowIndex;
+    },
+    mouseCellColIndex() {
+      return this.$root.mouseCellColIndex;
     },
   },
   watch: {
@@ -241,12 +258,19 @@ export default {
       } else {
         this.$root.$emit('layout-cell-resize-end', this.parentId, this.container);
       }
+      window.setTimeout(() => this.refreshTargetCellDimensions(), 300);
     },
     resizeX() {
       this.resizeWidth = this.originalWidth + this.resizeX - this.originalX;
     },
     resizeY() {
       this.resizeHeight = this.originalHeight + this.resizeY - this.originalY;
+    },
+    mouseCellRowIndex() {
+      this.refreshTargetCellDimensions();
+    },
+    mouseCellColIndex() {
+      this.refreshTargetCellDimensions();
     },
   },
   methods: {
@@ -282,6 +306,19 @@ export default {
       if (this.resize) {
         this.resizeX = event.x;
         this.resizeY = event.y;
+      }
+    },
+    refreshTargetCellDimensions() {
+      if (this.resize
+          && this.$root.mouseCellRowIndex > -1
+          && this.$root.mouseCellColIndex > -1) {
+        window.setTimeout(() => {
+          this.targetCellHeight = (this.$root.mouseCellRowIndex - this.rowIndex + 1) * this.cellHeight;
+          this.targetCellWidth = (this.$root.mouseCellColIndex - this.colIndex + 1) * this.cellWidth + 8;
+        }, 50);
+      } else {
+        this.targetCellHeight = 0;
+        this.targetCellWidth = 0;
       }
     },
   },

@@ -20,9 +20,13 @@ package io.meeds.layout.model;
 
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NavigationCreateModel {
 
   private Long                parentNodeId;
@@ -36,6 +40,8 @@ public class NavigationCreateModel {
   private boolean             visible;
 
   private boolean             scheduled;
+
+  private boolean             draft;
 
   private Long                startScheduleDate;
 

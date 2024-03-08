@@ -30,17 +30,18 @@
         :node-labels="nodeLabels" />
       <layout-editor-content
         :page="page"
-        :node="node"
-        :layout="layout" />
+        :node="draftNode"
+        :layout="draftLayout" />
     </div>
   </v-app>
 </template>
 <script>
 export default {
   data: () => ({
-    page: null,
-    layout: null,
     node: null,
+    page: null,
+    draftNode: null,
+    draftLayout: null,
     nodeLabels: null,
   }),
   computed: {
@@ -53,16 +54,34 @@ export default {
     nodeId() {
       return this.getQueryParam('nodeId');
     },
+    draftNodeId() {
+      return this.draftNode?.id;
+    },
+    draftPageKey() {
+      return this.draftNode?.state?.pageRef;
+    },
+    draftPageRef() {
+      return this.draftPageKey?.ref || (this.draftPageKey && `${this.draftPageKey.site.typeName}::${this.draftPageKey.site.name}::${this.draftPageKey.name}`);
+    },
   },
   watch: {
     pageRef: {
       immediate: true,
       handler() {
         if (this.pageRef) {
+          this.$root.pageRef = this.pageRef;
           this.$pageLayoutService.getPage(this.pageRef)
             .then(page => this.page = page);
-          this.$pageLayoutService.getPageLayout(this.pageRef)
-            .then(pageLayout => this.layout = pageLayout);
+        }
+      },
+    },
+    draftPageRef: {
+      immediate: true,
+      handler() {
+        if (this.draftPageRef) {
+          this.$root.draftPageRef = this.draftPageRef;
+          this.$pageLayoutService.getPageLayout(this.draftPageRef)
+            .then(draftLayout => this.draftLayout = draftLayout);
         }
       },
     },
@@ -71,10 +90,31 @@ export default {
       handler() {
         if (this.nodeId) {
           this.$root.nodeId = this.nodeId;
+          if (this.nodeId && !this.nodeLabels) {
+            this.$navigationLayoutService.getNodeLabels(this.nodeId)
+              .then(nodeLabels => this.nodeLabels = nodeLabels);
+          }
+          if (this.nodeId && !this.$root.nodeUri) {
+            this.$navigationLayoutService.getNodeUri(this.nodeId)
+              .then(uri => this.$root.nodeUri = uri);
+          }
           this.$navigationLayoutService.getNode(this.nodeId)
-            .then(node => this.node = node);
-          this.$navigationLayoutService.getNodeLabels(this.nodeId)
-            .then(nodeLabels => this.nodeLabels = nodeLabels);
+            .then(node => this.node = node)
+            .then(() => this.$navigationLayoutService.createDraftNode(this.node.id))
+            .then(draftNode => this.draftNode = draftNode);
+        }
+      },
+    },
+    draftNodeId: {
+      immediate: true,
+      handler() {
+        if (this.draftNodeId) {
+          this.$root.draftNode = this.draftNode;
+          this.$root.draftNodeId = this.draftNodeId;
+          if (this.draftNodeId && !this.$root.draftNodeUri) {
+            this.$navigationLayoutService.getNodeUri(this.draftNodeId)
+              .then(uri => this.$root.draftNodeUri = uri);
+          }
         }
       },
     },
@@ -84,7 +124,16 @@ export default {
       }
     },
   },
+  created() {
+    this.$root.$on('layout-draft-refresh', this.setDraftLayout);
+  },
+  beforeDestroy() {
+    this.$root.$off('layout-draft-refresh', this.setDraftLayout);
+  },
   methods: {
+    setDraftLayout(draftLayout) {
+      this.draftLayout = draftLayout;
+    },
     getQueryParam(paramName) {
       const uri = window.location.search.substring(1);
       const params = new URLSearchParams(uri);

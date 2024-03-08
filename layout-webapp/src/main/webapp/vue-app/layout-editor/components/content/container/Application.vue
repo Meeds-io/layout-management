@@ -1,8 +1,20 @@
 <template>
-  <div
-    v-if="content"
-    ref="content"
-    v-html="content"></div>
+  <v-card
+    :class="{
+      'position-absolute z-index-one': !!cellHeight,
+      'full-height full-width': !cellHeight,
+    }"
+    :min-height="appHeight || ''"
+    :min-width="appWidth || ''"
+    :max-height="appHeight || ''"
+    :max-width="appWidth || ''"
+    :height="appHeight || ''"
+    :width="appWidth || ''"
+    class="overflow-hidden"
+    color="transparent"
+    flat>
+    <div ref="content"></div>
+  </v-card>
 </template>
 <script>
 export default {
@@ -11,74 +23,63 @@ export default {
       type: Object,
       default: null,
     },
+    cellHeight: {
+      type: Number,
+      default: () => 0,
+    },
+    cellWidth: {
+      type: Number,
+      default: () => 0,
+    },
   },
   data: () => ({
-    applicationContent: null,
+    applicationInstalled: false,
   }),
   computed: {
-    contentId() {
-      return this.container?.contentId;
-    },
-    applicationName() {
-      return this.contentId?.split?.('/')?.[1];
-    },
     storageId() {
-      return this.container?.randomId === this.container?.storageId ? null : this.container?.storageId;
+      return this.container?.storageId;
     },
     nodeId() {
-      return this.$root.nodeId;
+      return this.$root.draftNodeId;
     },
-    content() {
-      return this.applicationContent?.content?.replaceAll?.('\n', '')?.replace('<script>', '<script type="text/javascript">');
+    nodeUri() {
+      return this.$root.draftNodeUri;
     },
-    jsModule() {
-      return this.applicationContent?.jsModule;
+    appHeight() {
+      return this.cellHeight - (this.container?.gap?.v || 20);
     },
-    cssModule() {
-      return this.applicationContent?.cssModule;
-    },
-    cssModuleId() {
-      return this.contentId?.replace?.('/', '_');
+    appWidth() {
+      return this.cellWidth - (this.container?.gap?.h || 20);
     },
   },
   watch: {
-    jsModule() {
-      this.runJsModule();
+    storageId(newVal, oldVal) {
+      if (!oldVal && newVal) {
+        this.installApplication();
+      }
     },
-    cssModule() {
-      this.addCssModule();
+    nodeUri(newVal, oldVal) {
+      if (!oldVal && newVal) {
+        this.installApplication();
+      }
     },
   },
-  created() {
-    if (this.applicationName) {
-      this.$applicationLayoutService.getApplicationRenderContent(this.applicationName, this.nodeId, this.storageId)
-        .then(applicationContent => this.applicationContent = applicationContent);
-    }
+  mounted() {
+    this.installApplication();
+  },
+  updated() {
+    this.installApplication();
   },
   methods: {
-    runJsModule() {
-      if (!this.$refs?.content) {
-        window.setTimeout(() => this.runJsModule(), 50);
-        return;
+    installApplication() {
+      if (!this.applicationInstalled
+          && this.$refs.content
+          && this.nodeUri
+          && this.storageId) {
+        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs.content)
+          .then(() => this.applicationInstalled = true);
       }
-      const script = this.$refs?.content.querySelector('script');
-      if (script) {
-        window.eval(script.innerText?.replaceAll?.('\n', '')?.replaceAll?.('\r', ''));
-        return;
-      } else if (this.jsModule) {
-        window.require([`PORTLET/${this.jsModule}`], app => app?.init?.());
-      }
-    },
-    addCssModule() {
-      if (this.cssModule && !document.querySelector(`link[href="${this.cssModule}"]`)) {
-        const link = document.createElement('link');
-        link.id = this.cssModuleId;
-        link.type = 'text/css';
-        link.rel = 'stylesheet';
-        link.href = this.cssModule;
-        document.head.appendChild(link);
-      }
-    },
-  },
+    }
+  }
 };
 </script>

@@ -122,7 +122,15 @@ export function parseSections(layout) {
 
 export function getSection(layout, id) {
   const parentContainer = getParentContainer(layout);
-  return parentContainer?.children.find(c => c.storageId === id);
+  return parentContainer?.children?.find?.(c => c.storageId === id);
+}
+
+export function getCell(container, storageId) {
+  if (container.storageId === storageId) {
+    return container;
+  } else {
+    return container?.children?.map?.(c => getCell(c, storageId))?.filter?.(c => c)?.[0];
+  }
 }
 
 export function newSection(parentContainer, index, rows, cols) {
@@ -148,8 +156,6 @@ export function newSection(parentContainer, index, rows, cols) {
 
 export function newApplication(parentContainer, appFromRegistry) {
   const application = JSON.parse(JSON.stringify(applicationModel));
-  application.storageId = parseInt(Math.random() * 65536);
-  application.randomId = application.storageId;
   application.contentId = appFromRegistry.contentId;
   application.title = appFromRegistry.displayName;
   application.showApplicationMode = true;
@@ -253,8 +259,7 @@ function newContainer(template, cssClass, parentContainer, index) {
   container.template = template;
   container.cssClass = cssClass || '';
   container.storageId = parseInt(Math.random() * 65536);
-  container.randomId = container.storageId;
-  container.id = container.storageId;
+  container.randomId = true;
   container.name = container.storageId;
   if (parentContainer && (index || index === 0)) {
     container.parentId = parentContainer.storageId;
@@ -279,6 +284,7 @@ function parseSection(section) {
 
   section.colBreakpoints = parseBreakpointClasses(section, 'grid-cols');
   section.rowBreakpoints = parseBreakpointClasses(section, 'grid-rows');
+  section.gap = parseGapClasses(section, 'grid-gap');
   section.colsCount = section.colBreakpoints[currentBreakpoint];
   section.rowsCount = section.rowBreakpoints[currentBreakpoint];
   // Compute cell indexes
@@ -291,6 +297,7 @@ function parseCell(colContainer) {
   }
   colContainer.colBreakpoints = parseBreakpointClasses(colContainer, 'grid-cell-colspan');
   colContainer.rowBreakpoints = parseBreakpointClasses(colContainer, 'grid-cell-rowspan');
+  colContainer.gap = parseGapClasses(colContainer, 'grid-cell-gap');
   colContainer.colsCount = colContainer.colBreakpoints[currentBreakpoint];
   colContainer.rowsCount = colContainer.rowBreakpoints[currentBreakpoint];
 }
@@ -360,6 +367,17 @@ function parseBreakpointClasses(container, classPrefix) {
   } else {
     throw Error(`CSS classes '${container.cssClass}' not compatible. Fallback to old editor.`);
   }
+}
+
+function parseGapClasses() {
+  return {
+    h: 20,
+    v: 20,
+    top: 0,
+    right: 20,
+    bottom: 20,
+    left: 0,
+  };
 }
 
 function applyBreakpointValues(container, rows, cols) {
