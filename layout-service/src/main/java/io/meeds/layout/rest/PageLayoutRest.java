@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,13 +38,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
+import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.model.PageTemplateModel;
 import io.meeds.layout.rest.util.EntityBuilder;
 import io.meeds.layout.service.LayoutI18NService;
@@ -97,13 +99,14 @@ public class PageLayoutRest {
   @Operation(summary = "Retrieve page layout by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public Container getPageLayout(
-                                 HttpServletRequest request,
-                                 @Parameter(description = "page reference", required = true)
-                                 @PathVariable("pageRef")
-                                 String pageRef) {
+  public LayoutModel getPageLayout(
+                                   HttpServletRequest request,
+                                   @Parameter(description = "page reference", required = true)
+                                   @PathVariable("pageRef")
+                                   String pageRef) {
     try {
-      return pageLayoutService.getPageLayout(PageKey.parse(pageRef), request.getRemoteUser());
+      Page page = pageLayoutService.getPageLayout(PageKey.parse(pageRef), request.getRemoteUser());
+      return EntityBuilder.toLayoutModel(page);
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -142,6 +145,31 @@ public class PageLayoutRest {
                                 PageCreateModel createModel) {
     try {
       return pageLayoutService.createPage(createModel, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @PutMapping("{pageRef}/layout")
+  @Secured("users")
+  @Operation(summary = "Updates an existing page layout", method = "PUT", description = "This updates the designated page layout")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "page created"),
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  public LayoutModel updatePageLayout(
+                                      HttpServletRequest request,
+                                      @Parameter(description = "page display name", required = true)
+                                      @PathVariable("pageRef")
+                                      String pageRef,
+                                      @RequestBody
+                                      LayoutModel layoutModel) {
+    try {
+      pageLayoutService.updatePageLayout(pageRef,
+                                         EntityBuilder.fromLayoutModel(layoutModel),
+                                         request.getRemoteUser());
+      return getPageLayout(request, pageRef);
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {

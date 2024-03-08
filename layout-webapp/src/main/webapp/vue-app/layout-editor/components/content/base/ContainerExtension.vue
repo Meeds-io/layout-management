@@ -19,19 +19,21 @@
 
 -->
 <template>
-  <component
-    v-if="containerType"
-    :is="containerType"
-    :container="container"
-    :index="index"
-    :parent-id="parentId"
-    :length="length"
-    :context="context"
-    :cell-height="cellHeight"
-    :cell-width="cellWidth"
-    :rows-count="rowsCount"
-    :cols-count="colsCount"
-    @move-start="$emit('move-start')" />
+  <KeepAlive v-if="containerType && storageId">
+    <component
+      :is="containerType"
+      :container="container"
+      :index="index"
+      :parent-id="parentId"
+      :length="length"
+      :context="context"
+      :cell-height="cellHeight"
+      :cell-width="cellWidth"
+      :rows-count="rowsCount"
+      :cols-count="colsCount"
+      @move-start="$emit('move-start')" />
+  </KeepAlive>
+  <v-progress-circular v-else-if="!storageId && containerType === 'application'" indeterminate />
 </template>
 <script>
 export default {
@@ -74,6 +76,9 @@ export default {
     },
   },
   computed: {
+    storageId() {
+      return this.container?.storageId;
+    },
     containerType() {
       const extension = this.container && this.$root.containerTypes.find(ext => ext?.isValid?.(this.container));
       return extension?.containerType;
@@ -82,6 +87,18 @@ export default {
       return {
         container: this.container,
       };
+    },
+  },
+  watch: {
+    storageId: {
+      immediate: true,
+      handler() {
+        if (!this.storageId) {
+          document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+        } else {
+          document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+        }
+      },
     },
   },
 };
