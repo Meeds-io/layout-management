@@ -60,6 +60,19 @@ export function createNode(parentNodeId,
   });
 }
 
+export function createDraftNode(nodeId) {
+  return fetch(`/layout/rest/navigations/${nodeId}/draft`, {
+    credentials: 'include',
+    method: 'POST',
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw resp;
+    }
+  });
+}
+
 export function updateNode(nodeId,
   nodeLabel,
   pageRef,
@@ -164,6 +177,19 @@ export function getNodeLabels(nodeId) {
       return resp.json();
     } else {
       throw new Error('Error when retrieving node labels');
+    }
+  });
+}
+
+export function getNodeUri(nodeId) {
+  return fetch(`/layout/rest/navigations/${nodeId}/uri`, {
+    credentials: 'include',
+    method: 'GET'
+  }).then(resp => {
+    if (resp?.ok) {
+      return resp.text();
+    } else {
+      throw new Error('Error when retrieving node uri');
     }
   });
 }

@@ -24,18 +24,23 @@ import SaveButton from './components/toolbar/actions/SaveButton.vue';
 
 import Content from './components/content/Content.vue';
 
-import ContainerExtension from './components/content/common/ContainerExtension.vue';
-import ContainerBase from './components/content/common/ContainerBase.vue';
+import ContainerExtension from './components/content/base/ContainerExtension.vue';
+import ContainerBase from './components/content/base/ContainerBase.vue';
+
 import SectionBorderMenu from './components/content/common/SectionBorderMenu.vue';
 import SectionGridEditor from './components/content/common/SectionGridEditor.vue';
+import ApplicationCategoryCard from './components/content/common/ApplicationCategoryCard.vue';
+import ApplicationCard from './components/content/common/ApplicationCard.vue';
 
 import Page from './components/content/container/Page.vue';
 import Container from './components/content/container/Container.vue';
 import Row from './components/content/container/Row.vue';
 import Column from './components/content/container/Column.vue';
+import Application from './components/content/container/Application.vue';
 
 import EditSectionDrawer from './components/content/drawer/EditSectionDrawer.vue';
 import AddSectionDrawer from './components/content/drawer/AddSectionDrawer.vue';
+import AddApplicationDrawer from './components/content/drawer/AddApplicationDrawer.vue';
 
 const components = {
   'layout-editor': LayoutEditor,
@@ -48,10 +53,14 @@ const components = {
   'layout-editor-container-container': Container,
   'layout-editor-container-row': Row,
   'layout-editor-container-column': Column,
+  'layout-editor-container-application': Application,
   'layout-editor-section-border-menu': SectionBorderMenu,
   'layout-editor-section-grid-editor': SectionGridEditor,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-section-add-drawer': AddSectionDrawer,
+  'layout-editor-application-drawer': AddApplicationDrawer,
+  'layout-editor-application-category-card': ApplicationCategoryCard,
+  'layout-editor-application-card': ApplicationCard,
 };
 
 for (const key in components) {
