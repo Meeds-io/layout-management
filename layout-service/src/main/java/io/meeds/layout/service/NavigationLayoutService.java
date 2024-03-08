@@ -31,8 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.application.PortalRequestHandler;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.Visibility;
+import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageContext;
@@ -40,6 +43,9 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.DescriptionService;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.web.WebAppController;
+import org.exoplatform.web.controller.QualifiedName;
+import org.exoplatform.web.controller.router.Router;
 
 import io.meeds.common.ContainerTransactional;
 import io.meeds.layout.model.NavigationCreateModel;
@@ -61,15 +67,21 @@ public class NavigationLayoutService {
   private LayoutService                  layoutService;
 
   @Autowired
+  private PageLayoutService              pageLayoutService;
+
+  @Autowired
   private DescriptionService             descriptionService;
 
   @Autowired
   private LayoutAclService               aclService;
 
+  @Autowired
+  private WebAppController               webController;
+
   public NodeData createNode(NavigationCreateModel nodeModel,
                              String username) throws ObjectNotFoundException,
                                               IllegalAccessException,
-                                              IllegalArgumentException{
+                                              IllegalArgumentException {
     NodeData parentNodeData = navigationService.getNodeById(nodeModel.getParentNodeId());
     if (parentNodeData == null) {
       throw new ObjectNotFoundException(String.format("Parent node with id %s doesn't exist", nodeModel.getParentNodeId()));
@@ -82,6 +94,7 @@ public class NavigationLayoutService {
                                          getPageKey(nodeModel.getPageRef()),
                                          nodeModel.getTarget(),
                                          nodeModel.isVisible(),
+                                         nodeModel.isDraft(),
                                          nodeModel.isScheduled(),
                                          nodeModel.getStartScheduleDate(),
                                          nodeModel.getEndScheduleDate(),
@@ -94,6 +107,35 @@ public class NavigationLayoutService {
     saveNodeLabels(nodeData.getId(), nodeModel.getLabels());
 
     return navigationService.getNodeById(Long.parseLong(nodeData.getId()));
+  }
+
+  public NodeData createDraftNode(Long nodeId, String username) throws ObjectNotFoundException,
+                                                                IllegalAccessException {
+    NodeData node = getNode(nodeId, username);
+    PageKey clonedPageKey = pageLayoutService.clonePage(node.getState().getPageRef(), username);
+
+    String clonedNodeName = node.getName() + "_draft_" + username;
+    NodeContext<NodeContext<Object>> parentNode = navigationService.loadNode(node.getSiteKey());
+    NodeContext<NodeContext<Object>> clonedNode = findNode(parentNode, clonedNodeName);
+    if (clonedNode == null) {
+      return createNode(new NavigationCreateModel(Long.parseLong(node.getParentId()),
+                                                  null,
+                                                  clonedNodeName,
+                                                  clonedNodeName,
+                                                  false,
+                                                  false,
+                                                  true,
+                                                  null,
+                                                  null,
+                                                  clonedPageKey.format(),
+                                                  null,
+                                                  false,
+                                                  null,
+                                                  getNodeLabels(nodeId, username).getLabels()),
+                        username);
+    } else {
+      return navigationService.getNodeById(Long.parseLong(clonedNode.getId()));
+    }
   }
 
   public void updateNode(long nodeId,
@@ -113,6 +155,7 @@ public class NavigationLayoutService {
                                          getPageKey(nodeModel.getPageRef()),
                                          nodeModel.getTarget(),
                                          nodeModel.isVisible(),
+                                         false,
                                          nodeModel.isScheduled(),
                                          nodeModel.getStartScheduleDate(),
                                          nodeModel.getEndScheduleDate(),
@@ -190,6 +233,23 @@ public class NavigationLayoutService {
     return EntityBuilder.toNodeLabel(nodeLabels);
   }
 
+  public String getNodeUri(Long nodeId, String username) throws IllegalAccessException, ObjectNotFoundException {
+    NodeData node = getNode(nodeId, username);
+    SiteKey siteKey = node.getSiteKey();
+
+    StringBuilder uriBuilder = new StringBuilder();
+    buildUri(node, uriBuilder);
+    Router router = webController.getRouter();
+
+    Map<QualifiedName, String> params = new HashMap<>();
+    params.put(WebAppController.HANDLER_PARAM, "portal"); // PortalRequestHandler.NAME
+    params.put(PortalRequestHandler.REQUEST_SITE_NAME, siteKey.getName());
+    params.put(PortalRequestHandler.REQUEST_SITE_TYPE, siteKey.getTypeName());
+    params.put(PortalRequestHandler.REQUEST_PATH, uriBuilder.toString().replaceFirst("/", ""));
+    params.put(PortalRequestHandler.LANG, Locale.ENGLISH.toLanguageTag());
+    return router.render(params).replace("/en", "").replace("?lang=en", "");
+  }
+
   @ContainerTransactional
   public void deleteNode(long nodeId) {
     if (QUEUE.containsKey(nodeId)) {
@@ -206,6 +266,7 @@ public class NavigationLayoutService {
                                    PageKey pageKey,
                                    String target,
                                    boolean visible,
+                                   boolean draft,
                                    boolean scheduled,
                                    Long startScheduleDate,
                                    Long endScheduleDate,
@@ -230,11 +291,19 @@ public class NavigationLayoutService {
                              System.currentTimeMillis());
       }
     } else {
+      Visibility visibility;
+      if (draft) {
+        visibility = Visibility.DRAFT;
+      } else if (visible) {
+        visibility = Visibility.DISPLAYED;
+      } else {
+        visibility = Visibility.HIDDEN;
+      }
       return new NodeState(label,
                            icon,
                            -1,
                            -1,
-                           visible ? Visibility.DISPLAYED : Visibility.HIDDEN,
+                           visibility,
                            pageKey,
                            null,
                            target,
@@ -262,6 +331,36 @@ public class NavigationLayoutService {
       }
     } else {
       return null;
+    }
+  }
+
+  private NodeContext<NodeContext<Object>> findNode(NodeContext<NodeContext<Object>> node, String name) {
+    if (node == null || StringUtils.equals(node.getName(), name)) {
+      return node;
+    } else if (node.getNodeCount() > 0) {
+      int count = node.getNodeCount();
+      while (--count >= 0) {
+        NodeContext<NodeContext<Object>> next = node.get(count);
+        NodeContext<NodeContext<Object>> result = findNode(next, name);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  private void buildUri(NodeData node, StringBuilder uriBuilder) {
+    if (StringUtils.isNotBlank(node.getName())
+        && !StringUtils.equals(node.getName(), "default")) {
+      uriBuilder.insert(0, node.getName());
+      if (!uriBuilder.isEmpty()) {
+        uriBuilder.insert(0, "/");
+      }
+    }
+    if (StringUtils.isNotBlank(node.getParentId())) {
+      NodeData parentNode = navigationService.getNodeById(Long.parseLong(node.getParentId()));
+      buildUri(parentNode, uriBuilder);
     }
   }
 

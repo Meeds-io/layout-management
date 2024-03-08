@@ -63,9 +63,9 @@ public class NavigationLayoutRest {
   @Operation(summary = "Create a navigation node", method = "POST", description = "This creates the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "navigation node created"),
                           @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "403", description = "User not authorized to create the navigation node"),
                           @ApiResponse(responseCode = "404", description = "Node not found"),
-                          @ApiResponse(responseCode = "401", description = "User not authorized to create the navigation node"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  })
   public NodeData createNode(
                              HttpServletRequest request,
                              @RequestBody
@@ -81,14 +81,37 @@ public class NavigationLayoutRest {
     }
   }
 
+  @PostMapping("{nodeId}/draft")
+  @Secured("users")
+  @Operation(summary = "Creates a draft navigation node",
+             method = "POST",
+             description = "This creates a daft node with page based on an existing navigation node")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "draft navigation node created"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden operation"),
+                          @ApiResponse(responseCode = "404", description = "Node not found"),
+  })
+  public NodeData createDraftNode(
+                                  HttpServletRequest request,
+                                  @Parameter(description = "navigation node id")
+                                  @PathVariable("nodeId")
+                                  Long nodeId) {
+    try {
+      return navigationLayoutService.createDraftNode(nodeId, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
   @PutMapping("{nodeId}")
   @Secured("users")
   @Operation(summary = "Update a navigation node", method = "PUT", description = "This updates the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "navigation node updated"),
                           @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "403", description = "User not authorized to update the navigation node"),
                           @ApiResponse(responseCode = "404", description = "Node not found"),
-                          @ApiResponse(responseCode = "401", description = "User not authorized to update the navigation node"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  })
   public void updateNode(
                          HttpServletRequest request,
                          @Parameter(description = "navigation node id")
@@ -111,10 +134,9 @@ public class NavigationLayoutRest {
   @Secured("users")
   @Operation(summary = "Delete a navigation node ", method = "DELETE", description = "This deletes the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "navigation node deleted"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "403", description = "User not authorized to delete the navigation node"),
                           @ApiResponse(responseCode = "404", description = "Node not found"),
-                          @ApiResponse(responseCode = "401", description = "User not authorized to delete the navigation node"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  })
   public void deleteNode(
                          HttpServletRequest request,
                          @Parameter(description = "Node id", required = true)
@@ -137,11 +159,8 @@ public class NavigationLayoutRest {
   @Operation(summary = "Undo delete a navigation node if not yet effectively deleted", method = "POST",
              description = "This undo deletes the given navigation node if not yet effectively deleted")
   @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
                           @ApiResponse(responseCode = "404", description = "Node not found"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden operation"),
-                          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  })
   public void undoDeleteNode(
                              HttpServletRequest request,
                              @Parameter(description = "Node identifier", required = true)
@@ -158,8 +177,7 @@ public class NavigationLayoutRest {
   @Secured("users")
   @Operation(summary = "Move a navigation node", method = "PATCH", description = "This moves the given navigation node")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "401", description = "User not authorized to move the navigation node"),
+                          @ApiResponse(responseCode = "403", description = "User not authorized to move the navigation node"),
                           @ApiResponse(responseCode = "404", description = "Node not found") })
   public void moveNode(
                        HttpServletRequest request,
@@ -185,7 +203,9 @@ public class NavigationLayoutRest {
   @Secured("users")
   @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public NodeData getNode(
                           HttpServletRequest request,
                           @Parameter(description = "Node id", required = true)
@@ -200,11 +220,35 @@ public class NavigationLayoutRest {
     }
   }
 
+  @GetMapping("{nodeId}/uri")
+  @Secured("users")
+  @Operation(summary = "Retrieve node uri", method = "GET",
+             description = "This retrieves node Uri that will allow to access the page")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public String getNodeUri(
+                           HttpServletRequest request,
+                           @Parameter(description = "Node id", required = true)
+                           @PathVariable("nodeId")
+                           Long nodeId) {
+    try {
+      return navigationLayoutService.getNodeUri(nodeId, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
   @GetMapping("{nodeId}/labels")
   @Secured("users")
   @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public NodeLabel getNodeLabels(
                                  HttpServletRequest request,
                                  @Parameter(description = "Node id", required = true)
