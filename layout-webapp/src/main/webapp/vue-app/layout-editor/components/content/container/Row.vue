@@ -21,7 +21,7 @@
 <template>
   <div
     ref="section"
-    class="position-relative layout-section">
+    class="position-relative layout-section pb-5">
     <layout-editor-container-container-base
       ref="container"
       :container="container"
@@ -80,6 +80,7 @@ export default {
     movingChildren: false,
     resizingCell: null,
     mouseX: 0,
+    mouseY: 0,
     sectionWidth: 0,
     sectionX: 0,
     sectionY: 0,
@@ -103,15 +104,6 @@ export default {
     resizingCellRowIndex() {
       return this.resizingCell?.rowIndex;
     },
-    mouseCellColIndex() {
-      return Math.max(
-        Math.min(
-          Math.ceil((this.mouseX - this.sectionX) / this.cellWidth) - 1,
-          this.colsCount - 1
-        ),
-        this.resizingCellColIndex
-      );
-    },
     mouseCellRowIndex() {
       return Math.max(
         Math.min(
@@ -119,6 +111,15 @@ export default {
           this.rowsCount - 1
         ),
         this.resizingCellRowIndex
+      );
+    },
+    mouseCellColIndex() {
+      return Math.max(
+        Math.min(
+          Math.ceil((this.mouseX - this.sectionX) / this.cellWidth) - 1,
+          this.colsCount - 1
+        ),
+        this.resizingCellColIndex
       );
     },
   },
@@ -131,6 +132,14 @@ export default {
     },
     rowsCount() {
       this.refreshDimensions();
+    },
+    mouseCellRowIndex() {
+      this.$root.mouseCellRowIndex = this.mouseY ? this.mouseCellRowIndex : -1;
+      this.$root.mouseCellColIndex = this.mouseX ? this.mouseCellColIndex : -1;
+    },
+    mouseCellColIndex() {
+      this.$root.mouseCellRowIndex = this.mouseY ? this.mouseCellRowIndex : -1;
+      this.$root.mouseCellColIndex = this.mouseX ? this.mouseCellColIndex : -1;
     },
   },
   created() {
@@ -176,8 +185,8 @@ export default {
       if (sectionId !== this.container.storageId) {
         return;
       }
-      this.resizingCell = cell;
       this.$refs.container.$el.addEventListener('mousemove', this.handleMouseMove);
+      this.resizingCell = cell;
     },
     handleCellResizeEnd(sectionId) {
       if (sectionId !== this.container.storageId) {

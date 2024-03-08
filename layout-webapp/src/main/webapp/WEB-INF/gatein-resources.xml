@@ -137,6 +137,7 @@
   <portlet>
     <name>LayoutEditor</name>
     <module>
+      <load-group>layout-editor-group</load-group>
       <script>
         <minify>false</minify>
         <path>/js/layoutEditor.bundle.js</path>

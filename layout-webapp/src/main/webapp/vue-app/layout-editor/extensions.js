@@ -27,20 +27,27 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 10,
   type: 'container',
-  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIContainer.gtmpl'),
+  isValid: container => container?.template?.includes?.(':/groovy/portal/webui/container/UIContainer.gtmpl'),
   containerType: 'layout-editor-container-container',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 10,
   type: 'grid',
-  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIVGridContainer.gtmpl'),
+  isValid: container => container?.template?.includes?.(':/groovy/portal/webui/container/UIVGridContainer.gtmpl'),
   containerType: 'layout-editor-container-row',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 10,
   type: 'grid-cell',
-  isValid: container => container?.template?.includes(':/groovy/portal/webui/container/UIVCellContainer.gtmpl'),
+  isValid: container => container?.template?.includes?.(':/groovy/portal/webui/container/UIVCellContainer.gtmpl'),
   containerType: 'layout-editor-container-column',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 10,
+  type: 'application',
+  isValid: container => !container.template && (container.contentId?.includes?.('/') || container.storageId),
+  containerType: 'layout-editor-container-application',
 });
