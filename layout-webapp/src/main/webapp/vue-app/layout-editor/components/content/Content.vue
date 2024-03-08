@@ -26,12 +26,18 @@
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
       ref="sectionEditDrawer" />
+    <layout-editor-application-drawer
+      ref="applicationDrawer" />
   </div>
 </template>
 <script>
 export default {
   props: {
     page: {
+      type: Object,
+      default: null,
+    },
+    node: {
       type: Object,
       default: null,
     },
@@ -55,11 +61,10 @@ export default {
           const layout = JSON.parse(JSON.stringify(this.layout));
           if (!layout.children?.length) {
             this.$layoutUtils.newParentContainer(layout);
+            this.saveDraft(layout);
+          } else {
+            this.setLayout(layout);
           }
-          this.layoutToEdit = layout;
-          this.isCompatible = this.$layoutUtils.parseSections(layout);
-        } else {
-          this.layoutToEdit = null;
         }
       },
     },
@@ -72,10 +77,38 @@ export default {
     this.$root.$on('layout-replace-section', this.replaceSection);
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
     this.$root.$on('layout-cell-resize', this.handleCellMerge);
+    this.$root.$on('layout-cell-add-application', this.handleOpenAddApplicationDrawer);
+    this.$root.$on('layout-add-application', this.handleAddApplication);
   },
   methods: {
     save() {
       // TODO
+    },
+    saveDraft(layout) {
+      const layoutToUpdate = JSON.parse(JSON.stringify(layout || this.layoutToEdit));
+      this.cleanStorageId(layoutToUpdate);
+      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
+        .then(layout => this.setLayout(layout));
+    },
+    handleOpenAddApplicationDrawer(sectionId, container) {
+      this.$root.selectedSectionId = sectionId;
+      this.$root.selectedCells = [container];
+      this.$refs.applicationDrawer.open();
+    },
+    handleAddApplication(application) {
+      const firstCell = this.$root.selectedCells[0];
+      try {
+        if (this.$root.selectedCells.length > 1) {
+          const lastCell = this.$root.selectedCells[this.$root.selectedCells.length - 1];
+          this.handleCellMerge(this.$root.selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
+        }
+        const cell = this.$layoutUtils.getCell(this.layoutToEdit, firstCell.storageId);
+        this.$layoutUtils.newApplication(cell, application);
+        this.saveDraft();
+      } finally {
+        this.$root.selectedSectionId = null;
+        this.$root.selectedCells = null;
+      }
     },
     handleCellMerge(parentId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
@@ -114,6 +147,30 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       if (parentContainer) {
         this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
+      }
+    },
+    cleanStorageId(container) {
+      if (container.randomId) {
+        container.storageId = null;
+      }
+      if (container.children?.length) {
+        container.children.forEach(this.cleanStorageId);
+      }
+    },
+    setLayout(layout) {
+      this.initContainer(layout);
+      this.isCompatible = this.$layoutUtils.parseSections(layout);
+      if (this.layoutToEdit) {
+        Object.assign(this.layoutToEdit, layout);
+      } else {
+        this.layoutToEdit = layout;
+      }
+    },
+    initContainer(container) {
+      if (container.children) {
+        container.children.forEach(this.initContainer);
+      } else {
+        container.children = [];
       }
     },
   },

@@ -51,10 +51,18 @@ export function init() {
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           editPage: true,
           layout: null,
+          pageRef: null,
+          draftPageRef: null,
+          draftNode: null,
+          draftNodeId: null,
+          draftNodeUri: null,
           draggedContainer: null,
           draggedSection: null,
           resizeDimensions: null,
           resizeParentId: null,
+          // Resize mouse Grid indexes
+          mouseCellRowIndex: -1,
+          mouseCellColIndex: -1,
         },
         computed: {
           resizeMouseX() {
@@ -73,5 +81,6 @@ export function init() {
           },
         },
       }, `#${appId}`, 'Layout Editor')
-    );
+    )
+    .finally(() => Vue.prototype.$utils.includeExtensions('LayoutEditorExtension'));
 }
