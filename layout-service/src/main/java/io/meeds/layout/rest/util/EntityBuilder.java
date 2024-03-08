@@ -31,12 +31,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.State;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.NodeLabel;
+import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.model.PageTemplateModel;
 import io.meeds.layout.service.LayoutI18NService;
 
@@ -46,8 +48,8 @@ public class EntityBuilder {
   }
 
   public static List<PageTemplateModel> toPageTemplateModel(List<SelectItemOption<String>> pageTemplates,
-                                                                   LayoutI18NService layoutI18NService,
-                                                                   Locale locale) {
+                                                            LayoutI18NService layoutI18NService,
+                                                            Locale locale) {
     return pageTemplates.stream()
                         .filter(Objects::nonNull)
                         .map(pageTemplate -> new PageTemplateModel(layoutI18NService.getLabel(pageTemplate.getLabel(),
@@ -90,6 +92,14 @@ public class EntityBuilder {
     nodeLabelRestEntity.setDefaultLanguage(defaultLanguage);
     nodeLabelRestEntity.setSupportedLanguages(supportedLanguages);
     return nodeLabelRestEntity;
+  }
+
+  public static LayoutModel toLayoutModel(Page page) {
+    return new LayoutModel(page);
+  }
+
+  public static Page fromLayoutModel(LayoutModel layoutModel) {
+    return layoutModel.toPage();
   }
 
 }

@@ -49,16 +49,18 @@
       :class="cssClass"
       :style="cssStyle">
       <slot name="content"></slot>
-      <layout-editor-container-container-extension
-        v-for="(child, i) in children"
-        :key="child.storageId"
-        :container="child"
-        :parent-id="storageId"
-        :index="i"
-        :length="children.length"
-        :context="context"
-        :cell-height="cellHeight"
-        :cell-width="cellWidth" />
+      <KeepAlive>
+        <layout-editor-container-container-extension
+          v-for="(child, i) in children"
+          :key="child.storageId"
+          :container="child"
+          :parent-id="storageId"
+          :index="i"
+          :length="children.length"
+          :context="context"
+          :cell-height="cellHeight"
+          :cell-width="cellWidth" />
+      </KeepAlive>
     </div>
   </v-hover>
 </template>
@@ -101,6 +103,10 @@ export default {
       type: Number,
       default: () => 0,
     },
+    rowsCount: {
+      type: Number,
+      default: () => 0,
+    },
     colsCount: {
       type: Number,
       default: () => 0,
@@ -123,6 +129,9 @@ export default {
     cellRows: 0,
   }),
   computed: {
+    storageId() {
+      return this.container?.storageId;
+    },
     id() {
       return this.container?.id || this.storageId;
     },
@@ -134,9 +143,6 @@ export default {
     },
     noChildren() {
       return !this.childrenSize;
-    },
-    storageId() {
-      return this.container?.storageId;
     },
     height() {
       return this.container.height;
@@ -159,10 +165,10 @@ export default {
       }
     },
     cssClass() {
-      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative pb-5' || ''}`;
+      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     draggable() {
-      return !this.context && (this.children.length > 1 || this.forceDraggable);
+      return !this.context && (this.childrenSize > 1 || this.forceDraggable);
     },
     draggableContainerClass() {
       return `draggable-container-${this.storageId}`;
@@ -202,10 +208,10 @@ export default {
   methods: {
     refreshChildren() {
       if (!this.context) {
-        this.children = this.container?.children;
+        this.children = this.container?.children || [];
       } else if (this.container?.children?.length || this.children?.length) {
         window.setTimeout(() => {
-          this.children = this.container?.children;
+          this.children = this.container?.children || [];
         }, 50);
       }
     },

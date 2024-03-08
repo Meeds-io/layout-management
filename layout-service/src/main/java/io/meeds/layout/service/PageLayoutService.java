@@ -28,9 +28,14 @@ import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationState;
+import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
@@ -41,6 +46,7 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.page.PageTemplateService;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.PageCreateModel;
@@ -50,6 +56,12 @@ import lombok.SneakyThrows;
 
 @Service
 public class PageLayoutService {
+
+  private static final String     PAGE_NOT_EXISTS_MESSAGE     = "Page with key %s doesn't exist";
+
+  private static final String     PAGE_NOT_ACCESSIBLE_MESSAGE = "Page with ref %s isn't accessible for user %s";
+
+  private static final String     PAGE_NOT_EDITABLE_MESSAGE   = "Page with ref %s isn't editable for user %s";
 
   @Autowired
   private LayoutService           layoutService;
@@ -85,20 +97,20 @@ public class PageLayoutService {
                              String username) throws ObjectNotFoundException, IllegalAccessException {
     PageContext page = layoutService.getPageContext(pageKey);
     if (page == null) {
-      throw new ObjectNotFoundException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     } else if (!aclService.canViewPage(pageKey, username)) {
-      throw new IllegalAccessException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     }
     return page;
   }
 
-  public Container getPageLayout(PageKey pageKey,
-                                 String username) throws ObjectNotFoundException, IllegalAccessException {
+  public Page getPageLayout(PageKey pageKey,
+                            String username) throws ObjectNotFoundException, IllegalAccessException {
     Page page = layoutService.getPage(pageKey);
     if (page == null) {
-      throw new ObjectNotFoundException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     } else if (!aclService.canViewPage(pageKey, username)) {
-      throw new IllegalAccessException(String.format("Page with ref %s isn't accessible for user %s", pageKey, username));
+      throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     }
     return page;
   }
@@ -139,6 +151,47 @@ public class PageLayoutService {
     return layoutService.getPageContext(page.getPageKey());
   }
 
+  public PageKey clonePage(PageKey pageKey,
+                           String username) throws IllegalAccessException,
+                                            ObjectNotFoundException {
+    Page page = layoutService.getPage(pageKey);
+    if (page == null) {
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
+    } else if (!aclService.canEditPage(pageKey, username)) {
+      throw new IllegalAccessException(String.format(PAGE_NOT_EDITABLE_MESSAGE, pageKey.format(), username));
+    }
+    // Copy applications into a dedicated application container
+    // to seperate lifecycle of original page and cloned page
+    // thus generate a dedicated storage identifier for
+    // applications and thus a dedicated portlet preferences
+    convertApplications(page);
+
+    String draftPageName = page.getName() + "_draft_" + username;
+    page.setName(draftPageName);
+    page.setTitle(page.getTitle() + " Draft " + username);
+
+    PageKey clonedPageKey = page.getPageKey();
+    layoutService.save(new PageContext(clonedPageKey, Utils.toPageState(page)), page);
+    return clonedPageKey;
+  }
+
+  public PageContext updatePageLayout(String pageRef, Page page, String username) throws IllegalAccessException,
+                                                                                  ObjectNotFoundException {
+    // Security and existence check
+    PageKey pageKey = PageKey.parse(pageRef);
+    Page existingPage = layoutService.getPage(pageKey);
+    if (existingPage == null) {
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
+    } else if (!aclService.canEditPage(pageKey, username)) {
+      throw new IllegalAccessException(String.format(PAGE_NOT_EDITABLE_MESSAGE, pageKey.format(), username));
+    }
+
+    // Update Page Layout only
+    existingPage.setChildren(page.getChildren());
+    layoutService.save(existingPage);
+    return layoutService.getPageContext(existingPage.getPageKey());
+  }
+
   public void updatePageLink(PageKey pageKey,
                              String link,
                              String username) throws ObjectNotFoundException,
@@ -146,7 +199,7 @@ public class PageLayoutService {
                                               IllegalStateException {
     PageContext pageContext = layoutService.getPageContext(pageKey);
     if (pageContext == null) {
-      throw new ObjectNotFoundException(String.format("Page with key %s doesn't exist", pageKey));
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey));
     } else if (!aclService.canEditPage(pageKey, username)) {
       throw new IllegalAccessException();
     }
@@ -174,7 +227,7 @@ public class PageLayoutService {
                                                      IllegalAccessException {
     PageContext pageContext = layoutService.getPageContext(pageKey);
     if (pageContext == null) {
-      throw new ObjectNotFoundException(String.format("Page with key %s doesn't exist", pageKey));
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey));
     } else if (!aclService.canEditPage(pageKey, username)) {
       throw new IllegalAccessException();
     }
@@ -230,6 +283,28 @@ public class PageLayoutService {
 
   private PageType getPageType(String pageType) {
     return StringUtils.isBlank(pageType) ? null : PageType.valueOf(pageType.toUpperCase());
+  }
+
+  @SuppressWarnings("unchecked")
+  private void convertApplications(ModelObject object) {
+    if (object instanceof Container container) {
+      if (container.getChildren() != null) {
+        container.getChildren().forEach(this::convertApplications);
+      }
+    } else if (object instanceof Application application) { // NOSONAR
+      convertApplication(application);
+    }
+  }
+
+  private void convertApplication(Application<Portlet> application) {
+    ApplicationState<Portlet> state = application.getState();
+
+    // Marshal application state
+    if (!(state instanceof TransientApplicationState)) { // NOSONAR
+      state = new TransientApplicationState<>(layoutService.getId(state),
+                                              layoutService.load(state, ApplicationType.PORTLET));
+      application.setState(state);
+    }
   }
 
 }

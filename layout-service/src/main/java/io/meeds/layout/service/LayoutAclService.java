@@ -18,9 +18,13 @@
  */
 package io.meeds.layout.service;
 
+import java.util.ArrayList;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.exoplatform.application.registry.Application;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
@@ -138,6 +142,16 @@ public class LayoutAclService {
       return userAcl.hasEditPermission(page);
     } finally {
       ConversationState.setCurrent(currentConversationState);
+    }
+  }
+
+  public boolean canViewApplication(Application application, String username) {
+    ArrayList<String> permissions = application.getAccessPermissions();
+    if (CollectionUtils.isEmpty(permissions)) {
+      return isAdministrator(username);
+    } else {
+      Identity identity = getUserIdentity(username);
+      return permissions.stream().anyMatch(p -> userAcl.hasPermission(identity, p));
     }
   }
 
