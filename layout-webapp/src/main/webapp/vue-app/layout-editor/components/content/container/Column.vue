@@ -25,34 +25,25 @@
     :index="index"
     :length="length"
     :context="context"
-    :cell-height="cellHeight"
-    :cell-width="cellWidth"
+    :cell-height="targetCellHeight"
+    :cell-width="targetCellWidth"
     :style="cellStyle"
-    class="px-3"
+    class="position-relative"
     @hovered="hover = $event">
     <template #content>
       <div
-        v-if="isResizeHover"
-        class="position-absolute full-width full-height test-dimensions">
-        <div class="position-relative full-width full-height">
-          <div class="position-absolute t-0 l-0 mt-n6 display-1">
-            <span class="green--text">{{ parseInt(dimensionsX0) }}</span>,
-            <span class="red--text">{{ parseInt(dimensionsY0) }}</span>
-          </div>
-        </div>
-      </div>
-      <div
-        v-if="resize"
+        v-if="resize && targetCellHeight && targetCellWidth"
         :style="resizeCellStyle"
         class="position-absolute secondary-border-color"></div>
       <div
-        v-if="noChildren"
+        v-if="hasApplication"
         ref="resizeContent"
+        :class="hover && 'grey-background opacity-5'"
         :style="resizeStyle"
-        :class="resizeClass">
+        class="d-flex position-absolute z-index-two">
         <div
           v-if="!context && length > 1"
-          class="position-relative d-flex align-center justify-center full-width full-height">
+          class="position-relative flex-grow-1 d-flex align-center justify-center full-width">
           <v-fade-transition>
             <div v-show="hover || resize">
               <v-btn
@@ -88,20 +79,22 @@
                 @mousedown="resizeStart">
                 <v-icon :size="iconSize" class="icon-default-color">fa-expand-alt</v-icon>
               </v-btn>
-              <div
-                v-if="resize && resizeMouseX"
-                class="position-absolute z-index-two resize-dimensions r-0 b-0 mb-10 mr-10">
-                <div class="position-relative full-width full-height">
-                  <div class="position-absolute b-0 r-0 mr-10 display-1">
-                    <span class="green--text">{{ parseInt(resizeMouseX) }}</span>,
-                    <span class="red--text">{{ parseInt(resizeMouseY) }}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </v-fade-transition>
         </div>
       </div>
+      <v-hover v-else>
+        <v-card
+          slot-scope="hoverScope"
+          :class="{
+            'opacity-5': hoverScope.hover || selected,
+          }"
+          :min-width="minWidth"
+          :min-height="minHeight"
+          class="grey-background full-width full-height"
+          flat
+          @click="$root.$emit('layout-cell-add-application', parentId, container)" />
+      </v-hover>
     </template>
   </layout-editor-container-container-base>
 </template>
@@ -158,8 +151,7 @@ export default {
     originalWidth: 0,
     cellCols: 0,
     cellRows: 0,
-    targetCellRowIndex: 0,
-    targetCellColIndex: 0,
+    targetCellComputing: 0,
     targetCellHeight: 0,
     targetCellWidth: 0,
     resizeInterval: null,
@@ -171,13 +163,19 @@ export default {
       return this.container.children;
     },
     childrenSize() {
-      return this.children.length;
+      return this.children?.length || 0;
     },
-    noChildren() {
-      return !this.childrenSize;
+    hasApplication() {
+      return this.childrenSize > 0;
     },
     storageId() {
       return this.container?.storageId;
+    },
+    rowIndex() {
+      return this.container?.rowIndex;
+    },
+    colIndex() {
+      return this.container?.colIndex;
     },
     iconSize() {
       return 24;
@@ -189,24 +187,21 @@ export default {
         'z-index': this.resize && '1050' || '0',
       };
     },
+    heightGap() {
+      return this.container?.gap?.v || 0;
+    },
+    widthGap() {
+      return this.container?.gap?.h || 0;
+    },
     resizeStyle() {
       return {
         'background-color': this.container.color,
         'box-sizing': this.resize && 'content-box' || 'border-box',
         'border': this.resize && '2px solid var(--allPagesPrimaryColor)' || 'none',
         'opacity': this.resize && '0.7' || '1',
-        'min-height': `${this.cellHeight - 20}px`,
-        'min-width': `${this.cellWidth - 24}px`,
         'height': this.resize && `${this.resizeHeight - 4}px` || '100%',
         'width': this.resize && `${this.resizeWidth - 4}px` || '100%',
-        'z-index': this.resize && '1000' || '0',
         'user-select': 'none',
-      };
-    },
-    resizeClass() {
-      return {
-        'position-absolute': this.resize,
-        'position-relative': !this.resize,
       };
     },
     resizeMouseX() {
@@ -233,14 +228,27 @@ export default {
     rowSpan() {
       return this.container.rowsCount;
     },
+    minWidth() {
+      return (this.cellWidth * this.colSpan);
+    },
     minHeight() {
-      return (this.cellHeight * this.rowSpan) - 20;
+      return (this.cellWidth * this.rowSpan);
     },
     cellStyle() {
       return {
         'min-height': `${this.minHeight - 20}px`,
-        'min-width': `${this.cellWidth - 24}px`,
+        'max-height': `${this.minHeight - 20}px`,
+        'min-width': `${this.minWidth - 20}px`,
       };
+    },
+    selected() {
+      return this.$root.selectedCells?.find?.(c => c.storageId === this.container.storageId);
+    },
+    mouseCellRowIndex() {
+      return this.$root.mouseCellRowIndex;
+    },
+    mouseCellColIndex() {
+      return this.$root.mouseCellColIndex;
     },
   },
   watch: {
@@ -250,12 +258,19 @@ export default {
       } else {
         this.$root.$emit('layout-cell-resize-end', this.parentId, this.container);
       }
+      window.setTimeout(() => this.refreshTargetCellDimensions(), 300);
     },
     resizeX() {
       this.resizeWidth = this.originalWidth + this.resizeX - this.originalX;
     },
     resizeY() {
       this.resizeHeight = this.originalHeight + this.resizeY - this.originalY;
+    },
+    mouseCellRowIndex() {
+      this.refreshTargetCellDimensions();
+    },
+    mouseCellColIndex() {
+      this.refreshTargetCellDimensions();
     },
   },
   methods: {
@@ -291,6 +306,19 @@ export default {
       if (this.resize) {
         this.resizeX = event.x;
         this.resizeY = event.y;
+      }
+    },
+    refreshTargetCellDimensions() {
+      if (this.resize
+          && this.$root.mouseCellRowIndex > -1
+          && this.$root.mouseCellColIndex > -1) {
+        window.setTimeout(() => {
+          this.targetCellHeight = (this.$root.mouseCellRowIndex - this.rowIndex + 1) * this.cellHeight;
+          this.targetCellWidth = (this.$root.mouseCellColIndex - this.colIndex + 1) * this.cellWidth + 8;
+        }, 50);
+      } else {
+        this.targetCellHeight = 0;
+        this.targetCellWidth = 0;
       }
     },
   },
