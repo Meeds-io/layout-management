@@ -31,14 +31,16 @@
     <template v-if="drawer && section" #content>
       <v-card class="pa-4" flat>
         <layout-editor-section-grid-editor
-          :section="section"
-          context="edit-section" />
+          :rows-count="section.rowsCount"
+          :cols-count="section.colsCount"
+          @rows-updated="rows = $event"
+          @cols-updated="cols = $event" />
       </v-card>
     </template>
     <template #footer>
       <div class="d-flex">
         <v-btn
-          v-if="length > 1"
+          v-if="canRemove"
           color="error"
           outlined
           elevation="0"
@@ -70,20 +72,13 @@ export default {
     section: null,
     drawer: false,
     index: null,
-    length: 0,
+    rows: 0,
+    cols: 0,
+    canRemove: false,
   }),
   computed: {
-    sectionPreviewContainer() {
-      if (this.section) {
-        const section = JSON.parse(JSON.stringify(this.section));
-        section.children.forEach(c => c.children = []);
-        return section;
-      } else {
-        return null;
-      }
-    },
     modified() {
-      return this.section && JSON.stringify(this.section.children) !== JSON.stringify(this.originalSection.children);
+      return this.section?.rowsCount !== this.rows || this.section?.colsCount !== this.cols;
     },
   },
   methods: {
@@ -91,7 +86,9 @@ export default {
       this.section = JSON.parse(JSON.stringify(section));
       this.originalSection = JSON.parse(JSON.stringify(section));
       this.index = index;
-      this.length = length;
+      this.rows = this.section?.rowsCount;
+      this.cols = this.section?.colsCount;
+      this.canRemove = length > 1;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     removeSection() {
@@ -99,7 +96,24 @@ export default {
       this.$root.$emit('layout-remove-section', this.index);
     },
     apply() {
-      this.$root.$emit('layout-replace-section', this.index, this.section);
+      const diffRows = this.rows - this.originalSection.rowsCount;
+      const diffCols = this.cols - this.originalSection.colsCount;
+      const section = JSON.parse(JSON.stringify(this.section));
+      if (diffCols) {
+        if (diffCols > 0) {
+          this.$layoutUtils.addColumns(section, diffCols);
+        } else {
+          this.$layoutUtils.removeColumns(section, diffCols);
+        }
+      }
+      if (diffRows) {
+        if (diffRows > 0) {
+          this.$layoutUtils.addRows(section, diffRows);
+        } else {
+          this.$layoutUtils.removeRows(section, diffRows);
+        }
+      }
+      this.$root.$emit('layout-replace-section', this.index, section);
       this.close();
     },
     close() {
