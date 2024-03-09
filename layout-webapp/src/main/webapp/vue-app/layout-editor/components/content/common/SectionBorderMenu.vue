@@ -34,7 +34,7 @@
                 height="32"
                 width="32"
                 icon
-                @click="$root.$emit('layout-add-section', index, 1, 4)">
+                @click="$root.$emit('layout-add-section-drawer', index, 1, 4)">
                 <v-icon size="24">fa-plus</v-icon>
               </v-btn>
             </template>
@@ -50,7 +50,7 @@
                 height="32"
                 width="32"
                 icon
-                @click="$root.$emit('layout-add-section', index + 1, 1, 4)">
+                @click="$root.$emit('layout-add-section-drawer', index + 1, 1, 4)">
                 <v-icon size="24">fa-plus</v-icon>
               </v-btn>
             </template>
@@ -66,7 +66,7 @@
                 height="32"
                 width="32"
                 icon
-                @click="$root.$emit('layout-edit-section', index, length)">
+                @click="$root.$emit('layout-edit-section-drawer', index, length)">
                 <v-icon size="24">fa-edit</v-icon>
               </v-btn>
             </template>

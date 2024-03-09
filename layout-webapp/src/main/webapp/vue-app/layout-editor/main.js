@@ -60,9 +60,18 @@ export function init() {
           draggedSection: null,
           resizeDimensions: null,
           resizeParentId: null,
+          selectedSectionId: null,
+          selectedCells: null,
           // Resize mouse Grid indexes
           mouseCellRowIndex: -1,
           mouseCellColIndex: -1,
+          // Grid cells selection
+          parentAppDimensions: false,
+          multiCellsSelect: false,
+          movingStartX: 0,
+          movingStartY: 0,
+          movingX: 0,
+          movingY: 0,
         },
         computed: {
           resizeMouseX() {
@@ -71,6 +80,24 @@ export function init() {
           resizeMouseY() {
             return this.resizeDimensions && (this.resizeDimensions.y + this.resizeDimensions.height);
           },
+          selectMouseX0() {
+            return Math.min(this.movingStartX, this.movingX) + this.parentAppX;
+          },
+          selectMouseX1() {
+            return Math.max(this.movingStartX, this.movingX) + this.parentAppX;
+          },
+          selectMouseY0() {
+            return Math.min(this.movingStartY, this.movingY) + this.parentAppY;
+          },
+          selectMouseY1() {
+            return Math.max(this.movingStartY, this.movingY) + this.parentAppY;
+          },
+          parentAppX() {
+            return this.$root.parentAppDimensions?.x || 0;
+          },
+          parentAppY() {
+            return this.$root.parentAppDimensions?.y || 0;
+          },
         },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
@@ -78,6 +105,9 @@ export function init() {
         methods: {
           refreshContainerTypes() {
             this.containerTypes = extensionRegistry.loadExtensions('layout-editor', 'container');
+          },
+          updateParentAppDimensions() {
+            this.parentAppDimensions = document.querySelector('#layoutEditor').getBoundingClientRect();
           },
         },
       }, `#${appId}`, 'Layout Editor')
