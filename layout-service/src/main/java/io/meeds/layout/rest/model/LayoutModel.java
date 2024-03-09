@@ -19,13 +19,9 @@
 package io.meeds.layout.rest.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -44,7 +40,6 @@ import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.portlet.Preference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -93,8 +88,6 @@ public class LayoutModel {
 
   // Specific to applications
   private String                    contentId;
-
-  private Map<String, List<String>> preferences;
 
   private boolean                   showInfoBar;
 
@@ -176,15 +169,6 @@ public class LayoutModel {
         this.storageId = persistentState.getStorageId();
       } else if (state instanceof TransientApplicationState<Portlet> transientState) {
         this.contentId = transientState.getContentId();
-        Portlet portlet = transientState.getContentState();
-        if (portlet != null) {
-          this.preferences = new HashMap<>();
-          for (Preference preference : portlet) {
-            this.preferences.put(preference.getName(), preference.getValues());
-          }
-        } else {
-          this.preferences = Collections.emptyMap();
-        }
       } else {
         throw new IllegalStateException("Application should either has a persistent or transient state");
       }
@@ -247,13 +231,6 @@ public class LayoutModel {
         TransientApplicationState<Portlet> transientState = new TransientApplicationState<>(layoutModel.getContentId());
         transientState.setOwnerId(layoutModel.getOwnerId());
         transientState.setOwnerType(layoutModel.getOwnerType());
-        if (MapUtils.isNotEmpty(layoutModel.getPreferences())) {
-          Portlet portlet = new Portlet();
-          transientState.setContentState(portlet);
-          layoutModel.getPreferences()
-                     .entrySet()
-                     .forEach(p -> portlet.putPreference(new Preference(p.getKey(), p.getValue(), false)));
-        }
         state = transientState;
       } else {
         throw new IllegalStateException("Application should either has a storageId or a contentId");
