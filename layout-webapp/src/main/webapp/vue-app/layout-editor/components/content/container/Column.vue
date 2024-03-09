@@ -50,18 +50,18 @@
                 :title="$t('layout.addApplication')"
                 :width="iconSize"
                 :height="iconSize"
-                class="me-3"
+                class="me-3 layout-no-multi-select"
                 icon
-                @click="$emit('add-application')">
+                @click.prevent.stop="$emit('add-application')">
                 <v-icon :size="iconSize" class="icon-default-color">fa-plus</v-icon>
               </v-btn>
               <v-btn
                 :title="$t('layout.moveCell')"
                 :width="iconSize"
                 :height="iconSize"
-                class="draggable ms-3"
+                class="draggable ms-3 layout-no-multi-select"
                 icon
-                @click="$emit('move-start')">
+                @click.prevent.stop="$emit('move-start')">
                 <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
               </v-btn>
               <v-btn
@@ -74,9 +74,9 @@
                   'r-0': !$vuetify.rtl,
                   'fa-rotate-90': !$vuetify.rtl
                 }"
-                class="position-absolute b-0"
+                class="position-absolute b-0 layout-no-multi-select"
                 icon
-                @mousedown="resizeStart">
+                @mousedown.prevent.stop="resizeStart">
                 <v-icon :size="iconSize" class="icon-default-color">fa-expand-alt</v-icon>
               </v-btn>
             </div>
@@ -87,7 +87,7 @@
         <v-card
           slot-scope="hoverScope"
           :class="{
-            'opacity-5': hoverScope.hover || selected,
+            'opacity-5': hoverScope.hover || isSelectedCell,
           }"
           :min-width="minWidth"
           :min-height="minHeight"
@@ -156,7 +156,6 @@ export default {
     targetCellWidth: 0,
     resizeInterval: null,
     dimensions: null,
-    sectionDimensions: null,
   }),
   computed: {
     children() {
@@ -210,17 +209,37 @@ export default {
     resizeMouseY() {
       return this.$root.resizeMouseY;
     },
+    multiCellsSelect() {
+      return this.$root.multiCellsSelect;
+    },
     dimensionsX0() {
-      return this.dimensions.x;
+      return this.dimensions?.x || 0;
     },
     dimensionsX1() {
-      return this.dimensions.x + this.dimensions.width;
+      return this.dimensionsX0 + this.dimensions?.width || 0;
     },
     dimensionsY0() {
-      return this.dimensions.y;
+      return this.dimensions?.y || 0;
     },
     dimensionsY1() {
-      return this.dimensions.y + this.dimensions.height;
+      return this.dimensionsY0 + this.dimensions.height || 0;
+    },
+    isInMultiSelection() {
+      return this.multiCellsSelect
+        && this.dimensions
+        && ((
+          (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
+           || (this.dimensionsX1 > this.$root.selectMouseX0 && this.dimensionsX1 < this.$root.selectMouseX1)
+        ) && (
+          (this.dimensionsY0 > this.$root.selectMouseY0 && this.dimensionsY0 < this.$root.selectMouseY1)
+           || (this.dimensionsY1 > this.$root.selectMouseY0 && this.dimensionsY1 < this.$root.selectMouseY1)
+        ) || (
+          (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX1)
+           && (this.dimensionsY0 > this.$root.selectMouseY0 && this.dimensionsY0 < this.$root.selectMouseY1)
+        ) || (
+          (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY1)
+           && (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
+        ));
     },
     colSpan() {
       return this.container.colsCount;
@@ -241,8 +260,12 @@ export default {
         'min-width': `${this.minWidth - 20}px`,
       };
     },
-    selected() {
-      return this.$root.selectedCells?.find?.(c => c.storageId === this.container.storageId);
+    selectedCells() {
+      return this.$root.selectedCells;
+    },
+    isSelectedCell() {
+      const index = this.selectedCells?.indexOf?.(this.container);
+      return index === 0 || (index && index > 0);
     },
     mouseCellRowIndex() {
       return this.$root.mouseCellRowIndex;
@@ -271,6 +294,28 @@ export default {
     },
     mouseCellColIndex() {
       this.refreshTargetCellDimensions();
+    },
+    multiCellsSelect(val) {
+      if (val) {
+        this.dimensions = this.$refs.container.$el.getBoundingClientRect();
+      }
+    },
+    isInMultiSelection() {
+      if (this.multiCellsSelect) {
+        if (this.isInMultiSelection) {
+          if (this.$root.selectedCells?.length === 0) {
+            this.$root.selectedSectionId = this.parentId;
+          }
+          if (this.$root.selectedSectionId === this.parentId) {
+            this.$root.selectedCells.push(this.container);
+          }
+        } else if (this.$root.selectedSectionId === this.parentId) {
+          const index = this.$root.selectedCells?.indexOf(this.container);
+          if (index === 0 || index) {
+            this.$root.selectedCells.splice(index, 1);
+          }
+        }
+      }
     },
   },
   methods: {

@@ -24,6 +24,7 @@ import SaveButton from './components/toolbar/actions/SaveButton.vue';
 
 import Content from './components/content/Content.vue';
 
+import CellsSelectionBox from './components/content/base/CellsSelectionBox.vue';
 import ContainerExtension from './components/content/base/ContainerExtension.vue';
 import ContainerBase from './components/content/base/ContainerBase.vue';
 
@@ -61,6 +62,7 @@ const components = {
   'layout-editor-application-drawer': AddApplicationDrawer,
   'layout-editor-application-category-card': ApplicationCategoryCard,
   'layout-editor-application-card': ApplicationCard,
+  'layout-editor-cells-selection-box': CellsSelectionBox,
 };
 
 for (const key in components) {

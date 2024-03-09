@@ -116,12 +116,12 @@
 <script>
 export default {
   props: {
-    section: {
-      type: Object,
+    rowsCount: {
+      type: Number,
       default: null,
     },
-    context: {
-      type: String,
+    colsCount: {
+      type: Number,
       default: null,
     },
   },
@@ -137,32 +137,18 @@ export default {
     },
   },
   watch: {
-    rows(newVal, oldVal) {
-      const diff = this.rows - this.section.rowsCount;
-      if (!diff || !oldVal) {
-        return;
-      } else if (diff > 0) {
-        this.$layoutUtils.addRows(this.section, diff);
-      } else {
-        this.$layoutUtils.removeRows(this.section, diff);
-      }
+    rows() {
       this.refreshGrid();
+      this.$emit('rows-updated', this.rows);
     },
-    cols(newVal, oldVal) {
-      const diff = this.cols - this.section.colsCount;
-      if (!diff || !oldVal) {
-        return;
-      } else if (diff > 0) {
-        this.$layoutUtils.addColumns(this.section, diff);
-      } else {
-        this.$layoutUtils.removeColumns(this.section, diff);
-      }
+    cols() {
       this.refreshGrid();
+      this.$emit('cols-updated', this.cols);
     },
   },
   created() {
-    this.rows = this.section.rowsCount;
-    this.cols = this.section.colsCount;
+    this.rows = this.rowsCount;
+    this.cols = this.colsCount;
   },
   mounted() {
     this.refreshGrid();
