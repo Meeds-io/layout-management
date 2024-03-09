@@ -25,6 +25,8 @@ export const gridTemplate = 'system:/groovy/portal/webui/container/UIVGridContai
 export const cellTemplate = 'system:/groovy/portal/webui/container/UIVCellContainer.gtmpl';
 
 export const containerModel = {
+  storageId: null,
+  storageName: null,
   // Used to add a specific id to the container on display
   // to be able to apply a specific CSS
   // but generally not useful
@@ -67,6 +69,8 @@ export const containerModel = {
 
 export const applicationModel = {
   storageId: null,
+  storageName: null,
+  contentId: null,
   id: null,
   title: null,
   icon: null,
@@ -77,9 +81,12 @@ export const applicationModel = {
   theme: null,
   width: null,
   height: null,
-  preferences: {},
   accessPermissions: ['Everyone'],
 };
+
+export const containerModelAttributes = Object.keys(containerModel);
+
+export const applicationModelAttributes = Object.keys(applicationModel);
 
 export function getParentContainer(layout) {
   if (!layout.children) {
@@ -244,6 +251,14 @@ export function resizeCell(section, cell, rowIndex, colIndex) {
   applyGridStyle(section);
 }
 
+export function getX(event) {
+  return event.x;
+}
+
+export function getY(event) {
+  return event.y;
+}
+
 function newCell(section, index, rows, cols) {
   const container = newContainer(cellTemplate,
     null,
@@ -269,6 +284,24 @@ function newContainer(template, cssClass, parentContainer, index) {
       parentContainer.children = [container];
     }
   }
+  return container;
+}
+
+export function cleanAttributes(container) {
+  container = JSON.parse(JSON.stringify(container));
+  if (container.children?.length) {
+    container.children = container.children.map(c => cleanAttributes(c));
+  }
+  if (container.randomId) {
+    container.storageId = null;
+  }
+  Object.keys(container).forEach(key => {
+    if (key
+      && containerModelAttributes.indexOf(key) < 0
+      && applicationModelAttributes.indexOf(key) < 0) {
+      delete container[key];
+    }
+  });
   return container;
 }
 
