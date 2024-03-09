@@ -32,6 +32,7 @@
         :page="page"
         :node="draftNode"
         :layout="draftLayout" />
+      <layout-editor-cells-selection-box />
     </div>
   </v-app>
 </template>

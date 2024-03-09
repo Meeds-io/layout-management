@@ -175,6 +175,9 @@ export default {
     },
     refreshDimensions() {
       window.setTimeout(() => {
+        if (!this.$refs.section) {
+          return;
+        }
         const dimensions = this.$refs.section.getBoundingClientRect();
         this.sectionWidth = dimensions.width;
         this.sectionX = dimensions.x;
