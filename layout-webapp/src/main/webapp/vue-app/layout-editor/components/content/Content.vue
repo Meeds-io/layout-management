@@ -49,10 +49,18 @@ export default {
   data: () => ({
     layoutToEdit: null,
     isCompatible: false,
+    loading: false,
   }),
   watch: {
     layoutToEdit() {
       this.$root.layout = this.layoutToEdit;
+    },
+    loading() {
+      if (this.loading) {
+        document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+      } else {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      }
     },
     layout: {
       immediate: true,
@@ -71,91 +79,22 @@ export default {
   },
   created() {
     this.$root.$on('layout-save-page', this.save);
-    this.$root.$on('layout-add-section', this.addSection);
-    this.$root.$on('layout-edit-section', this.editSection);
-    this.$root.$on('layout-remove-section', this.removeSection);
-    this.$root.$on('layout-replace-section', this.replaceSection);
+    this.$root.$on('layout-add-section-drawer', this.addSection);
+    this.$root.$on('layout-edit-section-drawer', this.editSection);
+    this.$root.$on('layout-cell-add-application', this.addApplication);
+    this.$root.$on('layout-cells-selection-start', this.initCellsSelection);
+    this.$root.$on('layout-cells-selection-end', this.addApplicationOnCells);
+    this.$root.$on('layout-add-section', this.handleAddSection);
+    this.$root.$on('layout-remove-section', this.handleRemoveSection);
+    this.$root.$on('layout-replace-section', this.handleReplaceSection);
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
     this.$root.$on('layout-cell-resize', this.handleCellMerge);
-    this.$root.$on('layout-cell-add-application', this.handleOpenAddApplicationDrawer);
     this.$root.$on('layout-add-application', this.handleAddApplication);
+    this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
   },
   methods: {
     save() {
       // TODO
-    },
-    saveDraft(layout) {
-      const layoutToUpdate = JSON.parse(JSON.stringify(layout || this.layoutToEdit));
-      this.cleanStorageId(layoutToUpdate);
-      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
-        .then(layout => this.setLayout(layout));
-    },
-    handleOpenAddApplicationDrawer(sectionId, container) {
-      this.$root.selectedSectionId = sectionId;
-      this.$root.selectedCells = [container];
-      this.$refs.applicationDrawer.open();
-    },
-    handleAddApplication(application) {
-      const firstCell = this.$root.selectedCells[0];
-      try {
-        if (this.$root.selectedCells.length > 1) {
-          const lastCell = this.$root.selectedCells[this.$root.selectedCells.length - 1];
-          this.handleCellMerge(this.$root.selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
-        }
-        const cell = this.$layoutUtils.getCell(this.layoutToEdit, firstCell.storageId);
-        this.$layoutUtils.newApplication(cell, application);
-        this.saveDraft();
-      } finally {
-        this.$root.selectedSectionId = null;
-        this.$root.selectedCells = null;
-      }
-    },
-    handleCellMerge(parentId, container, targetCellRowIndex, targetCellColIndex) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === parentId);
-      if (section) {
-        this.$layoutUtils.mergeCell(section, container, targetCellRowIndex, targetCellColIndex);
-      } else {
-        console.warn(`Can't find section with id ${parentId}`); // eslint-disable-line no-console
-      }
-    },
-    handleSectionUpdated(container, children, index, type) {
-      container.children = children;
-      if (type === 'section' && !container.children?.length) {
-        window.setTimeout(() => this.removeSection(index), 500);
-      }
-    },
-    addSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        this.$refs.sectionAddDrawer.open(parentContainer, index);
-      }
-    },
-    removeSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        parentContainer.children.splice(index, 1);
-      }
-    },
-    replaceSection(index, section) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        parentContainer.children.splice(index, 1, section);
-      }
-    },
-    editSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
-      }
-    },
-    cleanStorageId(container) {
-      if (container.randomId) {
-        container.storageId = null;
-      }
-      if (container.children?.length) {
-        container.children.forEach(this.cleanStorageId);
-      }
     },
     setLayout(layout) {
       this.initContainer(layout);
@@ -172,6 +111,108 @@ export default {
       } else {
         container.children = [];
       }
+    },
+    addSection(index) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        this.$refs.sectionAddDrawer.open(parentContainer, index);
+      }
+    },
+    editSection(index) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
+      }
+    },
+    initCellsSelection() {
+      this.$root.selectedSectionId = null;
+      this.$root.selectedCells = [];
+    },
+    addApplication(sectionId, container) {
+      this.$root.selectedSectionId = sectionId;
+      this.$root.selectedCells = [container];
+      this.$refs.applicationDrawer.open();
+    },
+    resetCellsSelection() {
+      window.setTimeout(() => this.initCellsSelection(), 300);
+    },
+    addApplicationOnCells() {
+      if (this.$root.selectedSectionId
+          && this.$root.selectedCells?.length) {
+        this.$refs.applicationDrawer.open();
+      }
+    },
+    handleAddApplication(application) {
+      const selectedCells = this.$root.selectedCells;
+      const selectedSectionId = this.$root.selectedSectionId;
+      const firstCellRowIndex = Math.min(...selectedCells.map(c => c.rowIndex));
+      const firstCellColIndex = Math.min(...selectedCells.map(c => c.colIndex));
+      const lastCellRowIndex = Math.max(...selectedCells.map(c => c.rowIndex));
+      const lastCellColIndex = Math.max(...selectedCells.map(c => c.colIndex));
+
+      try {
+        const firstCell = selectedCells.find(c => c.colIndex === firstCellColIndex && c.rowIndex === firstCellRowIndex);
+        const lastCell = selectedCells.find(c => c.colIndex === lastCellColIndex && c.rowIndex === lastCellRowIndex);
+        if (!firstCell) {
+          console.error('Can not find the first cell to add an application into it', selectedCells, firstCellColIndex, firstCellRowIndex); // eslint-lint-disable no-console
+          return;
+        } else if (!lastCell) {
+          console.error('Can not find the last cell to add an application into it', selectedCells, lastCellColIndex, lastCellRowIndex); // eslint-lint-disable no-console
+          return;
+        } else if (selectedCells.length > 1) {
+          this.mergeCell(selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
+        }
+        const cell = this.$layoutUtils.getCell(this.layoutToEdit, firstCell.storageId);
+        this.$layoutUtils.newApplication(cell, application);
+        this.saveDraft();
+      } finally {
+        this.initCellsSelection();
+      }
+    },
+    handleCellMerge(parentId, container, targetCellRowIndex, targetCellColIndex) {
+      this.mergeCell(parentId, container, targetCellRowIndex, targetCellColIndex);
+      this.saveDraft();
+    },
+    mergeCell(parentId, container, targetCellRowIndex, targetCellColIndex) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === parentId);
+      if (section) {
+        this.$layoutUtils.resizeCell(section, container, targetCellRowIndex, targetCellColIndex);
+      } else {
+        console.warn(`Can't find section with id ${parentId}`); // eslint-disable-line no-console
+      }
+    },
+    handleSectionUpdated(container, children, index, type) {
+      container.children = children;
+      if (type === 'section' && !container.children?.length) {
+        window.setTimeout(() => this.handleRemoveSection(index), 500);
+      }
+    },
+    handleAddSection(section, index) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      parentContainer.children.splice(index || 0, 0, section);
+      this.saveDraft();
+    },
+    handleRemoveSection(index) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        parentContainer.children.splice(index, 1);
+      }
+      this.saveDraft();
+    },
+    handleReplaceSection(index, section) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      if (parentContainer) {
+        parentContainer.children.splice(index, 1, section);
+      }
+      this.saveDraft();
+    },
+    saveDraft(layout) {
+      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit);
+      this.loading = true;
+      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
+        .then(layout => this.setLayout(layout))
+        .finally(() => this.loading = false);
     },
   },
 };
