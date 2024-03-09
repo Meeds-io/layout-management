@@ -28,11 +28,13 @@
     <template #title>
       {{ $t('layout.addSectionTitle') }}
     </template>
-    <template v-if="drawer && section" #content>
+    <template v-if="drawer && rows && cols" #content>
       <v-card class="pa-4" flat>
         <layout-editor-section-grid-editor
-          :section="section"
-          context="add-section" />
+          :rows-count="rows"
+          :cols-count="cols"
+          @rows-updated="rows = $event"
+          @cols-updated="cols = $event" />
       </v-card>
     </template>
     <template #footer>
@@ -59,16 +61,20 @@ export default {
     section: null,
     drawer: false,
     index: null,
+    rows: 0,
+    cols: 0,
   }),
   methods: {
     open(parentContainer, index) {
       this.parentContainer = parentContainer;
       this.index = index;
-      this.section = this.$layoutUtils.newSection(null, null, 1, 4);
+      this.rows = 1;
+      this.cols = 4;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     apply() {
-      this.parentContainer.children.splice(this.index || 0, 0, this.section);
+      this.section = this.$layoutUtils.newSection(null, null, this.rows, this.cols);
+      this.$root.$emit('layout-add-section', this.section, this.index);
       this.close();
     },
     close() {

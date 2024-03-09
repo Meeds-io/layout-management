@@ -36,6 +36,15 @@ export default {
     categories: [],
     expanded: 0,
   }),
+  watch: {
+    drawer() {
+      if (this.drawer) {
+        this.$root.$emit('layout-application-drawer-opened');
+      } else {
+        this.$root.$emit('layout-application-drawer-closed');
+      }
+    },
+  },
   created() {
     this.$applicationRegistryService.getCategories()
       .then(categories => this.categories = categories);
