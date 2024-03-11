@@ -22,6 +22,10 @@
   <div
     ref="section"
     class="position-relative layout-section pb-5">
+    <layout-editor-section-grid
+      :rows="rowsCount"
+      :cols="colsCount"
+      class="position-absolute full-width full-height grid-gap-cols-5 grid-gap-rows-5 pb-5" />
     <layout-editor-container-container-base
       ref="container"
       :container="container"
@@ -31,8 +35,9 @@
       :moving="movingChildren"
       :cell-height="cellHeight"
       :cell-width="cellWidth"
-      :cols-count="colsCount"
       :rows-count="rowsCount"
+      :cols-count="colsCount"
+      class="position-relative z-index-one"
       type="section"
       force-draggable
       @hovered="hoverSection = $event"
@@ -87,7 +92,7 @@ export default {
   }),
   computed: {
     cellWidth() {
-      return this.sectionWidth && this.colsCount && this.sectionWidth / this.colsCount;
+      return this.sectionWidth && this.colsCount && (this.sectionWidth / this.colsCount + 1);
     },
     cellHeight() {
       return this.cellWidth;
