@@ -143,7 +143,7 @@ export default {
       }
     },
     handleAddApplication(application) {
-      const selectedCells = this.$root.selectedCells;
+      const selectedCells = this.$root.selectedCells.slice();
       const selectedSectionId = this.$root.selectedSectionId;
       const firstCellRowIndex = Math.min(...selectedCells.map(c => c.rowIndex));
       const firstCellColIndex = Math.min(...selectedCells.map(c => c.colIndex));
@@ -151,13 +151,13 @@ export default {
       const lastCellColIndex = Math.max(...selectedCells.map(c => c.colIndex));
 
       try {
-        const firstCell = selectedCells.find(c => c.colIndex === firstCellColIndex && c.rowIndex === firstCellRowIndex);
-        const lastCell = selectedCells.find(c => c.colIndex === lastCellColIndex && c.rowIndex === lastCellRowIndex);
+        const firstCell = selectedCells.find(c => c.rowIndex === firstCellRowIndex && c.colIndex === firstCellColIndex);
+        const lastCell = selectedCells.find(c => c.rowIndex === lastCellRowIndex && c.colIndex === lastCellColIndex);
         if (!firstCell) {
-          console.error('Can not find the first cell to add an application into it', selectedCells, firstCellColIndex, firstCellRowIndex); // eslint-lint-disable no-console
+          console.error('Can not find the first cell to add an application into it', selectedCells, firstCellRowIndex, firstCellColIndex); // eslint-lint-disable no-console
           return;
         } else if (!lastCell) {
-          console.error('Can not find the last cell to add an application into it', selectedCells, lastCellColIndex, lastCellRowIndex); // eslint-lint-disable no-console
+          console.error('Can not find the last cell to add an application into it', selectedCells, lastCellRowIndex, lastCellColIndex); // eslint-lint-disable no-console
           return;
         } else if (selectedCells.length > 1) {
           this.mergeCell(selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);

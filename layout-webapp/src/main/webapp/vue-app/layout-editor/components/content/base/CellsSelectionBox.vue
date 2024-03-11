@@ -30,6 +30,7 @@ export default {
   data: () => ({
     interceptEvents: false,
     parentAppDimensions: null,
+    computingDisplayInterval: null,
   }),
   computed: {
     multiCellsSelect() {
@@ -128,8 +129,14 @@ export default {
     },
     updateDisplay() {
       if (this.interceptEvents) {
-        this.$root.multiCellsSelect = Math.abs(this.movingX - this.movingStartX) > 20
-          && Math.abs(this.movingY - this.movingStartY) > 20;
+        if (!this.computingDisplayInterval) {
+          this.computingDisplayInterval = window.setTimeout(() => {
+            this.$root.multiCellsSelect =
+              Math.abs(this.movingX - this.movingStartX) > 20
+              && Math.abs(this.movingY - this.movingStartY) > 20;
+            this.computingDisplayInterval = null;
+          }, 50);
+        }
       } else {
         this.$root.multiCellsSelect = false;
       }
@@ -160,6 +167,7 @@ export default {
         this.startScrollY = this.$root.parentAppDimensions.y;
         this.diffScrollX = 0;
         this.diffScrollY = 0;
+        this.interceptEvents = false;
         this.$nextTick().then(() => this.interceptEvents = true);
       }
     },
