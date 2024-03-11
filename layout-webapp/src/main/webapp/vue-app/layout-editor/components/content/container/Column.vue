@@ -28,72 +28,81 @@
     :cell-height="targetCellHeight"
     :cell-width="targetCellWidth"
     :style="cellStyle"
+    :class="hover && 'z-index-two'"
     class="position-relative"
     @hovered="hover = $event">
     <template #content>
-      <div
-        v-if="resize && targetCellHeight && targetCellWidth"
-        :style="resizeCellStyle"
-        class="position-absolute secondary-border-color"></div>
-      <div
-        v-if="hasApplication"
-        ref="resizeContent"
-        :class="hover && 'grey-background opacity-5'"
-        :style="resizeStyle"
-        class="d-flex position-absolute z-index-two">
+      <template v-if="hasApplication">
         <div
-          v-if="!context && length > 1"
-          class="position-relative flex-grow-1 d-flex align-center justify-center full-width">
-          <v-fade-transition>
-            <div v-show="hover || resize">
-              <v-btn
-                :title="$t('layout.addApplication')"
-                :width="iconSize"
-                :height="iconSize"
-                class="me-3 layout-no-multi-select"
-                icon
-                @click.prevent.stop="$emit('add-application')">
-                <v-icon :size="iconSize" class="icon-default-color">fa-plus</v-icon>
-              </v-btn>
+          v-if="resize"
+          :style="resizeStyle"
+          class="d-flex position-absolute z-index-two"></div>
+        <v-btn
+          v-if="hover && !resize"
+          ref="resizeButton"
+          :title="$t('layout.resizeCell')"
+          :width="iconSize"
+          :height="iconSize"
+          :class="{
+            'l-0': $vuetify.rtl,
+            'r-0': !$vuetify.rtl,
+            'fa-rotate-90': !$vuetify.rtl
+          }"
+          class="position-absolute z-index-two b-0"
+          icon
+          @mousedown.prevent.stop="resizeStart">
+          <v-icon :size="iconSize" class="icon-default-color">fa-expand-alt</v-icon>
+        </v-btn>
+        <v-fade-transition>
+          <div
+            v-show="hover && !resize"
+            class="layout-no-multi-select absolute-horizontal-center z-index-drawer mt-n4">
+            <v-chip color="white" class="elevation-2">
               <v-btn
                 :title="$t('layout.moveCell')"
                 :width="iconSize"
                 :height="iconSize"
-                class="draggable ms-3 layout-no-multi-select"
+                class="draggable ms-3"
                 icon
                 @click.prevent.stop="$emit('move-start')">
                 <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
               </v-btn>
               <v-btn
-                ref="resizeButton"
-                :title="$t('layout.resizeCell')"
+                :title="$t('layout.editApplication')"
                 :width="iconSize"
                 :height="iconSize"
-                :class="{
-                  'l-0': $vuetify.rtl,
-                  'r-0': !$vuetify.rtl,
-                  'fa-rotate-90': !$vuetify.rtl
-                }"
-                class="position-absolute b-0 layout-no-multi-select"
+                class="mx-3"
                 icon
-                @mousedown.prevent.stop="resizeStart">
-                <v-icon :size="iconSize" class="icon-default-color">fa-expand-alt</v-icon>
+                @click.prevent.stop="$emit('edit-application')">
+                <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
               </v-btn>
-            </div>
-          </v-fade-transition>
-        </div>
-      </div>
+              <v-btn
+                :title="$t('layout.deleteApplication')"
+                :width="iconSize"
+                :height="iconSize"
+                class="me-3"
+                icon
+                @click.prevent.stop="$emit('delete-application')">
+                <v-icon :size="iconSize" class="icon-default-color">fa-trash</v-icon>
+              </v-btn>
+            </v-chip>
+          </div>
+        </v-fade-transition>
+      </template>
       <v-hover v-else>
         <v-card
           slot-scope="hoverScope"
           :class="{
-            'opacity-5': hoverScope.hover || isSelectedCell,
+            'transparent': hoverScope.hover || isSelectedCell,
+            'grey-background': !hoverScope.hover && !isSelectedCell,
           }"
           :min-width="minWidth"
           :min-height="minHeight"
-          class="grey-background full-width full-height"
+          class="full-width full-height"
           flat
-          @click="$root.$emit('layout-cell-add-application', parentId, container)" />
+          v-on="!$root.multiCellsSelect && {
+            click: () => $root.$emit('layout-cell-add-application', parentId, container)
+          }" />
       </v-hover>
     </template>
   </layout-editor-container-container-base>
@@ -197,7 +206,6 @@ export default {
         'background-color': this.container.color,
         'box-sizing': this.resize && 'content-box' || 'border-box',
         'border': this.resize && '2px solid var(--allPagesPrimaryColor)' || 'none',
-        'opacity': this.resize && '0.7' || '1',
         'height': this.resize && `${this.resizeHeight - 4}px` || '100%',
         'width': this.resize && `${this.resizeWidth - 4}px` || '100%',
         'user-select': 'none',
@@ -323,8 +331,8 @@ export default {
       if (!this.resize) {
         this.originalX = event.x;
         this.originalY = event.y;
-        this.originalHeight = this.$refs.resizeContent.getBoundingClientRect().height;
-        this.originalWidth = this.$refs.resizeContent.getBoundingClientRect().width;
+        this.originalHeight = this.$refs.container.$el.getBoundingClientRect().height;
+        this.originalWidth = this.$refs.container.$el.getBoundingClientRect().width;
         this.resizeX = this.originalX;
         this.resizeY = this.originalY;
         this.resizeHeight = this.originalHeight;

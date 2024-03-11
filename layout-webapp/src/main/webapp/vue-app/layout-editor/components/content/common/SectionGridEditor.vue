@@ -100,16 +100,10 @@
       </v-card>
     </div>
     <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pa-2">
-      <div
-        v-if="updateGrid"
-        :class="gridClass"
-        class="d-grid grid-gap-cols-1 grid-gap-rows-1">
-        <div
-          v-for="i in length"
-          :key="i"
-          :id="`grid-cell-${i}`"
-          class="grey-background opacity-5 aspect-ratio-1"></div>
-      </div>
+      <layout-editor-section-grid
+        :rows="rows"
+        :cols="cols"
+        cell-class="aspect-ratio-1" />
     </div>
   </div>
 </template>
@@ -128,21 +122,12 @@ export default {
   data: () => ({
     rows: 0,
     cols: 0,
-    length: 0,
-    updateGrid: false,
   }),
-  computed: {
-    gridClass() {
-      return `grid-cols-${this.cols} grid-rows-${this.rows}`;
-    },
-  },
   watch: {
     rows() {
-      this.refreshGrid();
       this.$emit('rows-updated', this.rows);
     },
     cols() {
-      this.refreshGrid();
       this.$emit('cols-updated', this.cols);
     },
   },
@@ -150,17 +135,5 @@ export default {
     this.rows = this.rowsCount;
     this.cols = this.colsCount;
   },
-  mounted() {
-    this.refreshGrid();
-  },
-  methods: {
-    refreshGrid() {
-      this.updateGrid = false;
-      window.setTimeout(() => {
-        this.length = this.rows * this.cols;
-        this.updateGrid = true;
-      }, 50);
-    },
-  }
 };
 </script>
