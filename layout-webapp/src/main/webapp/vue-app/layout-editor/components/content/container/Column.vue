@@ -19,7 +19,7 @@
 
 -->
 <template>
-  <layout-editor-container-container-base
+  <layout-editor-container-base
     ref="container"
     :container="container"
     :index="index"
@@ -107,7 +107,7 @@
           }" />
       </v-hover>
     </template>
-  </layout-editor-container-container-base>
+  </layout-editor-container-base>
 </template>
 <script>
 export default {

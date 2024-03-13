@@ -8,6 +8,7 @@ const config = {
     siteNavigation: './src/main/webapp/vue-app/site-navigation/main.js',
     siteManagement: './src/main/webapp/vue-app/site-management/main.js',
     layoutEditor: './src/main/webapp/vue-app/layout-editor/main.js',
+    pageLayout: './src/main/webapp/vue-app/page-layout/main.js',
   },
   mode: 'production',
   context: path.resolve(__dirname, '.'),

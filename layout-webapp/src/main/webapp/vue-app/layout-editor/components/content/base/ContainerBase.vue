@@ -31,7 +31,7 @@
       class="position-relative"
       @start="startMoving"
       @end="endMoving">
-      <layout-editor-container-container-extension
+      <layout-editor-container-extension
         v-for="(child, i) in children"
         :key="child.storageId"
         :container="child"
@@ -50,7 +50,7 @@
       :style="cssStyle"
       class="position-relative">
       <slot name="content"></slot>
-      <layout-editor-container-container-extension
+      <layout-editor-container-extension
         v-for="(child, i) in children"
         v-show="!hideChildren"
         :key="child.storageId"
@@ -157,7 +157,7 @@ export default {
       }
     },
     cssClass() {
-      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
+      return `${this.container.cssClass || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     draggable() {
       return !this.context && !this.noDraggable && this.childrenSize > 1;
