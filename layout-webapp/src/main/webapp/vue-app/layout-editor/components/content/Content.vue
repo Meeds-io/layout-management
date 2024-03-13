@@ -171,17 +171,18 @@ export default {
         this.initCellsSelection();
       }
     },
-    handleCellMerge(parentId, container, targetCellRowIndex, targetCellColIndex) {
-      this.mergeCell(parentId, container, targetCellRowIndex, targetCellColIndex);
+    handleCellMerge(sectionId, container, targetCellRowIndex, targetCellColIndex) {
+      this.mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex);
       this.saveDraft();
     },
-    mergeCell(parentId, container, targetCellRowIndex, targetCellColIndex) {
+    mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === parentId);
+      const section = parentContainer.children.find(c => c.storageId === sectionId);
       if (section) {
+        this.addSectionVersion(sectionId);
         this.$layoutUtils.resizeCell(section, container, targetCellRowIndex, targetCellColIndex);
       } else {
-        console.warn(`Can't find section with id ${parentId}`); // eslint-disable-line no-console
+        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
     },
     handleSectionUpdated(container, children, index, type) {
