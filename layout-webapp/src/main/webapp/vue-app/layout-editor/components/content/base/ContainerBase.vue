@@ -28,7 +28,7 @@
       :style="cssStyle"
       :options="dragOptions"
       item-key="storageId"
-      class="position-relative z-index-two"
+      class="position-relative"
       @start="startMoving"
       @end="endMoving">
       <layout-editor-container-container-extension
@@ -157,7 +157,7 @@ export default {
       }
     },
     cssClass() {
-      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''} ${this.hover && !this.$root.drawerOpened && 'z-index-two' || ''}`;
+      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     draggable() {
       return !this.context && !this.noDraggable && this.childrenSize > 1;
