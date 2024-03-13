@@ -37,19 +37,28 @@
       :cell-width="cellWidth"
       :rows-count="rowsCount"
       :cols-count="colsCount"
-      class="position-relative z-index-one"
+      :class="zIndexClass"
+      class="position-relative"
       type="section"
-      force-draggable
-      @hovered="hoverSection = $event"
-      @move-start="movingChildren = true" />
-    <v-hover v-if="!context">
+      no-draggable
+      @hovered="hoverSection = $event && !drawerOpened"
+      @move-start="movingChildren = true">
+      <template v-if="$root.movingParentId === storageId" #content>
+        <layout-editor-cells-drop-box
+          :section="container"
+          :section-x="sectionX"
+          :section-y="sectionY"
+          @hide="$root.movingParentId = null" />
+      </template>
+    </layout-editor-container-container-base>
+    <v-hover>
       <div
         v-if="!context"
         slot-scope="{ hover }"
         class="layout-section-border">
         <div class="position-relative full-height full-width">
           <layout-editor-section-border-menu
-            :hover="hover || hoverSection || movingSection"
+            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
             :index="index"
             :length="length"
             :moving="movingSection"
@@ -83,7 +92,7 @@ export default {
     hoverSection: false,
     movingSection: false,
     movingChildren: false,
-    resizingCell: null,
+    sourceCell: null,
     mouseX: 0,
     mouseY: 0,
     sectionWidth: 0,
@@ -91,8 +100,14 @@ export default {
     sectionY: 0,
   }),
   computed: {
+    drawerOpened() {
+      return this.$root.drawerOpened;
+    },
+    zIndexClass() {
+      return !this.drawerOpened && 'z-index-one';
+    },
     cellWidth() {
-      return this.sectionWidth && this.colsCount && (this.sectionWidth / this.colsCount + 1);
+      return this.sectionWidth && this.colsCount && ((this.sectionWidth + this.$root.gap) / this.colsCount);
     },
     cellHeight() {
       return this.cellWidth;
@@ -103,11 +118,17 @@ export default {
     rowsCount() {
       return this.container?.rowsCount;
     },
-    resizingCellColIndex() {
-      return this.resizingCell?.colIndex;
+    storageId() {
+      return this.container?.storageId;
     },
-    resizingCellRowIndex() {
-      return this.resizingCell?.rowIndex;
+    movingCell() {
+      return this.$root.movingCell;
+    },
+    sourceCellRowIndex() {
+      return this.sourceCell?.rowIndex;
+    },
+    sourceCellColIndex() {
+      return this.sourceCell?.colIndex;
     },
     mouseCellRowIndex() {
       return Math.max(
@@ -115,16 +136,18 @@ export default {
           Math.ceil((this.mouseY - this.sectionY) / this.cellHeight) - 1,
           this.rowsCount - 1
         ),
-        this.resizingCellRowIndex
+        this.$root.movingCell ? 0 : this.sourceCellRowIndex
       );
     },
     mouseCellColIndex() {
+      const diffWidth = this.$root.movingCell ? (this.cellWidth * this.$root.movingCell.colsCount) / 2 : 0;
+      const diffX = this.$root.movingCell ? 0 : 1;
       return Math.max(
         Math.min(
-          Math.ceil((this.mouseX - this.sectionX) / this.cellWidth) - 1,
+          Math.ceil((this.mouseX - this.sectionX - diffWidth) / this.cellWidth) - diffX,
           this.colsCount - 1
         ),
-        this.resizingCellColIndex
+        this.$root.movingCell ? 0 : this.sourceCellColIndex
       );
     },
   },
@@ -148,9 +171,10 @@ export default {
     },
   },
   created() {
-    this.$root.$on('layout-move-container', this.handleMoving);
     this.$root.$on('layout-cell-resize-start', this.handleCellResizeStart);
+    this.$root.$on('layout-cell-moving-start', this.handleCellMoveStart);
     this.$root.$on('layout-cell-resize-end', this.handleCellResizeEnd);
+    this.$root.$on('layout-cell-moving-end', this.handleCellMoveEnd);
   },
   mounted() {
     if (!this.context) {
@@ -160,24 +184,16 @@ export default {
     this.refreshDimensions();
   },
   beforeDestroy() {
-    this.$root.$off('layout-move-container', this.handleMoving);
     this.$root.$off('layout-cell-resize-start', this.handleCellResizeStart);
+    this.$root.$off('layout-cell-moving-start', this.handleCellMoveStart);
     this.$root.$off('layout-cell-resize-end', this.handleCellResizeEnd);
+    this.$root.$off('layout-cell-moving-end', this.handleCellMoveEnd);
     if (!this.context) {
       window.removeEventListener('resize', this.refreshDimensions);
       document.querySelector('.page-scroll-content').removeEventListener('scroll', this.refreshDimensions);
     }
   },
   methods: {
-    handleMoving(moving, storageId, sectionId) {
-      if (this.movingSection && !moving) {
-        this.movingSection = false;
-      } else if (sectionId === this.container.storageId) {
-        window.setTimeout(() => {
-          this.$layoutUtils.refreshCellIndexes(this.container);
-        }, 300);
-      }
-    },
     refreshDimensions() {
       window.setTimeout(() => {
         if (!this.$refs.section) {
@@ -190,25 +206,43 @@ export default {
       }, 300);
     },
     handleCellResizeStart(sectionId, cell) {
-      if (sectionId !== this.container.storageId) {
-        return;
-      }
-      this.$refs.container.$el.addEventListener('mousemove', this.handleMouseMove);
-      this.resizingCell = cell;
+      this.handleCellMotionStart(sectionId, cell);
     },
     handleCellResizeEnd(sectionId) {
       if (sectionId !== this.container.storageId) {
         return;
       }
-      this.$layoutUtils.resizeCell(this.container, this.resizingCell, this.mouseCellRowIndex, this.mouseCellColIndex);
+      this.$layoutUtils.resizeCell(this.container, this.sourceCell, this.mouseCellRowIndex, this.mouseCellColIndex);
+      this.handleCellMotionEnd();
+    },
+    handleCellMoveStart(event) {
+      this.handleCellMotionStart(event.sectionId, event.cell);
+    },
+    handleCellMoveEnd(event) {
+      if (event.sectionId !== this.container.storageId) {
+        return;
+      }
+      this.$layoutUtils.moveCell(this.container, event.cell, this.mouseCellRowIndex, this.mouseCellColIndex);
+      this.handleCellMotionEnd();
+    },
+    handleCellMotionStart(sectionId, cell) {
+      if (sectionId !== this.container.storageId) {
+        return;
+      }
+      this.$refs.container.$el.addEventListener('mousemove', this.handleMouseMove);
+      this.sourceCell = cell;
+    },
+    handleCellMotionEnd() {
       this.$refs.container.$el.removeEventListener('mousemove', this.handleMouseMove);
-      this.resizingCell = null;
+      this.sourceCell = null;
       this.mouseX = 0;
       this.mouseY = 0;
     },
     handleMouseMove(event) {
-      this.mouseX = event.x;
-      this.mouseY = event.y;
+      if (event.x && event.y) {
+        this.mouseX = event.x;
+        this.mouseY = event.y;
+      }
     },
   },
 };

@@ -102,8 +102,8 @@ export function getParentContainer(layout) {
 
 export function newParentContainer(layout) {
   const vuetifyAppContainer = newContainer(simpleTemplate, 'VuetifyApp', layout, 0);
-  const parent = newContainer(simpleTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication', vuetifyAppContainer, 0);
-  newSection(parent, 0, 3, 4);
+  const parent = newContainer(simpleTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication layout-sections-parent', vuetifyAppContainer, 0);
+  newSection(parent, 0, 12, 12);
 }
 
 export function parseSections(layout) {
@@ -235,6 +235,58 @@ export function refreshCellIndexes(section) {
   applyGridStyle(section);
 }
 
+export function moveCell(section, sourceCell, targetRowIndex, targetColIndex) {
+  const sourceRowIndex = sourceCell.rowIndex;
+  const sourceColIndex = sourceCell.colIndex;
+  if ((sourceRowIndex === targetRowIndex && sourceColIndex === targetColIndex)
+    || !isValidTargetMovingCell(section,
+      sourceCell,
+      targetRowIndex,
+      targetColIndex)) {
+    return;
+  }
+  let matrix = parseMatrix(section);
+
+  const rowCollision1 = (targetRowIndex > sourceCell.rowIndex && targetRowIndex < (sourceCell.rowIndex + sourceCell.rowsCount));
+  const rowCollision2 = (targetRowIndex < sourceCell.rowIndex && (targetRowIndex + sourceCell.rowsCount) > sourceCell.rowIndex);
+  const colCollision1 = (targetColIndex > sourceCell.colIndex && targetColIndex < (sourceCell.colIndex + sourceCell.colsCount));
+  const colCollision2 = (targetColIndex < sourceCell.colIndex && (targetColIndex + sourceCell.colsCount) > sourceCell.colIndex);
+  if ((colCollision1 || colCollision2) && targetRowIndex === sourceCell.rowIndex) {
+    transistCol(matrix, sourceCell, targetColIndex);
+    sourceCell.rowIndex = targetRowIndex;
+    sourceCell.colIndex = targetColIndex;
+  } else if ((rowCollision1 || rowCollision2) && targetColIndex === sourceCell.colIndex) {
+    transistRow(matrix, sourceCell, targetRowIndex);
+    sourceCell.rowIndex = targetRowIndex;
+    sourceCell.colIndex = targetColIndex;
+  } else if ((rowCollision1 || rowCollision2) && (colCollision1 || colCollision2)) {
+    transistRow(matrix, sourceCell, targetRowIndex);
+    sourceCell.rowIndex = targetRowIndex;
+    transistCol(matrix, sourceCell, targetColIndex);
+    sourceCell.colIndex = targetColIndex;
+  } else {
+    resizeCell(section, sourceCell, sourceCell.rowIndex, sourceCell.colIndex);
+    matrix = parseMatrix(section);
+    for (let i = 0; i < sourceCell.rowsCount; i++) {
+      for (let j = 0; j < sourceCell.colsCount; j++) {
+        const targetCellRowIndex = targetRowIndex + i;
+        const targetCellColIndex = targetColIndex + j;
+        const sourceCellRowIndex = sourceCell.rowIndex + i;
+        const sourceCellColIndex = sourceCell.colIndex + j;
+
+        const target = matrix[targetCellRowIndex][targetCellColIndex];
+        matrix[sourceCellRowIndex][sourceCellColIndex] = target;
+        matrix[targetCellRowIndex][targetCellColIndex] = sourceCell;
+      }
+    }
+  }
+  sourceCell.rowIndex = targetRowIndex;
+  sourceCell.colIndex = targetColIndex;
+
+  parseSectionMatrix(section, matrix);
+  applyGridStyle(section);
+}
+
 export function resizeCell(section, cell, rowIndex, colIndex) {
   const matrix = parseMatrix(section);
   for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
@@ -249,6 +301,45 @@ export function resizeCell(section, cell, rowIndex, colIndex) {
   }
   parseSectionMatrix(section, matrix);
   applyGridStyle(section);
+}
+
+export function isValidTargetMovingCell(section, movingCell, targetRowIndex, targetColIndex) {
+  if (!section || !movingCell || targetRowIndex < 0 || targetColIndex < 0) {
+    return false;
+  }
+  const targetEndRowIndex = movingCell.rowsCount + targetRowIndex - 1;
+  const targetEndColIndex = movingCell.colsCount + targetColIndex - 1;
+
+  return (targetEndRowIndex < section.rowsCount)
+    && (targetEndColIndex < section.colsCount)
+    && section.children.every(c => !c.children?.length
+        || c.storageId === movingCell?.storageId
+        || c.rowIndex < targetRowIndex
+        || c.rowIndex > targetEndRowIndex
+        || c.colIndex < targetColIndex
+        || c.colIndex > targetEndColIndex
+        || (
+          c.rowsCount <= (movingCell.rowsCount - (targetRowIndex - c.rowIndex))
+          && c.colsCount <= (movingCell.colsCount - (targetColIndex - c.colIndex))
+        ));
+}
+  
+export function cleanAttributes(container) {
+  container = JSON.parse(JSON.stringify(container));
+  if (container.children?.length) {
+    container.children = container.children.map(c => cleanAttributes(c));
+  }
+  if (container.randomId) {
+    container.storageId = null;
+  }
+  Object.keys(container).forEach(key => {
+    if (key
+      && containerModelAttributes.indexOf(key) < 0
+      && applicationModelAttributes.indexOf(key) < 0) {
+      delete container[key];
+    }
+  });
+  return container;
 }
 
 export function getX(event) {
@@ -273,7 +364,7 @@ function newContainer(template, cssClass, parentContainer, index) {
   const container = JSON.parse(JSON.stringify(containerModel));
   container.template = template;
   container.cssClass = cssClass || '';
-  container.storageId = parseInt(Math.random() * 65536);
+  container.storageId = `${parseInt(Math.random() * 65536)}`;
   container.randomId = true;
   container.name = container.storageId;
   if (parentContainer && (index || index === 0)) {
@@ -284,24 +375,6 @@ function newContainer(template, cssClass, parentContainer, index) {
       parentContainer.children = [container];
     }
   }
-  return container;
-}
-
-export function cleanAttributes(container) {
-  container = JSON.parse(JSON.stringify(container));
-  if (container.children?.length) {
-    container.children = container.children.map(c => cleanAttributes(c));
-  }
-  if (container.randomId) {
-    container.storageId = null;
-  }
-  Object.keys(container).forEach(key => {
-    if (key
-      && containerModelAttributes.indexOf(key) < 0
-      && applicationModelAttributes.indexOf(key) < 0) {
-      delete container[key];
-    }
-  });
   return container;
 }
 
@@ -428,6 +501,50 @@ function applyBreakpointValues(container, rows, cols) {
   container.rowsCount = container.rowBreakpoints[currentBreakpoint];
 }
 
+function transistCol(matrix, sourceCell, targetColIndex) {
+  for (let i = 0; i < sourceCell.rowsCount; i++) {
+    let colIndex = 0;
+    for (let j = 0; j < sourceCell.colsCount; j++) {
+      const targetCellRowIndex = sourceCell.rowIndex + i;
+      const targetCellColIndex = targetColIndex + j;
+      const sourceCellRowIndex = sourceCell.rowIndex + i;
+      const sourceCellColIndex = sourceCell.colIndex + j - colIndex;
+
+      const target = matrix[targetCellRowIndex][targetCellColIndex];
+      if (target.storageId === sourceCell.storageId) { // Then update its col & row indices
+        colIndex++;
+      } else {
+        matrix[targetCellRowIndex][targetCellColIndex] = sourceCell;
+        matrix[sourceCellRowIndex][sourceCellColIndex] = target;
+        target.rowIndex = sourceCellRowIndex;
+        target.colIndex = sourceCellColIndex;
+      }
+    }
+  }
+}
+
+function transistRow(matrix, sourceCell, targetRowIndex) {
+  for (let j = 0; j < sourceCell.colsCount; j++) {
+    let rowIndex = 0;
+    for (let i = 0; i < sourceCell.rowsCount; i++) {
+      const targetCellRowIndex = targetRowIndex + i;
+      const targetCellColIndex = sourceCell.colIndex + j;
+      const sourceCellRowIndex = sourceCell.rowIndex + i - rowIndex;
+      const sourceCellColIndex = sourceCell.colIndex + j;
+
+      const target = matrix[targetCellRowIndex][targetCellColIndex];
+      if (target.storageId === sourceCell.storageId) { // Then update its col & row indices
+        rowIndex++;
+      } else {
+        matrix[targetCellRowIndex][targetCellColIndex] = sourceCell;
+        matrix[sourceCellRowIndex][sourceCellColIndex] = target;
+        target.rowIndex = sourceCellRowIndex;
+        target.colIndex = sourceCellColIndex;
+      }
+    }
+  }
+}
+
 function filterChildren(section) {
   section.children = section.children.filter(c => {
     const colSpan = breakpoints.reduce((sum, b) => sum += c.colBreakpoints[b], 0);
@@ -436,7 +553,28 @@ function filterChildren(section) {
   });
 }
 
-function parseMatrix(section) {
+// FIXME delete 'export'
+export function displayMatrix(matrix) {
+  const result = {};
+  Object.keys(matrix).forEach(r => {
+    result[r] = {};
+    Object.keys(matrix[r]).forEach(c => {
+      if (matrix[r][c]?.children?.length) {
+        result[r][c] = `${matrix[r][c].storageId}_${r}_${c}`;
+      } else if (matrix[r][c]?.randomId) {
+        result[r][c] = 0;
+      } else if (matrix[r][c]?.storageId) {
+        result[r][c] = '---------';
+      } else {
+        result[r][c] = null;
+      }
+    });
+  });
+  console.warn(result); // eslint-disable-line no-console
+}
+
+// FIXME delete 'export'
+export function parseMatrix(section) {
   const matrix = {};
   for (let i = 0; i < section.rowsCount; i++) {
     matrix[i] = {};
@@ -477,34 +615,36 @@ function parseMatrix(section) {
   return matrix;
 }
 
-function parseSectionMatrix(section, matrix) {
+// FIXME delete 'export'
+export function parseSectionMatrix(section, matrix) {
   const children = [];
   for (let row = 0; row < section.rowsCount; row++) {
     if (!matrix[row]) {
       matrix[row] = {};
     }
     for (let col = 0; col < section.colsCount; col++) {
-      let exists = false;
-      let cell = matrix[row][col];
+      let existingCell = null;
+      const cell = matrix[row][col];
       if (cell) {
-        exists = children.find(c => c.storageId === cell.storageId);
-        if (exists
-            && ((cell.rowIndex !== row && matrix[row - 1][col].storageId !== cell.storageId)
-            || (cell.colIndex !== col && matrix[row][col - 1].storageId !== cell.storageId))) {
+        const storageId = cell.storageId;
+        existingCell = children.find(c => c.storageId === storageId);
+        if (existingCell
+            && ((existingCell.rowIndex !== row && matrix[row - 1]?.[col]?.storageId !== storageId)
+            || (existingCell.colIndex !== col && matrix[row]?.[col - 1]?.storageId !== storageId))) {
           matrix[row][col] = null;
-          cell = null;
-          exists = false;
+          existingCell = null;
+        } else if (existingCell) {
+          matrix[row][col] = existingCell;
         }
       }
-      if (!cell) {
-        cell = newCell(section, children.length, 1, 1);
-        matrix[row][col] = cell;
+      if (!matrix[row][col]) {
+        matrix[row][col] = newCell(section, children.length, 1, 1);
       }
-      if (!exists) {
-        cell = JSON.parse(JSON.stringify(cell));
-        cell.rowIndex = row;
-        cell.colIndex = col;
-        children.push(cell);
+      if (!existingCell) {
+        matrix[row][col] = JSON.parse(JSON.stringify(matrix[row][col]));
+        matrix[row][col].rowIndex = row;
+        matrix[row][col].colIndex = col;
+        children.push(matrix[row][col]);
       }
     }
   }
