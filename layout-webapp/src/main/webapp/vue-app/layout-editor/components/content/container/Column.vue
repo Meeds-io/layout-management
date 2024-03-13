@@ -49,7 +49,7 @@
             'r-0': !$vuetify.rtl,
             'fa-rotate-90': !$vuetify.rtl
           }"
-          class="position-absolute z-index-two b-0"
+          class="position-absolute z-index-two b-0 mb-n3 me-n3"
           icon
           @mousedown.prevent.stop="resizeStart">
           <v-icon :size="iconSize" class="icon-default-color">fa-expand-alt</v-icon>
