@@ -235,6 +235,10 @@ public class NavigationLayoutService {
 
   public String getNodeUri(Long nodeId, String username) throws IllegalAccessException, ObjectNotFoundException {
     NodeData node = getNode(nodeId, username);
+    return getNodeUri(node);
+  }
+
+  public String getNodeUri(NodeData node) {
     SiteKey siteKey = node.getSiteKey();
 
     StringBuilder uriBuilder = new StringBuilder();

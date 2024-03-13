@@ -19,11 +19,9 @@
 
 -->
 <template>
-  <layout-editor-container-base
+  <page-layout-container-base
     :container="container"
-    :index="index"
-    :length="length"
-    :context="context" />
+    :parent-id="parentId" />
 </template>
 <script>
 export default {
@@ -32,15 +30,7 @@ export default {
       type: Object,
       default: null,
     },
-    index: {
-      type: Number,
-      default: null,
-    },
-    length: {
-      type: Number,
-      default: null,
-    },
-    context: {
+    parentId: {
       type: String,
       default: null,
     },

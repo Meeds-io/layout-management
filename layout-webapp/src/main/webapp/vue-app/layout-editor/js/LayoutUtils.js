@@ -20,9 +20,10 @@
 export const breakpoints = ['xs', 'sm', 'md', 'lg', 'xl'];
 
 export const currentBreakpoint = 'xl';
+export const pageLayoutTemplate = 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl';
 export const simpleTemplate = 'system:/groovy/portal/webui/container/UIContainer.gtmpl';
-export const gridTemplate = 'system:/groovy/portal/webui/container/UIVGridContainer.gtmpl';
-export const cellTemplate = 'system:/groovy/portal/webui/container/UIVCellContainer.gtmpl';
+export const gridTemplate = 'GridContainer';
+export const cellTemplate = 'CellContainer';
 
 export const containerModel = {
   storageId: null,
@@ -102,7 +103,7 @@ export function getParentContainer(layout) {
 
 export function newParentContainer(layout) {
   const vuetifyAppContainer = newContainer(simpleTemplate, 'VuetifyApp', layout, 0);
-  const parent = newContainer(simpleTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication layout-sections-parent', vuetifyAppContainer, 0);
+  const parent = newContainer(pageLayoutTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication layout-sections-parent', vuetifyAppContainer, 0);
   newSection(parent, 0, 12, 12);
 }
 
@@ -145,7 +146,7 @@ export function newSection(parentContainer, index, rows, cols) {
   cols = cols || 4;
   const section = newContainer(
     gridTemplate,
-    'grid-gap-cols-5 grid-gap-rows-5',
+    null,
     parentContainer,
     index || 0);
   applyBreakpointValues(section, rows, cols);
@@ -372,7 +373,7 @@ function newCell(section, index, rows, cols) {
 function newContainer(template, cssClass, parentContainer, index) {
   const container = JSON.parse(JSON.stringify(containerModel));
   container.template = template;
-  container.cssClass = cssClass || '';
+  container.cssClass = cssClass;
   container.storageId = `${parseInt(Math.random() * 65536)}`;
   container.randomId = true;
   container.name = container.storageId;
@@ -453,7 +454,7 @@ function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
 }
 
 function parseBreakpointClasses(container, classPrefix) {
-  const classes = container.cssClass.match(new RegExp(`(^| )${classPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
+  const classes = !container.cssClass && [] || container.cssClass.match(new RegExp(`(^| )${classPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
   const bp = {
     xs: 0,
     sm: 0,
@@ -480,7 +481,7 @@ function parseBreakpointClasses(container, classPrefix) {
   if (bp.xl) {
     return bp;
   } else {
-    throw Error(`CSS classes '${container.cssClass}' not compatible. Fallback to old editor.`);
+    throw Error(`CSS classes '${container.cssClass || ''}' not compatible. Fallback to old editor.`);
   }
 }
 
