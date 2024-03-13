@@ -20,10 +20,27 @@
 -->
 <template>
   <v-btn
+    :loading="saving"
     class="d-flex align-center"
     color="primary"
     elevation="0"
-    @click="$root.$emit('layout-save-page')">
+    @click="savePage">
     <span class="text-none">{{ $t('layout.save') }}</span>
   </v-btn>
 </template>
+<script>
+export default {
+  data: () => ({
+    loading: false,
+  }),
+  methods: {
+    savePage() {
+      this.loading = true;
+      const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout);
+      return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate)
+        .then(() => this.$root.$emit('layout-page-saved'))
+        .finally(() => window.setTimeout(() => this.loading = false));
+    },
+  },
+};
+</script>
