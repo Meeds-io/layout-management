@@ -23,7 +23,7 @@
     <div class="UIComponentBlock">
       <div class="VIEW-PAGE">
         <div id="UIPage">
-          <layout-editor-container-container-base
+          <layout-editor-container-base
             :container="container"
             class="UIRowContainer" />
         </div>

@@ -19,11 +19,11 @@
 
 -->
 <template>
-  <layout-editor-container-base
+  <component
+    v-if="containerType && container"
+    :is="containerType"
     :container="container"
-    :index="index"
-    :length="length"
-    :context="context" />
+    :parent-id="parentId" />
 </template>
 <script>
 export default {
@@ -32,17 +32,25 @@ export default {
       type: Object,
       default: null,
     },
-    index: {
-      type: Number,
-      default: null,
-    },
-    length: {
-      type: Number,
-      default: null,
-    },
-    context: {
+    parentId: {
       type: String,
       default: null,
+    },
+  },
+  computed: {
+    storageId() {
+      return this.container?.storageId;
+    },
+    containerType() {
+      const extension = this.container
+        && this.$root.containerTypes?.find?.(ext => ext?.isValid?.(this.container))
+        || this.$root.defaultContainer;
+      return extension?.containerType;
+    },
+    params() {
+      return {
+        container: this.container,
+      };
     },
   },
 };

@@ -17,31 +17,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import * as siteLayoutService from './js/SiteLayoutService.js';
-import * as navigationLayoutService from './js/NavigationLayoutService.js';
-import * as pageLayoutService from './js/PageLayoutService.js';
-import * as applicationUtils from './js/ApplicationUtils.js';
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 1000,
+  type: 'container',
+  isValid: container => container?.template === 'Container',
+  containerType: 'page-layout-container',
+});
 
-if (!Vue.prototype.$navigationLayoutService) {
-  window.Object.defineProperty(Vue.prototype, '$navigationLayoutService', {
-    value: navigationLayoutService,
-  });
-}
-
-if (!Vue.prototype.$siteLayoutService) {
-  window.Object.defineProperty(Vue.prototype, '$siteLayoutService', {
-    value: siteLayoutService,
-  });
-}
-
-if (!Vue.prototype.$pageLayoutService) {
-  window.Object.defineProperty(Vue.prototype, '$pageLayoutService', {
-    value: pageLayoutService,
-  });
-}
-
-if (!Vue.prototype.$applicationUtils) {
-  window.Object.defineProperty(Vue.prototype, '$applicationUtils', {
-    value: applicationUtils,
-  });
-}
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 600,
+  type: 'application',
+  isValid: container => !container.template && (container.contentId?.includes?.('/') || container.storageId),
+  containerType: 'page-layout-application',
+});

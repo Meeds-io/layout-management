@@ -17,31 +17,24 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import * as siteLayoutService from './js/SiteLayoutService.js';
-import * as navigationLayoutService from './js/NavigationLayoutService.js';
-import * as pageLayoutService from './js/PageLayoutService.js';
-import * as applicationUtils from './js/ApplicationUtils.js';
+import PageLayout from './components/PageLayout.vue';
 
-if (!Vue.prototype.$navigationLayoutService) {
-  window.Object.defineProperty(Vue.prototype, '$navigationLayoutService', {
-    value: navigationLayoutService,
-  });
-}
+import ContainerExtension from './components/base/ContainerExtension.vue';
+import ContainerBase from './components/base/ContainerBase.vue';
 
-if (!Vue.prototype.$siteLayoutService) {
-  window.Object.defineProperty(Vue.prototype, '$siteLayoutService', {
-    value: siteLayoutService,
-  });
-}
+import Container from './components/container/Container.vue';
+import Application from './components/container/Application.vue';
 
-if (!Vue.prototype.$pageLayoutService) {
-  window.Object.defineProperty(Vue.prototype, '$pageLayoutService', {
-    value: pageLayoutService,
-  });
-}
+const components = {
+  'page-layout': PageLayout,
 
-if (!Vue.prototype.$applicationUtils) {
-  window.Object.defineProperty(Vue.prototype, '$applicationUtils', {
-    value: applicationUtils,
-  });
+  'page-layout-container-extension': ContainerExtension,
+  'page-layout-container-base': ContainerBase,
+
+  'page-layout-container': Container,
+  'page-layout-application': Application,
+};
+
+for (const key in components) {
+  Vue.component(key, components[key]);
 }
