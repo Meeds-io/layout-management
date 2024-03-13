@@ -49,16 +49,16 @@ export default {
   data: () => ({
     layoutToEdit: null,
     isCompatible: false,
-    loading: false,
+    loading: 0,
   }),
   watch: {
     layoutToEdit() {
       this.$root.layout = this.layoutToEdit;
     },
-    loading() {
-      if (this.loading) {
+    loading(newVal, oldVal) {
+      if (newVal - oldVal > 0) {
         document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
-      } else {
+      } else if (newVal - oldVal < 0) {
         document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
       }
     },
@@ -91,6 +91,8 @@ export default {
     this.$root.$on('layout-cell-resize', this.handleCellMerge);
     this.$root.$on('layout-add-application', this.handleAddApplication);
     this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
+    this.$root.$on('layout-section-history-add', this.addSectionVersion);
+    document.addEventListener('keydown', this.restoreSectionVersion);
   },
   methods: {
     save() {
@@ -207,12 +209,49 @@ export default {
       }
       this.saveDraft();
     },
+    addSectionVersion(sectionId) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === sectionId);
+      if (section) {
+        if (!this.$root.sectionHistory) {
+          this.$root.sectionHistory = [JSON.parse(JSON.stringify(section))];
+        } else {
+          this.$root.sectionHistory.push(JSON.parse(JSON.stringify(section)));
+        }
+        this.$root.sectionRedo = [];
+      }
+    },
+    restoreSectionVersion(event) {
+      if (event.ctrlKey) {
+        if (event.keyCode === 90) {
+          if (this.$root.sectionHistory?.length) {
+            const section = this.$root.sectionHistory.pop();
+            const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+            const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
+            if (index >= 0) {
+              this.$root.sectionRedo.push(parentContainer.children[index]);
+              this.handleReplaceSection(index, section);
+            }
+          }
+        } else if (event.keyCode === 89) {
+          if (this.$root.sectionRedo?.length) {
+            const section = this.$root.sectionRedo.pop();
+            const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+            const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
+            if (index >= 0) {
+              this.$root.sectionHistory.push(parentContainer.children[index]);
+              this.handleReplaceSection(index, section);
+            }
+          }
+        }
+      }
+    },
     saveDraft(layout) {
+      this.loading++;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit);
-      this.loading = true;
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
         .then(layout => this.setLayout(layout))
-        .finally(() => this.loading = false);
+        .finally(() => window.setTimeout(() => this.loading--, 200));
     },
   },
 };

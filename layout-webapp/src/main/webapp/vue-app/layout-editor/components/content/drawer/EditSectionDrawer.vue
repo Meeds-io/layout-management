@@ -67,7 +67,6 @@
 <script>
 export default {
   data: () => ({
-    context: 'edit-section',
     originalSection: null,
     section: null,
     drawer: false,
