@@ -47,20 +47,19 @@
       v-else
       :id="id"
       :class="cssClass"
-      :style="cssStyle">
+      :style="cssStyle"
+      class="position-relative">
       <slot name="content"></slot>
-      <KeepAlive>
-        <layout-editor-container-container-extension
-          v-for="(child, i) in children"
-          :key="child.storageId"
-          :container="child"
-          :parent-id="storageId"
-          :index="i"
-          :length="children.length"
-          :context="context"
-          :cell-height="cellHeight"
-          :cell-width="cellWidth" />
-      </KeepAlive>
+      <layout-editor-container-container-extension
+        v-for="(child, i) in children"
+        v-show="!hideChildren"
+        :key="child.storageId"
+        :container="child"
+        :parent-id="storageId"
+        :index="i"
+        :length="children.length"
+        :cell-height="cellHeight"
+        :cell-width="cellWidth" />
     </div>
   </v-hover>
 </template>
@@ -87,7 +86,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    forceDraggable: {
+    noDraggable: {
+      type: Boolean,
+      default: false,
+    },
+    hideChildren: {
       type: Boolean,
       default: false,
     },
@@ -116,17 +119,6 @@ export default {
     hover: false,
     children: [],
     dragged: false,
-    resize: false,
-    resizeX: 0,
-    resizeY: 0,
-    resizeHeight: 0,
-    resizeWidth: 0,
-    originalX: 0,
-    originalY: 0,
-    originalHeight: 0,
-    originalWidth: 0,
-    cellCols: 0,
-    cellRows: 0,
   }),
   computed: {
     storageId() {
@@ -165,10 +157,10 @@ export default {
       }
     },
     cssClass() {
-      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
+      return `${this.container.cssClass} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''} ${this.hover && !this.$root.drawerOpened && 'z-index-two' || ''}`;
     },
     draggable() {
-      return !this.context && (this.childrenSize > 1 || this.forceDraggable);
+      return !this.context && !this.noDraggable && this.childrenSize > 1;
     },
     draggableContainerClass() {
       return `draggable-container-${this.storageId}`;
@@ -196,10 +188,6 @@ export default {
       if (JSON.stringify(this.container.children) !== JSON.stringify(this.children)) {
         this.$root.$emit('layout-children-size-updated', this.container, this.children, this.index, this.type);
       }
-    },
-    dragged() {
-      this.$root.draggedContainer = this.dragged && this.storageId || null;
-      this.$root.$emit('layout-move-container', this.dragged, this.storageId, this.parentId);
     },
   },
   created() {
