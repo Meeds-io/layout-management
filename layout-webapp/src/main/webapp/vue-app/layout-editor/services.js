@@ -18,16 +18,9 @@
  */
 
 import * as layoutUtils from './js/LayoutUtils.js';
-import * as applicationUtils from './js/ApplicationUtils.js';
 
 if (!Vue.prototype.$layoutUtils) {
   window.Object.defineProperty(Vue.prototype, '$layoutUtils', {
     value: layoutUtils,
-  });
-}
-
-if (!Vue.prototype.$applicationUtils) {
-  window.Object.defineProperty(Vue.prototype, '$applicationUtils', {
-    value: applicationUtils,
   });
 }

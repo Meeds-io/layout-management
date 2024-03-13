@@ -1,7 +1,5 @@
 <template>
-  <div
-    :class="gridClass"
-    class="d-grid grid-gap-cols-1 grid-gap-rows-1">
+  <div :class="gridClass">
     <div
       v-for="i in length"
       :key="i"

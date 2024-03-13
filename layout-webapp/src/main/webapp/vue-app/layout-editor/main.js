@@ -111,6 +111,9 @@ export function init() {
           isMovingCell() {
             return this.$root.movingCell && this.$root.movingX && this.$root.movingY && true || false;
           },
+          defaultContainer() {
+            return this.containerTypes.find(extension => extension.type === 'container');
+          },
         },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);

@@ -24,6 +24,13 @@
     xsi:schemaLocation="http://www.exoplatform.org/xml/ns/gatein_resources_1_4 http://www.exoplatform.org/xml/ns/gatein_resources_1_4"
     xmlns="http://www.exoplatform.org/xml/ns/gatein_resources_1_4">
 
+  <portal-skin>
+    <skin-name>Enterprise</skin-name>
+    <skin-module>pagelayout</skin-module>
+    <css-path>/skin/css/pagelayout.css</css-path>
+    <css-priority>100</css-priority>
+  </portal-skin>
+
   <portlet-skin>
     <application-name>layout</application-name>
     <portlet-name>SiteNavigation</portlet-name>
@@ -141,6 +148,38 @@
       <script>
         <minify>false</minify>
         <path>/js/layoutEditor.bundle.js</path>
+      </script>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>commonLayoutComponents</module>
+      </depends>
+      <depends>
+        <module>vueDraggable</module>
+      </depends>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <portlet>
+    <name>PageLayout</name>
+    <module>
+      <load-group>page-layout-group</load-group>
+      <script>
+        <minify>false</minify>
+        <path>/js/pageLayout.bundle.js</path>
       </script>
       <depends>
         <module>extensionRegistry</module>
