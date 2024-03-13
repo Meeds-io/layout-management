@@ -90,6 +90,7 @@ export default {
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
     this.$root.$on('layout-cell-resize', this.handleCellMerge);
     this.$root.$on('layout-add-application', this.handleAddApplication);
+    this.$root.$on('layout-delete-application', this.handleDeleteApplication);
     this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     document.addEventListener('keydown', this.restoreSectionVersion);
@@ -171,9 +172,24 @@ export default {
         this.initCellsSelection();
       }
     },
+    handleDeleteApplication(sectionId, container) {
+      this.addSectionVersion(sectionId);
+      this.deleteCell(sectionId, container);
+      this.saveDraft();
+    },
     handleCellMerge(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       this.mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex);
       this.saveDraft();
+    },
+    deleteCell(sectionId, container) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === sectionId);
+      if (section) {
+        this.addSectionVersion(sectionId);
+        this.$layoutUtils.deleteCell(section, container);
+      } else {
+        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
+      }
     },
     mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
