@@ -245,7 +245,7 @@ export function moveCell(section, sourceCell, targetRowIndex, targetColIndex) {
       targetColIndex)) {
     return;
   }
-  let matrix = parseMatrix(section);
+  const matrix = parseMatrix(section);
 
   const rowCollision1 = (targetRowIndex > sourceCell.rowIndex && targetRowIndex < (sourceCell.rowIndex + sourceCell.rowsCount));
   const rowCollision2 = (targetRowIndex < sourceCell.rowIndex && (targetRowIndex + sourceCell.rowsCount) > sourceCell.rowIndex);
@@ -265,8 +265,6 @@ export function moveCell(section, sourceCell, targetRowIndex, targetColIndex) {
     transistCol(matrix, sourceCell, targetColIndex);
     sourceCell.colIndex = targetColIndex;
   } else {
-    resizeCell(section, sourceCell, sourceCell.rowIndex, sourceCell.colIndex);
-    matrix = parseMatrix(section);
     for (let i = 0; i < sourceCell.rowsCount; i++) {
       for (let j = 0; j < sourceCell.colsCount; j++) {
         const targetCellRowIndex = targetRowIndex + i;
@@ -283,6 +281,17 @@ export function moveCell(section, sourceCell, targetRowIndex, targetColIndex) {
   sourceCell.rowIndex = targetRowIndex;
   sourceCell.colIndex = targetColIndex;
 
+  parseSectionMatrix(section, matrix);
+  applyGridStyle(section);
+}
+
+export function deleteCell(section, cell) {
+  const matrix = parseMatrix(section);
+  for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
+    for (let col = cell.colIndex; col < (cell.colIndex + cell.colsCount); col++) {
+      matrix[row][col] = null;
+    }
+  }
   parseSectionMatrix(section, matrix);
   applyGridStyle(section);
 }

@@ -29,7 +29,7 @@
     :cell-height="targetCellHeight"
     :cell-width="targetCellWidth"
     :style="cellStyle"
-    :class="hover && !$root.drawerOpened && 'z-index-two'"
+    :class="(hover && !$root.drawerOpened && 'z-index-two') || (resize && 'z-index-modal')"
     class="position-relative"
     @hovered="hover = $event">
     <template #content>
@@ -83,7 +83,7 @@
                 :height="iconSize"
                 class="me-3"
                 icon
-                @click.prevent.stop="$emit('delete-application')">
+                @click.prevent.stop="deleteApplication">
                 <v-icon :size="iconSize" class="icon-default-color">fa-trash</v-icon>
               </v-btn>
             </v-chip>
@@ -438,6 +438,9 @@ export default {
         this.targetCellHeight = 0;
         this.targetCellWidth = 0;
       }
+    },
+    deleteApplication() {
+      this.$root.$emit('layout-delete-application', this.parentId, this.container);
     },
   },
 };
