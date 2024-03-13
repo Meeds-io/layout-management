@@ -20,21 +20,71 @@
 -->
 <template>
   <div
-    v-show="multiCellsSelect"
+    v-show="movingCell"
+    ref="movingBox"
+    :class="!validSelection && 'secondary-border-color'"
     :style="boxStyle"
-    class="layout-selecting-container grey opacity-5 elevation-2 position-absolute z-index-modal">
+    class="layout-selecting-container d-flex position-absolute elevation-2 z-index-modal">
   </div>
 </template>
 <script>
 export default {
+  props: {
+    section: {
+      type: Object,
+      default: null,
+    },
+    sectionX: {
+      type: Number,
+      default: null,
+    },
+    sectionY: {
+      type: Number,
+      default: null,
+    },
+  },
   data: () => ({
+    containerElement: null,
     interceptEvents: false,
     parentAppDimensions: null,
     computingDisplayInterval: null,
+    boxHeight: null,
+    boxWidth: null,
   }),
   computed: {
-    multiCellsSelect() {
-      return this.$root.multiCellsSelect;
+    movingCell() {
+      return this.$root.movingCell;
+    },
+    mouseCellRowIndex() {
+      return this.$root.mouseCellRowIndex;
+    },
+    mouseCellColIndex() {
+      return this.$root.mouseCellColIndex;
+    },
+    movingCellRowIndex() {
+      return this.movingCell?.rowIndex || -1;
+    },
+    movingCellColIndex() {
+      return this.movingCell?.colIndex || -1;
+    },
+    movingCellRowsCount() {
+      return this.movingCell?.rowsCount || -1;
+    },
+    movingCellColsCount() {
+      return this.movingCell?.colsCount || -1;
+    },
+    mouseCellEndRowIndex() {
+      return this.mouseCellRowIndex + this.movingCellRowsCount;
+    },
+    mouseCellEndColIndex() {
+      return this.mouseCellColIndex + this.movingCellColsCount;
+    },
+    validSelection() {
+      return this.$layoutUtils.isValidTargetMovingCell(
+        this.section,
+        this.movingCell,
+        this.mouseCellRowIndex,
+        this.mouseCellColIndex);
     },
     movingStartX() {
       return this.$root.movingStartX;
@@ -54,93 +104,55 @@ export default {
     parentAppY() {
       return this.$root.parentAppDimensions?.y || 0;
     },
-    boxHeight() {
-      return this.movingY - this.movingStartY;
-    },
-    boxWidth() {
-      return this.movingX - this.movingStartX;
-    },
     boxStyle() {
-      const boxStyle = {};
-      if (this.boxHeight > 0) {
-        boxStyle.top = `${this.movingStartY}px`;
-      } else {
-        boxStyle.top = `${this.movingStartY + this.boxHeight}px`;
-      }
-      if (this.boxWidth > 0) {
-        boxStyle.left = `${this.movingStartX}px`;
-      } else {
-        boxStyle.left = `${this.movingStartX + this.boxWidth}px`;
-      }
-      boxStyle.height = `${Math.abs(this.boxHeight)}px`;
-      boxStyle.width = `${Math.abs(this.boxWidth)}px`;
-      return boxStyle;
+      return {
+        top: `${this.movingY - 24}px`,
+        left: `${this.movingX - this.sectionX - this.boxWidth / 2 + 36}px`,
+        height: `${this.boxHeight + 3}px`,
+        'max-height': `${this.boxHeight + 3}px`,
+        width: `${this.boxWidth + 3}px`,
+        'max-width': `${this.boxWidth + 3}px`,
+      };
     },
   },
   watch: {
-    multiCellsSelect() {
-      if (this.multiCellsSelect) {
-        this.$root.$emit('layout-cells-selection-start');
-      }
-    },
     interceptEvents() {
       if (this.interceptEvents) {
-        document.addEventListener('mousemove', this.updateSelection);
-        document.addEventListener('mouseup', this.endSelection);
+        document.addEventListener('mousemove', this.updateMoving);
         document.querySelector('.page-scroll-content').addEventListener('scroll', this.updateScrollPosition);
       } else {
-        document.removeEventListener('mousemove', this.updateSelection);
-        document.removeEventListener('mouseup', this.endSelection);
+        document.removeEventListener('mousemove', this.updateMoving);
         document.querySelector('.page-scroll-content').removeEventListener('scroll', this.updateScrollPosition);
-        this.reset();
+        this.$emit('hide');
       }
     },
-    movingX() {
-      this.updateDisplay();
-    },
-    movingY() {
-      this.updateDisplay();
-    },
     parentAppX(newVal, oldVal) {
-      if (this.interceptEvents) {
+      if (this.interceptEvents && this.$root.movingX && this.$root.movingY) {
         this.$root.movingX = this.$root.movingX - newVal + oldVal;
       }
     },
     parentAppY(newVal, oldVal) {
-      if (this.interceptEvents) {
+      if (this.interceptEvents && this.$root.movingX && this.$root.movingY) {
         this.$root.movingY = this.$root.movingY - newVal + oldVal;
+      }
+    },
+    containerElement(newVal, oldVal) {
+      if (!oldVal && newVal) {
+        window.setTimeout(() => {
+          this.$refs.movingBox.append(newVal);
+        }, 100);
       }
     },
   },
   created() {
-    document.addEventListener('mousedown', this.startSelection);
+    this.$root.$on('layout-cell-moving-start', this.startMoving);
+    this.$root.$on('layout-cell-moving-end', this.endMoving);
+  },
+  beforeDestroy() {
+    this.$root.$off('layout-cell-moving-start', this.startMoving);
+    this.$root.$off('layout-cell-moving-end', this.endMoving);
   },
   methods: {
-    reset() {
-      this.$root.movingX = 0;
-      this.$root.movingY = 0;
-      this.$root.movingStartX = 0;
-      this.$root.movingStartY = 0;
-      this.startScrollX = 0;
-      this.startScrollY = 0;
-      this.diffScrollX = 0;
-      this.diffScrollY = 0;
-      this.$root.parentAppDimensions = null;
-    },
-    updateDisplay() {
-      if (this.interceptEvents) {
-        if (!this.computingDisplayInterval && !this.$root.multiCellsSelect) {
-          this.computingDisplayInterval = window.setTimeout(() => {
-            this.$root.multiCellsSelect =
-              Math.abs(this.movingX - this.movingStartX) > 10
-              || Math.abs(this.movingY - this.movingStartY) > 10;
-            this.computingDisplayInterval = null;
-          }, 50);
-        }
-      } else {
-        this.$root.multiCellsSelect = false;
-      }
-    },
     updateScrollPosition() {
       if (this.interceptEvents) {
         this.$root.updateParentAppDimensions();
@@ -150,14 +162,15 @@ export default {
         });
       }
     },
-    startSelection(event) {
-      if (event.button !== 0) {
-        return;
-      }
-      if (event?.target?.closest?.('#layoutEditor')
-          && !event?.target?.closest?.('.layout-no-multi-select')
+    startMoving(event) {
+      if (!this.interceptEvents
+          && event?.target?.closest?.('#layoutEditor')
           && event?.target?.tagName !== 'BUTTON'
           && event?.target?.tagName !== 'A') {
+        const containerDimensions = event.containerElement.getBoundingClientRect();
+        this.boxHeight = containerDimensions.height;
+        this.boxWidth = containerDimensions.width;
+
         this.$root.updateParentAppDimensions();
         this.$root.movingX = this.$layoutUtils.getX(event) - this.$root.parentAppDimensions.x;
         this.$root.movingY = this.$layoutUtils.getY(event) - this.$root.parentAppDimensions.y;
@@ -167,22 +180,23 @@ export default {
         this.startScrollY = this.$root.parentAppDimensions.y;
         this.diffScrollX = 0;
         this.diffScrollY = 0;
+        this.containerElement = event.containerElement.cloneNode(true);
+        this.$root.movingCell = event.cell;
+
         this.interceptEvents = false;
         this.$nextTick().then(() => this.interceptEvents = true);
       }
     },
-    updateSelection(event) {
+    updateMoving(event) {
       if (this.interceptEvents) {
         this.$root.movingX = this.$layoutUtils.getX(event) - this.parentAppX;
         this.$root.movingY = this.$layoutUtils.getY(event) - this.parentAppY;
       }
     },
-    endSelection() {
+    endMoving() {
       if (this.interceptEvents) {
-        if (this.multiCellsSelect) {
-          this.$root.$emit('layout-cells-selection-end');
-        }
         this.interceptEvents = false;
+        this.$root.movingCell = null;
       }
     },
   },
