@@ -1,0 +1,132 @@
+@import 'variables.less';
+@import 'mixins.less';
+
+.layout-sections-parent {
+  .PORTLET-FRAGMENT {
+    padding-bottom: 0;
+  }
+}
+.grid-cols-1,
+.grid-cols-2,
+.grid-cols-3,
+.grid-cols-4,
+.grid-cols-5,
+.grid-cols-6,
+.grid-cols-7,
+.grid-cols-8,
+.grid-cols-9,
+.grid-cols-10,
+.grid-cols-11,
+.grid-cols-12 {
+  --gap-count: ~"calc(var(--grid-column-count) - 1)";
+  --total-gap-width: ~"calc(var(--gap-count)* var(--grid-layout-gap, 20px))";
+  --grid-item--max-width: ~"calc((100% - var(--total-gap-width)) / var(--grid-column-count))";
+  --grid-item--min-width: ~"var(--grid-item--max-width)";
+  display: grid;
+  grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-item--min-width), var(--grid-item--max-width)), 1fr))";
+  grid-gap: ~"var(--grid-layout-gap, 20px)";
+}
+.grid-cols-1 {
+  --grid-column-count: 1;
+}
+.grid-cols-2 {
+  --grid-column-count: 2;
+}
+.grid-cols-3 {
+  --grid-column-count: 3;
+}
+.grid-cols-4 {
+  --grid-column-count: 4;
+}
+.grid-cols-5 {
+  --grid-column-count: 5;
+}
+.grid-cols-6 {
+  --grid-column-count: 6;
+}
+.grid-cols-7 {
+  --grid-column-count: 7;
+}
+.grid-cols-8 {
+  --grid-column-count: 8;
+}
+.grid-cols-9 {
+  --grid-column-count: 9;
+}
+.grid-cols-10 {
+  --grid-column-count: 10;
+}
+.grid-cols-11 {
+  --grid-column-count: 11;
+}
+.grid-cols-12 {
+  --grid-column-count: 12;
+}
+
+.grid-cell-colspan-2 {
+  grid-column-end: span 2;
+}
+.grid-cell-colspan-3 {
+  grid-column-end: span 3;
+}
+.grid-cell-colspan-4 {
+  grid-column-end: span 4;
+}
+.grid-cell-colspan-5 {
+  grid-column-end: span 5;
+}
+.grid-cell-colspan-6 {
+  grid-column-end: span 6;
+}
+.grid-cell-colspan-7 {
+  grid-column-end: span 7;
+}
+.grid-cell-colspan-8 {
+  grid-column-end: span 8;
+}
+.grid-cell-colspan-9 {
+  grid-column-end: span 9;
+}
+.grid-cell-colspan-10 {
+  grid-column-end: span 10;
+}
+.grid-cell-colspan-11 {
+  grid-column-end: span 11;
+}
+.grid-cell-colspan-12 {
+  grid-column-end: span 12;
+}
+
+.grid-cell-rowspan-2 {
+  grid-row-end: span 2;
+}
+.grid-cell-rowspan-3 {
+  grid-row-end: span 3;
+}
+.grid-cell-rowspan-4 {
+  grid-row-end: span 4;
+}
+.grid-cell-rowspan-5 {
+  grid-row-end: span 5;
+}
+.grid-cell-rowspan-6 {
+  grid-row-end: span 6;
+}
+.grid-cell-rowspan-7 {
+  grid-row-end: span 7;
+}
+.grid-cell-rowspan-8 {
+  grid-row-end: span 8;
+}
+.grid-cell-rowspan-9 {
+  grid-row-end: span 9;
+}
+.grid-cell-rowspan-10 {
+  grid-row-end: span 10;
+}
+.grid-cell-rowspan-11 {
+  grid-row-end: span 11;
+}
+.grid-cell-rowspan-12 {
+  grid-row-end: span 12;
+}

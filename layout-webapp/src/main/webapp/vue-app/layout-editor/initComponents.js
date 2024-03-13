@@ -36,6 +36,7 @@ import ApplicationCategoryCard from './components/content/common/ApplicationCate
 import ApplicationCard from './components/content/common/ApplicationCard.vue';
 
 import Page from './components/content/container/Page.vue';
+import PageLayout from './components/content/container/PageLayout.vue';
 import Container from './components/content/container/Container.vue';
 import Row from './components/content/container/Row.vue';
 import Column from './components/content/container/Column.vue';
@@ -50,9 +51,10 @@ const components = {
   'layout-editor-toolbar': Toolbar,
   'layout-editor-toolbar-save-button': SaveButton,
   'layout-editor-content': Content,
-  'layout-editor-container-container-extension': ContainerExtension,
-  'layout-editor-container-container-base': ContainerBase,
+  'layout-editor-container-extension': ContainerExtension,
+  'layout-editor-container-base': ContainerBase,
   'layout-editor-container-page': Page,
+  'layout-editor-container-page-layout': PageLayout,
   'layout-editor-container-container': Container,
   'layout-editor-container-row': Row,
   'layout-editor-container-column': Column,

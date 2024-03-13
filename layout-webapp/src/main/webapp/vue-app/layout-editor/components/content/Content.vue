@@ -20,7 +20,7 @@
 -->
 <template>
   <div>
-    <layout-editor-container-container-extension
+    <layout-editor-container-extension
       :container="layoutToEdit" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
@@ -78,7 +78,6 @@ export default {
     },
   },
   created() {
-    this.$root.$on('layout-save-page', this.save);
     this.$root.$on('layout-add-section-drawer', this.addSection);
     this.$root.$on('layout-edit-section-drawer', this.editSection);
     this.$root.$on('layout-cell-add-application', this.addApplication);
@@ -93,12 +92,10 @@ export default {
     this.$root.$on('layout-delete-application', this.handleDeleteApplication);
     this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
+    this.$root.$on('layout-page-saved', this.handlePageSaved);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   methods: {
-    save() {
-      // TODO
-    },
     setLayout(layout) {
       this.initContainer(layout);
       this.isCompatible = this.$layoutUtils.parseSections(layout);
@@ -144,6 +141,10 @@ export default {
           && this.$root.selectedCells?.length) {
         this.$refs.applicationDrawer.open();
       }
+    },
+    handlePageSaved() {
+      this.$navigationLayoutService.deleteNode(this.$root.draftNodeId)
+        .finally(() => window.location.href = `/portal${this.$root.nodeUri}`);
     },
     handleAddApplication(application) {
       const selectedCells = this.$root.selectedCells.slice();

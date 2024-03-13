@@ -25,8 +25,8 @@
     <layout-editor-section-grid
       :rows="rowsCount"
       :cols="colsCount"
-      class="position-absolute full-width full-height grid-gap-cols-5 grid-gap-rows-5 pb-5" />
-    <layout-editor-container-container-base
+      class="position-absolute full-width full-height pb-5" />
+    <layout-editor-container-base
       ref="container"
       :container="container"
       :index="index"
@@ -50,7 +50,7 @@
           :section-y="sectionY"
           @hide="$root.movingParentId = null" />
       </template>
-    </layout-editor-container-container-base>
+    </layout-editor-container-base>
     <v-hover>
       <div
         v-if="!context"

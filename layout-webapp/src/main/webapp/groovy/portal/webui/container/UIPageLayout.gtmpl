@@ -1,0 +1,19 @@
+<%
+  import org.exoplatform.portal.application.PortalRequestContext;
+  import io.meeds.layout.service.NavigationLayoutService;
+
+  PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
+  NavigationLayoutService navigationLayoutService = uicomponent.getApplicationComponent(NavigationLayoutService.class);
+
+  String pageRef = rcontext.getUiPage().getPageId();
+
+  def jsManager = _ctx.getRequestContext().getJavascriptManager();
+  jsManager.require("PORTLET/layout/PageLayout");
+%>
+<div class="VuetifyApp">
+  <div id="PageLayout">
+    <script type="text/javascript">
+      require(['PORTLET/layout/PageLayout'], app => app.init('<%=pageRef%>'));
+    </script>
+  </div>
+</div>
