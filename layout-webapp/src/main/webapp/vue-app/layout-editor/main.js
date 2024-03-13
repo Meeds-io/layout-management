@@ -47,7 +47,7 @@ export function init() {
         template: `<layout-editor id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
         i18n,
-        data: {
+        data: () => ({
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           editPage: true,
           layout: null,
@@ -60,19 +60,29 @@ export function init() {
           draggedSection: null,
           resizeDimensions: null,
           resizeParentId: null,
+          movingParentId: null,
+          drawerOpened: 0,
           selectedSectionId: null,
-          selectedCells: null,
+          selectedCells: [],
           // Resize mouse Grid indexes
           mouseCellRowIndex: -1,
           mouseCellColIndex: -1,
           // Grid cells selection
           parentAppDimensions: false,
           multiCellsSelect: false,
+          sectionHistory: null,
+          sectionRedo: null,
+          movingCell: null,
+          movingCellRowIndex: 0,
+          movingCellColIndex: 0,
+          movingCellRowSpan: 0,
+          movingCellColSpan: 0,
           movingStartX: 0,
           movingStartY: 0,
           movingX: 0,
           movingY: 0,
-        },
+          gap: 20,
+        }),
         computed: {
           resizeMouseX() {
             return this.resizeDimensions && (this.resizeDimensions.x + this.resizeDimensions.width);
@@ -98,11 +108,22 @@ export function init() {
           parentAppY() {
             return this.$root.parentAppDimensions?.y || 0;
           },
+          isMovingCell() {
+            return this.$root.movingCell && this.$root.movingX && this.$root.movingY && true || false;
+          },
         },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
+          document.addEventListener('drawerOpened', this.setDrawerOpened);
+          document.addEventListener('drawerClosed', this.setDrawerClosed);
         },
         methods: {
+          setDrawerOpened() {
+            this.drawerOpened++;
+          },
+          setDrawerClosed() {
+            this.drawerOpened--;
+          },
           refreshContainerTypes() {
             this.containerTypes = extensionRegistry.loadExtensions('layout-editor', 'container');
           },

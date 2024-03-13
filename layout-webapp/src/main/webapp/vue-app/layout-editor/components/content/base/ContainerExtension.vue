@@ -33,7 +33,9 @@
       :cols-count="colsCount"
       @move-start="$emit('move-start')" />
   </KeepAlive>
-  <v-progress-circular v-else-if="!storageId && containerType === 'application'" indeterminate />
+  <div v-else-if="!storageId && containerType === 'application'" class="d-flex align-center justify-center full-width full-height">
+    <v-progress-circular color="primary" indeterminate />
+  </div>
 </template>
 <script>
 export default {
@@ -87,18 +89,6 @@ export default {
       return {
         container: this.container,
       };
-    },
-  },
-  watch: {
-    storageId: {
-      immediate: true,
-      handler() {
-        if (!this.storageId) {
-          document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
-        } else {
-          document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-        }
-      },
     },
   },
 };

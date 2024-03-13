@@ -25,10 +25,11 @@
     :index="index"
     :length="length"
     :context="context"
+    :hide-children="moving"
     :cell-height="targetCellHeight"
     :cell-width="targetCellWidth"
     :style="cellStyle"
-    :class="hover && 'z-index-two'"
+    :class="hover && !$root.drawerOpened && 'z-index-two'"
     class="position-relative"
     @hovered="hover = $event">
     <template #content>
@@ -38,7 +39,7 @@
           :style="resizeStyle"
           class="d-flex position-absolute z-index-two"></div>
         <v-btn
-          v-if="hover && !resize"
+          v-if="hover && !resize && !moving && !$root.drawerOpened"
           ref="resizeButton"
           :title="$t('layout.resizeCell')"
           :width="iconSize"
@@ -55,7 +56,7 @@
         </v-btn>
         <v-fade-transition>
           <div
-            v-show="hover && !resize"
+            v-show="hover && !resize && !moving && !$root.drawerOpened"
             class="layout-no-multi-select absolute-horizontal-center z-index-drawer mt-n4">
             <v-chip color="white" class="elevation-2">
               <v-btn
@@ -64,7 +65,7 @@
                 :height="iconSize"
                 class="draggable ms-3"
                 icon
-                @click.prevent.stop="$emit('move-start')">
+                @mousedown.prevent.stop="moveStart">
                 <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
               </v-btn>
               <v-btn
@@ -93,7 +94,8 @@
         <v-card
           slot-scope="hoverScope"
           :class="{
-            'transparent': hoverScope.hover || isSelectedCell,
+            'transparent': hoverScope.hover && !isSelectedCell,
+            'grey': isSelectedCell,
             'grey-background': !hoverScope.hover && !isSelectedCell,
           }"
           :min-width="minWidth"
@@ -247,7 +249,27 @@ export default {
         ) || (
           (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY1)
            && (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
+        ) || (
+          (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY0)
+           && (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX0)
         ));
+    },
+    moving() {
+      return this.$root.movingCell
+        && this.parentId === this.$root.movingParentId
+        && this.rowIndex === this.$root.movingCellRowIndex
+        && this.colIndex === this.$root.movingCellColIndex;
+    },
+    isTargetOfMoving() {
+      return this.$root.movingCell
+        && this.parentId === this.$root.movingParentId
+        && this.$root.mouseCellRowIndex >= 0
+        && this.$root.mouseCellColIndex >= 0
+        && this.rowIndex >= this.$root.mouseCellRowIndex
+        && this.rowIndex < (this.$root.mouseCellRowIndex + this.$root.movingCell.rowsCount)
+        && this.colIndex >= this.$root.mouseCellColIndex
+        && this.colIndex < (this.$root.mouseCellColIndex + this.$root.movingCell.colsCount)
+        || false;
     },
     colSpan() {
       return this.container.colsCount;
@@ -272,8 +294,11 @@ export default {
       return this.$root.selectedCells;
     },
     isSelectedCell() {
-      const index = this.selectedCells?.indexOf?.(this.container);
-      return index === 0 || (index && index > 0);
+      if (this.$root.isMovingCell) {
+        return this.isTargetOfMoving;
+      } else {
+        return !!this.selectedCells.find(c => c.storageId === this.container.storageId);
+      }
     },
     mouseCellRowIndex() {
       return this.$root.mouseCellRowIndex;
@@ -297,11 +322,15 @@ export default {
     resizeY() {
       this.resizeHeight = this.originalHeight + this.resizeY - this.originalY;
     },
-    mouseCellRowIndex() {
-      this.refreshTargetCellDimensions();
+    mouseCellRowIndex(newVal, oldVal) {
+      if (this.resize && newVal !== oldVal) {
+        this.refreshTargetCellDimensions();
+      }
     },
-    mouseCellColIndex() {
-      this.refreshTargetCellDimensions();
+    mouseCellColIndex(newVal, oldVal) {
+      if (this.resize && newVal !== oldVal) {
+        this.refreshTargetCellDimensions();
+      }
     },
     multiCellsSelect(val) {
       if (val) {
@@ -329,6 +358,7 @@ export default {
   methods: {
     resizeStart(event) {
       if (!this.resize) {
+        this.$root.$emit('layout-section-history-add', this.parentId);
         this.originalX = event.x;
         this.originalY = event.y;
         this.originalHeight = this.$refs.container.$el.getBoundingClientRect().height;
@@ -359,6 +389,41 @@ export default {
       if (this.resize) {
         this.resizeX = event.x;
         this.resizeY = event.y;
+      }
+    },
+    moveStart(event) {
+      this.$root.$emit('layout-section-history-add', this.parentId);
+      this.$root.mouseCellRowIndex = this.container.rowIndex;
+      this.$root.mouseCellColIndex = this.container.colIndex;
+      this.$root.movingCellRowIndex = this.container.rowIndex;
+      this.$root.movingCellColIndex = this.container.colIndex;
+      this.$root.movingCellRowSpan = this.container.rowsCount;
+      this.$root.movingCellColSpan = this.container.colsCount;
+      this.$root.movingParentId = this.parentId;
+      this.$nextTick().then(() => {
+        this.$root.$emit('layout-cell-moving-start', {
+          target: event.target,
+          x: event.x,
+          y: event.y,
+          sectionId: this.parentId,
+          cell: this.container,
+          containerElement: this.$refs.container.$el,
+        });
+        document.addEventListener('mouseup', this.moveEnd);
+      });
+    },
+    moveEnd(event) {
+      if (this.$root.movingCell) {
+        this.$root.$emit('layout-cell-moving-end', {
+          sectionId: this.parentId,
+          cell: this.container,
+          rowIndex: this.$root.mouseCellRowIndex,
+          colIndex: this.$root.mouseCellColIndex,
+          target: event.target,
+        });
+        this.$root.movingCellRowIndex = -1;
+        this.$root.movingCellColIndex = -1;
+        document.removeEventListener('mouseup', this.moveEnd);
       }
     },
     refreshTargetCellDimensions() {

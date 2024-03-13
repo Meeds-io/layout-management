@@ -4,12 +4,11 @@
       'position-absolute z-index-one': !!cellHeight,
       'full-height full-width': !cellHeight,
     }"
-    :min-height="appHeight || ''"
-    :min-width="appWidth || ''"
-    :max-height="appHeight || ''"
-    :max-width="appWidth || ''"
-    :height="appHeight || ''"
     :width="appWidth || ''"
+    :max-width="appWidth || ''"
+    :min-height="appHeight || ''"
+    :max-height="appHeight || ''"
+    :height="appHeight || ''"
     class="overflow-hidden"
     color="transparent"
     flat>
@@ -49,7 +48,7 @@ export default {
       return this.cellHeight - (this.container?.gap?.v || 20);
     },
     appWidth() {
-      return this.cellWidth - (this.container?.gap?.h || 20);
+      return this.cellWidth - (this.container?.gap?.h || 20) - 8;
     },
   },
   watch: {
