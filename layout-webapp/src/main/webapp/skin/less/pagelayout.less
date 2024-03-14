@@ -25,6 +25,7 @@
   display: grid;
   grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-item--min-width), var(--grid-item--max-width)), 1fr))";
   grid-gap: ~"var(--grid-layout-gap, 20px)";
+  margin-bottom: ~"var(--grid-layout-gap, 20px)";
 }
 .grid-cell-colspan-1,
 .grid-cell-colspan-2,
@@ -187,4 +188,7 @@
 }
 .grid-cell-rowspan-12 {
   --grid-cell-rows: 12;
+}
+.grid-gap-1 {
+  --grid-layout-gap: 4px;
 }

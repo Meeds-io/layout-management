@@ -20,7 +20,7 @@
 -->
 <template>
   <v-btn
-    :loading="saving"
+    :loading="loading"
     class="d-flex align-center"
     color="primary"
     elevation="0"
