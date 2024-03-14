@@ -26,8 +26,10 @@
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
       ref="sectionEditDrawer" />
-    <layout-editor-application-drawer
+    <layout-editor-application-add-drawer
       ref="applicationDrawer" />
+    <layout-editor-application-edit-drawer
+      ref="applicationPropertiesDrawer" />
   </div>
 </template>
 <script>
@@ -89,10 +91,12 @@ export default {
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
     this.$root.$on('layout-cell-resize', this.handleCellMerge);
     this.$root.$on('layout-add-application', this.handleAddApplication);
+    this.$root.$on('layout-edit-application', this.handleEditApplication);
     this.$root.$on('layout-delete-application', this.handleDeleteApplication);
     this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
+    this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   methods: {
@@ -146,6 +150,9 @@ export default {
       this.$navigationLayoutService.deleteNode(this.$root.draftNodeId)
         .finally(() => window.location.href = `/portal${this.$root.nodeUri}`);
     },
+    handleApplyGridStyle() {
+      this.$layoutUtils.applyGridStyle(this.layoutToEdit);
+    },
     handleAddApplication(application) {
       const selectedCells = this.$root.selectedCells.slice();
       const selectedSectionId = this.$root.selectedSectionId;
@@ -182,6 +189,15 @@ export default {
       if (section) {
         this.addSectionVersion(sectionId);
         this.$layoutUtils.deleteCell(section, container);
+      } else {
+        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
+      }
+    },
+    handleEditApplication(sectionId, container) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === sectionId);
+      if (section) {
+        this.$refs.applicationPropertiesDrawer.open(section, container);
       } else {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
