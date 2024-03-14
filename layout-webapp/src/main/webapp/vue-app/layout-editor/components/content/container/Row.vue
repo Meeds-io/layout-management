@@ -22,10 +22,6 @@
   <div
     ref="section"
     class="position-relative layout-section pb-5">
-    <layout-editor-section-grid
-      :rows="rowsCount"
-      :cols="colsCount"
-      class="position-absolute full-width full-height pb-5" />
     <layout-editor-container-base
       ref="container"
       :container="container"

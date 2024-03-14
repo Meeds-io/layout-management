@@ -39,6 +39,8 @@ const lang = eXo?.env.portal.language || 'en';
 //should expose the locale ressources as REST API
 const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.LayoutEditor-${lang}.json`;
 
+document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+
 export function init() {
   exoi18n.loadLanguageAsync(lang, url)
     .then(i18n =>
@@ -77,6 +79,8 @@ export function init() {
           movingCellColIndex: 0,
           movingCellRowSpan: 0,
           movingCellColSpan: 0,
+          diffScrollX: 0,
+          diffScrollY: 0,
           movingStartX: 0,
           movingStartY: 0,
           movingX: 0,
@@ -91,16 +95,16 @@ export function init() {
             return this.resizeDimensions && (this.resizeDimensions.y + this.resizeDimensions.height);
           },
           selectMouseX0() {
-            return Math.min(this.movingStartX, this.movingX) + this.parentAppX;
+            return Math.min(this.movingStartX - this.diffScrollX, this.movingX - this.diffScrollX) + this.parentAppX;
           },
           selectMouseX1() {
-            return Math.max(this.movingStartX, this.movingX) + this.parentAppX;
+            return Math.max(this.movingStartX - this.diffScrollX, this.movingX - this.diffScrollX) + this.parentAppX;
           },
           selectMouseY0() {
-            return Math.min(this.movingStartY, this.movingY) + this.parentAppY;
+            return Math.min(this.movingStartY - this.diffScrollY, this.movingY - this.diffScrollY) + this.parentAppY;
           },
           selectMouseY1() {
-            return Math.max(this.movingStartY, this.movingY) + this.parentAppY;
+            return Math.max(this.movingStartY - this.diffScrollY, this.movingY - this.diffScrollY) + this.parentAppY;
           },
           parentAppX() {
             return this.$root.parentAppDimensions?.x || 0;
