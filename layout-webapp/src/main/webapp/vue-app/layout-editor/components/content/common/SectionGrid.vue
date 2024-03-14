@@ -1,11 +1,11 @@
 <template>
-  <div :class="gridClass">
+  <div :class="gridClass" class="grid-gap-1">
     <div
       v-for="i in length"
       :key="i"
       :id="`grid-cell-${i}`"
       :class="cellClass"
-      class="grey-background opacity-5"></div>
+      class="grey-background grid-cell-colspan-1 grid-cell-rowspan-1 opacity-5"></div>
   </div>
 </template>
 <script>
