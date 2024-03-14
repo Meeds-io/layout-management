@@ -173,16 +173,10 @@ export default {
         this.initCellsSelection();
       }
     },
-    handleDeleteApplication(sectionId, container) {
-      this.addSectionVersion(sectionId);
-      this.deleteCell(sectionId, container);
-      this.saveDraft();
-    },
     handleCellMerge(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       this.mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex);
-      this.saveDraft();
     },
-    deleteCell(sectionId, container) {
+    handleDeleteApplication(sectionId, container) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       const section = parentContainer.children.find(c => c.storageId === sectionId);
       if (section) {
@@ -211,21 +205,18 @@ export default {
     handleAddSection(section, index) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       parentContainer.children.splice(index || 0, 0, section);
-      this.saveDraft();
     },
     handleRemoveSection(index) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       if (parentContainer) {
         parentContainer.children.splice(index, 1);
       }
-      this.saveDraft();
     },
     handleReplaceSection(index, section) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       if (parentContainer) {
         parentContainer.children.splice(index, 1, section);
       }
-      this.saveDraft();
     },
     addSectionVersion(sectionId) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
@@ -264,7 +255,13 @@ export default {
         }
       }
     },
+    resetSectionHistory() {
+      this.$root.sectionHistory = [];
+      this.$root.sectionRedo = [];
+    },
     saveDraft(layout) {
+      this.resetSectionHistory();
+
       this.loading++;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit);
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
