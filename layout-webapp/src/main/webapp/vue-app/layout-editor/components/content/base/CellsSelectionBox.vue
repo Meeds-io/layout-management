@@ -123,8 +123,8 @@ export default {
       this.$root.movingStartY = 0;
       this.startScrollX = 0;
       this.startScrollY = 0;
-      this.diffScrollX = 0;
-      this.diffScrollY = 0;
+      this.$root.diffScrollX = 0;
+      this.$root.diffScrollY = 0;
       this.$root.parentAppDimensions = null;
     },
     updateDisplay() {
@@ -145,8 +145,9 @@ export default {
       if (this.interceptEvents) {
         this.$root.updateParentAppDimensions();
         this.$nextTick(() => {
-          this.diffScrollX = this.$root.parentAppDimensions.x - this.startScrollX;
-          this.diffScrollY = this.$root.parentAppDimensions.y - this.startScrollY;
+          this.$root.diffScrollX = this.$root.parentAppDimensions.x - this.startScrollX;
+          this.$root.diffScrollY = this.$root.parentAppDimensions.y - this.startScrollY;
+          this.updateSelection();
         });
       }
     },
@@ -165,14 +166,14 @@ export default {
         this.$root.movingStartY = this.$root.movingY;
         this.startScrollX = this.$root.parentAppDimensions.x;
         this.startScrollY = this.$root.parentAppDimensions.y;
-        this.diffScrollX = 0;
-        this.diffScrollY = 0;
+        this.$root.diffScrollX = 0;
+        this.$root.diffScrollY = 0;
         this.interceptEvents = false;
         this.$nextTick().then(() => this.interceptEvents = true);
       }
     },
     updateSelection(event) {
-      if (this.interceptEvents) {
+      if (this.interceptEvents && event) {
         this.$root.movingX = this.$layoutUtils.getX(event) - this.parentAppX;
         this.$root.movingY = this.$layoutUtils.getY(event) - this.parentAppY;
       }

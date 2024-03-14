@@ -93,7 +93,7 @@
         <v-card
           slot-scope="hoverScope"
           :class="{
-            'transparent': hoverScope.hover && !isSelectedCell,
+            'grey-background opacity-5': hoverScope.hover && !isSelectedCell,
             'grey': isSelectedCell,
             'grey-background': !hoverScope.hover && !isSelectedCell,
           }"
@@ -164,6 +164,7 @@ export default {
     targetCellWidth: 0,
     resizeInterval: null,
     dimensions: null,
+    isInMultiSelection: false,
   }),
   computed: {
     children() {
@@ -224,26 +225,6 @@ export default {
     dimensionsY1() {
       return this.dimensionsY0 + this.dimensions.height || 0;
     },
-    isInMultiSelection() {
-      return this.multiCellsSelect
-        && this.dimensions
-        && ((
-          (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
-           || (this.dimensionsX1 > this.$root.selectMouseX0 && this.dimensionsX1 < this.$root.selectMouseX1)
-        ) && (
-          (this.dimensionsY0 > this.$root.selectMouseY0 && this.dimensionsY0 < this.$root.selectMouseY1)
-           || (this.dimensionsY1 > this.$root.selectMouseY0 && this.dimensionsY1 < this.$root.selectMouseY1)
-        ) || (
-          (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX1)
-           && (this.dimensionsY0 > this.$root.selectMouseY0 && this.dimensionsY0 < this.$root.selectMouseY1)
-        ) || (
-          (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY1)
-           && (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
-        ) || (
-          (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY0)
-           && (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX0)
-        ));
-    },
     moving() {
       return this.$root.movingCell
         && this.parentId === this.$root.movingParentId
@@ -289,6 +270,12 @@ export default {
     mouseCellColIndex() {
       return this.$root.mouseCellColIndex;
     },
+    selectMouseX1() {
+      return this.$root.selectMouseX1;
+    },
+    selectMouseY1() {
+      return this.$root.selectMouseY1;
+    },
   },
   watch: {
     resize() {
@@ -319,6 +306,15 @@ export default {
       if (val) {
         this.dimensions = this.$refs.container.$el.getBoundingClientRect();
       }
+    },
+    dimensions() {
+      return this.computeIsInMultiSelection();
+    },
+    selectMouseX1() {
+      return this.computeIsInMultiSelection();
+    },
+    selectMouseY1() {
+      return this.computeIsInMultiSelection();
     },
     isInMultiSelection() {
       if (this.multiCellsSelect) {
@@ -424,6 +420,27 @@ export default {
     },
     editApplication() {
       this.$root.$emit('layout-edit-application', this.parentId, this.container);
+    },
+    computeIsInMultiSelection() {
+      this.isInMultiSelection =
+        this.multiCellsSelect
+        && this.dimensions
+        && ((
+          (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
+           || (this.dimensionsX1 > this.$root.selectMouseX0 && this.dimensionsX1 < this.$root.selectMouseX1)
+        ) && (
+          (this.dimensionsY0 > this.$root.selectMouseY0 && this.dimensionsY0 < this.$root.selectMouseY1)
+           || (this.dimensionsY1 > this.$root.selectMouseY0 && this.dimensionsY1 < this.$root.selectMouseY1)
+        ) || (
+          (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX1)
+           && (this.dimensionsY0 > this.$root.selectMouseY0 && this.dimensionsY0 < this.$root.selectMouseY1)
+        ) || (
+          (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY1)
+           && (this.dimensionsX0 > this.$root.selectMouseX0 && this.dimensionsX0 < this.$root.selectMouseX1)
+        ) || (
+          (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY0)
+           && (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX0)
+        ));
     },
     deleteApplication() {
       this.$root.$emit('layout-delete-application', this.parentId, this.container);
