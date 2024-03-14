@@ -34,7 +34,7 @@ export default {
   }),
   computed: {
     pageLayout() {
-      return this.page?.children?.[0]?.children?.[0]?.children?.[0];
+      return this.page?.children?.[0]?.children?.[0];
     },
   },
   created() {
