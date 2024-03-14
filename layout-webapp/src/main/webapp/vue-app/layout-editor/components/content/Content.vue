@@ -51,7 +51,7 @@ export default {
   data: () => ({
     layoutToEdit: null,
     isCompatible: false,
-    loading: 0,
+    loading: 1,
   }),
   watch: {
     layoutToEdit() {
