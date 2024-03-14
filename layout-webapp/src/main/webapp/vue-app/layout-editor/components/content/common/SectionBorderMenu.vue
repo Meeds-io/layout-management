@@ -25,7 +25,7 @@
     class="absolute-full-size border-radius">
     <v-slide-y-transition>
       <div v-if="open" class="position-relative full-width full-height">
-        <div class="absolute-horizontal-center t-0 z-index-one mt-n4">
+        <div class="absolute-horizontal-center t-0 mt-n4">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
               <v-btn
@@ -41,7 +41,7 @@
             {{ $t('layout.addSectionBefore') }}
           </v-tooltip>
         </div>
-        <div class="absolute-horizontal-center b-0 z-index-one mb-n4">
+        <div class="absolute-horizontal-center b-0 mb-n4">
           <v-tooltip top>
             <template #activator="{on, attrs}">
               <v-btn
@@ -57,7 +57,7 @@
             {{ $t('layout.addSectionAfter') }}
           </v-tooltip>
         </div>
-        <div class="absolute-vertical-center r-0 z-index-one mr-n5">
+        <div class="absolute-vertical-center r-0 mr-n5">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
               <v-btn
@@ -75,7 +75,7 @@
         </div>
         <div
           v-if="displayMoveButton"
-          class="absolute-vertical-center l-0 z-index-one ml-n4">
+          class="absolute-vertical-center l-0 ml-n4">
           <v-tooltip :disabled="moving" bottom>
             <template #activator="{on, attrs}">
               <v-btn

@@ -2,14 +2,13 @@
   <v-card
     :class="{
       'position-absolute z-index-one': !!cellHeight,
-      'full-height full-width': !cellHeight,
     }"
     :width="appWidth || ''"
     :max-width="appWidth || ''"
     :min-height="appHeight || ''"
     :max-height="appHeight || ''"
     :height="appHeight || ''"
-    class="overflow-hidden"
+    class="layout-application"
     color="transparent"
     flat>
     <div ref="content"></div>
