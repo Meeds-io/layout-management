@@ -45,6 +45,7 @@ import Application from './components/content/container/Application.vue';
 import EditSectionDrawer from './components/content/drawer/EditSectionDrawer.vue';
 import AddSectionDrawer from './components/content/drawer/AddSectionDrawer.vue';
 import AddApplicationDrawer from './components/content/drawer/AddApplicationDrawer.vue';
+import EditApplicationDrawer from './components/content/drawer/EditApplicationDrawer.vue';
 
 const components = {
   'layout-editor': LayoutEditor,
@@ -59,14 +60,15 @@ const components = {
   'layout-editor-container-row': Row,
   'layout-editor-container-column': Column,
   'layout-editor-container-application': Application,
-  'layout-editor-section-border-menu': SectionBorderMenu,
-  'layout-editor-section-grid-editor': SectionGridEditor,
   'layout-editor-section-grid': SectionGrid,
-  'layout-editor-section-edit-drawer': EditSectionDrawer,
+  'layout-editor-section-grid-editor': SectionGridEditor,
   'layout-editor-section-add-drawer': AddSectionDrawer,
-  'layout-editor-application-drawer': AddApplicationDrawer,
-  'layout-editor-application-category-card': ApplicationCategoryCard,
+  'layout-editor-section-edit-drawer': EditSectionDrawer,
+  'layout-editor-section-border-menu': SectionBorderMenu,
+  'layout-editor-application-add-drawer': AddApplicationDrawer,
+  'layout-editor-application-edit-drawer': EditApplicationDrawer,
   'layout-editor-application-card': ApplicationCard,
+  'layout-editor-application-category-card': ApplicationCategoryCard,
   'layout-editor-cells-selection-box': CellsSelectionBox,
   'layout-editor-cells-drop-box': CellsDropBox,
 };

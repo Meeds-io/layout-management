@@ -107,6 +107,18 @@ export function newParentContainer(layout) {
   newSection(parent, 0, 12, 12);
 }
 
+export function applyGridStyle(container) {
+  if (container.template === gridTemplate) {
+    container.children?.forEach(applyGridStyle);
+    applyBreakpointClasses(container, 'grid-rows', 'grid-cols');
+  } else if (container.template === cellTemplate) {
+    applyBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
+    applyCellHeightStyle(container);
+  } else {
+    container.children?.forEach?.(applyGridStyle);
+  }
+}
+
 export function parseSections(layout) {
   const parentContainer = getParentContainer(layout);
   if (parentContainer) {
@@ -362,7 +374,7 @@ export function getY(event) {
 
 function newCell(section, index, rows, cols) {
   const container = newContainer(cellTemplate,
-    null,
+    'grid-cell',
     (index === 0 || index) && section || null,
     index);
   applyBreakpointValues(container, rows, cols);
@@ -416,15 +428,6 @@ function parseCell(colContainer) {
   colContainer.gap = parseGapClasses(colContainer, 'grid-cell-gap');
   colContainer.colsCount = colContainer.colBreakpoints[currentBreakpoint];
   colContainer.rowsCount = colContainer.rowBreakpoints[currentBreakpoint];
-}
-
-function applyGridStyle(container) {
-  if (container.template === gridTemplate) {
-    container.children.forEach(applyGridStyle);
-    applyBreakpointClasses(container, 'grid-rows', 'grid-cols');
-  } else if (container.template === cellTemplate) {
-    applyBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
-  }
 }
 
 function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
@@ -482,6 +485,17 @@ function parseBreakpointClasses(container, classPrefix) {
     return bp;
   } else {
     throw Error(`CSS classes '${container.cssClass || ''}' not compatible. Fallback to old editor.`);
+  }
+}
+
+function applyCellHeightStyle(container) {
+  container.cssClass = container.cssClass
+    .replace(' grid-cell-height-auto', '')
+    .replace(' grid-cell-height-scroll', '');
+  if (container.height === 'auto') {
+    container.cssClass += ' grid-cell-height-auto';
+  } else {
+    container.cssClass += ' grid-cell-height-scroll';
   }
 }
 
