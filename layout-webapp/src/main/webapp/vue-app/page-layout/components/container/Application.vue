@@ -1,15 +1,5 @@
 <template>
-  <v-card
-    :width="appWidth || ''"
-    :max-width="appWidth || ''"
-    :min-height="appHeight || ''"
-    :max-height="appHeight || ''"
-    :height="appHeight || ''"
-    class="overflow-hidden"
-    color="transparent"
-    flat>
-    <div ref="content"></div>
-  </v-card>
+  <div ref="content" class="layout-application"></div>
 </template>
 <script>
 export default {
@@ -29,12 +19,6 @@ export default {
     },
     storageId() {
       return this.container?.storageId;
-    },
-    appHeight() {
-      return this.cellHeight - (this.container?.gap?.v || 20);
-    },
-    appWidth() {
-      return this.cellWidth - (this.container?.gap?.h || 20) - 8;
     },
   },
   mounted() {

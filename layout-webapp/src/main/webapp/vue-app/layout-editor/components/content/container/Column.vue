@@ -28,7 +28,6 @@
     :hide-children="moving"
     :cell-height="targetCellHeight"
     :cell-width="targetCellWidth"
-    :style="cellStyle"
     :class="(hover && !$root.drawerOpened && 'z-index-two') || (resize && 'z-index-modal')"
     class="position-relative"
     @hovered="hover = $event">
@@ -63,7 +62,7 @@
                 :title="$t('layout.moveCell')"
                 :width="iconSize"
                 :height="iconSize"
-                class="draggable ms-3"
+                class="draggable ms-2"
                 icon
                 @mousedown.prevent.stop="moveStart">
                 <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
@@ -72,16 +71,16 @@
                 :title="$t('layout.editApplication')"
                 :width="iconSize"
                 :height="iconSize"
-                class="mx-3"
+                class="mx-4"
                 icon
-                @click.prevent.stop="$emit('edit-application')">
+                @click.prevent.stop="editApplication">
                 <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
               </v-btn>
               <v-btn
                 :title="$t('layout.deleteApplication')"
                 :width="iconSize"
                 :height="iconSize"
-                class="me-3"
+                class="me-2"
                 icon
                 @click.prevent.stop="deleteApplication">
                 <v-icon :size="iconSize" class="icon-default-color">fa-trash</v-icon>
@@ -98,8 +97,6 @@
             'grey': isSelectedCell,
             'grey-background': !hoverScope.hover && !isSelectedCell,
           }"
-          :min-width="minWidth"
-          :min-height="minHeight"
           class="full-width full-height"
           flat
           v-on="!$root.multiCellsSelect && {
@@ -190,13 +187,6 @@ export default {
     iconSize() {
       return 24;
     },
-    resizeCellStyle() {
-      return {
-        'height': this.resize && `${this.targetCellHeight}px` || '100%',
-        'width': this.resize && `${this.targetCellWidth}px` || '100%',
-        'z-index': this.resize && '1050' || '0',
-      };
-    },
     heightGap() {
       return this.container?.gap?.v || 0;
     },
@@ -282,13 +272,6 @@ export default {
     },
     minHeight() {
       return (this.cellWidth * this.rowSpan);
-    },
-    cellStyle() {
-      return {
-        'min-height': `${this.minHeight - 20}px`,
-        'max-height': `${this.minHeight - 20}px`,
-        'min-width': `${this.minWidth - 20}px`,
-      };
     },
     selectedCells() {
       return this.$root.selectedCells;
@@ -438,6 +421,9 @@ export default {
         this.targetCellHeight = 0;
         this.targetCellWidth = 0;
       }
+    },
+    editApplication() {
+      this.$root.$emit('layout-edit-application', this.parentId, this.container);
     },
     deleteApplication() {
       this.$root.$emit('layout-delete-application', this.parentId, this.container);

@@ -122,10 +122,10 @@ export default {
   }),
   computed: {
     storageId() {
-      return this.container?.storageId;
+      return this.container.storageId;
     },
     id() {
-      return this.container?.id || this.storageId;
+      return this.container.id || this.storageId;
     },
     containerChildren() {
       return this.container.children;
@@ -137,10 +137,10 @@ export default {
       return !this.childrenSize;
     },
     height() {
-      return this.container.height;
+      return this.container.height === 'unset' ? null : this.container.height;
     },
     width() {
-      return this.container.width;
+      return this.container.width === 'unset' ? null : this.container.width;
     },
     cssStyle() {
       if (!this.height && !this.width) {
