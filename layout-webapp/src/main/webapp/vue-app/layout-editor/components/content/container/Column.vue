@@ -64,7 +64,7 @@
                 :height="iconSize"
                 class="draggable ms-2"
                 icon
-                @mousedown.prevent.stop="moveStart">
+                @mousedown.prevent.stop="dragStart">
                 <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
               </v-btn>
               <v-btn
@@ -335,42 +335,13 @@ export default {
     },
   },
   methods: {
+    dragStart(event) {
+      this.moveStart(event, 'drag');
+    },
     resizeStart(event) {
-      if (!this.resize) {
-        this.$root.$emit('layout-section-history-add', this.parentId);
-        this.originalX = event.x;
-        this.originalY = event.y;
-        this.originalHeight = this.$refs.container.$el.getBoundingClientRect().height;
-        this.originalWidth = this.$refs.container.$el.getBoundingClientRect().width;
-        this.resizeX = this.originalX;
-        this.resizeY = this.originalY;
-        this.resizeHeight = this.originalHeight;
-        this.resizeWidth = this.originalWidth;
-        this.cellRows = this.container.colsCount;
-        this.cellCols = this.container.rowsCount;
-        this.resize = true;
-
-        document.addEventListener('mousemove', this.resizeMove);
-        document.addEventListener('mouseup', this.resizeEnd);
-      }
+      this.moveStart(event, 'resize');
     },
-    resizeEnd() {
-      if (this.resize) {
-        this.resize = false;
-        this.resizeX = 0;
-        this.resizeY = 0;
-
-        document.removeEventListener('mousemove', this.resizeMove);
-        document.removeEventListener('mouseup', this.resizeEnd);
-      }
-    },
-    resizeMove(event) {
-      if (this.resize) {
-        this.resizeX = event.x;
-        this.resizeY = event.y;
-      }
-    },
-    moveStart(event) {
+    moveStart(event, moveType) {
       this.$root.$emit('layout-section-history-add', this.parentId);
       this.$root.mouseCellRowIndex = this.container.rowIndex;
       this.$root.mouseCellColIndex = this.container.colIndex;
@@ -387,23 +358,9 @@ export default {
           sectionId: this.parentId,
           cell: this.container,
           containerElement: this.$refs.container.$el,
+          moveType,
         });
-        document.addEventListener('mouseup', this.moveEnd);
       });
-    },
-    moveEnd(event) {
-      if (this.$root.movingCell) {
-        this.$root.$emit('layout-cell-moving-end', {
-          sectionId: this.parentId,
-          cell: this.container,
-          rowIndex: this.$root.mouseCellRowIndex,
-          colIndex: this.$root.mouseCellColIndex,
-          target: event.target,
-        });
-        this.$root.movingCellRowIndex = -1;
-        this.$root.movingCellColIndex = -1;
-        document.removeEventListener('mouseup', this.moveEnd);
-      }
     },
     refreshTargetCellDimensions() {
       if (this.resize
@@ -417,9 +374,6 @@ export default {
         this.targetCellHeight = 0;
         this.targetCellWidth = 0;
       }
-    },
-    editApplication() {
-      this.$root.$emit('layout-edit-application', this.parentId, this.container);
     },
     computeIsInMultiSelection() {
       this.isInMultiSelection =
@@ -441,6 +395,9 @@ export default {
           (this.dimensionsY0 < this.$root.selectMouseY0 && this.dimensionsY1 > this.$root.selectMouseY0)
            && (this.dimensionsX0 < this.$root.selectMouseX0 && this.dimensionsX1 > this.$root.selectMouseX0)
         ));
+    },
+    editApplication() {
+      this.$root.$emit('layout-edit-application', this.parentId, this.container);
     },
     deleteApplication() {
       this.$root.$emit('layout-delete-application', this.parentId, this.container);
