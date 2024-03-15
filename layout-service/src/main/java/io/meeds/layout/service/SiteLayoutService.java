@@ -49,6 +49,16 @@ public class SiteLayoutService {
   @Autowired
   private LayoutAclService        aclService;
 
+  public PortalConfig getSiteById(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException(String.format("Site with key %s doesn't exists", siteKey));
+    } else if (!aclService.canViewSite(siteKey, username)) {
+      throw new IllegalAccessException();
+    }
+    return portalConfig;
+  }
+
   @SneakyThrows
   public void createSite(SiteCreateModel createModel, String username) throws IllegalAccessException,
                                                                        ObjectAlreadyExistsException {

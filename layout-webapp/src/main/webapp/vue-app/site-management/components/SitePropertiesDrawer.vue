@@ -229,10 +229,7 @@ export default {
         this.editMode = true;
         if (!freshInstance) {
           this.$refs.sitePropertiesDrawer.open();
-          return this.$siteService.getSiteById(parseInt(site.siteId), {
-            expandNavigations: false,
-            excludeEmptyNavigationSites: false,
-            lang: 'en' })
+          return this.$siteLayoutService.getSite(site.siteType, site.name, 'en')
             .then(freshSite => this.open(freshSite, true));
         }
         this.site = site;

@@ -43,6 +43,24 @@ export function createSite(siteName, siteTemplate, siteLabel, siteDescription, d
   });
 }
 
+export function getSite(siteType, siteName, lang) {
+  const formData = new FormData();
+  if (lang) {
+    formData.append('lang', lang);
+  }
+  const params = new URLSearchParams(formData).toString();
+  return fetch(`/layout/rest/sites/${siteType}/${siteName}${params.length && '?' || ''}${params.length && params || ''}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when Gettinh site');
+    }
+  });
+}
+
 export function updateSite(siteName, siteType, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, bannerRemoved) {
   const updateModel = {
     siteType,

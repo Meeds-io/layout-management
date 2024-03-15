@@ -19,27 +19,38 @@
  */
 package io.meeds.layout.rest;
 
+import java.util.Locale;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
 import io.meeds.layout.model.SiteUpdateModel;
+import io.meeds.layout.rest.model.SiteRestEntity;
+import io.meeds.layout.rest.util.RestEntityBuilder;
+import io.meeds.layout.service.PageLayoutService;
 import io.meeds.layout.service.SiteLayoutService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,6 +67,50 @@ public class SiteLayoutRest {
 
   @Autowired
   private SiteLayoutService siteLayoutService;
+
+  @Autowired
+  private PageLayoutService pageLayoutService;
+
+  @GetMapping("{siteType}/{siteName}")
+  @Secured("users")
+  @Operation(summary = "Gets a specific site by its site type and name", description = "Gets site by id", method = "GET")
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "500", description = "Internal server error"),
+  })
+  public ResponseEntity<SiteRestEntity> getSite(
+                                                HttpServletRequest request,
+                                                @Parameter(description = "site type")
+                                                @PathVariable("siteType")
+                                                String siteType,
+                                                @Parameter(description = "site name")
+                                                @PathVariable("siteName")
+                                                String siteName,
+                                                @Parameter(description = "Language used to retrieve names", required = false)
+                                                @RequestParam(name = "lang", required = false)
+                                                String lang) throws Exception {
+    try {
+      PortalConfig site = siteLayoutService.getSiteById(new SiteKey(siteType, siteName), request.getRemoteUser());
+      Locale locale;
+      if (StringUtils.isBlank(lang)) {
+        locale = request.getLocale();
+      } else {
+        locale = Locale.forLanguageTag(lang);
+      }
+      SiteRestEntity siteEntity = RestEntityBuilder.toSiteEntity(pageLayoutService,
+                                                                 site,
+                                                                 request,
+                                                                 locale);
+      return ResponseEntity.ok()
+                           .eTag(String.valueOf(Objects.hash(siteEntity, locale)))
+                           .body(siteEntity);
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
 
   @DeleteMapping("{siteType}/{siteName}")
   @Secured("users")

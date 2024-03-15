@@ -19,6 +19,7 @@
  */
 package io.meeds.layout.rest.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,24 +28,36 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.State;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.social.rest.api.EntityBuilder;
+import org.exoplatform.social.rest.entity.SiteEntity;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.model.PageTemplateModel;
+import io.meeds.layout.rest.model.SiteRestEntity;
 import io.meeds.layout.service.LayoutI18NService;
+import io.meeds.layout.service.PageLayoutService;
 
-public class EntityBuilder {
+import jakarta.servlet.http.HttpServletRequest;
 
-  private EntityBuilder() {
+public class RestEntityBuilder {
+
+  private RestEntityBuilder() {
   }
 
   public static List<PageTemplateModel> toPageTemplateModel(List<SelectItemOption<String>> pageTemplates,
@@ -94,12 +107,81 @@ public class EntityBuilder {
     return nodeLabelRestEntity;
   }
 
+  public static SiteRestEntity toSiteEntity(PageLayoutService pageLayoutService,
+                                            PortalConfig site,
+                                            HttpServletRequest request,
+                                            Locale locale) throws Exception {
+    SiteEntity siteEntity = EntityBuilder.buildSiteEntity(site,
+                                                          request,
+                                                          true,
+                                                          null,
+                                                          true,
+                                                          false,
+                                                          false,
+                                                          locale);
+    SiteRestEntity siteRestEntity = new SiteRestEntity(siteEntity);
+    List<UserNodeRestEntity> siteNavigations = siteEntity.getSiteNavigations();
+    computeCompatibilityWithEditor(pageLayoutService, siteRestEntity, siteNavigations);
+    return siteRestEntity;
+  }
+
+  private static void computeCompatibilityWithEditor(PageLayoutService pageLayoutService,
+                                                     SiteRestEntity siteRestEntity,
+                                                     List<UserNodeRestEntity> siteNavigations) {
+    if (CollectionUtils.isNotEmpty(siteNavigations)) {
+      siteNavigations.forEach(n -> {
+        PageKey pageKey = n.getPageKey();
+        if (n.isCanEditPage()) {
+          Page page = pageLayoutService.getPageLayout(pageKey);
+          siteRestEntity.getPagesCompatibility().put(pageKey.format(), page != null && isCompatibleWithEditor(page));
+        } else {
+          siteRestEntity.getPagesCompatibility().put(pageKey.format(), false);
+        }
+        computeCompatibilityWithEditor(pageLayoutService, siteRestEntity, n.getChildren());
+      });
+    }
+  }
+
   public static LayoutModel toLayoutModel(Page page) {
     return new LayoutModel(page);
   }
 
   public static Page fromLayoutModel(LayoutModel layoutModel) {
     return layoutModel.toPage();
+  }
+
+  private static boolean isCompatibleWithEditor(Page page) {
+    ArrayList<ModelObject> children = page.getChildren();
+    if (CollectionUtils.isEmpty(children)) {
+      return true;
+    } else {
+      if (children.size() != 1) {
+        return false;
+      }
+      ModelObject parentContainer = children.get(0);
+      if (parentContainer == null
+          || !(parentContainer instanceof Container vAppContainer)
+          || !StringUtils.contains(vAppContainer.getCssClass(), "VuetifyApp")) {
+        return false;
+      }
+      children = vAppContainer.getChildren();
+      if (CollectionUtils.isEmpty(children)) {
+        return true;
+      }
+      parentContainer = children.get(0);
+      if (parentContainer == null
+          || !(parentContainer instanceof Container appContainer)
+          || !StringUtils.contains(appContainer.getCssClass(), "v-application")) {
+        return false;
+      }
+      children = appContainer.getChildren();
+      if (CollectionUtils.isEmpty(children)) {
+        return true;
+      }
+      return children.stream()
+                     .allMatch(c -> c instanceof Container container
+                                    && StringUtils.equals("GridContainer", container.getTemplate()));
+    }
   }
 
 }

@@ -64,6 +64,7 @@
         </v-toolbar>
         <site-navigation-nodes-list
           :navigation-nodes="navigationNodesToDisplay"
+          :pages-compatibility="pagesCompatibility"
           :expanded="$refs.siteNavigationDrawer && $refs.siteNavigationDrawer?.expand"
           :loading="loading"
           :hide-children="hideChildren" />
@@ -77,8 +78,10 @@ export default {
   data() {
     return {
       navigationNodes: [],
+      pagesCompatibility: {},
       navigationNodesToDisplay: [],
       siteName: null,
+      siteType: null,
       siteId: null,
       includeGlobal: false,
       loading: false,
@@ -123,6 +126,7 @@ export default {
   methods: {
     open(event) {
       this.siteName = event?.siteName || eXo.env.portal.siteKeyName;
+      this.siteType = event?.siteType || 'PORTAL';
       this.siteId = event?.siteId || eXo.env.portal.siteId;
       this.includeGlobal = event?.includeGlobal || false;
       this.getNavigationNodes();
@@ -141,14 +145,11 @@ export default {
     },
     getNavigationNodes() {
       this.loading = true;
-      return this.$siteService.getSiteById(this.siteId, {
-        expandNavigations: true,
-        excludeEmptyNavigationSites: true,
-        lang: eXo.env.portal.language,
-      })
+      return this.$siteLayoutService.getSite(this.siteType, this.siteName)
         .then(site => {
           this.site = site;
           this.navigationNodes = site.siteNavigations || [];
+          this.pagesCompatibility = site.pagesCompatibility || {};
           this.filterNavigationNodes();
         })
         .finally(() => this.loading = false);

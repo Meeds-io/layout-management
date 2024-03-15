@@ -106,13 +106,17 @@ public class PageLayoutService {
 
   public Page getPageLayout(PageKey pageKey,
                             String username) throws ObjectNotFoundException, IllegalAccessException {
-    Page page = layoutService.getPage(pageKey);
+    Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     } else if (!aclService.canViewPage(pageKey, username)) {
       throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     }
     return page;
+  }
+
+  public Page getPageLayout(PageKey pageKey) {
+    return layoutService.getPage(pageKey);
   }
 
   @SneakyThrows
