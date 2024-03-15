@@ -2,7 +2,7 @@
   <div>
     <div
       :class="selected && 'grey lighten-2'"
-      class="border-primary-dashed full-width full-height"></div>
+      class="border-grey-dashed full-width full-height"></div>
   </div>
 </template>
 <script>
