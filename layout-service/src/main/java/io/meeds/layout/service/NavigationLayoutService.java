@@ -51,7 +51,7 @@ import io.meeds.common.ContainerTransactional;
 import io.meeds.layout.model.NavigationCreateModel;
 import io.meeds.layout.model.NavigationUpdateModel;
 import io.meeds.layout.model.NodeLabel;
-import io.meeds.layout.rest.util.EntityBuilder;
+import io.meeds.layout.rest.util.RestEntityBuilder;
 
 @Service
 public class NavigationLayoutService {
@@ -230,7 +230,7 @@ public class NavigationLayoutService {
       throw new IllegalAccessException();
     }
     Map<Locale, State> nodeLabels = descriptionService.getDescriptions(String.valueOf(nodeId));
-    return EntityBuilder.toNodeLabel(nodeLabels);
+    return RestEntityBuilder.toNodeLabel(nodeLabels);
   }
 
   public String getNodeUri(Long nodeId, String username) throws IllegalAccessException, ObjectNotFoundException {
