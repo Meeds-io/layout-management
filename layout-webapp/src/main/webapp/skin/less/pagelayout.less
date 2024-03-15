@@ -18,13 +18,20 @@
 .grid-cols-10,
 .grid-cols-11,
 .grid-cols-12 {
-  --gap-count: ~"calc(var(--grid-column-count) - 1)";
-  --total-gap-width: ~"calc(var(--gap-count)* var(--grid-layout-gap, 20px))";
-  --grid-item--max-width: ~"calc((100% - var(--total-gap-width)) / var(--grid-column-count))";
-  --grid-item--min-width: ~"var(--grid-item--max-width)";
+  --gap-col-count: ~"calc(var(--grid-column-count) - 1)";
+  --gap-row-count: ~"calc(var(--grid-row-count) - 1)";
+  --total-gap-width: ~"calc(var(--gap-col-count)* var(--grid-layout-gap, 20px))";
+  --total-gap-height: ~"calc(var(--gap-row-count)* var(--grid-layout-gap, 20px))";
+  --grid-cell--max-width: ~"calc((100% - var(--total-gap-width)) / var(--grid-column-count))";
+  --grid-cell--min-width: ~"var(--grid-cell--max-width)";
+  --grid-cell--max-height: ~"calc((100% - var(--total-gap-height)) / var(--grid-row-count))";
+  --grid-cell--min-height: ~"var(--grid-cell--max-width)";
   display: grid;
-  grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-item--min-width), var(--grid-item--max-width)), 1fr))";
+  grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-width), var(--grid-cell--max-width)), 1fr))";
+  grid-template-rows: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-height), var(--grid-cell--max-height)), 1fr))";
   grid-gap: ~"var(--grid-layout-gap, 20px)";
+
+  aspect-ratio: ~"calc(var(--grid-column-count) / var(--grid-row-count))";
   margin-bottom: ~"var(--grid-layout-gap, 20px)";
 }
 .grid-cell-colspan-1,
@@ -54,7 +61,6 @@
 .grid-cell-rowspan-11,
 .grid-cell-rowspan-12 {
   grid-row-end: span ~"var(--grid-cell-rows)";
-  aspect-ratio: ~"calc(var(--grid-cell-cols) / var(--grid-cell-rows))";
 }
 
 .layout-application {
@@ -116,6 +122,42 @@
 }
 .grid-cols-12 {
   --grid-column-count: 12;
+}
+.grid-rows-1 {
+  --grid-row-count: 1;
+}
+.grid-rows-2 {
+  --grid-row-count: 2;
+}
+.grid-rows-3 {
+  --grid-row-count: 3;
+}
+.grid-rows-4 {
+  --grid-row-count: 4;
+}
+.grid-rows-5 {
+  --grid-row-count: 5;
+}
+.grid-rows-6 {
+  --grid-row-count: 6;
+}
+.grid-rows-7 {
+  --grid-row-count: 7;
+}
+.grid-rows-8 {
+  --grid-row-count: 8;
+}
+.grid-rows-9 {
+  --grid-row-count: 9;
+}
+.grid-rows-10 {
+  --grid-row-count: 10;
+}
+.grid-rows-11 {
+  --grid-row-count: 11;
+}
+.grid-rows-12 {
+  --grid-row-count: 12;
 }
 .grid-cell-colspan-1 {
   --grid-cell-cols: 1;
