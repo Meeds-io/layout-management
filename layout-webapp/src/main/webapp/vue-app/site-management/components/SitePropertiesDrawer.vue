@@ -300,6 +300,7 @@ export default {
           this.$root.$emit('refresh-sites');
           this.close();
         }).catch((e) => {
+          console.error(e);
           const message = e.message ==='401' &&  this.$t('siteManagement.label.updateSite.unauthorized') || this.$t('siteManagement.label.updateSite.error');
           this.$root.$emit('alert-message', message, 'error');
         })
@@ -330,7 +331,8 @@ export default {
           this.$root.$emit('refresh-sites');
           this.$root.$emit('close-site-template-drawer', this.close);
           this.close();
-        }).catch(() => {
+        }).catch(e => {
+          console.error(e);
           const message = this.$t('siteManagement.label.createSite.error');
           this.$root.$emit('alert-message', message, 'error');
         })
