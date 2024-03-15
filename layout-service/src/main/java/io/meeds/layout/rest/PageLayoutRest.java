@@ -47,7 +47,7 @@ import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.model.PageTemplateModel;
-import io.meeds.layout.rest.util.EntityBuilder;
+import io.meeds.layout.rest.util.RestEntityBuilder;
 import io.meeds.layout.service.LayoutI18NService;
 import io.meeds.layout.service.PageLayoutService;
 
@@ -106,7 +106,7 @@ public class PageLayoutRest {
                                    String pageRef) {
     try {
       Page page = pageLayoutService.getPageLayout(PageKey.parse(pageRef), request.getRemoteUser());
-      return EntityBuilder.toLayoutModel(page);
+      return RestEntityBuilder.toLayoutModel(page);
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -167,7 +167,7 @@ public class PageLayoutRest {
                                       LayoutModel layoutModel) {
     try {
       pageLayoutService.updatePageLayout(pageRef,
-                                         EntityBuilder.fromLayoutModel(layoutModel),
+                                         RestEntityBuilder.fromLayoutModel(layoutModel),
                                          request.getRemoteUser());
       return getPageLayout(request, pageRef);
     } catch (ObjectNotFoundException e) {
@@ -232,7 +232,7 @@ public class PageLayoutRest {
   public List<PageTemplateModel> getPageTemplates(HttpServletRequest request) {
     Locale locale = request.getLocale();
     List<SelectItemOption<String>> pageTemplates = pageLayoutService.getPageTemplates();
-    return EntityBuilder.toPageTemplateModel(pageTemplates, layoutI18NService, locale);
+    return RestEntityBuilder.toPageTemplateModel(pageTemplates, layoutI18NService, locale);
   }
 
 }

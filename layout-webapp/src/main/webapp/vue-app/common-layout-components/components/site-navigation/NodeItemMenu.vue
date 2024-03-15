@@ -35,7 +35,7 @@
     </template>
     <v-list class="pa-0" dense>
       <v-list-item
-        v-if="canEditPage"
+        v-if="canEditPage && isPageCompatible"
         class="subtitle-2" 
         @click="editLayout">
         <v-icon
@@ -178,6 +178,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    pagesCompatibility: {
+      type: Object,
+      default: null
+    },
     navigationNode: {
       type: Object,
       default: null,
@@ -209,6 +213,9 @@ export default {
         return this.navigationNode.pageKey.ref || `${this.navigationNode.pageKey.site.typeName}::${this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
       }
       return null;
+    },
+    isPageCompatible() {
+      return this.pagesCompatibility?.[this.pageRef];
     },
     pageName() {
       return this.navigationNode?.pageKey?.name;
