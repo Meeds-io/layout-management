@@ -3,7 +3,8 @@
     ref="drawer"
     v-model="drawer"
     allow-expand
-    right>
+    right
+    @closed="$root.$emit('layout-application-drawer-closed')">
     <template slot="title">
       {{ $t('layout.addApplicationTitle') }}
     </template>
@@ -42,11 +43,15 @@ export default {
   },
   methods: {
     open() {
+      this.$refs.drawer.endLoading();
       this.$refs.drawer.open();
     },
     addApplication(application) {
+      this.$refs.drawer.startLoading();
       this.$root.$emit('layout-add-application', application);
-      this.close();
+      window.setTimeout(() => {
+        this.close();
+      }, 200);
     },
     close() {
       this.$refs.drawer.close();
