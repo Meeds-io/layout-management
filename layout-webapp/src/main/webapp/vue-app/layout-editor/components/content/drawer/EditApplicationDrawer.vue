@@ -44,10 +44,6 @@ export default {
       this.$root.$emit('layout-apply-grid-style');
     },
   },
-  created() {
-    this.$applicationRegistryService.getCategories()
-      .then(categories => this.categories = categories);
-  },
   methods: {
     open(section, container) {
       this.section = section;

@@ -51,6 +51,7 @@ export function init() {
         i18n,
         data: () => ({
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
+          applicationCategories: null,
           editPage: true,
           layout: null,
           pageRef: null,
@@ -132,6 +133,8 @@ export function init() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
           document.addEventListener('drawerClosed', this.setDrawerClosed);
+          this.$applicationRegistryService.getCategories()
+            .then(categories => this.applicationCategories = categories);
         },
         methods: {
           setDrawerOpened() {
