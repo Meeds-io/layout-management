@@ -37,7 +37,9 @@ export function createSite(siteName, siteTemplate, siteLabel, siteDescription, d
     },
     body: JSON.stringify(createModel),
   }).then((resp) => {
-    if (!resp?.ok) {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
       throw new Error('Error when creating site');
     }
   });

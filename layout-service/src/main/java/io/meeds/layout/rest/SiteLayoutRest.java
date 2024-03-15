@@ -230,13 +230,20 @@ public class SiteLayoutRest {
   @Operation(summary = "create a site", method = "POST", description = "This create a new site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public void createSite(
-                         HttpServletRequest request,
-                         @Parameter(description = "site to create", required = true)
-                         @RequestBody
-                         SiteCreateModel createModel) {
+  public ResponseEntity<SiteRestEntity> createSite(
+                                                   HttpServletRequest request,
+                                                   @Parameter(description = "site to create", required = true)
+                                                   @RequestBody
+                                                   SiteCreateModel createModel) throws Exception {
     try {
-      siteLayoutService.createSite(createModel, request.getRemoteUser());
+      PortalConfig site = siteLayoutService.createSite(createModel, request.getRemoteUser());
+      SiteRestEntity siteEntity = RestEntityBuilder.toSiteEntity(pageLayoutService,
+                                                                 site,
+                                                                 request,
+                                                                 request.getLocale());
+      return ResponseEntity.ok()
+                           .eTag(String.valueOf(Objects.hash(siteEntity, request.getLocale())))
+                           .body(siteEntity);
     } catch (ObjectAlreadyExistsException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
