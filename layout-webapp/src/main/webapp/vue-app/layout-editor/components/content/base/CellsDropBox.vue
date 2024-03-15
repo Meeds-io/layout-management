@@ -20,9 +20,7 @@
 -->
 <template>
   <div
-    v-show="movingCell"
     ref="movingBox"
-    :class="!validSelection && 'secondary-border-color'"
     :style="boxStyle"
     class="layout-selecting-container d-flex position-absolute elevation-2 z-index-modal">
   </div>
@@ -34,109 +32,99 @@ export default {
       type: Object,
       default: null,
     },
-    sectionX: {
-      type: Number,
-      default: null,
-    },
-    sectionY: {
-      type: Number,
-      default: null,
-    },
   },
   data: () => ({
-    containerElement: null,
+    cell: null,
+    cellElement: null,
+    sectionElement: null,
+    sectionDimensions: null,
     interceptEvents: false,
-    parentAppDimensions: null,
-    computingDisplayInterval: null,
     boxHeight: null,
     boxWidth: null,
+
+    moveType: null,
+
+    computingSelectionInterval: null,
+
+    sectionX: 0,
+    sectionWidth: 0,
+    sectionY: 0,
+    sectionHeight: 0,
+    cellX: 0,
+    cellWidth: 0,
+    cellY: 0,
+    cellHeight: 0,
+    startScrollX: 0,
+    startScrollY: 0,
+    diffScrollX: 0,
+    diffScrollY: 0,
+    movingStartX: 0,
+    movingStartY: 0,
+    diffMovingX: 0,
+    diffMovingY: 0,
+    movingX: 0,
+    movingY: 0,
+    startRowIndex: 0,
+    startColIndex: 0,
+    rowsCount: 0,
+    colsCount: 0,
+    parentAppDimensions: null,
   }),
   computed: {
-    movingCell() {
-      return this.$root.movingCell;
+    isResize() {
+      return this.moveType === 'resize';
     },
-    mouseCellRowIndex() {
-      return this.$root.mouseCellRowIndex;
+    isMove() {
+      return this.moveType === 'drag';
     },
-    mouseCellColIndex() {
-      return this.$root.mouseCellColIndex;
+    innerCellWidth() {
+      return this.section && this.sectionWidth && (this.sectionWidth - (this.$root.gap * (this.section.colsCount - 1))) / this.section.colsCount || 0;
     },
-    movingCellRowIndex() {
-      return this.movingCell?.rowIndex || -1;
+    innerCellHeight() {
+      return this.section && this.sectionHeight && (this.sectionHeight - (this.$root.gap * (this.section.rowsCount - 1))) / this.section.rowsCount || 0;
     },
-    movingCellColIndex() {
-      return this.movingCell?.colIndex || -1;
+    top() {
+      return this.isResize ? this.cellY - this.sectionY : this.movingY;
     },
-    movingCellRowsCount() {
-      return this.movingCell?.rowsCount || -1;
+    left() {
+      return this.isResize ? this.cellX - this.sectionX : this.movingX;
     },
-    movingCellColsCount() {
-      return this.movingCell?.colsCount || -1;
+    height() {
+      return this.isResize ? this.boxHeight + this.diffMovingY + 3 : this.boxHeight + 3;
     },
-    mouseCellEndRowIndex() {
-      return this.mouseCellRowIndex + this.movingCellRowsCount;
-    },
-    mouseCellEndColIndex() {
-      return this.mouseCellColIndex + this.movingCellColsCount;
-    },
-    validSelection() {
-      return this.$layoutUtils.isValidTargetMovingCell(
-        this.section,
-        this.movingCell,
-        this.mouseCellRowIndex,
-        this.mouseCellColIndex);
-    },
-    movingStartX() {
-      return this.$root.movingStartX;
-    },
-    movingStartY() {
-      return this.$root.movingStartY;
-    },
-    movingX() {
-      return this.$root.movingX;
-    },
-    movingY() {
-      return this.$root.movingY;
-    },
-    parentAppX() {
-      return this.$root.parentAppDimensions?.x || 0;
-    },
-    parentAppY() {
-      return this.$root.parentAppDimensions?.y || 0;
+    width() {
+      return this.isResize ? this.boxWidth + this.diffMovingX + 3 : this.boxWidth + 3;
     },
     boxStyle() {
       return {
-        top: `${this.movingY - 24}px`,
-        left: `${this.movingX - this.sectionX - this.boxWidth / 2 + 36}px`,
-        height: `${this.boxHeight + 3}px`,
-        'max-height': `${this.boxHeight + 3}px`,
-        width: `${this.boxWidth + 3}px`,
-        'max-width': `${this.boxWidth + 3}px`,
+        top: `${this.top}px`,
+        left: `${this.left}px`,
+        height: `${this.height}px`,
+        width: `${this.width}px`,
+        'max-height': `${this.height}px`,
+        'max-width': `${this.width}px`,
       };
     },
   },
   watch: {
     interceptEvents() {
       if (this.interceptEvents) {
-        document.addEventListener('mousemove', this.updateMoving);
+        document.addEventListener('mouseup', this.endMoving);
+        this.sectionElement.addEventListener('mousemove', this.updateMoving);
         document.querySelector('.page-scroll-content').addEventListener('scroll', this.updateScrollPosition);
+        this.computingSelectionInterval = window.setInterval(() => this.updateSelection(), 50);
       } else {
-        document.removeEventListener('mousemove', this.updateMoving);
+        document.removeEventListener('mouseup', this.endMoving);
+        this.sectionElement.removeEventListener('mousemove', this.updateMoving);
         document.querySelector('.page-scroll-content').removeEventListener('scroll', this.updateScrollPosition);
-        this.$emit('hide');
+        window.clearInterval(this.computingSelectionInterval);
+        this.$nextTick().then(() => {
+          this.$root.movingCell = null;
+          this.$emit('hide');
+        });
       }
     },
-    parentAppX(newVal, oldVal) {
-      if (this.interceptEvents && this.$root.movingX && this.$root.movingY) {
-        this.$root.movingX = this.$root.movingX - newVal + oldVal;
-      }
-    },
-    parentAppY(newVal, oldVal) {
-      if (this.interceptEvents && this.$root.movingX && this.$root.movingY) {
-        this.$root.movingY = this.$root.movingY - newVal + oldVal;
-      }
-    },
-    containerElement(newVal, oldVal) {
+    cellElement(newVal, oldVal) {
       if (!oldVal && newVal) {
         window.setTimeout(() => {
           this.$refs.movingBox.append(newVal);
@@ -146,19 +134,17 @@ export default {
   },
   created() {
     this.$root.$on('layout-cell-moving-start', this.startMoving);
-    this.$root.$on('layout-cell-moving-end', this.endMoving);
   },
   beforeDestroy() {
     this.$root.$off('layout-cell-moving-start', this.startMoving);
-    this.$root.$off('layout-cell-moving-end', this.endMoving);
   },
   methods: {
     updateScrollPosition() {
       if (this.interceptEvents) {
-        this.$root.updateParentAppDimensions();
+        this.updateParentAppDimensions();
         this.$nextTick(() => {
-          this.diffScrollX = this.$root.parentAppDimensions.x - this.startScrollX;
-          this.diffScrollY = this.$root.parentAppDimensions.y - this.startScrollY;
+          this.diffScrollX = this.parentAppDimensions.x - this.startScrollX;
+          this.diffScrollY = this.parentAppDimensions.y - this.startScrollY;
         });
       }
     },
@@ -167,36 +153,133 @@ export default {
           && event?.target?.closest?.('#layoutEditor')
           && event?.target?.tagName !== 'BUTTON'
           && event?.target?.tagName !== 'A') {
+        this.moveType = event.moveType;
+        this.cell = event.cell;
+
         const containerDimensions = event.containerElement.getBoundingClientRect();
         this.boxHeight = containerDimensions.height;
         this.boxWidth = containerDimensions.width;
 
-        this.$root.updateParentAppDimensions();
-        this.$root.movingX = this.$layoutUtils.getX(event) - this.$root.parentAppDimensions.x;
-        this.$root.movingY = this.$layoutUtils.getY(event) - this.$root.parentAppDimensions.y;
-        this.$root.movingStartX = this.$root.movingX;
-        this.$root.movingStartY = this.$root.movingY;
-        this.startScrollX = this.$root.parentAppDimensions.x;
-        this.startScrollY = this.$root.parentAppDimensions.y;
-        this.diffScrollX = 0;
-        this.diffScrollY = 0;
-        this.containerElement = event.containerElement.cloneNode(true);
+        this.sectionElement = event.containerElement.parentElement;
+
+        this.updateParentAppDimensions();
+        this.updateSectionDimensions();
+
+        this.sectionX = this.sectionDimensions.x;
+        this.sectionWidth = this.sectionDimensions.width;
+        this.sectionY = this.sectionDimensions.y;
+        this.sectionHeight = this.sectionDimensions.height;
+
+        this.cellX = containerDimensions.x;
+        this.cellWidth = containerDimensions.width;
+        this.cellY = containerDimensions.y;
+        this.cellHeight = containerDimensions.height;
+
+        this.movingStartX = event.x;
+        this.movingStartY = event.y;
+
+        this.startScrollX = this.parentAppDimensions.x;
+        this.startScrollY = this.parentAppDimensions.y;
+
+        this.updateBoxCoordinates(event);
+
+        this.startRowIndex = -1;
+        this.startColIndex = -1;
+        this.updateSelectedCellsCoordinates(this.cell.rowIndex, this.cell.colIndex);
+
+        this.cellElement = event.containerElement.cloneNode(true);
+        this.cellElement.classList.add('full-width');
+        this.cellElement.classList.add('full-height');
         this.$root.movingCell = event.cell;
 
         this.interceptEvents = false;
         this.$nextTick().then(() => this.interceptEvents = true);
       }
     },
+    updateSectionDimensions() {
+      this.sectionDimensions = this.sectionElement.getBoundingClientRect();
+    },
+    updateParentAppDimensions() {
+      this.parentAppDimensions = document.querySelector('#layoutEditor').getBoundingClientRect();
+    },
     updateMoving(event) {
       if (this.interceptEvents) {
-        this.$root.movingX = this.$layoutUtils.getX(event) - this.parentAppX;
-        this.$root.movingY = this.$layoutUtils.getY(event) - this.parentAppY;
+        this.updateBoxCoordinates(event);
       }
+    },
+    updateSelection() {
+      const startRowIndex = this.isMove ?
+        Math.min(
+          parseInt((this.movingY + this.$root.gap) / (this.innerCellHeight + this.$root.gap)),
+          this.section.rowsCount - this.cell.rowsCount
+        ):
+        this.cell.rowIndex;
+      const startColIndex = this.isMove ?
+        Math.min(
+          parseInt((this.movingX + this.$root.gap) / (this.innerCellWidth + this.$root.gap)),
+          this.section.colsCount - this.cell.colsCount
+        ):
+        this.cell.colIndex;
+      this.updateSelectedCellsCoordinates(startRowIndex, startColIndex);
+    },
+    updateSelectedCellsCoordinates(startRowIndex, startColIndex) {
+      if (this.isMove
+          && this.startRowIndex === startRowIndex
+          && this.startColIndex === startColIndex) {
+        return;
+      }
+      this.startRowIndex = startRowIndex;
+      this.startColIndex = startColIndex;
+      const rowsCount = this.isMove ? this.cell.rowsCount : parseInt((this.height + this.innerCellHeight) / (this.innerCellHeight + this.$root.gap));
+      const colsCount = this.isMove ? this.cell.colsCount : parseInt((this.width + this.innerCellWidth) / (this.innerCellWidth + this.$root.gap));
+      if (this.isResize
+          && this.rowsCount === rowsCount
+          && this.colsCount === colsCount) {
+        return;
+      }
+
+      this.rowsCount = rowsCount;
+      this.colsCount = colsCount;
+      const endRowIndex = parseInt(startRowIndex + rowsCount);
+      const endColIndex = parseInt(startColIndex + colsCount);
+      const selectedCellCoordinates = [];
+      for (let i = startRowIndex; i < endRowIndex; i++) {
+        for (let j = startColIndex; j < endColIndex; j++) {
+          selectedCellCoordinates.push({
+            rowIndex: i,
+            colIndex: j,
+          });
+        }
+      }
+      this.$root.selectedCellCoordinates = selectedCellCoordinates;
+    },
+    updateBoxCoordinates(event) {
+      this.diffMovingX = event.x - this.movingStartX;
+      this.diffMovingY = event.y - this.movingStartY;
+
+      this.diffScrollX = this.parentAppDimensions.x - this.startScrollX;
+      this.diffScrollY = this.parentAppDimensions.y - this.startScrollY;
+
+      this.movingX = Math.min(
+        Math.max(this.cellX - this.sectionX + this.diffMovingX, 0),
+        this.cellX - this.sectionX + this.sectionWidth - this.cellWidth
+      );
+      this.movingY = Math.min(
+        Math.max(this.cellY - this.sectionY + this.diffMovingY, 0),
+        this.cellY - this.sectionY + this.sectionHeight - this.cellHeight
+      );
     },
     endMoving() {
       if (this.interceptEvents) {
+        this.$root.$emit(`layout-cell-${this.moveType}`, { // layout-cell-resize or layout-cell-drag
+          sectionId: this.section.storageId,
+          cell: this.cell,
+          rowIndex: this.startRowIndex,
+          colIndex: this.startColIndex,
+          rowsCount: this.rowsCount,
+          colsCount: this.colsCount,
+        });
         this.interceptEvents = false;
-        this.$root.movingCell = null;
       }
     },
   },

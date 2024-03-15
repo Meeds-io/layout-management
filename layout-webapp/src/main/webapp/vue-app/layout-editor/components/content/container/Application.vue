@@ -1,18 +1,5 @@
 <template>
-  <v-card
-    :class="{
-      'position-absolute z-index-one': !!cellHeight,
-    }"
-    :width="appWidth || ''"
-    :max-width="appWidth || ''"
-    :min-height="appHeight || ''"
-    :max-height="appHeight || ''"
-    :height="appHeight || ''"
-    class="layout-application"
-    color="transparent"
-    flat>
-    <div ref="content"></div>
-  </v-card>
+  <div ref="content" class="layout-application"></div>
 </template>
 <script>
 export default {
@@ -20,14 +7,6 @@ export default {
     container: {
       type: Object,
       default: null,
-    },
-    cellHeight: {
-      type: Number,
-      default: () => 0,
-    },
-    cellWidth: {
-      type: Number,
-      default: () => 0,
     },
   },
   data: () => ({
@@ -42,12 +21,6 @@ export default {
     },
     nodeUri() {
       return this.$root.draftNodeUri;
-    },
-    appHeight() {
-      return this.cellHeight - (this.container?.gap?.v || 20);
-    },
-    appWidth() {
-      return this.cellWidth - (this.container?.gap?.h || 20) - 8;
     },
   },
   watch: {

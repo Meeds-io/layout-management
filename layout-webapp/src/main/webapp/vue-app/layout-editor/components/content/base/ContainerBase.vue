@@ -47,8 +47,7 @@
       v-else
       :id="id"
       :class="cssClass"
-      :style="cssStyle"
-      class="position-relative">
+      :style="cssStyle">
       <slot name="content"></slot>
       <layout-editor-container-extension
         v-for="(child, i) in children"
