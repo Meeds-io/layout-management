@@ -89,7 +89,8 @@ export default {
     this.$root.$on('layout-remove-section', this.handleRemoveSection);
     this.$root.$on('layout-replace-section', this.handleReplaceSection);
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
-    this.$root.$on('layout-cell-resize', this.handleCellMerge);
+    this.$root.$on('layout-cell-resize', this.handleCellResize);
+    this.$root.$on('layout-cell-drag', this.handleCellMove);
     this.$root.$on('layout-add-application', this.handleAddApplication);
     this.$root.$on('layout-edit-application', this.handleEditApplication);
     this.$root.$on('layout-delete-application', this.handleDeleteApplication);
@@ -180,6 +181,21 @@ export default {
         this.initCellsSelection();
       }
     },
+    handleCellResize(event) {
+      this.mergeCell(
+        event.sectionId,
+        event.cell,
+        event.rowIndex + event.rowsCount - 1,
+        event.colIndex + event.colsCount - 1
+      );
+    },
+    handleCellMove(event) {
+      this.moveCell(
+        event.sectionId,
+        event.cell,
+        event.rowIndex,
+        event.colIndex);
+    },
     handleCellMerge(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       this.mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex);
     },
@@ -208,6 +224,16 @@ export default {
       if (section) {
         this.addSectionVersion(sectionId);
         this.$layoutUtils.resizeCell(section, container, targetCellRowIndex, targetCellColIndex);
+      } else {
+        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
+      }
+    },
+    moveCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === sectionId);
+      if (section) {
+        this.addSectionVersion(sectionId);
+        this.$layoutUtils.moveCell(section, container, targetCellRowIndex, targetCellColIndex);
       } else {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
