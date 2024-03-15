@@ -70,7 +70,7 @@ public class SiteLayoutService {
   }
 
   @SneakyThrows
-  public void createSite(SiteCreateModel createModel, String username) throws IllegalAccessException,
+  public PortalConfig createSite(SiteCreateModel createModel, String username) throws IllegalAccessException,
                                                                        ObjectAlreadyExistsException {
     if (!aclService.canAddSite(username)) {
       throw new IllegalAccessException();
@@ -100,6 +100,7 @@ public class SiteLayoutService {
       createdPortalConfig.setBannerUploadId(portalConfigToCreate.getBannerUploadId());
     }
     layoutService.save(createdPortalConfig);
+    return createdPortalConfig;
   }
 
   public void updateSite(SiteKey siteKey, SiteUpdateModel updateModel, String username) throws IllegalAccessException,
