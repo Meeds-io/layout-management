@@ -108,8 +108,11 @@
     <template v-if="hasApplication && !moving" #bottom>
       <div
         ref="placeholder"
-        class="linear-gradient-grey-background position-relative flex-grow-1 flex-shrink-1 border-radius overflow-hidden">
-        <div v-if="!hasContent" class="absolute-all-center d-flex flex-column align-center justify-center">
+        :class="hasContent && 'linear-gradient-grey-background' || 'white'"
+        class="position-relative flex-grow-1 flex-shrink-1 border-radius overflow-hidden">
+        <div
+          v-if="!hasContent"
+          class="absolute-all-center d-flex flex-column align-center justify-center">
           <v-icon size="40" class="icon-default-color mb-5">far fa-hourglass</v-icon>
           <span class="font-weight-bold">{{ $t('layout.inSearchOfData') }}</span>
           <span v-if="applicationTitle" class="caption">{{ applicationTitle }}</span>
@@ -166,6 +169,7 @@ export default {
     dimensions: null,
     isInMultiSelection: false,
     hasContent: true,
+    iconSize: 20,
   }),
   computed: {
     moving() {
@@ -191,9 +195,6 @@ export default {
     },
     applicationCategoryTitle() {
       return this.applicationCategory?.displayName || '';
-    },
-    iconSize() {
-      return 24;
     },
     multiCellsSelect() {
       return this.$root.multiCellsSelect;
