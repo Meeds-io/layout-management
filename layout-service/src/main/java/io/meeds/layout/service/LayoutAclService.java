@@ -85,6 +85,20 @@ public class LayoutAclService {
     }
   }
 
+  public boolean canViewSite(SiteKey siteKey, String username) {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    if (portalConfig == null) {
+      return false;
+    }
+    ConversationState currentConversationState = ConversationState.getCurrent();
+    ConversationState.setCurrent(getConversationState(username));
+    try {
+      return userAcl.hasPermission(portalConfig);
+    } finally {
+      ConversationState.setCurrent(currentConversationState);
+    }
+  }
+
   public boolean canEditNavigation(SiteKey siteKey, String username) {
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
