@@ -1,5 +1,7 @@
 <template>
-  <div ref="content" class="layout-application"></div>
+  <div
+    ref="content"
+    class="layout-application"></div>
 </template>
 <script>
 export default {
@@ -24,6 +26,9 @@ export default {
     },
   },
   watch: {
+    applicationInstalled() {
+      this.$emit('initialized');
+    },
     storageId(newVal, oldVal) {
       if (!oldVal && newVal) {
         this.installApplication();

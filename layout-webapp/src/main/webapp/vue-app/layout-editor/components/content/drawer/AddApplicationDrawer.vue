@@ -20,7 +20,7 @@
           focusable
           flat>
           <layout-editor-application-category-card
-            v-for="(category, index) in categories"
+            v-for="(category, index) in $root.applicationCategories"
             :key="category.id"
             :category="category"
             :expanded="expanded === index"
@@ -34,13 +34,8 @@
 export default {
   data: () => ({
     drawer: false,
-    categories: [],
     expanded: 0,
   }),
-  created() {
-    this.$applicationRegistryService.getCategories()
-      .then(categories => this.categories = categories);
-  },
   methods: {
     open() {
       this.$refs.drawer.endLoading();

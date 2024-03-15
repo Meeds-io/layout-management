@@ -58,7 +58,9 @@
         :index="i"
         :length="children.length"
         :cell-height="cellHeight"
-        :cell-width="cellWidth" />
+        :cell-width="cellWidth"
+        @initialized="$emit('initialized', child)" />
+      <slot name="bottom"></slot>
     </div>
   </v-hover>
 </template>
