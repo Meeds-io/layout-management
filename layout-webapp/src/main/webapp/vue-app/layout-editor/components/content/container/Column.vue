@@ -30,13 +30,13 @@
     :cell-width="targetCellWidth"
     :class="{
       'z-index-two': hover && !$root.drawerOpened,
-      'elevation-1': hasApplication && hover,
+      'elevation-1': hasApplication && hover && !$root.movingCell,
       'z-index-modal': resize,
     }"
     class="position-relative d-flex flex-column border-radius"
     @hovered="hover = $event"
     @initialized="computeHasContent">
-    <template #content>
+    <template #header>
       <template v-if="hasApplication">
         <v-btn
           v-if="hover && !resize && !moving && !$root.drawerOpened"
@@ -74,7 +74,7 @@
                 :height="iconSize"
                 class="mx-4"
                 icon
-                @click.prevent.stop="$emit('layout-edit-application', parentId, container)">
+                @click.prevent.stop="$root.$emit('layout-edit-application', parentId, container)">
                 <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
               </v-btn>
               <v-btn
@@ -94,9 +94,10 @@
         <v-card
           slot-scope="hoverScope"
           :class="{
-            'grey-background opacity-5': hoverScope.hover && !isSelectedCell,
+            'opacity-5': hoverScope.hover && !isSelectedCell,
+            'grey-background': !isSelectedCell && !$root.movingCell,
+            'transparent': $root.movingCell && !isSelectedCell,
             'grey': isSelectedCell,
-            'grey-background': !hoverScope.hover && !isSelectedCell,
           }"
           class="full-width full-height"
           flat
@@ -105,7 +106,7 @@
           }" />
       </v-hover>
     </template>
-    <template v-if="hasApplication && !moving" #bottom>
+    <template v-if="hasApplication && !moving" #footer>
       <div
         ref="placeholder"
         :class="hasContent && 'linear-gradient-grey-background' || 'white'"

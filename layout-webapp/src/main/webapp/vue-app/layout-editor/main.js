@@ -77,6 +77,7 @@ export function init() {
           sectionHistory: null,
           sectionRedo: null,
           movingCell: null,
+          moveType: null,
           movingCellRowIndex: 0,
           movingCellColIndex: 0,
           movingCellRowSpan: 0,
@@ -98,12 +99,6 @@ export function init() {
           gap: 20,
         }),
         computed: {
-          resizeMouseX() {
-            return this.resizeDimensions && (this.resizeDimensions.x + this.resizeDimensions.width);
-          },
-          resizeMouseY() {
-            return this.resizeDimensions && (this.resizeDimensions.y + this.resizeDimensions.height);
-          },
           selectMouseX0() {
             return Math.min(this.movingStartX - this.diffScrollX, this.movingX - this.diffScrollX) + this.parentAppX;
           },
@@ -117,16 +112,25 @@ export function init() {
             return Math.max(this.movingStartY - this.diffScrollY, this.movingY - this.diffScrollY) + this.parentAppY;
           },
           parentAppX() {
-            return this.$root.parentAppDimensions?.x || 0;
+            return this.parentAppDimensions?.x || 0;
           },
           parentAppY() {
-            return this.$root.parentAppDimensions?.y || 0;
-          },
-          isMovingCell() {
-            return this.$root.movingCell && this.$root.movingX && this.$root.movingY && true || false;
+            return this.parentAppDimensions?.y || 0;
           },
           defaultContainer() {
-            return this.containerTypes.find(extension => extension.type === 'container');
+            return this.containerTypes.find(extension => extension.type === 'default');
+          },
+          isResize() {
+            return this.moveType === 'resize';
+          },
+          isMove() {
+            return this.moveType === 'drag';
+          },
+          movingSelectedFirstRowIndex() {
+            return Math.min(...this.selectedCellCoordinates.map(c => c.rowIndex));
+          },
+          movingSelectedFirstColIndex() {
+            return Math.min(...this.selectedCellCoordinates.map(c => c.colIndex));
           },
         },
         created() {
