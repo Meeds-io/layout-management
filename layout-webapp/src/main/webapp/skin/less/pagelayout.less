@@ -30,9 +30,9 @@
   grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-width), var(--grid-cell--max-width)), 1fr))";
   grid-template-rows: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-height), var(--grid-cell--max-height)), 1fr))";
   grid-gap: ~"var(--grid-layout-gap, 20px)";
-
   aspect-ratio: ~"calc(var(--grid-column-count) / var(--grid-row-count))";
   margin-bottom: ~"var(--grid-layout-gap, 20px)";
+  overflow: hidden;
 }
 .grid-cell-colspan-1,
 .grid-cell-colspan-2,

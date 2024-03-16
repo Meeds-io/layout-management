@@ -23,14 +23,16 @@
     :id="id"
     :class="cssClass"
     :style="cssStyle">
-    <slot name="content"></slot>
-    <template v-if="hasChildren">
+    <slot name="header"></slot>
+    <slot v-if="$slots.content" name="content"></slot>
+    <template v-else-if="hasChildren">
       <page-layout-container-extension
         v-for="child in children"
         :key="child.storageId"
         :container="child"
         :parent-id="storageId" />
     </template>
+    <slot name="footer"></slot>
   </div>
 </template>
 <script>
