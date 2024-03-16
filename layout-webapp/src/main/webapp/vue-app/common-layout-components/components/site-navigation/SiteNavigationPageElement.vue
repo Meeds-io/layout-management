@@ -17,12 +17,12 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <div>
-    <site-navigation-new-page-element
-      v-if="isNewPageElement" />
+  <div v-if="!isNewPageElement || hasMoreThanOneTemplate">
     <site-navigation-existing-page-element
-      v-else
+      v-if="!isNewPageElement"
       :selected-page="selectedPage" />
+    <site-navigation-new-page-element
+      v-else-if="hasMoreThanOneTemplate" />
   </div>
 </template>
 
@@ -31,17 +31,34 @@ export default {
   props: {
     elementType: {
       type: String,
-      default: 'PAGE'
+      default: () => 'PAGE',
     },
     selectedPage: {
       type: Object,
-      default: null
+      default: null,
     }
   },
   computed: {
     isNewPageElement() {
       return this.elementType === 'PAGE';
-    }
-  }
+    },
+    templatesCount() {
+      return this.$root.pageTemplates?.length || 0;
+    },
+    hasMoreThanOneTemplate() {
+      return this.templatesCount > 1;
+    },
+  },
+  created() {
+    this.getPageTemplates();
+  },
+  methods: {
+    getPageTemplates() {
+      if (!this.$root.pageTemplates) {
+        return this.$pageLayoutService.getPageTemplates()
+          .then(pageTemplates => this.$root.pageTemplates = pageTemplates || []);
+      }
+    },
+  },
 };
 </script>
