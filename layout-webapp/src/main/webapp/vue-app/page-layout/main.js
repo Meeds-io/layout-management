@@ -43,11 +43,11 @@ export function init(pageRef) {
     }),
     computed: {
       defaultContainer() {
-        return this.containerTypes.find(extension => extension.type === 'container');
+        return this.containerTypes.find(extension => extension.type === 'default');
       },
     },
     created() {
-      document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
+      document.addEventListener('extension-page-layout-container-updated', this.refreshContainerTypes);
     },
     methods: {
       refreshContainerTypes() {

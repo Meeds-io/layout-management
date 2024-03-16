@@ -6,7 +6,8 @@
       :id="`grid-cell-${i}`"
       :key="i"
       :index="i"
-      :cols="cols" />
+      :cols="cols"
+      :cells-validity="cellsValidity" />
   </div>
 </template>
 <script>
@@ -17,7 +18,13 @@ export default {
       default: null,
     },
   },
+  data: () => ({
+    cellsValidity: {},
+  }),
   computed: {
+    isMove() {
+      return this.$root.isMove;
+    },
     rows() {
       return this.section.rowsCount;
     },
@@ -29,6 +36,32 @@ export default {
     },
     length() {
       return this.rows * this.cols;
+    },
+  },
+  watch: {
+    isMove() {
+      this.computeCellsValidity();
+    },
+  },
+  created() {
+    this.computeCellsValidity();
+  },
+  methods: {
+    computeCellsValidity() {
+      if (this.isMove) {
+        window.setTimeout(() => {
+          const cellsValidity = {};
+          for (let i = 0; i < this.section.rowsCount; i++) {
+            cellsValidity[i] = {};
+            for (let j = 0; j < this.section.colsCount; j++) {
+              cellsValidity[i][j] = this.$layoutUtils.isValidTargetMovingCell(this.section, this.$root.movingCell, i, j);
+            }
+          }
+          this.cellsValidity = cellsValidity;
+        }, 50);
+      } else {
+        this.cellsValidity = {};
+      }
     },
   },
 };

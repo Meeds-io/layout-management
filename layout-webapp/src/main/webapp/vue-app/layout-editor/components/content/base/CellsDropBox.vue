@@ -41,11 +41,7 @@ export default {
     interceptEvents: false,
     boxHeight: null,
     boxWidth: null,
-
-    moveType: null,
-
     computingSelectionInterval: null,
-
     sectionX: 0,
     sectionWidth: 0,
     sectionY: 0,
@@ -71,12 +67,6 @@ export default {
     parentAppDimensions: null,
   }),
   computed: {
-    isResize() {
-      return this.moveType === 'resize';
-    },
-    isMove() {
-      return this.moveType === 'drag';
-    },
     innerCellWidth() {
       return this.section && this.sectionWidth && (this.sectionWidth - (this.$root.gap * (this.section.colsCount - 1))) / this.section.colsCount || 0;
     },
@@ -84,16 +74,16 @@ export default {
       return this.section && this.sectionHeight && (this.sectionHeight - (this.$root.gap * (this.section.rowsCount - 1))) / this.section.rowsCount || 0;
     },
     top() {
-      return this.isResize ? this.cellY - this.sectionY : this.movingY;
+      return this.$root.isResize ? this.cellY - this.sectionY : this.movingY;
     },
     left() {
-      return this.isResize ? this.cellX - this.sectionX : this.movingX;
+      return this.$root.isResize ? this.cellX - this.sectionX : this.movingX;
     },
     height() {
-      return this.isResize ? this.boxHeight + this.diffMovingY + 3 : this.boxHeight + 3;
+      return this.$root.isResize ? this.boxHeight + this.diffMovingY + 3 : this.boxHeight + 3;
     },
     width() {
-      return this.isResize ? this.boxWidth + this.diffMovingX + 3 : this.boxWidth + 3;
+      return this.$root.isResize ? this.boxWidth + this.diffMovingX + 3 : this.boxWidth + 3;
     },
     boxStyle() {
       return {
@@ -153,7 +143,7 @@ export default {
           && event?.target?.closest?.('#layoutEditor')
           && event?.target?.tagName !== 'BUTTON'
           && event?.target?.tagName !== 'A') {
-        this.moveType = event.moveType;
+        this.$root.moveType = event.moveType;
         this.cell = event.cell;
 
         const containerDimensions = event.containerElement.getBoundingClientRect();
@@ -208,13 +198,13 @@ export default {
       }
     },
     updateSelection() {
-      const startRowIndex = this.isMove ?
+      const startRowIndex = this.$root.isMove ?
         Math.min(
           parseInt((this.movingY + this.$root.gap) / (this.innerCellHeight + this.$root.gap)),
           this.section.rowsCount - this.cell.rowsCount
         ):
         this.cell.rowIndex;
-      const startColIndex = this.isMove ?
+      const startColIndex = this.$root.isMove ?
         Math.min(
           parseInt((this.movingX + this.$root.gap) / (this.innerCellWidth + this.$root.gap)),
           this.section.colsCount - this.cell.colsCount
@@ -223,16 +213,16 @@ export default {
       this.updateSelectedCellsCoordinates(startRowIndex, startColIndex);
     },
     updateSelectedCellsCoordinates(startRowIndex, startColIndex) {
-      if (this.isMove
+      if (this.$root.isMove
           && this.startRowIndex === startRowIndex
           && this.startColIndex === startColIndex) {
         return;
       }
       this.startRowIndex = startRowIndex;
       this.startColIndex = startColIndex;
-      const rowsCount = this.isMove ? this.cell.rowsCount : parseInt((this.height + this.innerCellHeight) / (this.innerCellHeight + this.$root.gap));
-      const colsCount = this.isMove ? this.cell.colsCount : parseInt((this.width + this.innerCellWidth) / (this.innerCellWidth + this.$root.gap));
-      if (this.isResize
+      const rowsCount = this.$root.isMove ? this.cell.rowsCount : parseInt((this.height + this.innerCellHeight) / (this.innerCellHeight + this.$root.gap));
+      const colsCount = this.$root.isMove ? this.cell.colsCount : parseInt((this.width + this.innerCellWidth) / (this.innerCellWidth + this.$root.gap));
+      if (this.$root.isResize
           && this.rowsCount === rowsCount
           && this.colsCount === colsCount) {
         return;
@@ -271,7 +261,7 @@ export default {
     },
     endMoving() {
       if (this.interceptEvents) {
-        this.$root.$emit(`layout-cell-${this.moveType}`, { // layout-cell-resize or layout-cell-drag
+        this.$root.$emit(`layout-cell-${this.$root.moveType}`, { // layout-cell-resize or layout-cell-drag
           sectionId: this.section.storageId,
           cell: this.cell,
           rowIndex: this.startRowIndex,

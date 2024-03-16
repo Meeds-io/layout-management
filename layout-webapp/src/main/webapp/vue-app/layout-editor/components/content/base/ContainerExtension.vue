@@ -82,7 +82,9 @@ export default {
       return this.container?.storageId;
     },
     containerType() {
-      const extension = this.container && this.$root.containerTypes.find(ext => ext?.isValid?.(this.container));
+      const extension = this.container
+        && this.$root.containerTypes.find(ext => ext?.isValid?.(this.container))
+        || this.$root.defaultContainer;
       return extension?.containerType;
     },
     params() {
