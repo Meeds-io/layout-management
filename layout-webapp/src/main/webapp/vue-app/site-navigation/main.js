@@ -56,7 +56,10 @@ export function init(canManageSiteNavigation) {
       Vue.createApp({
         template: `<site-navigation id="${appId}" :can-manage-site-navigation="${canManageSiteNavigation}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
-        i18n},
-      `#${appId}`, 'site-navigation');
+        i18n,
+        data: () => ({
+          pageTemplates: null,
+        }),
+      }, `#${appId}`, 'site-navigation');
     });
 }
