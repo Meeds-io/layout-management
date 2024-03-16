@@ -42,7 +42,7 @@ export function getPages(siteType, siteName, pageDisplayName) {
 }
 
 export function updatePageLayout(pageRef, pageLayout) {
-  return fetch(`/layout/rest/pages/${pageRef}/layout`, {
+  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {
@@ -89,7 +89,7 @@ export function updatePageLink(pageRef, link) {
   const formData = new FormData();
   formData.append('link', link);
   const params = new URLSearchParams(formData).toString();
-  return fetch(`/layout/rest/pages/${pageRef}/link`, {
+  return fetch(`/layout/rest/pages/link?pageRef=${pageRef}`, {
     method: 'PATCH',
     credentials: 'include',
     headers: {
@@ -104,7 +104,7 @@ export function updatePageLink(pageRef, link) {
 }
 
 export function updatePagePermissions(pageRef, editPermission, accessPermissions) {
-  return fetch(`/layout/rest/pages/${pageRef}/permissions`, {
+  return fetch(`/layout/rest/pages/permissions?pageRef=${pageRef}`, {
     method: 'PATCH',
     credentials: 'include',
     headers: {
@@ -122,7 +122,7 @@ export function updatePagePermissions(pageRef, editPermission, accessPermissions
 }
 
 export function getPage(pageRef) {
-  return fetch(`/layout/rest/pages/${pageRef}`, {
+  return fetch(`/layout/rest/pages/byRef?pageRef=${pageRef}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
@@ -135,7 +135,7 @@ export function getPage(pageRef) {
 }
 
 export function getPageLayout(pageRef) {
-  return fetch(`/layout/rest/pages/${pageRef}/layout`, {
+  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {

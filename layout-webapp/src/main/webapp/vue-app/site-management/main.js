@@ -47,7 +47,10 @@ export function init() {
       Vue.createApp({
         template: `<site-management id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
-        i18n},
-      `#${appId}`, 'site-management');
+        i18n,
+        data: () => ({
+          pageTemplates: null,
+        }),
+      }, `#${appId}`, 'site-management');
     });
 }

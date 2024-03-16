@@ -94,7 +94,7 @@ public class PageLayoutRest {
     return pageLayoutService.getPages(siteType, siteName, pageDisplayName, offset, limit, request.getRemoteUser());
   }
 
-  @GetMapping("{pageRef}/layout")
+  @GetMapping("layout")
   @Secured("users")
   @Operation(summary = "Retrieve page layout by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
@@ -102,7 +102,7 @@ public class PageLayoutRest {
   public LayoutModel getPageLayout(
                                    HttpServletRequest request,
                                    @Parameter(description = "page reference", required = true)
-                                   @PathVariable("pageRef")
+                                   @RequestParam("pageRef")
                                    String pageRef) {
     try {
       Page page = pageLayoutService.getPageLayout(PageKey.parse(pageRef), request.getRemoteUser());
@@ -114,7 +114,7 @@ public class PageLayoutRest {
     }
   }
 
-  @GetMapping("{pageRef}")
+  @GetMapping("byRef")
   @Secured("users")
   @Operation(summary = "Retrieve page by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
@@ -122,7 +122,7 @@ public class PageLayoutRest {
   public PageContext getPage(
                              HttpServletRequest request,
                              @Parameter(description = "page reference", required = true)
-                             @PathVariable("pageRef")
+                             @RequestParam("pageRef")
                              String pageRef) {
     try {
       return pageLayoutService.getPage(PageKey.parse(pageRef), request.getRemoteUser());
@@ -152,7 +152,7 @@ public class PageLayoutRest {
     }
   }
 
-  @PutMapping("{pageRef}/layout")
+  @PutMapping("layout")
   @Secured("users")
   @Operation(summary = "Updates an existing page layout", method = "PUT", description = "This updates the designated page layout")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "page created"),
@@ -161,7 +161,7 @@ public class PageLayoutRest {
   public LayoutModel updatePageLayout(
                                       HttpServletRequest request,
                                       @Parameter(description = "page display name", required = true)
-                                      @PathVariable("pageRef")
+                                      @RequestParam("pageRef")
                                       String pageRef,
                                       @RequestBody
                                       LayoutModel layoutModel) {
@@ -177,7 +177,7 @@ public class PageLayoutRest {
     }
   }
 
-  @PatchMapping(name = "{pageRef}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @PatchMapping(name = "link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   @Secured("users")
   @Operation(summary = "Update page link", method = "GET", description = "This updates page link")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
@@ -185,7 +185,7 @@ public class PageLayoutRest {
   public void updatePageLink(
                              HttpServletRequest request,
                              @Parameter(description = "page display name", required = true)
-                             @PathVariable("pageRef")
+                             @RequestParam("pageRef")
                              String pageRef,
                              @Parameter(description = "page new Link")
                              @RequestParam("link")
@@ -199,7 +199,7 @@ public class PageLayoutRest {
     }
   }
 
-  @PatchMapping("{pageRef}/permissions")
+  @PatchMapping("permissions")
   @Secured("users")
   @Operation(summary = "Update a page access and edit permission", method = "PATCH",
              description = "This updates the given page access and edit permission")
@@ -211,7 +211,7 @@ public class PageLayoutRest {
   public void updatePagePermissions(
                                     HttpServletRequest request,
                                     @Parameter(description = "Page reference", required = true)
-                                    @PathVariable("pageRef")
+                                    @RequestParam("pageRef")
                                     String pageRef,
                                     @RequestBody
                                     PermissionUpdateModel permissionUpdateModel) {
