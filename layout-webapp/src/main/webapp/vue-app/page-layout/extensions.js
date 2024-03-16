@@ -19,7 +19,7 @@
 
 extensionRegistry.registerExtension('page-layout', 'container', {
   rank: 1000,
-  type: 'container',
+  type: 'default',
   isValid: container => container?.template === 'Container',
   containerType: 'page-layout-container',
 });

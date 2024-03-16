@@ -336,14 +336,21 @@ export function isValidTargetMovingCell(section, movingCell, targetRowIndex, tar
     && (targetEndColIndex < section.colsCount)
     && section.children.every(c => !c.children?.length
         || c.storageId === movingCell?.storageId
-        || c.rowIndex < targetRowIndex
+        || (c.colsCount === 1 && c.rowsCount === 1)
+        || (c.rowIndex + c.rowsCount - 1) < targetRowIndex
         || c.rowIndex > targetEndRowIndex
-        || c.colIndex < targetColIndex
+        || (c.colIndex + c.colsCount - 1) < targetColIndex
         || c.colIndex > targetEndColIndex
         || (
-          c.rowsCount <= (movingCell.rowsCount - (targetRowIndex - c.rowIndex))
-          && c.colsCount <= (movingCell.colsCount - (targetColIndex - c.colIndex))
+          isBetween(c.colIndex, targetColIndex, targetEndColIndex)
+          && isBetween(c.colIndex + c.colsCount -1, targetColIndex, targetEndColIndex)
+          && isBetween(c.rowIndex, targetRowIndex, targetEndRowIndex)
+          && isBetween(c.rowIndex + c.rowsCount -1, targetRowIndex, targetEndRowIndex)
         ));
+}
+
+export function isBetween(value, b0, b1) {
+  return value >= b0 && value <= b1;
 }
   
 export function cleanAttributes(container) {

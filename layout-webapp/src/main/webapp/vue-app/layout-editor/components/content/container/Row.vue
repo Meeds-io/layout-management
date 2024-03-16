@@ -33,11 +33,11 @@
       :rows-count="rowsCount"
       :cols-count="colsCount"
       :class="zIndexClass"
-      class="position-relative"
+      class="position-relative overflow-initial"
       type="section"
       no-draggable
       @hovered="hoverSection = $event && !drawerOpened">
-      <template v-if="$root.movingParentId === storageId" #content>
+      <template v-if="$root.movingParentId === storageId" #header>
         <layout-editor-section-selection-grid
           :section="container"
           class="position-absolute z-index-two full-width full-height" />
