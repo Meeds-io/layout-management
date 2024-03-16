@@ -18,17 +18,24 @@
  */
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 100,
-  type: 'page',
-  isValid: container => container.type === 'PAGE',
-  containerType: 'layout-editor-container-page',
+  rank: 1000,
+  type: 'default',
+  isValid: container => container?.template === 'Container',
+  containerType: 'layout-editor-container',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 200,
   type: 'page-layout',
   isValid: container => container?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl',
-  containerType: 'layout-editor-container-page-layout',
+  containerType: 'layout-editor-container',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 100,
+  type: 'page',
+  isValid: container => container.type === 'PAGE',
+  containerType: 'layout-editor-container-page',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
@@ -43,13 +50,6 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
   type: 'grid-cell',
   isValid: container => container?.template === 'CellContainer',
   containerType: 'layout-editor-container-column',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 1000,
-  type: 'container',
-  isValid: container => container?.template === 'system:/groovy/portal/webui/container/UIContainer.gtmpl',
-  containerType: 'layout-editor-container-container',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
