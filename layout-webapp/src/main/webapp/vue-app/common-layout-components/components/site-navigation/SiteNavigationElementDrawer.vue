@@ -73,11 +73,10 @@
               outlined
               dense />
           </template>
-          <template v-else>
-            <site-navigation-page-element
-              :element-type="elementType"
-              :selected-page="selectedPage" />
-          </template>
+          <site-navigation-page-element
+            v-else
+            :element-type="elementType"
+            :selected-page="selectedPage" />
         </v-form>
       </v-card>
     </template>

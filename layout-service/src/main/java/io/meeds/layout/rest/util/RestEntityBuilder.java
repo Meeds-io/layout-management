@@ -134,7 +134,7 @@ public class RestEntityBuilder {
         if (n.isCanEditPage()) {
           Page page = pageLayoutService.getPageLayout(pageKey);
           siteRestEntity.getPagesCompatibility().put(pageKey.format(), page != null && isCompatibleWithEditor(page));
-        } else {
+        } else if (pageKey != null) {
           siteRestEntity.getPagesCompatibility().put(pageKey.format(), false);
         }
         computeCompatibilityWithEditor(pageLayoutService, siteRestEntity, n.getChildren());

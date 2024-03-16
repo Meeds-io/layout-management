@@ -21,7 +21,7 @@
     <span class="font-weight-bold text-start text-color body-2 mt-8">{{ $t('siteNavigation.label.pageTemplate') }}</span>
     <v-select
       v-model="pageTemplate"
-      :items="pageTemplates"
+      :items="$root.pageTemplates"
       item-text="label"
       item-value="value"
       dense
@@ -37,12 +37,9 @@
 
 <script>
 export default {
-  data() {
-    return {
-      pageTemplate: 'empty',
-      pageTemplates: [],
-    };
-  },
+  data: () => ({
+    pageTemplate: 'empty',
+  }),
   computed: {
     pageTemplateSkeleton() {
       return `/layout/images/page-templates/${this.pageTemplate}.png`;
@@ -57,18 +54,11 @@ export default {
   },
   created() {
     this.$root.$on('reset-element-drawer', this.reset);
-    this.getPageTemplates();
   },
   methods: {
-    getPageTemplates() {
-      return this.$pageLayoutService.getPageTemplates()
-        .then(pageTemplates => {
-          this.pageTemplates = pageTemplates || [];
-        });
-    },
     reset() {
       this.pageTemplate = 'empty';
-    }
+    },
   }
 };
 </script>
