@@ -48,19 +48,22 @@
       :id="id"
       :class="cssClass"
       :style="cssStyle">
-      <slot name="content"></slot>
-      <layout-editor-container-extension
-        v-for="(child, i) in children"
-        v-show="!hideChildren"
-        :key="child.storageId"
-        :container="child"
-        :parent-id="storageId"
-        :index="i"
-        :length="children.length"
-        :cell-height="cellHeight"
-        :cell-width="cellWidth"
-        @initialized="$emit('initialized', child)" />
-      <slot name="bottom"></slot>
+      <slot name="header"></slot>
+      <slot v-if="$slots.content" name="content"></slot>
+      <template v-else-if="hasChildren">
+        <layout-editor-container-extension
+          v-for="(child, i) in children"
+          v-show="!hideChildren"
+          :key="child.storageId"
+          :container="child"
+          :parent-id="storageId"
+          :index="i"
+          :length="children.length"
+          :cell-height="cellHeight"
+          :cell-width="cellWidth"
+          @initialized="$emit('initialized', child)" />
+      </template>
+      <slot name="footer"></slot>
     </div>
   </v-hover>
 </template>
@@ -73,7 +76,7 @@ export default {
     },
     type: {
       type: String,
-      default: () => 'base',
+      default: () => 'default',
     },
     index: {
       type: Number,
@@ -133,6 +136,9 @@ export default {
     },
     childrenSize() {
       return this.children.length;
+    },
+    hasChildren() {
+      return !!this.childrenSize;
     },
     noChildren() {
       return !this.childrenSize;
