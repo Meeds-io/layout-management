@@ -48,7 +48,8 @@ export default {
       return this.cellsValidity?.[this.rowIndex]?.[this.colIndex] !== false;
     },
     firstCell() {
-      return this.rowIndex === this.$root.movingSelectedFirstRowIndex && this.colIndex === this.$root.movingSelectedFirstColIndex;
+      return this.rowIndex === this.$root.selectedFirstRowIndex
+        && this.colIndex === this.$root.selectedFirstColIndex;
     },
   },
 };

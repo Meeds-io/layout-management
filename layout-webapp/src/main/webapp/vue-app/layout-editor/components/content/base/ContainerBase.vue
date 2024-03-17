@@ -39,8 +39,6 @@
         :index="i"
         :length="children.length"
         :class="draggableContainerClass"
-        :cell-height="cellHeight"
-        :cell-width="cellWidth"
         @move-start="$emit('move-start')" />
     </draggable>
     <div
@@ -59,8 +57,6 @@
           :parent-id="storageId"
           :index="i"
           :length="children.length"
-          :cell-height="cellHeight"
-          :cell-width="cellWidth"
           @initialized="$emit('initialized', child)" />
       </template>
       <slot name="footer"></slot>
@@ -82,14 +78,6 @@ export default {
       type: Number,
       default: () => 0,
     },
-    length: {
-      type: Number,
-      default: () => 0,
-    },
-    moving: {
-      type: Boolean,
-      default: false,
-    },
     noDraggable: {
       type: Boolean,
       default: false,
@@ -97,26 +85,6 @@ export default {
     hideChildren: {
       type: Boolean,
       default: false,
-    },
-    context: {
-      type: String,
-      default: null,
-    },
-    cellHeight: {
-      type: Number,
-      default: () => 0,
-    },
-    cellWidth: {
-      type: Number,
-      default: () => 0,
-    },
-    rowsCount: {
-      type: Number,
-      default: () => 0,
-    },
-    colsCount: {
-      type: Number,
-      default: () => 0,
     },
   },
   data: () => ({
@@ -167,7 +135,7 @@ export default {
       return `${this.container.cssClass || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     draggable() {
-      return !this.context && !this.noDraggable && this.childrenSize > 1;
+      return !this.noDraggable && this.childrenSize > 1;
     },
     draggableContainerClass() {
       return `draggable-container-${this.storageId}`;
@@ -202,13 +170,7 @@ export default {
   },
   methods: {
     refreshChildren() {
-      if (!this.context) {
-        this.children = this.container?.children || [];
-      } else if (this.container?.children?.length || this.children?.length) {
-        window.setTimeout(() => {
-          this.children = this.container?.children || [];
-        }, 50);
-      }
+      this.children = this.container?.children || [];
     },
     hasUnit(length) {
       return Number.isNaN(Number(length));

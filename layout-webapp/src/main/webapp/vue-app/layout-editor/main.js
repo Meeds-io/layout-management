@@ -52,65 +52,30 @@ export function init() {
         data: () => ({
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           applicationCategories: null,
-          editPage: true,
           layout: null,
           pageRef: null,
           draftPageRef: null,
           draftNode: null,
           draftNodeId: null,
           draftNodeUri: null,
-          draggedContainer: null,
-          draggedSection: null,
-          resizeDimensions: null,
-          resizeParentId: null,
           movingParentId: null,
           drawerOpened: 0,
           selectedSectionId: null,
           selectedCellCoordinates: [],
           selectedCells: [],
-          // Resize mouse Grid indexes
-          mouseCellRowIndex: -1,
-          mouseCellColIndex: -1,
-          // Grid cells selection
           parentAppDimensions: false,
           multiCellsSelect: false,
           sectionHistory: null,
           sectionRedo: null,
           movingCell: null,
           moveType: null,
-          movingCellRowIndex: 0,
-          movingCellColIndex: 0,
-          movingCellRowSpan: 0,
-          movingCellColSpan: 0,
-          sectionX: 0,
-          sectionY: 0,
-          cellX: 0,
-          cellY: 0,
           startScrollX: 0,
           startScrollY: 0,
           diffScrollX: 0,
           diffScrollY: 0,
-          movingStartX: 0,
-          movingStartY: 0,
-          diffMovingX: 0,
-          diffMovingY: 0,
-          movingX: 0,
-          movingY: 0,
           gap: 20,
         }),
         computed: {
-          selectMouseX0() {
-            return Math.min(this.movingStartX - this.diffScrollX, this.movingX - this.diffScrollX) + this.parentAppX;
-          },
-          selectMouseX1() {
-            return Math.max(this.movingStartX - this.diffScrollX, this.movingX - this.diffScrollX) + this.parentAppX;
-          },
-          selectMouseY0() {
-            return Math.min(this.movingStartY - this.diffScrollY, this.movingY - this.diffScrollY) + this.parentAppY;
-          },
-          selectMouseY1() {
-            return Math.max(this.movingStartY - this.diffScrollY, this.movingY - this.diffScrollY) + this.parentAppY;
-          },
           parentAppX() {
             return this.parentAppDimensions?.x || 0;
           },
@@ -126,10 +91,13 @@ export function init() {
           isMove() {
             return this.moveType === 'drag';
           },
-          movingSelectedFirstRowIndex() {
+          isMultiSelect() {
+            return this.moveType === 'multiSelect';
+          },
+          selectedFirstRowIndex() {
             return Math.min(...this.selectedCellCoordinates.map(c => c.rowIndex));
           },
-          movingSelectedFirstColIndex() {
+          selectedFirstColIndex() {
             return Math.min(...this.selectedCellCoordinates.map(c => c.colIndex));
           },
         },
@@ -152,6 +120,29 @@ export function init() {
           },
           updateParentAppDimensions() {
             this.parentAppDimensions = document.querySelector('#layoutEditor').getBoundingClientRect();
+          },
+          initScrollPosition() {
+            this.updateParentAppDimensions();
+            this.startScrollX = this.parentAppDimensions.x;
+            this.startScrollY = this.parentAppDimensions.y;
+            this.diffScrollX = 0;
+            this.diffScrollY = 0;
+          },
+          updateScrollPosition() {
+            this.updateParentAppDimensions();
+            this.diffScrollX = this.parentAppDimensions.x - this.startScrollX;
+            this.diffScrollY = this.parentAppDimensions.y - this.startScrollY;
+          },
+          initCellsSelection() {
+            this.selectedSectionId = null;
+            this.moveType = null;
+            this.selectedCells = [];
+            this.selectedCellCoordinates = [];
+          },
+          resetMoving() {
+            this.parentAppDimensions = null;
+            this.moveType = null;
+            this.multiCellsSelect = false;
           },
         },
       }, `#${appId}`, 'Layout Editor')

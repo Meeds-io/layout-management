@@ -43,28 +43,23 @@ export default {
     boxWidth: null,
     computingSelectionInterval: null,
     sectionX: 0,
-    sectionWidth: 0,
     sectionY: 0,
+    sectionWidth: 0,
     sectionHeight: 0,
     cellX: 0,
-    cellWidth: 0,
     cellY: 0,
+    cellWidth: 0,
     cellHeight: 0,
-    startScrollX: 0,
-    startScrollY: 0,
-    diffScrollX: 0,
-    diffScrollY: 0,
     movingStartX: 0,
     movingStartY: 0,
-    diffMovingX: 0,
-    diffMovingY: 0,
     movingX: 0,
     movingY: 0,
+    diffMovingX: 0,
+    diffMovingY: 0,
     startRowIndex: 0,
     startColIndex: 0,
     rowsCount: 0,
     colsCount: 0,
-    parentAppDimensions: null,
   }),
   computed: {
     innerCellWidth() {
@@ -74,16 +69,16 @@ export default {
       return this.section && this.sectionHeight && (this.sectionHeight - (this.$root.gap * (this.section.rowsCount - 1))) / this.section.rowsCount || 0;
     },
     top() {
-      return this.$root.isResize ? this.cellY - this.sectionY : this.movingY;
+      return this.$root.isResize ? this.cellY - this.sectionY : this.movingY - this.$root.diffScrollY;
     },
     left() {
-      return this.$root.isResize ? this.cellX - this.sectionX : this.movingX;
+      return this.$root.isResize ? this.cellX - this.sectionX : this.movingX - this.$root.diffScrollX;
     },
     height() {
-      return this.$root.isResize ? this.boxHeight + this.diffMovingY + 3 : this.boxHeight + 3;
+      return this.$root.isResize ? this.boxHeight + this.diffMovingY - this.$root.diffScrollY + 3 : this.boxHeight + 3;
     },
     width() {
-      return this.$root.isResize ? this.boxWidth + this.diffMovingX + 3 : this.boxWidth + 3;
+      return this.$root.isResize ? this.boxWidth + this.diffMovingX - this.$root.diffScrollX + 3 : this.boxWidth + 3;
     },
     boxStyle() {
       return {
@@ -131,11 +126,8 @@ export default {
   methods: {
     updateScrollPosition() {
       if (this.interceptEvents) {
-        this.updateParentAppDimensions();
-        this.$nextTick(() => {
-          this.diffScrollX = this.parentAppDimensions.x - this.startScrollX;
-          this.diffScrollY = this.parentAppDimensions.y - this.startScrollY;
-        });
+        this.$root.updateScrollPosition();
+        this.$nextTick(() => this.updateSelection());
       }
     },
     startMoving(event) {
@@ -143,18 +135,19 @@ export default {
           && event?.target?.closest?.('#layoutEditor')
           && event?.target?.tagName !== 'BUTTON'
           && event?.target?.tagName !== 'A') {
+        this.$root.initCellsSelection();
+        this.$root.resetMoving();
+        this.$root.initScrollPosition();
+
         this.$root.moveType = event.moveType;
         this.cell = event.cell;
 
         const containerDimensions = event.containerElement.getBoundingClientRect();
         this.boxHeight = containerDimensions.height;
         this.boxWidth = containerDimensions.width;
-
         this.sectionElement = event.containerElement.parentElement;
 
-        this.updateParentAppDimensions();
         this.updateSectionDimensions();
-
         this.sectionX = this.sectionDimensions.x;
         this.sectionWidth = this.sectionDimensions.width;
         this.sectionY = this.sectionDimensions.y;
@@ -168,14 +161,11 @@ export default {
         this.movingStartX = event.x;
         this.movingStartY = event.y;
 
-        this.startScrollX = this.parentAppDimensions.x;
-        this.startScrollY = this.parentAppDimensions.y;
-
         this.updateBoxCoordinates(event);
 
         this.startRowIndex = -1;
         this.startColIndex = -1;
-        this.updateSelectedCellsCoordinates(this.cell.rowIndex, this.cell.colIndex);
+        this.updateSelectedCellCoordinates(this.cell.rowIndex, this.cell.colIndex);
 
         this.cellElement = event.containerElement.cloneNode(true);
         this.cellElement.classList.add('full-width');
@@ -189,9 +179,6 @@ export default {
     updateSectionDimensions() {
       this.sectionDimensions = this.sectionElement.getBoundingClientRect();
     },
-    updateParentAppDimensions() {
-      this.parentAppDimensions = document.querySelector('#layoutEditor').getBoundingClientRect();
-    },
     updateMoving(event) {
       if (this.interceptEvents) {
         this.updateBoxCoordinates(event);
@@ -200,19 +187,19 @@ export default {
     updateSelection() {
       const startRowIndex = this.$root.isMove ?
         Math.min(
-          parseInt((this.movingY + this.$root.gap) / (this.innerCellHeight + this.$root.gap)),
+          parseInt((this.movingY - this.$root.diffScrollY + this.$root.gap) / (this.innerCellHeight + this.$root.gap)),
           this.section.rowsCount - this.cell.rowsCount
         ):
         this.cell.rowIndex;
       const startColIndex = this.$root.isMove ?
         Math.min(
-          parseInt((this.movingX + this.$root.gap) / (this.innerCellWidth + this.$root.gap)),
+          parseInt((this.movingX - this.$root.diffScrollX + this.$root.gap) / (this.innerCellWidth + this.$root.gap)),
           this.section.colsCount - this.cell.colsCount
         ):
         this.cell.colIndex;
-      this.updateSelectedCellsCoordinates(startRowIndex, startColIndex);
+      this.updateSelectedCellCoordinates(startRowIndex, startColIndex);
     },
-    updateSelectedCellsCoordinates(startRowIndex, startColIndex) {
+    updateSelectedCellCoordinates(startRowIndex, startColIndex) {
       if (this.$root.isMove
           && this.startRowIndex === startRowIndex
           && this.startColIndex === startColIndex) {
@@ -246,9 +233,6 @@ export default {
     updateBoxCoordinates(event) {
       this.diffMovingX = event.x - this.movingStartX;
       this.diffMovingY = event.y - this.movingStartY;
-
-      this.diffScrollX = this.parentAppDimensions.x - this.startScrollX;
-      this.diffScrollY = this.parentAppDimensions.y - this.startScrollY;
 
       this.movingX = Math.min(
         Math.max(this.cellX - this.sectionX + this.diffMovingX, 0),

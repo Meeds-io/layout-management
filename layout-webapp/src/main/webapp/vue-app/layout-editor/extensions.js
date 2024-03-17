@@ -42,14 +42,14 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 300,
   type: 'grid',
   isValid: container => container?.template === 'GridContainer',
-  containerType: 'layout-editor-container-row',
+  containerType: 'layout-editor-container-section',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 400,
   type: 'grid-cell',
   isValid: container => container?.template === 'CellContainer',
-  containerType: 'layout-editor-container-column',
+  containerType: 'layout-editor-container-cell',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
