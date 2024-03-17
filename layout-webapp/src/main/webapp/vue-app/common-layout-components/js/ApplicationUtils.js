@@ -27,7 +27,7 @@ export function installApplication(navUri, applicationStorageId, applicationElem
       if (resp?.status === 200) {
         return resp.text();
       } else {
-        throw new Error('The retrieved page seems to be a portal page');
+        throw new Error('The retrieved page is not a portal page');
       }
     })
     .then(applicationContent => handleApplicationContent(applicationContent, applicationElement))
@@ -97,13 +97,14 @@ function installNewJS(newHeadContent) {
   while (scriptIteratorElement) {
     const script = scriptIteratorElement[0];
     const id = script.match(/id="([^"]*)"/i)[1];
-    const scriptContent = newHeadContent.substring(scriptIteratorElement.index, newHeadContent.indexOf('</script>', scriptIteratorElement.index));
-    const oldScriptElement = document.querySelector(`#${id}`);
-    if (oldScriptElement) {
-      oldScriptElement.remove();
+    let scriptElement = id && (document.querySelector(`#${id.trim()}`) || document.querySelector(`[data-id=${id.trim()}]`));
+    if (!scriptElement) {
+      const scriptContent = newHeadContent.substring(scriptIteratorElement.index, newHeadContent.indexOf('</script>', scriptIteratorElement.index));
+      scriptElement = document.createElement('script');
+      scriptElement.innerText = scriptContent.substring(scriptContent.indexOf('>') + 1).replace(/(\r)?(\n)?/g, '');
+      document.head.append(scriptElement);
+      replaceScriptElements(scriptElement);
     }
-    const scriptElement = `${scriptContent}</script>`;
-    document.head.append(scriptElement);
     scriptIteratorElement = replacableScriptsIterator.next().value;
   }
 }
