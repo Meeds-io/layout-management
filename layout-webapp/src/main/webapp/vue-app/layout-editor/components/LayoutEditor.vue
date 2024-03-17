@@ -97,7 +97,10 @@ export default {
           }
           if (this.nodeId && !this.$root.nodeUri) {
             this.$navigationLayoutService.getNodeUri(this.nodeId)
-              .then(uri => this.$root.nodeUri = uri);
+              .then(uri =>
+                this.$layoutUtils.initPageContext(uri)
+                  .finally(() => this.$root.nodeUri = uri)
+              );
           }
           this.$navigationLayoutService.getNode(this.nodeId)
             .then(node => this.node = node)
