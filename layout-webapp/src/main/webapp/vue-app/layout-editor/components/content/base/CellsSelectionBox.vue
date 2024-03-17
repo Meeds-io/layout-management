@@ -146,8 +146,8 @@ export default {
       this.movingStartX = this.movingX;
       this.movingStartY = this.movingY;
 
-      this.startRowIndex = parseInt(this.movingStartY / (this.innerCellHeight + this.$root.gap));
-      this.startColIndex = parseInt(this.movingStartX / (this.innerCellWidth + this.$root.gap)) - 1;
+      this.startRowIndex = parseInt((this.movingStartY - this.sectionY + this.$root.startScrollY) / (this.innerCellHeight + this.$root.gap));
+      this.startColIndex = parseInt((this.movingStartX - this.sectionX + this.$root.startScrollX) / (this.innerCellWidth + this.$root.gap));
       this.endRowIndex = this.startRowIndex;
       this.endColIndex = this.startColIndex;
 
@@ -179,19 +179,19 @@ export default {
     },
     updateSelection(event) {
       if (this.interceptEvents && event) {
-        this.movingX = event.x - this.parentAppX;
-        this.movingY = event.y - this.parentAppY;
+        this.movingX = event.x - this.$root.parentAppDimensions.x;
+        this.movingY = event.y - this.$root.parentAppDimensions.y;
         this.updateSelectedCellCoordinates();
       }
     },
     updateSelectedCellCoordinates() {
       const endRowIndex = Math.min(
-        parseInt(this.movingY / (this.innerCellHeight + this.$root.gap)),
+        parseInt((this.movingY - this.sectionY + this.$root.startScrollY - this.$root.gap) / (this.innerCellHeight + this.$root.gap)),
         this.section?.rowsCount || 12 - 1
       );
 
       const endColIndex = Math.min(
-        parseInt(this.movingX / (this.innerCellWidth + this.$root.gap)) - 1,
+        parseInt((this.movingX - this.sectionX + this.$root.startScrollX) / (this.innerCellWidth + this.$root.gap)),
         this.section?.colsCount || 12 - 1
       );
       if (this.endRowIndex === endRowIndex
@@ -221,10 +221,10 @@ export default {
       if (this.interceptEvents) {
         if (this.multiCellsSelect) {
           this.$root.$emit('layout-cells-select', {
-            fromRowIndex: this.startRowIndex,
-            toRowIndex: this.endRowIndex,
-            fromColIndex: this.startColIndex,
-            toColIndex: this.endColIndex,
+            fromRowIndex: Math.min(this.startRowIndex, this.endRowIndex),
+            toRowIndex: Math.max(this.startRowIndex, this.endRowIndex),
+            fromColIndex: Math.min(this.startColIndex, this.endColIndex),
+            toColIndex: Math.max(this.startColIndex, this.endColIndex),
           });
         }
         this.interceptEvents = false;
