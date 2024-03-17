@@ -43,8 +43,8 @@
           slot-scope="hoverScope"
           :class="{
             'opacity-5': hoverScope.hover && !isSelectedCell,
-            'grey-background': !isSelectedCell && !$root.movingCell,
-            'transparent': $root.movingCell && !isSelectedCell,
+            'grey-background': !isSelectedCell && (!$root.movingCell || $root.selectedSectionId !== parentId),
+            'transparent': $root.movingCell && $root.selectedSectionId === parentId && !isSelectedCell,
             'grey': isSelectedCell,
           }"
           class="full-width full-height"
@@ -118,6 +118,7 @@ export default {
     },
     isSelectedCell() {
       return this.$root.isMultiSelect
+        && this.$root.selectedSectionId === this.parentId
         && !!this.$root.selectedCellCoordinates.find(c => c.rowIndex === this.container.rowIndex && c.colIndex === this.container.colIndex);
     },
   },
