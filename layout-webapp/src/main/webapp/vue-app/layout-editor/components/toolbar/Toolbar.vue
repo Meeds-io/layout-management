@@ -28,7 +28,7 @@
     <v-icon class="icon-default-color">fa-pager</v-icon>
     <span class="px-2">{{ $t('layout.editPageName', {0: pageName}) }}</span>
     <v-spacer />
-    <layout-editor-toolbar-save-button />
+    <layout-editor-toolbar-save-button :disabled="disableSave" />
   </v-card>
 </template>
 <script>
@@ -45,6 +45,10 @@ export default {
     nodeLabels: {
       type: Object,
       default: null,
+    },
+    disableSave: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

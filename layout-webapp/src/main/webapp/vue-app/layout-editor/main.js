@@ -39,11 +39,9 @@ const lang = eXo?.env.portal.language || 'en';
 //should expose the locale ressources as REST API
 const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.LayoutEditor-${lang}.json`;
 
-document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
-
 export function init() {
   exoi18n.loadLanguageAsync(lang, url)
-    .then(i18n =>
+    .then(i18n => {
       // init Vue app when locale ressources are ready
       Vue.createApp({
         template: `<layout-editor id="${appId}"/>`,
@@ -101,6 +99,13 @@ export function init() {
             return Math.min(...this.selectedCellCoordinates.map(c => c.colIndex));
           },
         },
+        watch: {
+          layout(newVal, oldVal) {
+            if (!oldVal) {
+              window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
+            }
+          },
+        },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
@@ -145,7 +150,10 @@ export function init() {
             this.multiCellsSelect = false;
           },
         },
-      }, `#${appId}`, 'Layout Editor')
-    )
-    .finally(() => Vue.prototype.$utils.includeExtensions('LayoutEditorExtension'));
+      }, `#${appId}`, 'Layout Editor');
+    })
+    .finally(() => {
+      Vue.prototype.$utils.includeExtensions('LayoutEditorExtension');
+      document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
+    });
 }

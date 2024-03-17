@@ -25,6 +25,7 @@
     flat>
     <div>
       <layout-editor-toolbar
+        :disable-save="!$root.layout"
         :page="page"
         :node="node"
         :node-labels="nodeLabels" />
