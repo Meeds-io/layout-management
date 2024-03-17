@@ -19,19 +19,16 @@
 
 -->
 <template>
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     ref="section"
-    class="position-relative layout-section pb-5">
+    class="position-relative layout-section pb-5"
+    @mousedown="startSelection">
     <layout-editor-container-base
       ref="container"
       :container="container"
       :index="index"
       :length="length"
-      :context="context"
-      :cell-height="cellHeight"
-      :cell-width="cellWidth"
-      :rows-count="rowsCount"
-      :cols-count="colsCount"
       :class="zIndexClass"
       class="position-relative overflow-initial"
       type="section"
@@ -48,7 +45,6 @@
     </layout-editor-container-base>
     <v-hover>
       <div
-        v-if="!context"
         slot-scope="{ hover }"
         class="layout-section-border">
         <div class="position-relative full-height full-width">
@@ -78,10 +74,6 @@ export default {
       type: Number,
       default: null,
     },
-    context: {
-      type: String,
-      default: null,
-    },
   },
   data: () => ({
     hoverSection: false,
@@ -89,26 +81,14 @@ export default {
     sectionWidth: 0,
   }),
   computed: {
-    drawerOpened() {
-      return this.$root.drawerOpened;
+    storageId() {
+      return this.container?.storageId;
     },
     zIndexClass() {
       return !this.drawerOpened && 'z-index-one';
     },
-    cellWidth() {
-      return this.sectionWidth && this.colsCount && ((this.sectionWidth + this.$root.gap) / this.colsCount);
-    },
-    cellHeight() {
-      return this.cellWidth;
-    },
-    colsCount() {
-      return this.container?.colsCount;
-    },
-    rowsCount() {
-      return this.container?.rowsCount;
-    },
-    storageId() {
-      return this.container?.storageId;
+    drawerOpened() {
+      return this.$root.drawerOpened;
     },
   },
   created() {
@@ -131,6 +111,16 @@ export default {
         const dimensions = this.$refs.section.getBoundingClientRect();
         this.sectionWidth = dimensions.width;
       }, 300);
+    },
+    startSelection(event) {
+      if (event.button !== 0) {
+        return;
+      }
+      if (!event?.target?.closest?.('.layout-no-multi-select')
+          && event?.target?.tagName !== 'BUTTON'
+          && event?.target?.tagName !== 'A') {
+        this.$root.$emit('layout-section-selection-start', event, this.container, this.$refs.container.$el);
+      }
     },
   },
 };
