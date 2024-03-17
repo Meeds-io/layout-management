@@ -127,24 +127,14 @@ export default {
     displayMoveButton() {
       return this.length > 1;
     },
-    draggedContainer() {
-      return this.$root.draggedContainer;
-    },
     displayBorder() {
-      return this.open || (this.hover || this.draggedContainer);
+      return this.open || this.hover;
     },
   },
   watch: {
     hover() {
       window.setTimeout(() => {
-        if (!this.moving && !this.draggedContainer) {
-          this.open = this.hover;
-        }
-      }, 200);
-    },
-    draggedContainer() {
-      window.setTimeout(() => {
-        if (!this.moving && !this.draggedContainer) {
+        if (!this.moving) {
           this.open = this.hover;
         }
       }, 200);

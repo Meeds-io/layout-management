@@ -29,30 +29,38 @@
 export default {
   data: () => ({
     interceptEvents: false,
-    parentAppDimensions: null,
+    movingStartX: 0,
+    movingStartY: 0,
+    movingX: false,
+    movingY: false,
+    startRowIndex: -1,
+    startColIndex: -1,
+    endRowIndex: -1,
+    endColIndex: -1,
     computingDisplayInterval: null,
+    section: null,
+    sectionElement: null,
+    sectionX: 0,
+    sectionY: 0,
+    sectionWidth: 0,
+    sectionHeight: 0,
+    sectionDimensions: null,
   }),
   computed: {
     multiCellsSelect() {
       return this.$root.multiCellsSelect;
     },
-    movingStartX() {
-      return this.$root.movingStartX;
-    },
-    movingStartY() {
-      return this.$root.movingStartY;
-    },
-    movingX() {
-      return this.$root.movingX;
-    },
-    movingY() {
-      return this.$root.movingY;
-    },
     parentAppX() {
-      return this.$root.parentAppDimensions?.x || 0;
+      return this.$root.parentAppX;
     },
     parentAppY() {
-      return this.$root.parentAppDimensions?.y || 0;
+      return this.$root.parentAppY;
+    },
+    innerCellWidth() {
+      return this.section && this.sectionWidth && (this.sectionWidth - (this.$root.gap * (this.section.colsCount - 1))) / this.section.colsCount || 0;
+    },
+    innerCellHeight() {
+      return this.section && this.sectionHeight && (this.sectionHeight - (this.$root.gap * (this.section.rowsCount - 1))) / this.section.rowsCount || 0;
     },
     boxHeight() {
       return this.movingY - this.movingStartY;
@@ -78,13 +86,8 @@ export default {
     },
   },
   watch: {
-    multiCellsSelect() {
-      if (this.multiCellsSelect) {
-        this.$root.$emit('layout-cells-selection-start');
-      }
-    },
-    interceptEvents() {
-      if (this.interceptEvents) {
+    interceptEvents(val) {
+      if (val) {
         document.addEventListener('mousemove', this.updateSelection);
         document.addEventListener('mouseup', this.endSelection);
         document.querySelector('.page-scroll-content').addEventListener('scroll', this.updateScrollPosition);
@@ -103,29 +106,53 @@ export default {
     },
     parentAppX(newVal, oldVal) {
       if (this.interceptEvents) {
-        this.$root.movingX = this.$root.movingX - newVal + oldVal;
+        this.movingX = this.movingX - newVal + oldVal;
       }
     },
     parentAppY(newVal, oldVal) {
       if (this.interceptEvents) {
-        this.$root.movingY = this.$root.movingY - newVal + oldVal;
+        this.movingY = this.movingY - newVal + oldVal;
       }
     },
   },
   created() {
-    document.addEventListener('mousedown', this.startSelection);
+    this.$root.$on('layout-section-selection-start', this.startSelection);
+  },
+  beforeDestroy() {
+    this.$root.$off('layout-section-selection-start', this.startSelection);
   },
   methods: {
     reset() {
-      this.$root.movingX = 0;
-      this.$root.movingY = 0;
-      this.$root.movingStartX = 0;
-      this.$root.movingStartY = 0;
-      this.startScrollX = 0;
-      this.startScrollY = 0;
-      this.$root.diffScrollX = 0;
-      this.$root.diffScrollY = 0;
-      this.$root.parentAppDimensions = null;
+      this.$root.multiCellsSelect = false;
+    },
+    startSelection(event, section, sectionElement) {
+      this.$root.initCellsSelection();
+      this.$root.resetMoving();
+      this.$root.initScrollPosition();
+
+      this.$root.moveType = 'multiSelect';
+      this.$root.selectedSectionId = section.storageId;
+      this.section = section;
+      this.sectionElement = sectionElement;
+
+      this.updateSectionDimensions();
+      this.sectionX = this.sectionDimensions.x;
+      this.sectionWidth = this.sectionDimensions.width;
+      this.sectionY = this.sectionDimensions.y;
+      this.sectionHeight = this.sectionDimensions.height;
+
+      this.movingX = event.x - this.$root.parentAppDimensions.x;
+      this.movingY = event.y - this.$root.parentAppDimensions.y;
+      this.movingStartX = this.movingX;
+      this.movingStartY = this.movingY;
+
+      this.startRowIndex = parseInt(this.movingStartY / (this.innerCellHeight + this.$root.gap));
+      this.startColIndex = parseInt(this.movingStartX / (this.innerCellWidth + this.$root.gap)) - 1;
+      this.endRowIndex = this.startRowIndex;
+      this.endColIndex = this.startColIndex;
+
+      this.interceptEvents = false;
+      this.$nextTick().then(() => this.interceptEvents = true);
     },
     updateDisplay() {
       if (this.interceptEvents) {
@@ -143,45 +170,62 @@ export default {
     },
     updateScrollPosition() {
       if (this.interceptEvents) {
-        this.$root.updateParentAppDimensions();
-        this.$nextTick(() => {
-          this.$root.diffScrollX = this.$root.parentAppDimensions.x - this.startScrollX;
-          this.$root.diffScrollY = this.$root.parentAppDimensions.y - this.startScrollY;
-          this.updateSelection();
-        });
+        this.$root.updateScrollPosition();
+        this.$nextTick(() => this.updateSelectedCellCoordinates());
       }
     },
-    startSelection(event) {
-      if (event.button !== 0) {
-        return;
-      }
-      if (event?.target?.closest?.('#layoutEditor')
-          && !event?.target?.closest?.('.layout-no-multi-select')
-          && event?.target?.tagName !== 'BUTTON'
-          && event?.target?.tagName !== 'A') {
-        this.$root.updateParentAppDimensions();
-        this.$root.movingX = this.$layoutUtils.getX(event) - this.$root.parentAppDimensions.x;
-        this.$root.movingY = this.$layoutUtils.getY(event) - this.$root.parentAppDimensions.y;
-        this.$root.movingStartX = this.$root.movingX;
-        this.$root.movingStartY = this.$root.movingY;
-        this.startScrollX = this.$root.parentAppDimensions.x;
-        this.startScrollY = this.$root.parentAppDimensions.y;
-        this.$root.diffScrollX = 0;
-        this.$root.diffScrollY = 0;
-        this.interceptEvents = false;
-        this.$nextTick().then(() => this.interceptEvents = true);
-      }
+    updateSectionDimensions() {
+      this.sectionDimensions = this.sectionElement.getBoundingClientRect();
     },
     updateSelection(event) {
       if (this.interceptEvents && event) {
-        this.$root.movingX = this.$layoutUtils.getX(event) - this.parentAppX;
-        this.$root.movingY = this.$layoutUtils.getY(event) - this.parentAppY;
+        this.movingX = event.x - this.parentAppX;
+        this.movingY = event.y - this.parentAppY;
+        this.updateSelectedCellCoordinates();
       }
+    },
+    updateSelectedCellCoordinates() {
+      const endRowIndex = Math.min(
+        parseInt(this.movingY / (this.innerCellHeight + this.$root.gap)),
+        this.section?.rowsCount || 12 - 1
+      );
+
+      const endColIndex = Math.min(
+        parseInt(this.movingX / (this.innerCellWidth + this.$root.gap)) - 1,
+        this.section?.colsCount || 12 - 1
+      );
+      if (this.endRowIndex === endRowIndex
+          && this.endColIndex === endColIndex) {
+        return;
+      }
+      this.endRowIndex = endRowIndex;
+      this.endColIndex = endColIndex;
+
+      const fromRow = Math.min(this.startRowIndex, this.endRowIndex);
+      const toRow = Math.max(this.startRowIndex, this.endRowIndex);
+      const fromCol = Math.min(this.startColIndex, this.endColIndex);
+      const toCol = Math.max(this.startColIndex, this.endColIndex);
+
+      const selectedCellCoordinates = [];
+      for (let i = fromRow; i <= toRow; i++) {
+        for (let j = fromCol; j <= toCol; j++) {
+          selectedCellCoordinates.push({
+            rowIndex: i,
+            colIndex: j,
+          });
+        }
+      }
+      this.$root.selectedCellCoordinates = selectedCellCoordinates;
     },
     endSelection() {
       if (this.interceptEvents) {
         if (this.multiCellsSelect) {
-          this.$root.$emit('layout-cells-selection-end');
+          this.$root.$emit('layout-cells-select', {
+            fromRowIndex: this.startRowIndex,
+            toRowIndex: this.endRowIndex,
+            fromColIndex: this.startColIndex,
+            toColIndex: this.endColIndex,
+          });
         }
         this.interceptEvents = false;
       }
