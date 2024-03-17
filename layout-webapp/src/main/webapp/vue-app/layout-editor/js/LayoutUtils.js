@@ -89,6 +89,32 @@ export const containerModelAttributes = Object.keys(containerModel);
 
 export const applicationModelAttributes = Object.keys(applicationModel);
 
+export const pageJSContextIds = [
+  'portalHeadScripts',
+  'socialHeadScripts',
+  'sitesHeadScripts',
+];
+
+export function initPageContext(navUri) {
+  return fetch(`/portal${navUri}?showMaxWindow=true&hideSharedLayout=true`, {
+    credentials: 'include',
+    method: 'GET',
+    redirect: 'manual'
+  })
+    .then(resp => {
+      if (resp?.status === 200) {
+        return resp.text();
+      } else {
+        throw new Error('The retrieved page is not a portal page');
+      }
+    })
+    .then(pageContent => {
+      const headContent = pageContent.substring(pageContent.search('<head') + pageContent.match(/<head.*>/g)[0].length, pageContent.search('</head>'));
+      installPageContext(headContent);
+    })
+    .catch(e => console.error('Error navigating to ', navUri, '.', e));
+}
+
 export function getParentContainer(layout) {
   if (!layout.children) {
     layout.children = [];
@@ -697,4 +723,45 @@ export function parseSectionMatrix(section, matrix) {
     });
   });
   Object.assign(section, {children});
+}
+
+function installPageContext(pageHeadContent) {
+  const replacableScriptsIterator = pageHeadContent.matchAll(/<script[^>]*id="[^>]*"[^>]*>/g);
+  let scriptIteratorElement = replacableScriptsIterator.next().value;
+  while (scriptIteratorElement) {
+    const script = scriptIteratorElement[0];
+    const id = script.match(/id="([^"]*)"/i)[1];
+    if (pageJSContextIds.indexOf(id) >= 0) {
+      const scriptContent = pageHeadContent.substring(scriptIteratorElement.index, pageHeadContent.indexOf('</script>', scriptIteratorElement.index));
+      let scriptElement = document.querySelector(`#${id.trim()}`) || document.querySelector(`[data-id=${id.trim()}]`);
+      if (!scriptElement) {
+        scriptElement = document.createElement('script');
+        document.head.append(scriptElement);
+      }
+      scriptElement.innerText = scriptContent.substring(scriptContent.indexOf('>') + 1).replace(/(\r)?(\n)?/g, '');
+      replaceScriptElements(scriptElement);
+    }
+    scriptIteratorElement = replacableScriptsIterator.next().value;
+  }
+}
+
+function replaceScriptElements(node) {
+  if (node.tagName === 'SCRIPT') {
+    node.parentNode.replaceChild(cloneScriptElement(node), node);
+  } else {
+    for (let i = 0; i < node.childNodes.length; i++) {
+      replaceScriptElements(node.childNodes[i]);
+    }
+  }
+  return node;
+}
+
+function cloneScriptElement(node) {
+  const scriptElement  = document.createElement('script');
+  scriptElement.innerText = node.innerHTML;
+  const scriptAttrs = node.attributes;
+  for (let i = 0; i < scriptAttrs.length; i++)  {
+    scriptElement.setAttribute(scriptAttrs[i].name, scriptAttrs[i].value);
+  }
+  return scriptElement;
 }
