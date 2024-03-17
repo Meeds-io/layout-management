@@ -20,9 +20,9 @@
 -->
 <template>
   <v-btn
+    :disabled="disabled"
     :loading="loading"
-    class="d-flex align-center"
-    color="primary"
+    class="btn btn-primary d-flex align-center"
     elevation="0"
     @click="savePage">
     <span class="text-none">{{ $t('layout.save') }}</span>
@@ -30,6 +30,12 @@
 </template>
 <script>
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data: () => ({
     loading: false,
   }),
