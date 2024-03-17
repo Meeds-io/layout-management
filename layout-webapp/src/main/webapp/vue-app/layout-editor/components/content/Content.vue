@@ -83,14 +83,13 @@ export default {
     this.$root.$on('layout-add-section-drawer', this.addSection);
     this.$root.$on('layout-edit-section-drawer', this.editSection);
     this.$root.$on('layout-cell-add-application', this.addApplication);
-    this.$root.$on('layout-cells-selection-start', this.initCellsSelection);
-    this.$root.$on('layout-cells-selection-end', this.addApplicationOnCells);
     this.$root.$on('layout-add-section', this.handleAddSection);
     this.$root.$on('layout-remove-section', this.handleRemoveSection);
     this.$root.$on('layout-replace-section', this.handleReplaceSection);
     this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
     this.$root.$on('layout-cell-resize', this.handleCellResize);
     this.$root.$on('layout-cell-drag', this.handleCellMove);
+    this.$root.$on('layout-cells-select', this.addApplicationOnCells);
     this.$root.$on('layout-add-application', this.handleAddApplication);
     this.$root.$on('layout-edit-application', this.handleEditApplication);
     this.$root.$on('layout-delete-application', this.handleDeleteApplication);
@@ -129,22 +128,28 @@ export default {
         this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
       }
     },
-    initCellsSelection() {
-      this.$root.selectedSectionId = null;
-      this.$root.selectedCells = [];
-    },
     addApplication(sectionId, container) {
       this.$root.selectedSectionId = sectionId;
       this.$root.selectedCells = [container];
       this.$refs.applicationDrawer.open();
     },
     resetCellsSelection() {
-      window.setTimeout(() => this.initCellsSelection(), 300);
+      window.setTimeout(() => {
+        this.$root.resetMoving();
+        this.$root.initCellsSelection();
+      }, 300);
     },
-    addApplicationOnCells() {
-      if (this.$root.selectedSectionId
-          && this.$root.selectedCells?.length) {
+    addApplicationOnCells(selection) {
+      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      const section = parentContainer.children.find(c => c.storageId === this.$root.selectedSectionId);
+      if (section) {
+        this.$root.selectedCells = section.children?.filter?.(c =>
+          this.$layoutUtils.isBetween(c.colIndex, selection.fromColIndex, selection.toColIndex)
+          && this.$layoutUtils.isBetween(c.rowIndex, selection.fromRowIndex, selection.toRowIndex)
+        ) || [];
         this.$refs.applicationDrawer.open();
+      } else {
+        console.warn(`Can't find section with id ${this.$root.selectedSectionId}`); // eslint-disable-line no-console
       }
     },
     handlePageSaved() {
@@ -178,7 +183,7 @@ export default {
         this.$layoutUtils.newApplication(cell, application);
         this.saveDraft();
       } finally {
-        this.initCellsSelection();
+        this.$root.initCellsSelection();
       }
     },
     handleCellResize(event) {
