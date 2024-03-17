@@ -397,14 +397,6 @@ export function cleanAttributes(container) {
   return container;
 }
 
-export function getX(event) {
-  return event.x;
-}
-
-export function getY(event) {
-  return event.y;
-}
-
 function newCell(section, index, rows, cols) {
   const container = newContainer(cellTemplate,
     'grid-cell',
