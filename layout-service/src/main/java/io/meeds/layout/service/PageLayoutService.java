@@ -28,14 +28,8 @@ import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
-import org.exoplatform.portal.config.model.Application;
-import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
-import org.exoplatform.portal.config.model.Container;
-import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
@@ -46,7 +40,6 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.page.PageTemplateService;
-import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.PageCreateModel;
@@ -168,18 +161,18 @@ public class PageLayoutService {
     // to seperate lifecycle of original page and cloned page
     // thus generate a dedicated storage identifier for
     // applications and thus a dedicated portlet preferences
-    convertApplications(page);
-
-    String draftPageName = page.getName() + "_draft_" + username;
-    page.setName(draftPageName);
+    page.resetStorage();
+    page.setName(page.getName() + "_draft_" + username);
     page.setTitle(page.getTitle() + " Draft " + username);
 
-    PageKey clonedPageKey = page.getPageKey();
-    layoutService.save(new PageContext(clonedPageKey, Utils.toPageState(page)), page);
-    return clonedPageKey;
+    layoutService.save(new PageContext(page.getPageKey(), Utils.toPageState(page)), page);
+    return page.getPageKey();
   }
 
-  public PageContext updatePageLayout(String pageRef, Page page, String username) throws IllegalAccessException,
+  public PageContext updatePageLayout(String pageRef,
+                                      Page page,
+                                      boolean publish,
+                                      String username) throws IllegalAccessException,
                                                                                   ObjectNotFoundException {
     // Security and existence check
     PageKey pageKey = PageKey.parse(pageRef);
@@ -191,6 +184,9 @@ public class PageLayoutService {
     }
 
     // Update Page Layout only
+    if (publish) {
+      page.resetStorage();
+    }
     existingPage.setChildren(page.getChildren());
     layoutService.save(existingPage);
     return layoutService.getPageContext(existingPage.getPageKey());
@@ -287,28 +283,6 @@ public class PageLayoutService {
 
   private PageType getPageType(String pageType) {
     return StringUtils.isBlank(pageType) ? null : PageType.valueOf(pageType.toUpperCase());
-  }
-
-  @SuppressWarnings("unchecked")
-  private void convertApplications(ModelObject object) {
-    if (object instanceof Container container) {
-      if (container.getChildren() != null) {
-        container.getChildren().forEach(this::convertApplications);
-      }
-    } else if (object instanceof Application application) { // NOSONAR
-      convertApplication(application);
-    }
-  }
-
-  private void convertApplication(Application<Portlet> application) {
-    ApplicationState<Portlet> state = application.getState();
-
-    // Marshal application state
-    if (!(state instanceof TransientApplicationState)) { // NOSONAR
-      state = new TransientApplicationState<>(layoutService.getId(state),
-                                              layoutService.load(state, ApplicationType.PORTLET));
-      application.setState(state);
-    }
   }
 
 }

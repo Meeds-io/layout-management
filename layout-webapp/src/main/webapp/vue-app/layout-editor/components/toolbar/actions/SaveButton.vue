@@ -43,7 +43,7 @@ export default {
     savePage() {
       this.loading = true;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout);
-      return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate)
+      return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, true)
         .then(() => this.$root.$emit('layout-page-saved'))
         .finally(() => window.setTimeout(() => this.loading = false));
     },

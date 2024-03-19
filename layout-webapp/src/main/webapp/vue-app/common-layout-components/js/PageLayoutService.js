@@ -41,8 +41,8 @@ export function getPages(siteType, siteName, pageDisplayName) {
   });
 }
 
-export function updatePageLayout(pageRef, pageLayout) {
-  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}`, {
+export function updatePageLayout(pageRef, pageLayout, publish) {
+  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}&publish=${publish || false}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {
