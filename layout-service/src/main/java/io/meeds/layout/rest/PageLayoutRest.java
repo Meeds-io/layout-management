@@ -21,6 +21,7 @@ package io.meeds.layout.rest;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -162,11 +163,15 @@ public class PageLayoutRest {
                                       @Parameter(description = "page display name", required = true)
                                       @RequestParam("pageRef")
                                       String pageRef,
+                                      @Parameter(description = "Whether the page layout update is a draft page publication or not", required = false)
+                                      @RequestParam(name = "publish", required = false)
+                                      Optional<Boolean> publish,
                                       @RequestBody
                                       LayoutModel layoutModel) {
     try {
       pageLayoutService.updatePageLayout(pageRef,
                                          RestEntityBuilder.fromLayoutModel(layoutModel),
+                                         publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
       return getPageLayout(request, pageRef);
     } catch (ObjectNotFoundException e) {
