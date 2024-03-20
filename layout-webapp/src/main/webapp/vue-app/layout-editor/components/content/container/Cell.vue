@@ -147,10 +147,11 @@ export default {
     },
     computeHasContent() {
       this.hasContentCheckCount = 0;
+      this.hasContent = true;
       this.computeHasContentAsync();
     },
     computeHasContentAsync() {
-      if (this.hasContentCheckCount > 3) {
+      if (this.hasContentCheckCount > 10) {
         this.hasContent = false;
         return;
       }
@@ -162,9 +163,8 @@ export default {
           const containerHeight = this.$refs.container.$el.getBoundingClientRect().height;
           hasContent = containerHeight - placeholderHeight > 10;
         }
-        if (hasContent) {
-          this.hasContent = true;
-        } else {
+        this.hasContent = hasContent;
+        if (!hasContent) {
           this.computeHasContentAsync();
         }
       }, 200);
