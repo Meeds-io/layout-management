@@ -17,7 +17,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export const breakpoints = ['xs', 'sm', 'md', 'lg', 'xl'];
+export const breakpoints = ['md', 'lg', 'xl'];
 
 export const currentBreakpoint = 'xl';
 export const pageLayoutTemplate = 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl';
@@ -184,7 +184,7 @@ export function newSection(parentContainer, index, rows, cols) {
   cols = cols || 4;
   const section = newContainer(
     gridTemplate,
-    null,
+    'd-flex flex-column d-md-grid',
     parentContainer,
     index || 0);
   applyBreakpointValues(section, rows, cols);
@@ -458,7 +458,7 @@ function parseCell(colContainer) {
 function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
   let cssClasses = container.cssClass || '';
 
-  const colClasses = cssClasses.match(new RegExp(`(^| )${colClassPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
+  const colClasses = cssClasses.match(new RegExp(`(^| )${colClassPrefix}-((md|lg|xl)-)?[0-9]{1,2}`, 'g'));
   // Remove old Classes
   if (colClasses?.length) {
     colClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
@@ -466,32 +466,30 @@ function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
   // Apply new Classes
   cssClasses = cssClasses.replace(/  +/g, ' ');
   if (container.colBreakpoints) {
-    breakpoints.forEach(b => cssClasses += ` ${colClassPrefix}${b !== 'xs' && `-${  b}` || ''}-${container.colBreakpoints[b]}`);
+    breakpoints.forEach(b => cssClasses += ` ${colClassPrefix}-${b}-${container.colBreakpoints[b]}`);
   }
 
-  const rowClasses = cssClasses.match(new RegExp(`(^| )${rowClassPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
+  const rowClasses = cssClasses.match(new RegExp(`(^| )${rowClassPrefix}-((md|lg|xl)-)?[0-9]{1,2}`, 'g'));
   // Remove old Classes
   if (rowClasses?.length) {
     rowClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
   }
   // Apply new Classes
   if (container.rowBreakpoints) {
-    breakpoints.forEach(b => cssClasses += ` ${rowClassPrefix}${b !== 'xs' && `-${  b}` || ''}-${container.rowBreakpoints[b]}`);
+    breakpoints.forEach(b => cssClasses += ` ${rowClassPrefix}-${b}-${container.rowBreakpoints[b]}`);
   }
   container.cssClass = cssClasses;
 }
 
 function parseBreakpointClasses(container, classPrefix) {
-  const classes = !container.cssClass && [] || container.cssClass.match(new RegExp(`(^| )${classPrefix}-((sm|md|lg|xl)-)?[0-9]{1,2}`, 'g'));
+  const classes = !container.cssClass && [] || container.cssClass.match(new RegExp(`(^| )${classPrefix}-((md|lg|xl)-)?[0-9]{1,2}`, 'g'));
   const bp = {
-    xs: 0,
-    sm: 0,
     md: 0,
     lg: 0,
     xl: 0,
   };
   breakpoints.forEach(b => {
-    const prefix = b === 'xs' ?  `${classPrefix}-` : `${classPrefix}-${b}-`;
+    const prefix = `${classPrefix}-${b}-`;
     const aClass = classes.find(c => c.match(`${prefix}[0-9]{1,2}`)?.length);
     if (aClass) {
       const span = Number(aClass.replace(prefix, ''));
@@ -502,10 +500,8 @@ function parseBreakpointClasses(container, classPrefix) {
       bp[b] = 1;
     }
   });
-  bp.xl = bp.xl || bp.lg || bp.md || bp.sm || bp.xs;
-  bp.lg = bp.lg || bp.md || bp.sm || bp.xs;
-  bp.md = bp.md || bp.sm || bp.xs;
-  bp.sm = bp.sm || bp.xs;
+  bp.xl = bp.xl || bp.lg || bp.md;
+  bp.lg = bp.lg || bp.md;
   if (bp.xl) {
     return bp;
   } else {
