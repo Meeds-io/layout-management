@@ -31,7 +31,8 @@
       :cell-width="cellWidth"
       :rows-count="rowsCount"
       :cols-count="colsCount"
-      @move-start="$emit('move-start')" />
+      @move-start="$emit('move-start')"
+      @initialized="$emit('initialized', container)" />
   </KeepAlive>
   <div v-else-if="!storageId && containerType === 'application'" class="d-flex align-center justify-center full-width full-height">
     <v-progress-circular color="primary" indeterminate />
