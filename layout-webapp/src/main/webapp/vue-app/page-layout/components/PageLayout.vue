@@ -31,15 +31,30 @@
 export default {
   data: () => ({
     page: null,
+    pageSavedResult: null,
   }),
   computed: {
     pageLayout() {
       return this.page?.children?.[0]?.children?.[0];
     },
   },
+  watch: {
+    pageSavedResult: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          window.setTimeout(() => this.$root.$emit('alert-message', val, 'success'), 300);
+          window.sessionStorage.removeItem('layout-page-saved-result');
+        }
+      },
+    },
+  },
   created() {
     this.$pageLayoutService.getPageLayout(this.$root.pageRef)
       .then(page => this.page = page);
+  },
+  mounted() {
+    this.pageSavedResult = window.sessionStorage.getItem('layout-page-saved-result');
   },
 };
 </script>
