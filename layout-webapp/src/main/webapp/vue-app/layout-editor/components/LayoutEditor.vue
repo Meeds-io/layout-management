@@ -25,14 +25,15 @@
     flat>
     <div>
       <layout-editor-toolbar
-        :disable-save="!$root.layout"
+        :disable-save="!modified"
         :page="page"
         :node="node"
         :node-labels="nodeLabels" />
       <layout-editor-content
         :page="page"
         :node="draftNode"
-        :layout="draftLayout" />
+        :layout="draftLayout"
+        @modified="modified = true" />
       <layout-editor-cells-selection-box />
     </div>
   </v-app>
@@ -45,6 +46,7 @@ export default {
     draftNode: null,
     draftLayout: null,
     nodeLabels: null,
+    modified: false,
   }),
   computed: {
     pageKey() {
