@@ -21,6 +21,7 @@ import LayoutEditor from './components/LayoutEditor.vue';
 
 import Toolbar from './components/toolbar/Toolbar.vue';
 import SaveButton from './components/toolbar/actions/SaveButton.vue';
+import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -53,6 +54,7 @@ const components = {
   'layout-editor': LayoutEditor,
   'layout-editor-toolbar': Toolbar,
   'layout-editor-toolbar-save-button': SaveButton,
+  'layout-editor-toolbar-history-buttons': HistoryButtons,
   'layout-editor-content': Content,
   'layout-editor-container': Container,
   'layout-editor-container-extension': ContainerExtension,

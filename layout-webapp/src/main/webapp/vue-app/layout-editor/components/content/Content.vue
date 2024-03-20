@@ -51,9 +51,13 @@ export default {
   data: () => ({
     layoutToEdit: null,
     isCompatible: false,
+    modified: false,
     loading: 1,
   }),
   watch: {
+    modified() {
+      this.$emit('modified');
+    },
     layoutToEdit() {
       this.$root.layout = this.layoutToEdit;
     },
@@ -154,7 +158,10 @@ export default {
     },
     handlePageSaved() {
       this.$navigationLayoutService.deleteNode(this.$root.draftNodeId)
-        .finally(() => window.location.href = `/portal${this.$root.nodeUri}`);
+        .finally(() => {
+          window.sessionStorage.setItem('layout-page-saved-result', this.$t('layout.pageSavedSuccessfully'));
+          window.location.href = `/portal${this.$root.nodeUri}`;
+        });
     },
     handleApplyGridStyle() {
       this.$layoutUtils.applyGridStyle(this.layoutToEdit);
@@ -251,19 +258,19 @@ export default {
     },
     handleAddSection(section, index) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
+      this.addSectionVersion(section.storageId);
       parentContainer.children.splice(index || 0, 0, section);
     },
     handleRemoveSection(index) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        parentContainer.children.splice(index, 1);
-      }
+      const section = parentContainer.children[index];
+      this.addSectionVersion(section.storageId);
+      parentContainer.children.splice(index, 1);
     },
     handleReplaceSection(index, section) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        parentContainer.children.splice(index, 1, section);
-      }
+      this.addSectionVersion(section.storageId);
+      parentContainer.children.splice(index, 1, section);
     },
     addSectionVersion(sectionId) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
@@ -276,6 +283,7 @@ export default {
         }
         this.$root.sectionRedo = [];
       }
+      this.modified = true;
     },
     restoreSectionVersion(event) {
       if (event.ctrlKey) {
@@ -286,7 +294,7 @@ export default {
             const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
             if (index >= 0) {
               this.$root.sectionRedo.push(parentContainer.children[index]);
-              this.handleReplaceSection(index, section);
+              parentContainer.children.splice(index, 1, section);
             }
           }
         } else if (event.keyCode === 89) {
@@ -296,7 +304,7 @@ export default {
             const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
             if (index >= 0) {
               this.$root.sectionHistory.push(parentContainer.children[index]);
-              this.handleReplaceSection(index, section);
+              parentContainer.children.splice(index, 1, section);
             }
           }
         }
