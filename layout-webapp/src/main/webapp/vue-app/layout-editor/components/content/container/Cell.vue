@@ -132,7 +132,6 @@ export default {
   },
   methods: {
     moveStart(event, moveType) {
-      this.$root.$emit('layout-section-history-add', this.parentId);
       this.$root.movingParentId = this.parentId;
       this.$nextTick().then(() => {
         this.$root.$emit('layout-cell-moving-start', {

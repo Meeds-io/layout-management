@@ -25,7 +25,7 @@
     class="btn btn-primary d-flex align-center"
     elevation="0"
     @click="savePage">
-    <span class="text-none">{{ $t('layout.save') }}</span>
+    <span class="text-none">{{ $t('layout.publish') }}</span>
   </v-btn>
 </template>
 <script>
@@ -45,6 +45,7 @@ export default {
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout);
       return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, true)
         .then(() => this.$root.$emit('layout-page-saved'))
+        .catch(() => this.$root.$emit('alert-message', this.$t('layout.pageSavingError'), 'error'))
         .finally(() => window.setTimeout(() => this.loading = false));
     },
   },
