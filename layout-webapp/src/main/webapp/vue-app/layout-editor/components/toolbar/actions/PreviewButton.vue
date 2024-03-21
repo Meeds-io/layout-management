@@ -19,18 +19,30 @@
 
 -->
 <template>
-  <v-btn
-    icon
-    class="d-none"
-    @click="switchMode">
-    <v-icon size="20" class="icon-default-color">{{ mobileDisplayMode ? 'fa-desktop' :'fa-mobile-alt' }}</v-icon>
-  </v-btn>
+  <div>
+    <v-tooltip bottom>
+      <template #activator="{on, attrs}">
+        <div v-bind="attrs" v-on="on">
+          <v-btn
+            :aria-label="label"
+            icon
+            @click="switchMode">
+            <v-icon size="20" class="icon-default-color">{{ mobileDisplayMode ? 'fa-desktop' :'fa-mobile-alt' }}</v-icon>
+          </v-btn>
+        </div>
+      </template>
+      <span>{{ label }}</span>
+    </v-tooltip>
+  </div>
 </template>
 <script>
 export default {
   computed: {
     mobileDisplayMode() {
       return this.$root.displayMode === 'mobile';
+    },
+    label() {
+      return this.mobileDisplayMode ? this.$t('layout.switchToDesktop') : this.$t('layout.switchToMobile');
     },
   },
   methods: {
