@@ -133,6 +133,21 @@ export function newParentContainer(layout) {
   newSection(parent, 0, 12, 12);
 }
 
+export function applyMobileStyle(container) {
+  if (container.template === gridTemplate) {
+    container.children?.forEach(applyMobileStyle);
+    cleanBreakpointClasses(container, 'grid-rows', 'grid-cols');
+  } else if (container.template === cellTemplate) {
+    cleanBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
+  } else {
+    container.children?.forEach?.(applyMobileStyle);
+  }
+}
+
+export function applyDesktopStyle(container) {
+  applyGridStyle(container);
+}
+
 export function applyGridStyle(container) {
   if (container.template === gridTemplate) {
     container.children?.forEach(applyGridStyle);
@@ -456,6 +471,23 @@ function parseCell(colContainer) {
 }
 
 function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
+  if (!container.cssClass) {
+    container.cssClass = '';
+  }
+  cleanBreakpointClasses(container, rowClassPrefix, colClassPrefix);
+
+  let cssClasses = container.cssClass;
+  // Apply new Classes
+  if (container.colBreakpoints) {
+    breakpoints.forEach(b => cssClasses += ` ${colClassPrefix}-${b}-${container.colBreakpoints[b]}`);
+  }
+  if (container.rowBreakpoints) {
+    breakpoints.forEach(b => cssClasses += ` ${rowClassPrefix}-${b}-${container.rowBreakpoints[b]}`);
+  }
+  container.cssClass = cssClasses;
+}
+
+function cleanBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
   let cssClasses = container.cssClass || '';
 
   const colClasses = cssClasses.match(new RegExp(`(^| )${colClassPrefix}-((md|lg|xl)-)?[0-9]{1,2}`, 'g'));
@@ -463,22 +495,15 @@ function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
   if (colClasses?.length) {
     colClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
   }
-  // Apply new Classes
-  cssClasses = cssClasses.replace(/  +/g, ' ');
-  if (container.colBreakpoints) {
-    breakpoints.forEach(b => cssClasses += ` ${colClassPrefix}-${b}-${container.colBreakpoints[b]}`);
-  }
 
   const rowClasses = cssClasses.match(new RegExp(`(^| )${rowClassPrefix}-((md|lg|xl)-)?[0-9]{1,2}`, 'g'));
   // Remove old Classes
   if (rowClasses?.length) {
     rowClasses.forEach(c => cssClasses = cssClasses.replace(c, ''));
   }
+
   // Apply new Classes
-  if (container.rowBreakpoints) {
-    breakpoints.forEach(b => cssClasses += ` ${rowClassPrefix}-${b}-${container.rowBreakpoints[b]}`);
-  }
-  container.cssClass = cssClasses;
+  container.cssClass = cssClasses.replace(/  +/g, ' ');
 }
 
 function parseBreakpointClasses(container, classPrefix) {
