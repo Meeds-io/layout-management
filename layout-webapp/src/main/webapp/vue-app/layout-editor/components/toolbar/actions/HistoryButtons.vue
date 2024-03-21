@@ -24,6 +24,7 @@
       <template #activator="{on, attrs}">
         <div v-bind="attrs" v-on="on">
           <v-btn
+            :aria-label="$t('layout.undoChanges')"
             :disabled="!canUndo"
             icon
             @click="undo">
@@ -37,6 +38,7 @@
       <template #activator="{on, attrs}">
         <div v-bind="attrs" v-on="on">
           <v-btn
+            :aria-label="$t('layout.redoChanges')"
             :disabled="!canRedo"
             icon
             @click="redo">

@@ -22,6 +22,7 @@
   <v-btn
     :disabled="disabled"
     :loading="loading"
+    :aria-label="$t('layout.publish')"
     class="btn btn-primary d-flex align-center"
     elevation="0"
     @click="savePage">

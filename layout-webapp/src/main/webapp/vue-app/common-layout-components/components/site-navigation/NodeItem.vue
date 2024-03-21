@@ -20,7 +20,7 @@
   <div class="d-contents">
     <tr>
       <td>
-        <v-hover>
+        <v-hover :disabled="$root.mobileDisplayMode">
           <v-row
             slot-scope="{ hover }"
             class="d-flex pt-2 px-0 text-truncate v-list-item v-list-item--dense d-flex flex-nowrap"

@@ -43,7 +43,7 @@
           @hide="$root.movingParentId = null" />
       </template>
     </layout-editor-container-base>
-    <v-hover>
+    <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
         class="layout-section-border">
