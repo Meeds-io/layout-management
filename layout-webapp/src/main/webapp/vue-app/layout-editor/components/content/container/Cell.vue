@@ -38,7 +38,7 @@
         :hover="hover"
         :moving="moving"
         @move-start="moveStart" />
-      <v-hover v-else>
+      <v-hover :disabled="$root.mobileDisplayMode" v-else>
         <v-card
           slot-scope="hoverScope"
           :class="{

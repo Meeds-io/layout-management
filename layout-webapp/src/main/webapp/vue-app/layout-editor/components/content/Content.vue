@@ -19,7 +19,11 @@
 
 -->
 <template>
-  <div>
+  <v-card
+    :max-width="maxWidth"
+    :class="parentClass"
+    class="transparent mx-auto"
+    flat>
     <layout-editor-container-extension
       :container="layoutToEdit" />
     <layout-editor-section-add-drawer
@@ -30,7 +34,7 @@
       ref="applicationDrawer" />
     <layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
-  </div>
+  </v-card>
 </template>
 <script>
 export default {
@@ -54,6 +58,17 @@ export default {
     modified: false,
     loading: 1,
   }),
+  computed: {
+    mobileDisplayMode() {
+      return this.$root.mobileDisplayMode;
+    },
+    maxWidth() {
+      return this.mobileDisplayMode && '500px' || 'initial';
+    },
+    parentClass() {
+      return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
+    },
+  },
   watch: {
     modified() {
       this.$emit('modified');
@@ -81,6 +96,9 @@ export default {
           }
         }
       },
+    },
+    mobileDisplayMode() {
+      this.switchDisplayMode();
     },
   },
   created() {
@@ -111,6 +129,13 @@ export default {
         Object.assign(this.layoutToEdit, layout);
       } else {
         this.layoutToEdit = layout;
+      }
+    },
+    switchDisplayMode() {
+      if (this.$root.displayMode === 'mobile') {
+        this.$layoutUtils.applyMobileStyle(this.layoutToEdit);
+      } else {
+        this.$layoutUtils.applyDesktopStyle(this.layoutToEdit);
       }
     },
     initContainer(container) {
