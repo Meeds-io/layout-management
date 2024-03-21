@@ -5,7 +5,7 @@
       :key="i"
       :id="`grid-cell-${i}`"
       :class="cellClass"
-      class="grey-background grid-cell-colspan-1 grid-cell-rowspan-1 opacity-5"></div>
+      class="grey-background grid-cell-lg-colspan-1 grid-cell-lg-rowspan-1 opacity-5"></div>
   </div>
 </template>
 <script>
@@ -29,7 +29,7 @@ export default {
   }),
   computed: {
     gridClass() {
-      return `grid-cols-${this.cols} grid-rows-${this.rows}`;
+      return `d-md-grid grid-cols-md-${this.cols} grid-rows-md-${this.rows}`;
     },
     length() {
       return this.rows * this.cols;
