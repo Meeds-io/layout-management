@@ -50,6 +50,7 @@ export function init() {
         data: () => ({
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           applicationCategories: null,
+          displayMode: 'desktop',
           layout: null,
           pageRef: null,
           draftPageRef: null,
