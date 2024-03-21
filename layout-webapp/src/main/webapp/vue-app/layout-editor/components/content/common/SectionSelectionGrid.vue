@@ -32,7 +32,7 @@ export default {
       return this.section.colsCount;
     },
     gridClass() {
-      return `grid-cols-${this.cols} grid-rows-${this.rows}`;
+      return `d-md-grid grid-cols-md-${this.cols} grid-rows-md-${this.rows}`;
     },
     length() {
       return this.rows * this.cols;

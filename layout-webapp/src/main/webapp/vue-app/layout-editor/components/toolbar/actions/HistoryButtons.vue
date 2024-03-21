@@ -27,7 +27,7 @@
             :disabled="!canUndo"
             icon
             @click="undo">
-            <v-icon size="20">fa-undo</v-icon>
+            <v-icon size="20" class="icon-default-color">fa-undo</v-icon>
           </v-btn>
         </div>
       </template>
@@ -40,7 +40,7 @@
             :disabled="!canRedo"
             icon
             @click="redo">
-            <v-icon size="20">fa-redo</v-icon>
+            <v-icon size="20" class="icon-default-color">fa-redo</v-icon>
           </v-btn>
         </div>
       </template>

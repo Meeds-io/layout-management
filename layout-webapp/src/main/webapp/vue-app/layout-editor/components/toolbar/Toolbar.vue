@@ -28,7 +28,8 @@
     <v-icon class="icon-default-color">fa-pager</v-icon>
     <span class="px-2">{{ $t('layout.editPageName', {0: pageName}) }}</span>
     <v-spacer />
-    <layout-editor-toolbar-history-buttons class="me-4" />
+    <layout-editor-toolbar-history-buttons class="me-3" />
+    <layout-editor-toolbar-preview-button class="me-3" />
     <layout-editor-toolbar-save-button :disabled="disableSave" />
   </v-card>
 </template>
