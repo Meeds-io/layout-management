@@ -99,6 +99,12 @@ export function init() {
           selectedFirstColIndex() {
             return Math.min(...this.selectedCellCoordinates.map(c => c.colIndex));
           },
+          mobileDisplayMode() {
+            return this.$root.displayMode === 'mobile';
+          },
+          desktopDisplayMode() {
+            return this.$root.displayMode === 'desktop';
+          },
         },
         watch: {
           layout(newVal, oldVal) {
