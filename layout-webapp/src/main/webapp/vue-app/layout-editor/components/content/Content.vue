@@ -183,11 +183,14 @@ export default {
       }
     },
     handlePageSaved() {
-      this.$navigationLayoutService.deleteNode(this.$root.draftNodeId)
-        .finally(() => {
-          window.sessionStorage.setItem('layout-page-saved-result', this.$t('layout.pageSavedSuccessfully'));
-          window.location.href = `/portal${this.$root.nodeUri}`;
-        });
+      document.dispatchEvent(new CustomEvent('alert-message', {detail: {
+        alertLink: `/portal${this.$root.nodeUri}`,
+        alertMessage: this.$t('layout.pageSavedSuccessfully'),
+        alertLinkText: this.$t('layout.view'),
+        alertLinkTarget: '_blank',
+        alertType: 'success',
+      }}));
+      this.$navigationLayoutService.deleteNode(this.$root.draftNodeId);
     },
     handleApplyGridStyle() {
       this.$layoutUtils.applyGridStyle(this.layoutToEdit);
