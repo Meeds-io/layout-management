@@ -25,7 +25,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -196,7 +195,7 @@ public class SiteLayoutRest {
     }
   }
 
-  @PatchMapping(value = "{siteType}/{siteName}/permissions", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @PatchMapping(value = "{siteType}/{siteName}/permissions")
   @Secured("users")
   @Operation(summary = "Update a page access and edit permission", method = "PATCH",
              description = "This updates the given page access and edit permission")
