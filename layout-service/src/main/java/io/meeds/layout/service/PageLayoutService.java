@@ -22,12 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.javascript.jscomp.jarjar.com.google.re2j.Pattern;
+
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
@@ -49,6 +54,10 @@ import lombok.SneakyThrows;
 
 @Service
 public class PageLayoutService {
+
+  private static final Pattern    COLOR_MATCHER_VALIDATOR     = Pattern.compile("[#0-9a-zA-Z]+");
+
+  private static final Pattern    SIZE_MATCHER_VALIDATOR      = Pattern.compile("[0-9a-zA-Z%]+");
 
   private static final String     PAGE_NOT_EXISTS_MESSAGE     = "Page with key %s doesn't exist";
 
@@ -173,7 +182,7 @@ public class PageLayoutService {
                                       Page page,
                                       boolean publish,
                                       String username) throws IllegalAccessException,
-                                                                                  ObjectNotFoundException {
+                                                       ObjectNotFoundException {
     // Security and existence check
     PageKey pageKey = PageKey.parse(pageRef);
     Page existingPage = layoutService.getPage(pageKey);
@@ -187,6 +196,7 @@ public class PageLayoutService {
     if (publish) {
       page.resetStorage();
     }
+    validateCSSInputs(page);
     existingPage.setChildren(page.getChildren());
     layoutService.save(existingPage);
     return layoutService.getPageContext(existingPage.getPageKey());
@@ -283,6 +293,32 @@ public class PageLayoutService {
 
   private PageType getPageType(String pageType) {
     return StringUtils.isBlank(pageType) ? null : PageType.valueOf(pageType.toUpperCase());
+  }
+
+  private void validateCSSInputs(ModelObject modelObject) {
+    if (modelObject instanceof Container container) {
+      if (container.getWidth() != null
+          && !SIZE_MATCHER_VALIDATOR.matches(container.getWidth())) {
+        throw new IllegalArgumentException(String.format("Container with id %s has an invalid width input %s",
+                                                         container.getStorageId(),
+                                                         container.getWidth()));
+      }
+      if (container.getHeight() != null
+          && !SIZE_MATCHER_VALIDATOR.matches(container.getHeight())) {
+        throw new IllegalArgumentException(String.format("Container with id %s has an invalid height input %s",
+                                                         container.getStorageId(),
+                                                         container.getHeight()));
+      }
+      if (container.getBorderColor() != null
+          && !COLOR_MATCHER_VALIDATOR.matches(container.getBorderColor())) {
+        throw new IllegalArgumentException(String.format("Container with id %s has an invalid border color input %s",
+                                                         container.getStorageId(),
+                                                         container.getBorderColor()));
+      }
+      if (!CollectionUtils.isEmpty(container.getChildren())) {
+        container.getChildren().forEach(this::validateCSSInputs);
+      }
+    }
   }
 
 }
