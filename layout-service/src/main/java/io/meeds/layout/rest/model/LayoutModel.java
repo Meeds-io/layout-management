@@ -78,6 +78,9 @@ public class LayoutModel {
   // Specific to container
   protected String                  cssClass;
 
+  // Specific to container
+  protected String                  borderColor;
+
   protected String                  profiles;
 
   protected String[]                moveAppsPermissions;
@@ -131,6 +134,7 @@ public class LayoutModel {
       this.width = container.getWidth();
       this.height = container.getHeight();
       this.cssClass = container.getCssClass();
+      this.borderColor = container.getBorderColor();
       this.profiles = container.getProfiles();
       this.accessPermissions = container.getAccessPermissions();
       this.moveAppsPermissions = container.getMoveAppsPermissions();
@@ -198,6 +202,7 @@ public class LayoutModel {
       container.setWidth(layoutModel.getWidth());
       container.setHeight(layoutModel.getHeight());
       container.setCssClass(layoutModel.getCssClass());
+      container.setBorderColor(layoutModel.getBorderColor());
       container.setProfiles(layoutModel.getProfiles());
       container.setAccessPermissions(layoutModel.getAccessPermissions());
       container.setMoveAppsPermissions(layoutModel.getMoveAppsPermissions());
