@@ -28,7 +28,6 @@
       ref="container"
       :container="container"
       :index="index"
-      :length="length"
       :class="zIndexClass"
       class="position-relative overflow-initial"
       type="section"

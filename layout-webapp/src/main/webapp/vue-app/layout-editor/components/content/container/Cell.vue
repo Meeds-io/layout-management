@@ -27,7 +27,7 @@
       'z-index-two': hover && !$root.drawerOpened,
       'elevation-1': hasApplication && hover && !$root.movingCell,
     }"
-    class="position-relative d-flex flex-column border-radius"
+    class="position-relative d-flex flex-column"
     @hovered="hover = $event"
     @initialized="computeHasContent">
     <template #header>
@@ -58,7 +58,7 @@
       <div
         ref="placeholder"
         :class="hasContent && 'linear-gradient-grey-background' || 'white'"
-        class="position-relative flex-grow-1 flex-shrink-1 border-radius overflow-hidden">
+        class="position-relative flex-grow-1 flex-shrink-1 overflow-hidden">
         <div
           v-if="!hasContent"
           class="absolute-all-center d-flex flex-column align-center justify-center">

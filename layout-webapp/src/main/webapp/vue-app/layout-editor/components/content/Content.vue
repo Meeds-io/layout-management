@@ -119,6 +119,7 @@ export default {
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
+    this.$root.$on('layout-modified', this.setAsModified);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   methods: {
@@ -308,6 +309,9 @@ export default {
         }
         this.$root.sectionRedo = [];
       }
+      this.modified = true;
+    },
+    setAsModified() {
       this.modified = true;
     },
     restoreSectionVersion(event) {
