@@ -24,6 +24,10 @@ import SaveButton from './components/toolbar/actions/SaveButton.vue';
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import PreviewButton from './components/toolbar/actions/PreviewButton.vue';
 
+import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
+import BorderInput from './components/form/BorderInput.vue';
+import ColorPicker from './components/form/ColorPicker.vue';
+
 import Content from './components/content/Content.vue';
 
 import CellsDropBox from './components/content/base/CellsDropBox.vue';
@@ -46,10 +50,10 @@ import Section from './components/content/container/Section.vue';
 import Cell from './components/content/container/Cell.vue';
 import Application from './components/content/container/Application.vue';
 
-import EditSectionDrawer from './components/content/drawer/EditSectionDrawer.vue';
-import AddSectionDrawer from './components/content/drawer/AddSectionDrawer.vue';
-import AddApplicationDrawer from './components/content/drawer/AddApplicationDrawer.vue';
-import EditApplicationDrawer from './components/content/drawer/EditApplicationDrawer.vue';
+import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
+import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
+import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
+import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
 
 const components = {
   'layout-editor': LayoutEditor,
@@ -58,6 +62,9 @@ const components = {
   'layout-editor-toolbar-history-buttons': HistoryButtons,
   'layout-editor-toolbar-preview-button': PreviewButton,
   'layout-editor-content': Content,
+  'layout-editor-color-picker': ColorPicker,
+  'layout-editor-border-radius-selector': BorderRadiusSelector,
+  'layout-editor-border-input': BorderInput,
   'layout-editor-container': Container,
   'layout-editor-container-extension': ContainerExtension,
   'layout-editor-container-base': ContainerBase,

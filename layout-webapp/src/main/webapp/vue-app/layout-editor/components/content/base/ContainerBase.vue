@@ -117,8 +117,11 @@ export default {
     width() {
       return this.container.width === 'unset' ? null : this.container.width;
     },
+    borderColor() {
+      return this.container.borderColor;
+    },
     cssStyle() {
-      if (!this.height && !this.width) {
+      if (!this.height && !this.width && !this.borderColor) {
         return null;
       } else {
         const style = {};
@@ -128,11 +131,17 @@ export default {
         if (this.width) {
           style.width = this.hasUnit(this.width) ? this.width : `${this.width}px`;
         }
+        if (this.borderColor) {
+          style.border = `1px solid ${this.borderColor}`;
+        }
         return style;
       }
     },
+    containerCssClass() {
+      return this.container.cssClass;
+    },
     cssClass() {
-      return `${this.container.cssClass || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
+      return `${this.containerCssClass || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     draggable() {
       return !this.noDraggable && this.childrenSize > 1;

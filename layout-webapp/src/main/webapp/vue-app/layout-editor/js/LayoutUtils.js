@@ -25,6 +25,13 @@ export const simpleTemplate = 'system:/groovy/portal/webui/container/UIContainer
 export const gridTemplate = 'GridContainer';
 export const cellTemplate = 'CellContainer';
 
+export const defaultMarginTop = 20;
+export const defaultMarginRight = 20;
+export const defaultMarginBottom = 20;
+export const defaultMarginLeft = 20;
+export const defaultBorderRadius = 8;
+export const defaultBorderColor = '#FFFFFF';
+
 export const containerModel = {
   storageId: null,
   storageName: null,
@@ -51,6 +58,7 @@ export const containerModel = {
   height: null,
   // Used to specify some special CSS Classes to be used on container parent
   cssClass: null,
+  borderColor: null,
   // Used to specify whether the block should be displayed or not
   // when an addon is present
   profiles: null,
@@ -158,6 +166,27 @@ export function applyGridStyle(container) {
   } else {
     container.children?.forEach?.(applyGridStyle);
   }
+}
+
+export function applyContainerStyle(section, container, containerStyle) {
+  let cssClasses = container.cssClass || '';
+  cssClasses = cssClasses.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '');
+  cssClasses = cssClasses.replace(new RegExp('(^| )(border-radius-descendant)-((md|lg|xl)-)?[0-9]{1,2}', 'g'), '');
+
+  // Apply new Classes
+  container.cssClass = cssClasses.replace(/  +/g, ' ');
+  container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop, 20)) / 4))}`;
+  container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight, 20)) / 4))}`;
+  container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom, 20)) / 4))}`;
+  container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
+  container.cssClass += ` border-radius-descendant-${parseInt(Math.max(0, Math.min(containerStyle.borderRadius, 20)) / 4)}`;
+
+  container.marginTop = containerStyle.marginTop || 0;
+  container.marginRight = containerStyle.marginRight || 0;
+  container.marginBottom = containerStyle.marginBottom || 0;
+  container.marginLeft = containerStyle.marginLeft || 0;
+  container.borderRadius = containerStyle.borderRadius || 8;
+  Vue.set(container, 'borderColor', containerStyle.borderColor || null);
 }
 
 export function parseSections(layout) {
@@ -306,17 +335,17 @@ export function moveCell(section, sourceCell, targetRowIndex, targetColIndex) {
   const colCollision1 = (targetColIndex > sourceCell.colIndex && targetColIndex < (sourceCell.colIndex + sourceCell.colsCount));
   const colCollision2 = (targetColIndex < sourceCell.colIndex && (targetColIndex + sourceCell.colsCount) > sourceCell.colIndex);
   if ((colCollision1 || colCollision2) && targetRowIndex === sourceCell.rowIndex) {
-    transistCol(matrix, sourceCell, targetColIndex);
+    moveCol(matrix, sourceCell, targetColIndex);
     sourceCell.rowIndex = targetRowIndex;
     sourceCell.colIndex = targetColIndex;
   } else if ((rowCollision1 || rowCollision2) && targetColIndex === sourceCell.colIndex) {
-    transistRow(matrix, sourceCell, targetRowIndex);
+    moveRow(matrix, sourceCell, targetRowIndex);
     sourceCell.rowIndex = targetRowIndex;
     sourceCell.colIndex = targetColIndex;
   } else if ((rowCollision1 || rowCollision2) && (colCollision1 || colCollision2)) {
-    transistRow(matrix, sourceCell, targetRowIndex);
+    moveRow(matrix, sourceCell, targetRowIndex);
     sourceCell.rowIndex = targetRowIndex;
-    transistCol(matrix, sourceCell, targetColIndex);
+    moveCol(matrix, sourceCell, targetColIndex);
     sourceCell.colIndex = targetColIndex;
   } else {
     for (let i = 0; i < sourceCell.rowsCount; i++) {
@@ -459,6 +488,17 @@ function parseSection(section) {
   parseMatrix(section);
 }
 
+export function parseContainerStyle(container) {
+  let matches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
+  container.marginTop = parseInt(matches.find(c => c.indexOf('mt-') >= 0)?.replace('mt-n', '-')?.replace('mt-', '') || 0) * 4;
+  container.marginRight = parseInt(matches.find(c => c.indexOf('me-') >= 0)?.replace('me-n', '-')?.replace('me-', '') || 0) * 4;
+  container.marginBottom = parseInt(matches.find(c => c.indexOf('mb-') >= 0)?.replace('mb-n', '-')?.replace('mb-', '') || 0) * 4;
+  container.marginLeft = parseInt(matches.find(c => c.indexOf('ms-') >= 0)?.replace('ms-n', '-')?.replace('ms-', '') || 0) * 4;
+
+  matches = container?.cssClass?.match?.(new RegExp('(^| )border-radius-descendant-((md|lg|xl)-)?[0-9]{1,2}', 'g')) || [];
+  container.borderRadius = parseInt(matches.find(c => c.indexOf('border-radius-descendant-') >= 0)?.replace('border-radius-descendant-', '') || 0) * 4;
+}
+
 function parseCell(colContainer) {
   if (colContainer.template !== cellTemplate) {
     throw Error(`Container template '${colContainer.template}' not compatible. Fallback to old editor.`);
@@ -468,6 +508,7 @@ function parseCell(colContainer) {
   colContainer.gap = parseGapClasses(colContainer, 'grid-cell-gap');
   colContainer.colsCount = colContainer.colBreakpoints[currentBreakpoint];
   colContainer.rowsCount = colContainer.rowBreakpoints[currentBreakpoint];
+  parseContainerStyle(colContainer);
 }
 
 function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
@@ -571,7 +612,7 @@ function applyBreakpointValues(container, rows, cols) {
   container.rowsCount = container.rowBreakpoints[currentBreakpoint];
 }
 
-function transistCol(matrix, sourceCell, targetColIndex) {
+function moveCol(matrix, sourceCell, targetColIndex) {
   for (let i = 0; i < sourceCell.rowsCount; i++) {
     let colIndex = 0;
     for (let j = 0; j < sourceCell.colsCount; j++) {
@@ -593,7 +634,7 @@ function transistCol(matrix, sourceCell, targetColIndex) {
   }
 }
 
-function transistRow(matrix, sourceCell, targetRowIndex) {
+function moveRow(matrix, sourceCell, targetRowIndex) {
   for (let j = 0; j < sourceCell.colsCount; j++) {
     let rowIndex = 0;
     for (let i = 0; i < sourceCell.rowsCount; i++) {

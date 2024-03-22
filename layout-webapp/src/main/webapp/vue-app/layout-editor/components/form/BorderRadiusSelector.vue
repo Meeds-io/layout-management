@@ -12,33 +12,59 @@
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
-
+ 
  You should have received a copy of the GNU Lesser General Public License
  along with this program; if not, write to the Free Software Foundation,
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 -->
 <template>
-  <layout-editor-container-base
-    :container="container"
-    :index="index"
-    :context="context" />
+  <div class="d-flex">
+    <v-btn 
+      text
+      small
+      class="ms-n3"
+      @click="bordeRadius = 0">
+      {{ $t('layout.square') }}
+    </v-btn>
+    <v-slider
+      v-model="bordeRadius"
+      :thumb-size="24"
+      :max="maxBorderRadius"
+      tick-size="2"
+      thumb-label="always"
+      ticks
+      min="0"
+      step="4"
+      color="primary" />
+    <v-btn
+      text
+      small
+      class="me-n3"
+      @click="bordeRadius = maxBorderRadius"> 
+      {{ $t('layout.rounded') }} 
+    </v-btn>
+  </div>
 </template>
 <script>
 export default {
   props: {
-    container: {
-      type: Object,
-      default: null,
-    },
-    index: {
-      type: Number,
-      default: null,
-    },
-    context: {
+    value: {
       type: String,
       default: null,
     },
+  },
+  data: () => ({
+    bordeRadius: 8,
+    maxBorderRadius: 20
+  }),
+  watch: {
+    bordeRadius() {
+      this.$emit('input', this.bordeRadius);
+    },
+  },
+  created() {
+    this.bordeRadius = this.value;
   },
 };
 </script>
