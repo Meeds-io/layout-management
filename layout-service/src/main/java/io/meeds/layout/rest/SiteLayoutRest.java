@@ -70,7 +70,7 @@ public class SiteLayoutRest {
   @Autowired
   private PageLayoutService pageLayoutService;
 
-  @GetMapping("{id}")
+  @GetMapping("{siteId}")
   @Secured("users")
   @Operation(summary = "Gets a specific site by its id", description = "Gets site by id", method = "GET")
   @ApiResponses(value = {
@@ -81,7 +81,7 @@ public class SiteLayoutRest {
   public ResponseEntity<SiteRestEntity> getSiteById(
                                                 HttpServletRequest request,
                                                 @Parameter(description = "site id")
-                                                @PathVariable("id")
+                                                @PathVariable("siteId")
                                                 long siteId,
                                                 @Parameter(description = "Language used to retrieve names", required = false)
                                                 @RequestParam(name = "lang", required = false)
@@ -108,7 +108,7 @@ public class SiteLayoutRest {
     }
   }
 
-  @GetMapping("{siteType}/{siteName}")
+  @GetMapping
   @Secured("users")
   @Operation(summary = "Gets a specific site by its type and name", description = "Gets site its type and name", method = "GET")
   @ApiResponses(value = {
@@ -119,10 +119,10 @@ public class SiteLayoutRest {
   public ResponseEntity<SiteRestEntity> getSite(
                                                 HttpServletRequest request,
                                                 @Parameter(description = "site type")
-                                                @PathVariable("siteType")
+                                                @RequestParam("siteType")
                                                 String siteType,
                                                 @Parameter(description = "site name")
-                                                @PathVariable("siteName")
+                                                @RequestParam("siteName")
                                                 String siteName,
                                                 @Parameter(description = "Language used to retrieve names", required = false)
                                                 @RequestParam(name = "lang", required = false)
@@ -149,7 +149,7 @@ public class SiteLayoutRest {
     }
   }
 
-  @DeleteMapping("{siteType}/{siteName}")
+  @DeleteMapping
   @Secured("users")
   @Operation(summary = "Delete a site", method = "GET", description = "This deletes the given site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
@@ -157,10 +157,10 @@ public class SiteLayoutRest {
   public void deleteSite(
                          HttpServletRequest request,
                          @Parameter(description = "site type")
-                         @PathVariable("siteType")
+                         @RequestParam("siteType")
                          String siteType,
                          @Parameter(description = "site name")
-                         @PathVariable("siteName")
+                         @RequestParam("siteName")
                          String siteName) {
     try {
       siteLayoutService.deleteSite(new SiteKey(siteType, siteName), request.getRemoteUser());
@@ -171,23 +171,17 @@ public class SiteLayoutRest {
     }
   }
 
-  @PutMapping("{siteType}/{siteName}")
+  @PutMapping
   @Secured("users")
   @Operation(summary = "update a site", method = "PUT", description = "This updates the given site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })
   public void updateSite(
                          HttpServletRequest request,
-                         @Parameter(description = "site type")
-                         @PathVariable("siteType")
-                         String siteType,
-                         @Parameter(description = "site name")
-                         @PathVariable("siteName")
-                         String siteName,
                          @RequestBody
                          SiteUpdateModel updateModel) {
     try {
-      siteLayoutService.updateSite(new SiteKey(siteType, siteName), updateModel, request.getRemoteUser());
+      siteLayoutService.updateSite(updateModel, request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -195,7 +189,7 @@ public class SiteLayoutRest {
     }
   }
 
-  @PatchMapping(value = "{siteType}/{siteName}/permissions")
+  @PatchMapping(value = "permissions")
   @Secured("users")
   @Operation(summary = "Update a page access and edit permission", method = "PATCH",
              description = "This updates the given page access and edit permission")
@@ -206,17 +200,10 @@ public class SiteLayoutRest {
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })
   public void updateSitePermissions(
                                     HttpServletRequest request,
-                                    @Parameter(description = "site type")
-                                    @PathVariable("siteType")
-                                    String siteType,
-                                    @Parameter(description = "site name")
-                                    @PathVariable("siteName")
-                                    String siteName,
-                                    @Parameter(description = "Site permission model", required = true)
                                     @RequestBody
                                     PermissionUpdateModel permissionUpdateModel) {
     try {
-      siteLayoutService.updateSitePermissions(new SiteKey(siteType, siteName), permissionUpdateModel, request.getRemoteUser());
+      siteLayoutService.updateSitePermissions(permissionUpdateModel, request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
