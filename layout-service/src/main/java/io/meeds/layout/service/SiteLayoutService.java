@@ -103,8 +103,9 @@ public class SiteLayoutService {
     return createdPortalConfig;
   }
 
-  public void updateSite(SiteKey siteKey, SiteUpdateModel updateModel, String username) throws IllegalAccessException,
+  public void updateSite(SiteUpdateModel updateModel, String username) throws IllegalAccessException,
                                                                                         ObjectNotFoundException {
+    SiteKey siteKey = new SiteKey(updateModel.getSiteType(), updateModel.getSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
       throw new ObjectNotFoundException(String.format("Site with key %s doesn't exist", siteKey));
@@ -134,9 +135,9 @@ public class SiteLayoutService {
     layoutService.remove(portalConfig);
   }
 
-  public void updateSitePermissions(SiteKey siteKey,
-                                    PermissionUpdateModel permissionUpdateModel,
+  public void updateSitePermissions(PermissionUpdateModel permissionUpdateModel,
                                     String username) throws IllegalAccessException, ObjectNotFoundException {
+    SiteKey siteKey = new SiteKey(permissionUpdateModel.getSiteType(), permissionUpdateModel.getSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
       throw new ObjectNotFoundException(String.format("Site %s doesn't exist", siteKey));
