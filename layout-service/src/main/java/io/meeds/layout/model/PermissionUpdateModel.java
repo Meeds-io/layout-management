@@ -23,6 +23,10 @@ import lombok.Data;
 @Data
 public class PermissionUpdateModel {
 
+  private String siteType;
+
+  private String siteName;
+
   private String editPermission;
 
   private String accessPermissions;

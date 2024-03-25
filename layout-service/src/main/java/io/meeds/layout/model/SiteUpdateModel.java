@@ -23,6 +23,10 @@ import lombok.Data;
 @Data
 public class SiteUpdateModel {
 
+  private String  siteType;
+
+  private String  siteName;
+
   private String  siteLabel;
 
   private String  siteDescription;
