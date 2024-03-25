@@ -81,7 +81,7 @@ export default {
           style.width = this.hasUnit(this.width) ? this.width : `${this.width}px`;
         }
         if (this.borderColor) {
-          style.border = `1px solid ${this.borderColor}`;
+          style['--appBorderColor'] = this.borderColor;
         }
         return style;
       }
