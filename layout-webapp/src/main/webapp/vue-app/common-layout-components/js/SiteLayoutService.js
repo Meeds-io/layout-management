@@ -65,11 +65,13 @@ export function getSiteById(siteId, lang) {
 
 export function getSite(siteType, siteName, lang) {
   const formData = new FormData();
+  formData.append('siteName', siteName);
+  formData.append('siteType', siteType || 'portal');
   if (lang) {
     formData.append('lang', lang);
   }
   const params = new URLSearchParams(formData).toString();
-  return fetch(`/layout/rest/sites/${siteType}/${siteName}${params.length && '?' || ''}${params.length && params || ''}`, {
+  return fetch(`/layout/rest/sites?${params}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
@@ -109,7 +111,11 @@ export function updateSite(siteName, siteType, siteLabel, siteDescription, displ
 }
 
 export function deleteSite(siteType, siteName) {
-  return fetch(`/layout/rest/sites/${siteType}/${siteName}`, {
+  const formData = new FormData();
+  formData.append('siteName', siteName);
+  formData.append('siteType', siteType || 'portal');
+  const params = new URLSearchParams(formData).toString();
+  return fetch(`/layout/rest/sites?${params}`, {
     method: 'DELETE',
     credentials: 'include',
   }).then(resp => {
@@ -120,13 +126,15 @@ export function deleteSite(siteType, siteName) {
 }
 
 export function updateSitePermissions(siteType, siteName, editPermission, accessPermissions) {
-  return fetch(`/layout/rest/sites/${siteType}/${siteName}/permissions`, {
+  return fetch('/layout/rest/sites/permissions', {
     method: 'PATCH',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
+      siteType,
+      siteName,
       editPermission: editPermission || null,
       accessPermissions: accessPermissions || null,
     }),
