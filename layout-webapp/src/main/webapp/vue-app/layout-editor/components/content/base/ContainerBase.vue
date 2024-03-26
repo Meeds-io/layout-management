@@ -138,7 +138,7 @@ export default {
       }
     },
     containerCssClass() {
-      return this.container.cssClass;
+      return this.$root.mobileDisplayMode ? this.container.cssClass?.replace?.('d-md-grid', '') : this.container.cssClass;
     },
     cssClass() {
       return `${this.containerCssClass || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
