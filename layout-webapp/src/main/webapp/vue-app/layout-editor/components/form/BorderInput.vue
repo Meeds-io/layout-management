@@ -1,18 +1,19 @@
 <template>
   <v-card
-    max-width="70"
-    class="my-auto"
+    class="d-flex flex-row align-center justify-center me-n3"
+    max-width="88"
     flat>
-    <v-text-field
-      v-model="border"
-      class="border-box-sizing pt-0"
-      type="number"
-      max="20"
-      min="0"
-      step="4"
-      hide-details
-      outlined
-      dense />
+    <v-btn
+      icon
+      @click="decrementBorder">
+      <v-icon>fa-minus fa-sm</v-icon>
+    </v-btn>
+    <div>{{ border }}</div>
+    <v-btn
+      icon
+      @click="incrementBorder">
+      <v-icon>fa-plus fa-sm</v-icon>
+    </v-btn>
   </v-card>
 </template>
 <script>
@@ -22,6 +23,10 @@ export default {
       type: String,
       default: null,
     },
+    diff: {
+      type: Number,
+      default: () => 0,
+    },
   },
   data: () => ({
     border: 20,
@@ -30,12 +35,24 @@ export default {
     border: {
       immediate: true,
       handler() {
-        this.$emit('input', this.border - 20);
+        this.$emit('input', this.border + this.diff);
       },
     },
   },
   created() {
-    this.border = (this.value || 0) + 20;
-  }
+    this.border = (this.value || 0) - this.diff;
+  },
+  methods: {
+    decrementBorder() {
+      if (this.border > 0) {
+        this.border -= 4;
+      }
+    },
+    incrementBorder() {
+      if (this.border < 20) {
+        this.border += 4;
+      }
+    },
+  },
 };
 </script>
