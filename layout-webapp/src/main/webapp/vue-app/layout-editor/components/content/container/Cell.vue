@@ -27,7 +27,7 @@
       'z-index-two': hover && !$root.drawerOpened,
       'elevation-1': hasApplication && hover && !$root.movingCell,
     }"
-    class="position-relative d-flex flex-column"
+    class="position-relative d-flex flex-column max-width-fit"
     @hovered="hover = $event"
     @initialized="computeHasContent">
     <template #header>
