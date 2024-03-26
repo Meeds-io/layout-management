@@ -7,7 +7,7 @@
     <template slot="title">
       {{ $t('layout.editApplicationTitle') }}
     </template>
-    <template #content>
+    <template v-if="drawer" #content>
       <v-card
         max-width="100%"
         class="ma-4 overflow-hidden"
@@ -108,10 +108,10 @@ export default {
   },
   methods: {
     open(section, container) {
-      this.section = section;
-      this.container = container;
       this.initialized = false;
 
+      this.section = section;
+      this.container = container;
       this.$layoutUtils.parseContainerStyle(this.container, this.styleClasses);
       this.marginTop = this.container.marginTop || 0;
       this.marginRight = this.container.marginRight || 0;
@@ -119,6 +119,7 @@ export default {
       this.marginLeft = this.container.marginLeft || 0;
       this.borderRadius = this.container.borderRadius || 8;
       this.borderColor = this.container.borderColor || '#FFFFFF';
+
       this.$nextTick(() => this.$refs.drawer.open());
     },
     close() {
