@@ -169,23 +169,35 @@ export function applyGridStyle(container) {
 }
 
 export function applyContainerStyle(section, container, containerStyle) {
-  let cssClasses = container.cssClass || '';
-  cssClasses = cssClasses.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '');
-  cssClasses = cssClasses.replace(new RegExp('(^| )(border-radius-descendant)-((md|lg|xl)-)?[0-9]{1,2}', 'g'), '');
+  if (!container.cssClass) {
+    container.cssClass = '';
+  }
+  container.cssClass = container.cssClass.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '').replace(/  +/g, ' ');
 
   // Apply new Classes
-  container.cssClass = cssClasses.replace(/  +/g, ' ');
-  container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop, 20)) / 4))}`;
-  container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight, 20)) / 4))}`;
-  container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom, 20)) / 4))}`;
-  container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
-  container.cssClass += ` border-radius-descendant-${parseInt(Math.max(0, Math.min(containerStyle.borderRadius, 20)) / 4)}`;
-
   container.marginTop = containerStyle.marginTop || 0;
   container.marginRight = containerStyle.marginRight || 0;
   container.marginBottom = containerStyle.marginBottom || 0;
   container.marginLeft = containerStyle.marginLeft || 0;
-  container.borderRadius = containerStyle.borderRadius || 8;
+
+  container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop, 20)) / 4))}`;
+  container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight, 20)) / 4))}`;
+  container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom, 20)) / 4))}`;
+  container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
+
+  container.cssClass = container.cssClass.replace(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g'), '').replace(/  +/g, ' ');
+  Vue.set(container, 'radiusTopRight', containerStyle.radiusTopRight || null);
+  Vue.set(container, 'radiusTopLeft', containerStyle.radiusTopLeft || null);
+  Vue.set(container, 'radiusBottomRight', containerStyle.radiusBottomRight || null);
+  Vue.set(container, 'radiusBottomLeft', containerStyle.radiusBottomLeft || null);
+
+  if (container.radiusTopRight === 0 || container.radiusTopRight) {
+    container.cssClass += ` brtr-${parseInt(Math.min(20, Math.max(containerStyle.radiusTopRight, 0)) / 4)}`;
+    container.cssClass += ` brtl-${parseInt(Math.min(20, Math.max(containerStyle.radiusTopLeft, 0)) / 4)}`;
+    container.cssClass += ` brbr-${parseInt(Math.min(20, Math.max(containerStyle.radiusBottomRight, 0)) / 4)}`;
+    container.cssClass += ` brbl-${parseInt(Math.min(20, Math.max(containerStyle.radiusBottomLeft, 0)) / 4)}`;
+  }
+
   Vue.set(container, 'borderColor', containerStyle.borderColor || null);
 }
 
@@ -489,14 +501,19 @@ function parseSection(section) {
 }
 
 export function parseContainerStyle(container) {
-  let matches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
-  container.marginTop = parseInt(matches.find(c => c.indexOf('mt-') >= 0)?.replace('mt-n', '-')?.replace('mt-', '') || 0) * 4;
-  container.marginRight = parseInt(matches.find(c => c.indexOf('me-') >= 0)?.replace('me-n', '-')?.replace('me-', '') || 0) * 4;
-  container.marginBottom = parseInt(matches.find(c => c.indexOf('mb-') >= 0)?.replace('mb-n', '-')?.replace('mb-', '') || 0) * 4;
-  container.marginLeft = parseInt(matches.find(c => c.indexOf('ms-') >= 0)?.replace('ms-n', '-')?.replace('ms-', '') || 0) * 4;
+  const marginMatches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
+  container.marginTop = parseInt(marginMatches.find(c => c.indexOf('mt-') >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
+  container.marginRight = parseInt(marginMatches.find(c => c.indexOf('me-') >= 0)?.replace?.('me-n', '-')?.replace?.('me-', '') || 0) * 4;
+  container.marginBottom = parseInt(marginMatches.find(c => c.indexOf('mb-') >= 0)?.replace?.('mb-n', '-')?.replace?.('mb-', '') || 0) * 4;
+  container.marginLeft = parseInt(marginMatches.find(c => c.indexOf('ms-') >= 0)?.replace?.('ms-n', '-')?.replace?.('ms-', '') || 0) * 4;
 
-  matches = container?.cssClass?.match?.(new RegExp('(^| )border-radius-descendant-((md|lg|xl)-)?[0-9]{1,2}', 'g')) || [];
-  container.borderRadius = parseInt(matches.find(c => c.indexOf('border-radius-descendant-') >= 0)?.replace('border-radius-descendant-', '') || 0) * 4;
+  const radiusMatches = container?.cssClass?.match?.(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g')) || [];
+  if (radiusMatches?.length) {
+    container.radiusTopRight = parseInt(radiusMatches.find(c => c.indexOf('brtr-') >= 0)?.replace?.('brtr-', '') || 1) * 4;
+    container.radiusTopLeft = parseInt(radiusMatches.find(c => c.indexOf('brtl-') >= 0)?.replace?.('brtl-', '') || 1) * 4;
+    container.radiusBottomRight = parseInt(radiusMatches.find(c => c.indexOf('brbr-') >= 0)?.replace?.('brbr-', '') || 1) * 4;
+    container.radiusBottomLeft = parseInt(radiusMatches.find(c => c.indexOf('brbl-') >= 0)?.replace?.('brbl-', '') || 1) * 4;
+  }
 }
 
 function parseCell(colContainer) {
