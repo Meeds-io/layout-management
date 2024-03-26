@@ -62,7 +62,10 @@
 
 .layout-sections-parent {
   .PORTLET-FRAGMENT {
-    border-radius: ~"var(--allPagesBorderRadius, 4px) !important";
+    border-top-right-radius: ~"var(--appBorderRadiusTopRight, var(--allPagesBorderRadius, 4px)) !important;";
+    border-top-left-radius: ~"var(--appBorderRadiusTopLeft, var(--allPagesBorderRadius, 4px)) !important;";
+    border-bottom-right-radius: ~"var(--appBorderRadiusBottomRight, var(--allPagesBorderRadius, 4px)) !important;";
+    border-bottom-left-radius: ~"var(--appBorderRadiusBottomLeft, var(--allPagesBorderRadius, 4px)) !important;";
     border: ~"1px solid var(--appBorderColor, transparent) !important";
   }
 }
