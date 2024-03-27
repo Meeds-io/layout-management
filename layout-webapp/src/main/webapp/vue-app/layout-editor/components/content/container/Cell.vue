@@ -37,6 +37,8 @@
         :parent-id="parentId"
         :hover="hover"
         :moving="moving"
+        :application-title="applicationTitle"
+        :application-category="applicationCategoryTitle"
         @move-start="moveStart" />
       <v-hover :disabled="$root.mobileDisplayMode" v-else>
         <v-card
