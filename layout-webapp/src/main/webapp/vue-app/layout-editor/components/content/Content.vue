@@ -250,11 +250,11 @@ export default {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
     },
-    handleEditApplication(sectionId, container) {
+    handleEditApplication(sectionId, container, applicationCategory, applicationTitle) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       const section = parentContainer.children.find(c => c.storageId === sectionId);
       if (section) {
-        this.$refs.applicationPropertiesDrawer.open(section, container);
+        this.$refs.applicationPropertiesDrawer.open(section, container, applicationCategory, applicationTitle);
       } else {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
