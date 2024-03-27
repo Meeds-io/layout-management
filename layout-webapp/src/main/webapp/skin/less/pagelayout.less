@@ -52,14 +52,6 @@
   grid-row-end: span ~"var(--grid-cell-rows)";
 }
 
-@media (min-width: @minLargeTabletWidth) {
-  .layout-sections-parent {
-    .PORTLET-FRAGMENT {
-      padding-bottom: 0;
-    }
-  }
-}
-
 .layout-sections-parent {
   .PORTLET-FRAGMENT {
     border-top-right-radius: ~"var(--appBorderRadiusTopRight, var(--allPagesBorderRadius, 4px)) !important;";
@@ -67,6 +59,20 @@
     border-bottom-right-radius: ~"var(--appBorderRadiusBottomRight, var(--allPagesBorderRadius, 4px)) !important;";
     border-bottom-left-radius: ~"var(--appBorderRadiusBottomLeft, var(--allPagesBorderRadius, 4px)) !important;";
     border: ~"1px solid var(--appBorderColor, transparent) !important";
+  }
+}
+
+.layout-sections-parent {
+  .PORTLET-FRAGMENT {
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: @maxTabletWidth) {
+  .layout-sections-parent {
+    .PORTLET-FRAGMENT {
+      margin-bottom: ~"var(--grid-layout-gap, 20px)";
+    }
   }
 }
 

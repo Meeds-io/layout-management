@@ -50,6 +50,7 @@ export function init() {
         data: () => ({
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
           applicationCategories: null,
+          branding: null,
           displayMode: 'desktop',
           layout: null,
           pageRef: null,
@@ -119,6 +120,8 @@ export function init() {
           document.addEventListener('drawerClosed', this.setDrawerClosed);
           this.$applicationRegistryService.getCategories()
             .then(categories => this.applicationCategories = categories);
+          this.$brandingService.getBrandingInformation()
+            .then(data => this.branding = data);
         },
         methods: {
           setDrawerOpened() {

@@ -5,7 +5,10 @@
     allow-expand
     right>
     <template slot="title">
-      {{ $t('layout.editApplicationTitle') }}
+      {{ $t('layout.editApplicationTitle', {
+        0: applicationTitle,
+        1: applicationCategory,
+      }) }}
     </template>
     <template v-if="drawer" #content>
       <v-card
@@ -177,12 +180,14 @@ export default {
     marginLeft: 20,
     enableBorderRadius: true,
     radiusChoice: 'same',
-    radiusTopRight: 4,
-    radiusTopLeft: 4,
-    radiusBottomRight: 4,
-    radiusBottomLeft: 4,
+    radiusTopRight: null,
+    radiusTopLeft: null,
+    radiusBottomRight: null,
+    radiusBottomLeft: null,
     enableBorderColor: true,
     borderColor: '#FFFFFF',
+    applicationCategory: null,
+    applicationTitle: null,
   }),
   computed: {
     sectionId() {
@@ -228,13 +233,14 @@ export default {
     },
     enableBorderRadius(val) {
       if (val) {
-        if (!this.radiusTopRight) {
-          this.radiusTopRight = 4;
-          this.radiusTopLeft = 4;
-          this.radiusBottomRight = 4;
-          this.radiusBottomLeft = 4;
+        if (this.radiusTopRight !== 0 && !this.radiusTopRight) {
+          const defaultBorderRadius = parseInt(this.$root.branding?.themeStyle?.borderRadius?.replace?.('px', '') || '4');
+          this.radiusTopRight = defaultBorderRadius;
+          this.radiusTopLeft = defaultBorderRadius;
+          this.radiusBottomRight = defaultBorderRadius;
+          this.radiusBottomLeft = defaultBorderRadius;
         }
-      } else {
+      } else if (this.radiusTopRight !== 0) {
         this.radiusTopRight = null;
         this.radiusTopLeft = null;
         this.radiusBottomRight = null;
@@ -252,11 +258,13 @@ export default {
     },
   },
   methods: {
-    open(section, container) {
+    open(section, container, applicationCategory, applicationTitle) {
       this.initialized = false;
 
       this.section = section;
       this.container = container;
+      this.applicationCategory = applicationCategory;
+      this.applicationTitle = applicationTitle;
       this.$layoutUtils.parseContainerStyle(this.container, this.styleClasses);
 
       this.marginTop = this.container.marginTop || 0;
