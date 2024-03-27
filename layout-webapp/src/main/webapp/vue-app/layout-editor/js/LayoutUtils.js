@@ -186,10 +186,12 @@ export function applyContainerStyle(section, container, containerStyle) {
   container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
 
   container.cssClass = container.cssClass.replace(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g'), '').replace(/  +/g, ' ');
-  Vue.set(container, 'radiusTopRight', containerStyle.radiusTopRight || null);
-  Vue.set(container, 'radiusTopLeft', containerStyle.radiusTopLeft || null);
-  Vue.set(container, 'radiusBottomRight', containerStyle.radiusBottomRight || null);
-  Vue.set(container, 'radiusBottomLeft', containerStyle.radiusBottomLeft || null);
+  const borderRadiusEnabled = containerStyle.radiusTopRight === 0 || containerStyle.radiusTopRight;
+
+  Vue.set(container, 'radiusTopRight', borderRadiusEnabled ? containerStyle.radiusTopRight : null);
+  Vue.set(container, 'radiusTopLeft', borderRadiusEnabled ? containerStyle.radiusTopLeft : null);
+  Vue.set(container, 'radiusBottomRight', borderRadiusEnabled ? containerStyle.radiusBottomRight : null);
+  Vue.set(container, 'radiusBottomLeft', borderRadiusEnabled ? containerStyle.radiusBottomLeft : null);
 
   if (container.radiusTopRight === 0 || container.radiusTopRight) {
     container.cssClass += ` brtr-${parseInt(Math.min(20, Math.max(containerStyle.radiusTopRight, 0)) / 4)}`;
