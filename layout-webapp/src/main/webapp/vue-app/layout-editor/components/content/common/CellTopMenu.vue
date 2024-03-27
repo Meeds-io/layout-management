@@ -56,7 +56,7 @@
             :height="iconSize"
             class="mx-4"
             icon
-            @click.prevent.stop="$root.$emit('layout-edit-application', parentId, container)">
+            @click.prevent.stop="$root.$emit('layout-edit-application', parentId, container, applicationCategory, applicationTitle)">
             <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
           </v-btn>
           <v-btn
@@ -78,6 +78,14 @@ export default {
   props: {
     container: {
       type: Object,
+      default: null,
+    },
+    applicationCategory: {
+      type: String,
+      default: null,
+    },
+    applicationTitle: {
+      type: String,
       default: null,
     },
     parentId: {
