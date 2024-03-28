@@ -38,8 +38,9 @@
       <v-card
         v-if="isDynamicSection"
         :class="{
-          'position-relative my-n5': hasApplication,
+          'position-relative mt-n5': hasApplication,
           'absolute-all-center': !hasApplication,
+          'invisible': moving,
         }"
         :min-height="hasApplication && 50"
         class="position-relative d-flex align-center justify-center flex-grow-1 flex-shrink-1 z-index-one"
@@ -73,17 +74,26 @@
           <span v-if="applicationCategoryTitle" class="caption">({{ applicationCategoryTitle }})</span>
         </div>
       </div>
-      <layout-editor-cell-top-menu
-        v-if="hasApplication"
-        :container="container"
-        :dynamic-section="isDynamicSection"
-        :parent-id="parentId"
-        :hover="hover"
-        :moving="moving"
-        :application-title="applicationTitle"
-        :application-category="applicationCategoryTitle"
-        @move-start="moveStart" />
-      <v-hover :disabled="$root.mobileDisplayMode" v-else>
+      <div class="mt-n5">
+        <layout-editor-cell-move-button
+          v-if="hasApplication || isDynamicSection"
+          :container="container"
+          :dynamic-section="isDynamicSection"
+          :hover="hover"
+          :moving="moving"
+          @move-start="moveStart" />
+        <layout-editor-cell-top-menu
+          v-if="hasApplication"
+          :container="container"
+          :dynamic-section="isDynamicSection"
+          :parent-id="parentId"
+          :hover="hover"
+          :moving="moving"
+          :application-title="applicationTitle"
+          :application-category="applicationCategoryTitle"
+          @move-start="moveStart" />
+      </div>
+      <v-hover :disabled="$root.mobileDisplayMode" v-if="!hasApplication">
         <v-card
           slot-scope="hoverScope"
           :class="{
