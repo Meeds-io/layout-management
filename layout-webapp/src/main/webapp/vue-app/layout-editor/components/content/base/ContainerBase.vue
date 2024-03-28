@@ -51,12 +51,14 @@
       <template v-else-if="hasChildren">
         <layout-editor-container-extension
           v-for="(child, i) in children"
-          v-show="!hideChildren"
           :key="child.storageId"
           :container="child"
           :parent-id="storageId"
           :index="i"
           :length="children.length"
+          :class="{
+            'invisible': hideChildren
+          }"
           @initialized="$emit('initialized', child)" />
       </template>
       <slot name="footer"></slot>
