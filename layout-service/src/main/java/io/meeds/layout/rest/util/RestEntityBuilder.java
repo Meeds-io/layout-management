@@ -180,7 +180,8 @@ public class RestEntityBuilder {
       }
       return children.stream()
                      .allMatch(c -> c instanceof Container container
-                                    && StringUtils.equals("GridContainer", container.getTemplate()));
+                                    && (StringUtils.equals("GridContainer", container.getTemplate())
+                                        || StringUtils.equals("FlexContainer", container.getTemplate())));
     }
   }
 
