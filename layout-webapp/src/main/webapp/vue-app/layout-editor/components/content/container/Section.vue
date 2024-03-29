@@ -48,6 +48,7 @@
         class="layout-section-border">
         <div class="position-relative full-height full-width">
           <layout-editor-section-border-menu
+            :container="container"
             :hover="!drawerOpened && (hover || hoverSection || movingSection)"
             :index="index"
             :length="length"
