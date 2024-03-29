@@ -157,13 +157,16 @@ export function applyDesktopStyle(container) {
   applyGridStyle(container);
 }
 
-export function applyGridStyle(container) {
+export function applyGridStyle(container, sectionTemplate) {
   if (container.template === gridTemplate || container.template === flexTemplate) {
-    container.children?.forEach(applyGridStyle);
+    container.children?.forEach(c => applyGridStyle(c, container.template));
     applyBreakpointClasses(container, container.template === gridTemplate && 'grid-rows' || null, 'grid-cols');
   } else if (container.template === cellTemplate) {
     applyBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
-    applyCellHeightStyle(container);
+    cleanCellHeightStyle(container);
+    if (sectionTemplate === gridTemplate) {
+      applyCellHeightStyle(container);
+    }
   } else {
     container.children?.forEach?.(applyGridStyle);
   }
@@ -657,13 +660,14 @@ function parseBreakpointClasses(container, classPrefix) {
   }
 }
 
-function applyCellHeightStyle(container) {
+function cleanCellHeightStyle(container) {
   container.cssClass = container.cssClass
     .replace(' grid-cell-height-auto', '')
     .replace(' grid-cell-height-scroll', '');
-  if (container.height === 'auto') {
-    container.cssClass += ' grid-cell-height-auto';
-  } else {
+}
+
+function applyCellHeightStyle(container) {
+  if (container.height !== 'auto') {
     container.cssClass += ' grid-cell-height-scroll';
   }
 }
