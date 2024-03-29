@@ -59,6 +59,7 @@
         <layout-editor-cell-move-button
           v-if="hasApplication || isDynamicSection"
           :container="container"
+          :parent-id="parentId"
           :dynamic-section="isDynamicSection"
           :hover="hover"
           :moving="moving"
@@ -123,6 +124,14 @@ export default {
     parentId: {
       type: String,
       default: null,
+    },
+    index: {
+      type: Number,
+      default: () => 0,
+    },
+    length: {
+      type: Number,
+      default: () => 0,
     },
   },
   data: () => ({

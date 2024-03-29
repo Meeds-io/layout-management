@@ -80,6 +80,10 @@ export default {
       type: Number,
       default: () => 0,
     },
+    length: {
+      type: Number,
+      default: () => 0,
+    },
     noDraggable: {
       type: Boolean,
       default: false,

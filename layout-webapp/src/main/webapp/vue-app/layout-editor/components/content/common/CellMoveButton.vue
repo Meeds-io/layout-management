@@ -19,32 +19,46 @@
 
 -->
 <template>
-  <v-btn
-    v-if="hover && !moving && !$root.drawerOpened"
+  <component
+    v-if="((!dynamicSection && hover) || (dynamicSection && sectionHovered)) && !moving && !$root.drawerOpened"
     ref="resizeButton"
+    v-bind="!dynamicSection && {
+      width: iconSize,
+      height: iconSize,
+      icon: true,
+    }"
+    :is="dynamicSection && 'div' || 'v-btn'"
     :title="dynamicSection && $t('layout.updateWidth') || $t('layout.resizeCell')"
-    :width="iconSize"
-    :height="iconSize"
     :class="{
       'l-0': $vuetify.rtl,
       'r-0': !$vuetify.rtl,
       'b-0 mb-n3 me-n3': !dynamicSection,
-      'absolute-vertical-center me-n5': dynamicSection,
-      'fa-rotate-90': !dynamicSection && !$vuetify.rtl
+      'absolute-vertical-center full-height me-n5': dynamicSection,
+      'fa-rotate-90': !dynamicSection && !$vuetify.rtl,
+      'col-resize-cursor grid-gap-width': dynamicSection,
+      'layout-column-resize': dynamicSection && hoverSeparator,
     }"
     class="position-absolute z-index-two"
-    icon
-    @mousedown.prevent.stop="resizeStart">
-    <v-icon :size="iconSize" class="icon-default-color">
+    @mousedown.prevent.stop="resizeStart"
+    @mouseover="hoverSeparator = true"
+    @mouseout="hoverSeparator = false">
+    <v-icon
+      v-if="!dynamicSection"
+      :size="iconSize"
+      class="icon-default-color">
       {{ dynamicSection && 'fa-arrows-alt-h' || 'fa-expand-alt' }}
     </v-icon>
-  </v-btn>
+  </component>
 </template>
 <script>
 export default {
   props: {
     container: {
       type: Object,
+      default: null,
+    },
+    parentId: {
+      type: String,
       default: null,
     },
     dynamicSection: {
@@ -62,7 +76,18 @@ export default {
   },
   data: () => ({
     iconSize: 20,
+    hoverSeparator: false,
   }),
+  computed: {
+    sectionHovered() {
+      return this.$root.hoveredSectionId === this.parentId;
+    },
+  },
+  watch: {
+    hoverSeparator() {
+      console.warn('hoverSeparator', this.hoverSeparator);
+    },
+  },
   methods: {
     resizeStart(event) {
       this.$emit('move-start', event, 'resize');
