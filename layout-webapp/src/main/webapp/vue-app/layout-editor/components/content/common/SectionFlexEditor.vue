@@ -42,7 +42,7 @@
               icon
               fab
               x-small
-              @click="cols--">
+              @click="decrementCols">
               <v-icon class="pt-2px">fa-minus</v-icon>
             </v-btn>
           </template>
@@ -53,7 +53,7 @@
               fab
               icon
               x-small
-              @click="cols++">
+              @click="incrementCols">
               <v-icon class="pt-2px">fa-plus</v-icon>
             </v-btn>
           </template>
@@ -85,6 +85,7 @@ export default {
   },
   data: () => ({
     cols: 0,
+    allowedCols: [1, 2, 3, 4, 6, 12],
   }),
   computed: {
     gridClass() {
@@ -92,12 +93,32 @@ export default {
     },
   },
   watch: {
-    cols() {
-      this.$emit('cols-updated', this.cols);
+    cols(newVal, oldVal) {
+      const index = this.allowedCols.indexOf(this.cols);
+      if (index < 0) {
+        this.cols = oldVal;
+        if (newVal - oldVal > 0) {
+          this.incrementCols();
+        } else {
+          this.decrementCols();
+        }
+      } else {
+        this.$emit('cols-updated', this.cols);
+      }
     },
   },
   created() {
     this.cols = this.colsCount;
+  },
+  methods: {
+    decrementCols() {
+      const index = this.allowedCols.indexOf(this.cols);
+      this.cols = this.allowedCols[index - 1];
+    },
+    incrementCols() {
+      const index = this.allowedCols.indexOf(this.cols);
+      this.cols = this.allowedCols[index + 1];
+    },
   },
 };
 </script>

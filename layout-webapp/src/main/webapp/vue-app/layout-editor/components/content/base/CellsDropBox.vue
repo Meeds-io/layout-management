@@ -62,6 +62,24 @@ export default {
     colsCount: 0,
   }),
   computed: {
+    nextCell() {
+      if (this.section.template === this.$layoutUtils.flexTemplate) {
+        const cellIndex = this.section.children.findIndex(c => c.storageId === this.cell?.storageId);
+        return this.section.children[cellIndex + 1];
+      } else {
+        return null;
+      }
+    },
+    nextCellColsCount() {
+      return this.nextCell?.colsCount;
+    },
+    maxWidth() {
+      if (this.section.template === this.$layoutUtils.flexTemplate) {
+        return this.boxWidth + (this.nextCellColsCount - 1) * (this.innerCellWidth + this.$root.gap);
+      } else {
+        return null;
+      }
+    },
     innerCellWidth() {
       return this.section && this.sectionWidth && (this.sectionWidth - (this.$root.gap * (this.section.colsCount - 1))) / this.section.colsCount || 0;
     },
@@ -75,10 +93,19 @@ export default {
       return this.$root.isResize ? this.cellX - this.sectionX : this.movingX - this.$root.diffScrollX;
     },
     height() {
-      return this.$root.isResize ? this.boxHeight + this.diffMovingY - this.$root.diffScrollY + 3 : this.boxHeight + 3;
+      if (this.section.template === this.$layoutUtils.flexTemplate) {
+        return this.boxHeight;
+      } else {
+        return this.$root.isResize ? this.boxHeight + this.diffMovingY - this.$root.diffScrollY + 3 : this.boxHeight + 3;
+      }
     },
     width() {
-      return this.$root.isResize ? this.boxWidth + this.diffMovingX - this.$root.diffScrollX + 3 : this.boxWidth + 3;
+      const width = this.$root.isResize ? this.boxWidth + this.diffMovingX - this.$root.diffScrollX + 3 : this.boxWidth + 3;
+      if (this.maxWidth) {
+        return Math.max(this.innerCellWidth, Math.min(width, this.maxWidth));
+      } else {
+        return Math.max(this.innerCellWidth, width);
+      }
     },
     boxStyle() {
       return {
