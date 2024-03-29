@@ -181,9 +181,10 @@ export default {
     },
     cssStyle() {
       if (this.isDynamicSection) {
-        const cssStyle = {
-          'min-height': this.hasApplication && '100px' || '150px',
-        };
+        const cssStyle = {};
+        if (this.$root.desktopDisplayMode) {
+          cssStyle['min-height'] = this.hasApplication && '100px' || '150px';
+        }
         if (this.isNextCellOfMovedCell) {
           if (this.$vuetify.$rtl) {
             cssStyle['margin-right'] = `${this.$root.nextCellDiffWidth}px`;
