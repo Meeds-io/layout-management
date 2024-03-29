@@ -28,37 +28,15 @@
       'elevation-1': hasApplication && hover && !$root.movingCell,
     }"
     :style="{
-      'min-height': isDynamicSection && !hasApplication && '50px' || 'initial',
+      'min-height': isDynamicSection && (hasApplication && '100px' || '150px') || 'initial',
     }"
     class="position-relative d-flex flex-column"
     no-draggable
     @hovered="hover = $event"
     @initialized="computeHasContent">
     <template #footer>
-      <v-card
-        v-if="isDynamicSection"
-        :class="{
-          'position-relative mt-n5': hasApplication,
-          'absolute-all-center': !hasApplication,
-          'invisible': moving,
-        }"
-        :min-height="hasApplication && 50"
-        class="position-relative d-flex align-center justify-center flex-grow-1 flex-shrink-1 z-index-one"
-        color="transparent">
-        <v-btn
-          :class="{
-            'absolute-all-center': hasApplication,
-          }"
-          :title="$t('layout.addApplicationButton')"
-          min-width="50%"
-          class="primary"
-          outlined
-          @click="$root.$emit('layout-cell-add-application', parentId, container)">
-          <v-icon color="primary">far fa-plus-square</v-icon>
-        </v-btn>
-      </v-card>
       <div
-        v-else-if="hasApplication && !moving"
+        v-if="$root.desktopDisplayMode && !isDynamicSection && hasApplication && !moving"
         ref="placeholder"
         :class="{
           'linear-gradient-grey-background': hasContent,
@@ -74,7 +52,10 @@
           <span v-if="applicationCategoryTitle" class="caption">({{ applicationCategoryTitle }})</span>
         </div>
       </div>
-      <div class="mt-n5">
+      <div
+        :class="{
+          'mt-n5': isDynamicSection,
+        }">
         <layout-editor-cell-move-button
           v-if="hasApplication || isDynamicSection"
           :container="container"
@@ -93,20 +74,41 @@
           :application-category="applicationCategoryTitle"
           @move-start="moveStart" />
       </div>
-      <v-hover :disabled="$root.mobileDisplayMode" v-if="!hasApplication">
+      <v-hover v-if="$root.desktopDisplayMode && (!hasApplication || isDynamicSection)">
         <v-card
           slot-scope="hoverScope"
           :class="{
-            'opacity-5': hoverScope.hover && !isSelectedCell,
-            'grey-background': !isSelectedCell && (!$root.movingCell || $root.selectedSectionId !== parentId),
+            'full-height': !hasApplication,
+            'mt-n5': hasApplication,
+            'grey-background': !isSelectedCell && !hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
+            'light-grey-background': !isSelectedCell && hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
             'transparent': $root.movingCell && $root.selectedSectionId === parentId && !isSelectedCell,
             'grey': isSelectedCell,
+            'invisible': moving,
           }"
-          class="full-width full-height"
+          class="full-width"
           flat
           v-on="!multiSelectEnabled && {
             click: () => $root.$emit('layout-cell-add-application', parentId, container)
-          }" />
+          }">
+          <v-card
+            v-if="isDynamicSection"
+            :class="{
+              'invisible': !hoverScope.hover,
+            }"
+            :aria-label="$t('layout.addApplicationButton')"
+            :title="$t('layout.addApplicationButton')"
+            :height="hasApplication && 50 || '50%'"
+            max-height="200"
+            color="transparent"
+            class="full-width d-flex flex-wrap align-center justify-center px-2"
+            flat>
+            <div class="d-flex flex-wrap align-center justify-center">
+              <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
+              <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
+            </div>
+          </v-card>
+        </v-card>
       </v-hover>
     </template>
   </layout-editor-container-base>
