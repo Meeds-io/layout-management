@@ -64,6 +64,8 @@ export function init() {
           selectedSectionId: null,
           selectedCellCoordinates: [],
           selectedCells: [],
+          nextCellStorageId: null,
+          nextCellDiffWidth: null,
           parentAppDimensions: false,
           multiCellsSelect: false,
           sectionHistory: null,
