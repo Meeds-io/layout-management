@@ -41,7 +41,9 @@
     class="position-absolute z-index-two"
     @mousedown.prevent.stop="resizeStart"
     @mouseover="hoverSeparator = true"
-    @mouseout="hoverSeparator = false">
+    @focusin="hoverSeparator = true"
+    @mouseout="hoverSeparator = false"
+    @focusout="hoverSeparator = false">
     <v-icon
       v-if="!dynamicSection"
       :size="iconSize"
@@ -81,11 +83,6 @@ export default {
   computed: {
     sectionHovered() {
       return this.$root.hoveredSectionId === this.parentId;
-    },
-  },
-  watch: {
-    hoverSeparator() {
-      console.warn('hoverSeparator', this.hoverSeparator);
     },
   },
   methods: {
