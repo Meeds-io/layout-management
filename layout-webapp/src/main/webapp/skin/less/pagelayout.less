@@ -2,17 +2,18 @@
 @import 'mixins.less';
 
 .layout-application {
-  overflow-x: hidden;
   /* Scrollbar style */
   .specific-scrollbar();
 
+  overflow-x: unset;
   /* Default Vertical Scroll behavior */
-  overflow-y: auto;
+  overflow-y: unset;
   max-height: 100%;
 }
 .grid-cell-height-scroll {
   .layout-application {
     overflow-y: auto;
+    overflow-x: hidden;
     max-height: 100%;
   }
 }
@@ -20,7 +21,6 @@
   aspect-ratio: auto !important;
 
   .layout-application {
-    overflow-y: hidden;
     max-height: none;
   }
 }
