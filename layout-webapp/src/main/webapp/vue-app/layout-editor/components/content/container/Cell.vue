@@ -57,7 +57,7 @@
           'mt-n5': isDynamicSection,
         }">
         <layout-editor-cell-move-button
-          v-if="hasApplication || isDynamicSection"
+          v-if="hasApplication || (isDynamicSection && index < (length - 1) && length < 12)"
           :container="container"
           :parent-id="parentId"
           :dynamic-section="isDynamicSection"
