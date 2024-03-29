@@ -81,8 +81,11 @@ export default {
     canRemove: false,
   }),
   computed: {
+    colsCount() {
+      return this.section.template === this.$layoutUtils.flexTemplate ? this.section.children.length : this.section?.colsCount;
+    },
     modified() {
-      return this.section?.rowsCount !== this.rows || this.section?.colsCount !== this.cols;
+      return this.section?.rowsCount !== this.rows || this.colsCount !== this.cols;
     },
     sectionType() {
       return this.section?.template;
@@ -93,8 +96,13 @@ export default {
       this.section = JSON.parse(JSON.stringify(section));
       this.originalSection = JSON.parse(JSON.stringify(section));
       this.index = index;
-      this.rows = this.section?.rowsCount;
-      this.cols = this.section?.colsCount;
+      if (this.section.template === this.$layoutUtils.flexTemplate) {
+        this.rows = 1;
+        this.cols = this.section.children.length;
+      } else {
+        this.rows = this.section?.rowsCount;
+        this.cols = this.section?.colsCount;
+      }
       this.canRemove = length > 1;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
@@ -103,22 +111,11 @@ export default {
       this.$root.$emit('layout-remove-section', this.index);
     },
     apply() {
-      const diffRows = this.rows - this.originalSection.rowsCount;
-      const diffCols = this.cols - this.originalSection.colsCount;
       const section = JSON.parse(JSON.stringify(this.section));
-      if (diffCols) {
-        if (diffCols > 0) {
-          this.$layoutUtils.addColumns(section, diffCols);
-        } else {
-          this.$layoutUtils.removeColumns(section, diffCols);
-        }
-      }
-      if (diffRows) {
-        if (diffRows > 0) {
-          this.$layoutUtils.addRows(section, diffRows);
-        } else {
-          this.$layoutUtils.removeRows(section, diffRows);
-        }
+      if (section.template === this.$layoutUtils.flexTemplate) {
+        this.$layoutUtils.editDynamicSection(section, this.cols);
+      } else {
+        this.$layoutUtils.editGridSection(section, this.rows, this.cols);
       }
       this.$root.$emit('layout-replace-section', this.index, section);
       this.close();
