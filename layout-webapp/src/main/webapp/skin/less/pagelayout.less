@@ -30,9 +30,9 @@
 }
 
 .grid-cols-mixin(){
-  --gap-col-count: ~"calc(var(--grid-column-count) - 1)";
+  --gap-col-count: ~"calc(var(--grid-col-count) - 1)";
   --total-gap-width: ~"calc(var(--gap-col-count)* var(--grid-layout-gap, 20px))";
-  --grid-cell--max-width: ~"calc((100% - var(--total-gap-width)) / var(--grid-column-count))";
+  --grid-cell--max-width: ~"calc((100% - var(--total-gap-width)) / var(--grid-col-count))";
   --grid-cell--min-width: ~"var(--grid-cell--max-width)";
   grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-width), var(--grid-cell--max-width)), 1fr))";
   grid-gap: ~"var(--grid-layout-gap, 20px)";
@@ -44,11 +44,8 @@
   --grid-cell--max-height: ~"calc((100% - var(--total-gap-height)) / var(--grid-row-count))";
   --grid-cell--min-height: ~"var(--grid-cell--max-height)";
   grid-template-rows: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-height), var(--grid-cell--max-height)), 1fr))";
-  aspect-ratio: ~"calc(var(--grid-column-count) / var(--grid-row-count))";
+  aspect-ratio: ~"calc(var(--grid-col-count) / var(--grid-row-count))";
   overflow: hidden;
-}
-.grid-cell-colspan-mixin(){
-  grid-column-end: span ~"var(--grid-cell-cols)";
 }
 .grid-cell-rowspan-mixin(){
   grid-row-end: span ~"var(--grid-cell-rows)";
@@ -62,6 +59,12 @@
     border-bottom-left-radius: ~"var(--appBorderRadiusBottomLeft, var(--allPagesBorderRadius, 4px)) !important;";
     border: ~"1px solid var(--appBorderColor, transparent) !important";
   }
+}
+
+.flex-cell {
+  display: flex;
+  flex-direction: column;
+  row-gap: ~"var(--grid-layout-gap, 20px)";
 }
 
 .layout-sections-parent {
@@ -111,20 +114,6 @@
   .grid-rows-sm-12 {
     .grid-rows-mixin();
   }
-  .grid-cell-colspan-sm-1,
-  .grid-cell-colspan-sm-2,
-  .grid-cell-colspan-sm-3,
-  .grid-cell-colspan-sm-4,
-  .grid-cell-colspan-sm-5,
-  .grid-cell-colspan-sm-6,
-  .grid-cell-colspan-sm-7,
-  .grid-cell-colspan-sm-8,
-  .grid-cell-colspan-sm-9,
-  .grid-cell-colspan-sm-10,
-  .grid-cell-colspan-sm-11,
-  .grid-cell-colspan-sm-12 {
-    .grid-cell-colspan-mixin();
-  }
   .grid-cell-rowspan-sm-1,
   .grid-cell-rowspan-sm-2,
   .grid-cell-rowspan-sm-3,
@@ -139,150 +128,10 @@
   .grid-cell-rowspan-sm-12 {
     .grid-cell-rowspan-mixin();
   }
-  .grid-cols-sm-1 {
-    --grid-column-count: 1;
-  }
-  .grid-cols-sm-2 {
-    --grid-column-count: 2;
-  }
-  .grid-cols-sm-3 {
-    --grid-column-count: 3;
-  }
-  .grid-cols-sm-4 {
-    --grid-column-count: 4;
-  }
-  .grid-cols-sm-5 {
-    --grid-column-count: 5;
-  }
-  .grid-cols-sm-6 {
-    --grid-column-count: 6;
-  }
-  .grid-cols-sm-7 {
-    --grid-column-count: 7;
-  }
-  .grid-cols-sm-8 {
-    --grid-column-count: 8;
-  }
-  .grid-cols-sm-9 {
-    --grid-column-count: 9;
-  }
-  .grid-cols-sm-10 {
-    --grid-column-count: 10;
-  }
-  .grid-cols-sm-11 {
-    --grid-column-count: 11;
-  }
-  .grid-cols-sm-12 {
-    --grid-column-count: 12;
-  }
-  .grid-rows-sm-1 {
-    --grid-row-count: 1;
-  }
-  .grid-rows-sm-2 {
-    --grid-row-count: 2;
-  }
-  .grid-rows-sm-3 {
-    --grid-row-count: 3;
-  }
-  .grid-rows-sm-4 {
-    --grid-row-count: 4;
-  }
-  .grid-rows-sm-5 {
-    --grid-row-count: 5;
-  }
-  .grid-rows-sm-6 {
-    --grid-row-count: 6;
-  }
-  .grid-rows-sm-7 {
-    --grid-row-count: 7;
-  }
-  .grid-rows-sm-8 {
-    --grid-row-count: 8;
-  }
-  .grid-rows-sm-9 {
-    --grid-row-count: 9;
-  }
-  .grid-rows-sm-10 {
-    --grid-row-count: 10;
-  }
-  .grid-rows-sm-11 {
-    --grid-row-count: 11;
-  }
-  .grid-rows-sm-12 {
-    --grid-row-count: 12;
-  }
-  .grid-cell-colspan-sm-1 {
-    --grid-cell-cols: 1;
-  }
-  .grid-cell-colspan-sm-2 {
-    --grid-cell-cols: 2;
-  }
-  .grid-cell-colspan-sm-3 {
-    --grid-cell-cols: 3;
-  }
-  .grid-cell-colspan-sm-4 {
-    --grid-cell-cols: 4;
-  }
-  .grid-cell-colspan-sm-5 {
-    --grid-cell-cols: 5;
-  }
-  .grid-cell-colspan-sm-6 {
-    --grid-cell-cols: 6;
-  }
-  .grid-cell-colspan-sm-7 {
-    --grid-cell-cols: 7;
-  }
-  .grid-cell-colspan-sm-8 {
-    --grid-cell-cols: 8;
-  }
-  .grid-cell-colspan-sm-9 {
-    --grid-cell-cols: 9;
-  }
-  .grid-cell-colspan-sm-10 {
-    --grid-cell-cols: 10;
-  }
-  .grid-cell-colspan-sm-11 {
-    --grid-cell-cols: 11;
-  }
-  .grid-cell-colspan-sm-12 {
-    --grid-cell-cols: 12;
-  }
-  .grid-cell-rowspan-sm-1 {
-    --grid-cell-rows: 1;
-  }
-  .grid-cell-rowspan-sm-2 {
-    --grid-cell-rows: 2;
-  }
-  .grid-cell-rowspan-sm-3 {
-    --grid-cell-rows: 3;
-  }
-  .grid-cell-rowspan-sm-4 {
-    --grid-cell-rows: 4;
-  }
-  .grid-cell-rowspan-sm-5 {
-    --grid-cell-rows: 5;
-  }
-  .grid-cell-rowspan-sm-6 {
-    --grid-cell-rows: 6;
-  }
-  .grid-cell-rowspan-sm-7 {
-    --grid-cell-rows: 7;
-  }
-  .grid-cell-rowspan-sm-8 {
-    --grid-cell-rows: 8;
-  }
-  .grid-cell-rowspan-sm-9 {
-    --grid-cell-rows: 9;
-  }
-  .grid-cell-rowspan-sm-10 {
-    --grid-cell-rows: 10;
-  }
-  .grid-cell-rowspan-sm-11 {
-    --grid-cell-rows: 11;
-  }
-  .grid-cell-rowspan-sm-12 {
-    --grid-cell-rows: 12;
-  }
+  .grid-cols(sm, 12);
+  .grid-rows(sm, 12);
+  .grid-cell-rowspan(sm, 12);
+  .grid-cell-colspan(sm, 12);
 }
 
 @media (min-width: @minLargeTabletWidth) {
@@ -318,20 +167,6 @@
   .grid-rows-md-12 {
     .grid-rows-mixin();
   }
-  .grid-cell-colspan-md-1,
-  .grid-cell-colspan-md-2,
-  .grid-cell-colspan-md-3,
-  .grid-cell-colspan-md-4,
-  .grid-cell-colspan-md-5,
-  .grid-cell-colspan-md-6,
-  .grid-cell-colspan-md-7,
-  .grid-cell-colspan-md-8,
-  .grid-cell-colspan-md-9,
-  .grid-cell-colspan-md-10,
-  .grid-cell-colspan-md-11,
-  .grid-cell-colspan-md-12 {
-    .grid-cell-colspan-mixin();
-  }
   .grid-cell-rowspan-md-1,
   .grid-cell-rowspan-md-2,
   .grid-cell-rowspan-md-3,
@@ -346,150 +181,10 @@
   .grid-cell-rowspan-md-12 {
     .grid-cell-rowspan-mixin();
   }
-  .grid-cols-md-1 {
-    --grid-column-count: 1;
-  }
-  .grid-cols-md-2 {
-    --grid-column-count: 2;
-  }
-  .grid-cols-md-3 {
-    --grid-column-count: 3;
-  }
-  .grid-cols-md-4 {
-    --grid-column-count: 4;
-  }
-  .grid-cols-md-5 {
-    --grid-column-count: 5;
-  }
-  .grid-cols-md-6 {
-    --grid-column-count: 6;
-  }
-  .grid-cols-md-7 {
-    --grid-column-count: 7;
-  }
-  .grid-cols-md-8 {
-    --grid-column-count: 8;
-  }
-  .grid-cols-md-9 {
-    --grid-column-count: 9;
-  }
-  .grid-cols-md-10 {
-    --grid-column-count: 10;
-  }
-  .grid-cols-md-11 {
-    --grid-column-count: 11;
-  }
-  .grid-cols-md-12 {
-    --grid-column-count: 12;
-  }
-  .grid-rows-md-1 {
-    --grid-row-count: 1;
-  }
-  .grid-rows-md-2 {
-    --grid-row-count: 2;
-  }
-  .grid-rows-md-3 {
-    --grid-row-count: 3;
-  }
-  .grid-rows-md-4 {
-    --grid-row-count: 4;
-  }
-  .grid-rows-md-5 {
-    --grid-row-count: 5;
-  }
-  .grid-rows-md-6 {
-    --grid-row-count: 6;
-  }
-  .grid-rows-md-7 {
-    --grid-row-count: 7;
-  }
-  .grid-rows-md-8 {
-    --grid-row-count: 8;
-  }
-  .grid-rows-md-9 {
-    --grid-row-count: 9;
-  }
-  .grid-rows-md-10 {
-    --grid-row-count: 10;
-  }
-  .grid-rows-md-11 {
-    --grid-row-count: 11;
-  }
-  .grid-rows-md-12 {
-    --grid-row-count: 12;
-  }
-  .grid-cell-colspan-md-1 {
-    --grid-cell-cols: 1;
-  }
-  .grid-cell-colspan-md-2 {
-    --grid-cell-cols: 2;
-  }
-  .grid-cell-colspan-md-3 {
-    --grid-cell-cols: 3;
-  }
-  .grid-cell-colspan-md-4 {
-    --grid-cell-cols: 4;
-  }
-  .grid-cell-colspan-md-5 {
-    --grid-cell-cols: 5;
-  }
-  .grid-cell-colspan-md-6 {
-    --grid-cell-cols: 6;
-  }
-  .grid-cell-colspan-md-7 {
-    --grid-cell-cols: 7;
-  }
-  .grid-cell-colspan-md-8 {
-    --grid-cell-cols: 8;
-  }
-  .grid-cell-colspan-md-9 {
-    --grid-cell-cols: 9;
-  }
-  .grid-cell-colspan-md-10 {
-    --grid-cell-cols: 10;
-  }
-  .grid-cell-colspan-md-11 {
-    --grid-cell-cols: 11;
-  }
-  .grid-cell-colspan-md-12 {
-    --grid-cell-cols: 12;
-  }
-  .grid-cell-rowspan-md-1 {
-    --grid-cell-rows: 1;
-  }
-  .grid-cell-rowspan-md-2 {
-    --grid-cell-rows: 2;
-  }
-  .grid-cell-rowspan-md-3 {
-    --grid-cell-rows: 3;
-  }
-  .grid-cell-rowspan-md-4 {
-    --grid-cell-rows: 4;
-  }
-  .grid-cell-rowspan-md-5 {
-    --grid-cell-rows: 5;
-  }
-  .grid-cell-rowspan-md-6 {
-    --grid-cell-rows: 6;
-  }
-  .grid-cell-rowspan-md-7 {
-    --grid-cell-rows: 7;
-  }
-  .grid-cell-rowspan-md-8 {
-    --grid-cell-rows: 8;
-  }
-  .grid-cell-rowspan-md-9 {
-    --grid-cell-rows: 9;
-  }
-  .grid-cell-rowspan-md-10 {
-    --grid-cell-rows: 10;
-  }
-  .grid-cell-rowspan-md-11 {
-    --grid-cell-rows: 11;
-  }
-  .grid-cell-rowspan-md-12 {
-    --grid-cell-rows: 12;
-  }
+  .grid-cols(md, 12);
+  .grid-rows(md, 12);
+  .grid-cell-rowspan(md, 12);
+  .grid-cell-colspan(md, 12);
 }
 
 @media (min-width: @minDesktop) {
@@ -525,20 +220,6 @@
   .grid-rows-lg-12 {
     .grid-rows-mixin();
   }
-  .grid-cell-colspan-lg-1,
-  .grid-cell-colspan-lg-2,
-  .grid-cell-colspan-lg-3,
-  .grid-cell-colspan-lg-4,
-  .grid-cell-colspan-lg-5,
-  .grid-cell-colspan-lg-6,
-  .grid-cell-colspan-lg-7,
-  .grid-cell-colspan-lg-8,
-  .grid-cell-colspan-lg-9,
-  .grid-cell-colspan-lg-10,
-  .grid-cell-colspan-lg-11,
-  .grid-cell-colspan-lg-12 {
-    .grid-cell-colspan-mixin();
-  }
   .grid-cell-rowspan-lg-1,
   .grid-cell-rowspan-lg-2,
   .grid-cell-rowspan-lg-3,
@@ -553,150 +234,10 @@
   .grid-cell-rowspan-lg-12 {
     .grid-cell-rowspan-mixin();
   }
-  .grid-cols-lg-1 {
-    --grid-column-count: 1;
-  }
-  .grid-cols-lg-2 {
-    --grid-column-count: 2;
-  }
-  .grid-cols-lg-3 {
-    --grid-column-count: 3;
-  }
-  .grid-cols-lg-4 {
-    --grid-column-count: 4;
-  }
-  .grid-cols-lg-5 {
-    --grid-column-count: 5;
-  }
-  .grid-cols-lg-6 {
-    --grid-column-count: 6;
-  }
-  .grid-cols-lg-7 {
-    --grid-column-count: 7;
-  }
-  .grid-cols-lg-8 {
-    --grid-column-count: 8;
-  }
-  .grid-cols-lg-9 {
-    --grid-column-count: 9;
-  }
-  .grid-cols-lg-10 {
-    --grid-column-count: 10;
-  }
-  .grid-cols-lg-11 {
-    --grid-column-count: 11;
-  }
-  .grid-cols-lg-12 {
-    --grid-column-count: 12;
-  }
-  .grid-rows-lg-1 {
-    --grid-row-count: 1;
-  }
-  .grid-rows-lg-2 {
-    --grid-row-count: 2;
-  }
-  .grid-rows-lg-3 {
-    --grid-row-count: 3;
-  }
-  .grid-rows-lg-4 {
-    --grid-row-count: 4;
-  }
-  .grid-rows-lg-5 {
-    --grid-row-count: 5;
-  }
-  .grid-rows-lg-6 {
-    --grid-row-count: 6;
-  }
-  .grid-rows-lg-7 {
-    --grid-row-count: 7;
-  }
-  .grid-rows-lg-8 {
-    --grid-row-count: 8;
-  }
-  .grid-rows-lg-9 {
-    --grid-row-count: 9;
-  }
-  .grid-rows-lg-10 {
-    --grid-row-count: 10;
-  }
-  .grid-rows-lg-11 {
-    --grid-row-count: 11;
-  }
-  .grid-rows-lg-12 {
-    --grid-row-count: 12;
-  }
-  .grid-cell-colspan-lg-1 {
-    --grid-cell-cols: 1;
-  }
-  .grid-cell-colspan-lg-2 {
-    --grid-cell-cols: 2;
-  }
-  .grid-cell-colspan-lg-3 {
-    --grid-cell-cols: 3;
-  }
-  .grid-cell-colspan-lg-4 {
-    --grid-cell-cols: 4;
-  }
-  .grid-cell-colspan-lg-5 {
-    --grid-cell-cols: 5;
-  }
-  .grid-cell-colspan-lg-6 {
-    --grid-cell-cols: 6;
-  }
-  .grid-cell-colspan-lg-7 {
-    --grid-cell-cols: 7;
-  }
-  .grid-cell-colspan-lg-8 {
-    --grid-cell-cols: 8;
-  }
-  .grid-cell-colspan-lg-9 {
-    --grid-cell-cols: 9;
-  }
-  .grid-cell-colspan-lg-10 {
-    --grid-cell-cols: 10;
-  }
-  .grid-cell-colspan-lg-11 {
-    --grid-cell-cols: 11;
-  }
-  .grid-cell-colspan-lg-12 {
-    --grid-cell-cols: 12;
-  }
-  .grid-cell-rowspan-lg-1 {
-    --grid-cell-rows: 1;
-  }
-  .grid-cell-rowspan-lg-2 {
-    --grid-cell-rows: 2;
-  }
-  .grid-cell-rowspan-lg-3 {
-    --grid-cell-rows: 3;
-  }
-  .grid-cell-rowspan-lg-4 {
-    --grid-cell-rows: 4;
-  }
-  .grid-cell-rowspan-lg-5 {
-    --grid-cell-rows: 5;
-  }
-  .grid-cell-rowspan-lg-6 {
-    --grid-cell-rows: 6;
-  }
-  .grid-cell-rowspan-lg-7 {
-    --grid-cell-rows: 7;
-  }
-  .grid-cell-rowspan-lg-8 {
-    --grid-cell-rows: 8;
-  }
-  .grid-cell-rowspan-lg-9 {
-    --grid-cell-rows: 9;
-  }
-  .grid-cell-rowspan-lg-10 {
-    --grid-cell-rows: 10;
-  }
-  .grid-cell-rowspan-lg-11 {
-    --grid-cell-rows: 11;
-  }
-  .grid-cell-rowspan-lg-12 {
-    --grid-cell-rows: 12;
-  }
+  .grid-cols(lg, 12);
+  .grid-rows(lg, 12);
+  .grid-cell-rowspan(lg, 12);
+  .grid-cell-colspan(lg, 12);
 }
 
 @media (min-width: @minLargeDesktop) {
@@ -732,20 +273,6 @@
   .grid-rows-xl-12 {
     .grid-rows-mixin();
   }
-  .grid-cell-colspan-xl-1,
-  .grid-cell-colspan-xl-2,
-  .grid-cell-colspan-xl-3,
-  .grid-cell-colspan-xl-4,
-  .grid-cell-colspan-xl-5,
-  .grid-cell-colspan-xl-6,
-  .grid-cell-colspan-xl-7,
-  .grid-cell-colspan-xl-8,
-  .grid-cell-colspan-xl-9,
-  .grid-cell-colspan-xl-10,
-  .grid-cell-colspan-xl-11,
-  .grid-cell-colspan-xl-12 {
-    .grid-cell-colspan-mixin();
-  }
   .grid-cell-rowspan-xl-1,
   .grid-cell-rowspan-xl-2,
   .grid-cell-rowspan-xl-3,
@@ -760,150 +287,10 @@
   .grid-cell-rowspan-xl-12 {
     .grid-cell-rowspan-mixin();
   }
-  .grid-cols-xl-1 {
-    --grid-column-count: 1;
-  }
-  .grid-cols-xl-2 {
-    --grid-column-count: 2;
-  }
-  .grid-cols-xl-3 {
-    --grid-column-count: 3;
-  }
-  .grid-cols-xl-4 {
-    --grid-column-count: 4;
-  }
-  .grid-cols-xl-5 {
-    --grid-column-count: 5;
-  }
-  .grid-cols-xl-6 {
-    --grid-column-count: 6;
-  }
-  .grid-cols-xl-7 {
-    --grid-column-count: 7;
-  }
-  .grid-cols-xl-8 {
-    --grid-column-count: 8;
-  }
-  .grid-cols-xl-9 {
-    --grid-column-count: 9;
-  }
-  .grid-cols-xl-10 {
-    --grid-column-count: 10;
-  }
-  .grid-cols-xl-11 {
-    --grid-column-count: 11;
-  }
-  .grid-cols-xl-12 {
-    --grid-column-count: 12;
-  }
-  .grid-rows-xl-1 {
-    --grid-row-count: 1;
-  }
-  .grid-rows-xl-2 {
-    --grid-row-count: 2;
-  }
-  .grid-rows-xl-3 {
-    --grid-row-count: 3;
-  }
-  .grid-rows-xl-4 {
-    --grid-row-count: 4;
-  }
-  .grid-rows-xl-5 {
-    --grid-row-count: 5;
-  }
-  .grid-rows-xl-6 {
-    --grid-row-count: 6;
-  }
-  .grid-rows-xl-7 {
-    --grid-row-count: 7;
-  }
-  .grid-rows-xl-8 {
-    --grid-row-count: 8;
-  }
-  .grid-rows-xl-9 {
-    --grid-row-count: 9;
-  }
-  .grid-rows-xl-10 {
-    --grid-row-count: 10;
-  }
-  .grid-rows-xl-11 {
-    --grid-row-count: 11;
-  }
-  .grid-rows-xl-12 {
-    --grid-row-count: 12;
-  }
-  .grid-cell-colspan-xl-1 {
-    --grid-cell-cols: 1;
-  }
-  .grid-cell-colspan-xl-2 {
-    --grid-cell-cols: 2;
-  }
-  .grid-cell-colspan-xl-3 {
-    --grid-cell-cols: 3;
-  }
-  .grid-cell-colspan-xl-4 {
-    --grid-cell-cols: 4;
-  }
-  .grid-cell-colspan-xl-5 {
-    --grid-cell-cols: 5;
-  }
-  .grid-cell-colspan-xl-6 {
-    --grid-cell-cols: 6;
-  }
-  .grid-cell-colspan-xl-7 {
-    --grid-cell-cols: 7;
-  }
-  .grid-cell-colspan-xl-8 {
-    --grid-cell-cols: 8;
-  }
-  .grid-cell-colspan-xl-9 {
-    --grid-cell-cols: 9;
-  }
-  .grid-cell-colspan-xl-10 {
-    --grid-cell-cols: 10;
-  }
-  .grid-cell-colspan-xl-11 {
-    --grid-cell-cols: 11;
-  }
-  .grid-cell-colspan-xl-12 {
-    --grid-cell-cols: 12;
-  }
-  .grid-cell-rowspan-xl-1 {
-    --grid-cell-rows: 1;
-  }
-  .grid-cell-rowspan-xl-2 {
-    --grid-cell-rows: 2;
-  }
-  .grid-cell-rowspan-xl-3 {
-    --grid-cell-rows: 3;
-  }
-  .grid-cell-rowspan-xl-4 {
-    --grid-cell-rows: 4;
-  }
-  .grid-cell-rowspan-xl-5 {
-    --grid-cell-rows: 5;
-  }
-  .grid-cell-rowspan-xl-6 {
-    --grid-cell-rows: 6;
-  }
-  .grid-cell-rowspan-xl-7 {
-    --grid-cell-rows: 7;
-  }
-  .grid-cell-rowspan-xl-8 {
-    --grid-cell-rows: 8;
-  }
-  .grid-cell-rowspan-xl-9 {
-    --grid-cell-rows: 9;
-  }
-  .grid-cell-rowspan-xl-10 {
-    --grid-cell-rows: 10;
-  }
-  .grid-cell-rowspan-xl-11 {
-    --grid-cell-rows: 11;
-  }
-  .grid-cell-rowspan-xl-12 {
-    --grid-cell-rows: 12;
-  }
+  .grid-cols(xl, 12);
+  .grid-rows(xl, 12);
+  .grid-cell-rowspan(xl, 12);
+  .grid-cell-colspan(xl, 12);
 }
 
 .grid-gap-1 {
@@ -911,4 +298,29 @@
 }
 .row-gap-5 {
   row-gap: 20px;
+}
+
+.grid-cols(@breakpoint, @count) when (@count > 0) {
+   .grid-cols(@breakpoint, (@count - 1));
+    .grid-cols-@{breakpoint}-@{count} {
+      --grid-col-count: @count;
+    }
+}
+.grid-rows(@breakpoint, @count) when (@count > 0) {
+   .grid-rows(@breakpoint, (@count - 1));
+    .grid-rows-@{breakpoint}-@{count} {
+      --grid-row-count: @count;
+    }
+}
+.grid-cell-colspan(@breakpoint, @count) when (@count > 0) {
+   .grid-cell-colspan(@breakpoint, (@count - 1));
+    .grid-cell-colspan-@{breakpoint}-@{count} {
+      grid-column-end: span @count;
+    }
+}
+.grid-cell-rowspan(@breakpoint, @count) when (@count > 0) {
+   .grid-cell-rowspan(@breakpoint, (@count - 1));
+    .grid-cell-rowspan-@{breakpoint}-@{count} {
+      grid-row-end: span @count;
+    }
 }

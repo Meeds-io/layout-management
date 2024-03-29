@@ -57,7 +57,7 @@
             {{ $t('layout.addSectionAfter') }}
           </v-tooltip>
         </div>
-        <div class="absolute-vertical-center r-0 mr-n5">
+        <div class="absolute-vertical-center r-0 mr-n5 z-index-two">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
               <v-btn
@@ -99,11 +99,11 @@
 <script>
 export default {
   props: {
-    hover: {
-      type: Boolean,
-      default: false,
-    },
     container: {
+      type: Object,
+      default: null,
+    },
+    hover: {
       type: Boolean,
       default: false,
     },
@@ -145,6 +145,13 @@ export default {
           this.open = false;
         }
       }, 200);
+    },
+    open(newVal, oldVal) {
+      if (!oldVal && newVal) {
+        this.$root.hoveredSectionId = this.container.storageId;
+      } else if (!newVal && this.$root.hoveredSectionId === this.container.storageId) {
+        this.$root.hoveredSectionId = null;
+      }
     },
   },
 };
