@@ -27,9 +27,7 @@
       'z-index-two': hover && !$root.drawerOpened,
       'elevation-1': hasApplication && hover && !$root.movingCell,
     }"
-    :style="{
-      'min-height': isDynamicSection && (hasApplication && '100px' || '150px') || 'initial',
-    }"
+    :style="cssStyle"
     class="position-relative d-flex flex-column"
     no-draggable
     @hovered="hover = $event"
@@ -177,6 +175,26 @@ export default {
       return this.$root.isMultiSelect
         && this.$root.selectedSectionId === this.parentId
         && !!this.$root.selectedCellCoordinates.find(c => c.rowIndex === this.container.rowIndex && c.colIndex === this.container.colIndex);
+    },
+    isNextCellOfMovedCell() {
+      return this.$root.movingCell && this.storageId === this.$root.nextCellStorageId || false;
+    },
+    cssStyle() {
+      if (this.isDynamicSection) {
+        const cssStyle = {
+          'min-height': this.hasApplication && '100px' || '150px',
+        };
+        if (this.isNextCellOfMovedCell) {
+          if (this.$vuetify.$rtl) {
+            cssStyle['margin-right'] = `${this.$root.nextCellDiffWidth}px`;
+          } else {
+            cssStyle['margin-left'] = `${this.$root.nextCellDiffWidth}px`;
+          }
+        }
+        return cssStyle;
+      } else {
+        return null;
+      }
     },
   },
   watch: {

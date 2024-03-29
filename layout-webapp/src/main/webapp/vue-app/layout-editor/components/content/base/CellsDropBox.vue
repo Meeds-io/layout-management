@@ -256,6 +256,13 @@ export default {
         }
       }
       this.$root.selectedCellCoordinates = selectedCellCoordinates;
+      if (this.section.template === this.$layoutUtils.flexTemplate) {
+        this.$root.nextCellStorageId = this.nextCell?.storageId;
+        this.$root.nextCellDiffWidth = (this.innerCellWidth + this.$root.gap) * (colsCount - this.cell.colsCount);
+      } else {
+        this.$root.nextCellStorageId = null;
+        this.$root.nextCellDiffWidth = 0;
+      }
     },
     updateBoxCoordinates(event) {
       this.diffMovingX = event.x - this.movingStartX;
