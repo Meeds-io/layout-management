@@ -239,8 +239,6 @@ export function getCell(container, storageId) {
 }
 
 export function newSection(parentContainer, index, rows, cols, sectionType) {
-  rows = rows || 1;
-  cols = cols || 4;
   const section = newContainer(
     sectionType,
     'd-flex flex-column d-md-grid',
@@ -458,7 +456,7 @@ export function cleanAttributes(container) {
 
 function newCell(section, index, rows, cols) {
   const container = newContainer(cellTemplate,
-    section.template === flexTemplate ? 'flex-cell row-gap-5' : 'grid-cell',
+    section.template === flexTemplate ? 'flex-cell' : 'grid-cell',
     (index === 0 || index) && section || null,
     index);
   applyBreakpointValues(container, rows, cols);
@@ -541,9 +539,15 @@ function applyBreakpointClasses(container, rowClassPrefix, colClassPrefix) {
   let cssClasses = container.cssClass;
   // Apply new Classes
   if (container.colBreakpoints) {
+    if (!cssClasses.includes(colClassPrefix)) {
+      cssClasses += ` ${colClassPrefix}`;
+    }
     breakpoints.forEach(b => cssClasses += ` ${colClassPrefix}-${b}-${container.colBreakpoints[b]}`);
   }
   if (container.rowBreakpoints && rowClassPrefix) {
+    if (!cssClasses.includes(rowClassPrefix)) {
+      cssClasses += ` ${rowClassPrefix}`;
+    }
     breakpoints.forEach(b => cssClasses += ` ${rowClassPrefix}-${b}-${container.rowBreakpoints[b]}`);
   }
   container.cssClass = cssClasses;
