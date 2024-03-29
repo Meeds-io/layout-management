@@ -244,17 +244,60 @@ export function newSection(parentContainer, index, rows, cols, sectionType) {
     'd-flex flex-column d-md-grid',
     parentContainer,
     index || 0);
-  applyBreakpointValues(section, rows, cols);
+  applyBreakpointValues(section,
+    sectionType === flexTemplate ? 1 : rows,
+    sectionType === flexTemplate ? 12 : cols);
   applyGridStyle(section);
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      newCell(section, 0, 1, 1);
+  if (sectionType === flexTemplate) {
+    const colSpan = parseInt(12 / cols);
+    for (let i = 0; i < cols - 1; i++) {
+      newCell(section, 0, 1, colSpan);
+    }
+    const leftColSpan = colSpan + 12 % cols;
+    newCell(section, 0, 1, leftColSpan);
+  } else {
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        newCell(section, 0, 1, 1);
+      }
     }
   }
   // Compute cell indexes
   parseMatrix(section);
   return section;
+}
+
+export function editGridSection(section, rows, cols) {
+  const diffRows = rows - section.rowsCount;
+  const diffCols = cols - section.colsCount;
+  if (diffCols > 0) {
+    addColumns(section, diffCols);
+  } else if (diffCols < 0) {
+    removeColumns(section, diffCols);
+  }
+  if (diffRows > 0) {
+    addRows(section, diffRows);
+  } else if (diffRows < 0) {
+    removeRows(section, diffRows);
+  }
+}
+
+export function editDynamicSection(section, cols) {
+  const colSpan = parseInt(section.colsCount / cols);
+  section.children.forEach(c => applyBreakpointValues(c, 1, colSpan));
+
+  const diffCols = cols - section.children.length;
+  if (diffCols < 0) {
+    section.children = section.children.slice(0, cols);
+  } else if (diffCols > 0) {
+    const lastIndex = section.children.length;
+    for (let i = 0; i < diffCols; i++) {
+      newCell(section, lastIndex, 1, colSpan);
+    }
+  }
+  parseSectionMatrix(section, parseMatrix(section));
+  applyGridStyle(section);
 }
 
 export function newApplication(parentContainer, appFromRegistry, append) {
@@ -393,18 +436,30 @@ export function deleteCell(section, cell) {
 }
 
 export function resizeCell(section, cell, rowIndex, colIndex) {
-  const matrix = parseMatrix(section);
-  for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
-    for (let col = cell.colIndex; col < (cell.colIndex + cell.colsCount); col++) {
-      matrix[row][col] = null;
+  if (section.template === flexTemplate) {
+    cell = section.children.find(c => c.storageId === cell.storageId);
+    const cellIndex = section.children.findIndex(c => c.storageId === cell.storageId);
+    const nextCell = section.children[cellIndex + 1];
+
+    cell.colsCount = colIndex - cell.colIndex + 1;
+    nextCell.colsCount = nextCell.colsCount + nextCell.colIndex - colIndex - 1;
+    nextCell.colIndex = colIndex + cell.colsCount;
+    applyBreakpointValues(section, section.rowsCount, section.colsCount);
+    parseSectionMatrix(section, parseMatrix(section));
+  } else {
+    const matrix = parseMatrix(section);
+    for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
+      for (let col = cell.colIndex; col < (cell.colIndex + cell.colsCount); col++) {
+        matrix[row][col] = null;
+      }
     }
-  }
-  for (let row = cell.rowIndex; row <= rowIndex; row++) {
-    for (let col = cell.colIndex; col <= colIndex; col++) {
-      matrix[row][col] = cell;
+    for (let row = cell.rowIndex; row <= rowIndex; row++) {
+      for (let col = cell.colIndex; col <= colIndex; col++) {
+        matrix[row][col] = cell;
+      }
     }
+    parseSectionMatrix(section, matrix);
   }
-  parseSectionMatrix(section, matrix);
   applyGridStyle(section);
 }
 
@@ -454,7 +509,7 @@ export function cleanAttributes(container) {
   return container;
 }
 
-function newCell(section, index, rows, cols) {
+export function newCell(section, index, rows, cols) {
   const container = newContainer(cellTemplate,
     section.template === flexTemplate ? 'flex-cell' : 'grid-cell',
     (index === 0 || index) && section || null,
@@ -624,7 +679,7 @@ function parseGapClasses() {
   };
 }
 
-function applyBreakpointValues(container, rows, cols) {
+export function applyBreakpointValues(container, rows, cols) {
   if (!container.colBreakpoints) {
     container.colBreakpoints = {};
   }
@@ -697,12 +752,8 @@ export function displayMatrix(matrix) {
   Object.keys(matrix).forEach(r => {
     result[r] = {};
     Object.keys(matrix[r]).forEach(c => {
-      if (matrix[r][c]?.children?.length) {
+      if (matrix[r][c]?.storageId) {
         result[r][c] = `${matrix[r][c].storageId}_${r}_${c}`;
-      } else if (matrix[r][c]?.randomId) {
-        result[r][c] = 0;
-      } else if (matrix[r][c]?.storageId) {
-        result[r][c] = '---------';
       } else {
         result[r][c] = null;
       }

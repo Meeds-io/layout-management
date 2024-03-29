@@ -37,7 +37,7 @@
         :container="child"
         :parent-id="storageId"
         :index="i"
-        :length="children.length"
+        :length="childrenSize"
         :class="draggableContainerClass"
         @move-start="$emit('move-start')" />
     </draggable>
@@ -55,7 +55,7 @@
           :container="child"
           :parent-id="storageId"
           :index="i"
-          :length="children.length"
+          :length="childrenSize"
           :class="{
             'invisible': hideChildren
           }"
