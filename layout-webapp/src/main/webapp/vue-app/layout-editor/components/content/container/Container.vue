@@ -21,8 +21,10 @@
 <template>
   <layout-editor-container-base
     :container="container"
+    :parent-id="parentId"
     :index="index"
-    :context="context" />
+    :context="context"
+    :draggable="childrenSize > 1" />
 </template>
 <script>
 export default {
@@ -38,6 +40,11 @@ export default {
     context: {
       type: String,
       default: null,
+    },
+  },
+  computed: {
+    childrenSize() {
+      return this.container?.children?.length || 0;
     },
   },
 };
