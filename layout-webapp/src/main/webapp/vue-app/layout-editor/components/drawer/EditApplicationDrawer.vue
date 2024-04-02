@@ -170,7 +170,8 @@ export default {
   data: () => ({
     drawer: false,
     initialized: false,
-    section: null,
+    sectionId: null,
+    parentId: null,
     container: null,
     marginChoice: 'same',
     marginTop: 20,
@@ -185,17 +186,14 @@ export default {
     radiusBottomLeft: null,
     enableBorderColor: true,
     borderColor: '#FFFFFF',
-    applicationCategory: null,
+    applicationCategoryTitle: null,
     applicationTitle: null,
   }),
   computed: {
-    sectionId() {
-      return this.section.storageId;
-    },
     drawerTitle() {
       return this.$t('layout.editApplicationTitle', {
         0: this.applicationTitle,
-        1: this.applicationCategory,
+        1: this.applicationCategoryTitle,
       });
     },
     styleClasses() {
@@ -253,22 +251,23 @@ export default {
       }
     },
     styleClasses(value, oldVal) {
-      if (value && oldVal && this.sectionId) {
+      if (value && oldVal) {
         this.$root.$emit('layout-section-history-add', this.sectionId);
-        this.$layoutUtils.applyContainerStyle(this.section, this.container, value);
-        this.$root.$emit('layout-modified', true);
+        this.$layoutUtils.applyContainerStyle(this.container, value);
+        this.$root.$emit('layout-section-application-update-style', this.container);
       } else if (value && !oldVal) {
         this.initialized = true;
       }
     },
   },
   methods: {
-    open(section, container, applicationCategory, applicationTitle) {
+    open(parentId, container, applicationCategoryTitle, applicationTitle) {
       this.initialized = false;
 
-      this.section = section;
+      this.parentId = parentId;
+      this.sectionId = this.$root.hoveredSectionId;
       this.container = container;
-      this.applicationCategory = applicationCategory;
+      this.applicationCategoryTitle = applicationCategoryTitle;
       this.applicationTitle = applicationTitle;
       this.$layoutUtils.parseContainerStyle(this.container, this.styleClasses);
 
