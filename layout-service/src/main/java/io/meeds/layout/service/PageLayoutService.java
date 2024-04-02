@@ -31,6 +31,7 @@ import com.google.javascript.jscomp.jarjar.com.google.re2j.Pattern;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
@@ -296,28 +297,40 @@ public class PageLayoutService {
   }
 
   private void validateCSSInputs(ModelObject modelObject) {
+    String width;
+    String height;
+    String borderColor;
     if (modelObject instanceof Container container) {
-      if (container.getWidth() != null
-          && !SIZE_MATCHER_VALIDATOR.matches(container.getWidth())) {
-        throw new IllegalArgumentException(String.format("Container with id %s has an invalid width input %s",
-                                                         container.getStorageId(),
-                                                         container.getWidth()));
-      }
-      if (container.getHeight() != null
-          && !SIZE_MATCHER_VALIDATOR.matches(container.getHeight())) {
-        throw new IllegalArgumentException(String.format("Container with id %s has an invalid height input %s",
-                                                         container.getStorageId(),
-                                                         container.getHeight()));
-      }
-      if (container.getBorderColor() != null
-          && !COLOR_MATCHER_VALIDATOR.matches(container.getBorderColor())) {
-        throw new IllegalArgumentException(String.format("Container with id %s has an invalid border color input %s",
-                                                         container.getStorageId(),
-                                                         container.getBorderColor()));
-      }
+      width = container.getWidth();
+      height = container.getHeight();
+      borderColor = container.getBorderColor();
       if (!CollectionUtils.isEmpty(container.getChildren())) {
         container.getChildren().forEach(this::validateCSSInputs);
       }
+    } else if (modelObject instanceof Application application) { // NOSONAR
+      width = application.getWidth();
+      height = application.getHeight();
+      borderColor = application.getBorderColor();
+    } else {
+      return;
+    }
+    if (width != null
+        && !SIZE_MATCHER_VALIDATOR.matches(width)) {
+      throw new IllegalArgumentException(String.format("Container with id %s has an invalid width input %s",
+                                                       modelObject.getStorageId(),
+                                                       width));
+    }
+    if (height != null
+        && !SIZE_MATCHER_VALIDATOR.matches(height)) {
+      throw new IllegalArgumentException(String.format("Container with id %s has an invalid height input %s",
+                                                       modelObject.getStorageId(),
+                                                       height));
+    }
+    if (borderColor != null
+        && !COLOR_MATCHER_VALIDATOR.matches(borderColor)) {
+      throw new IllegalArgumentException(String.format("Container with id %s has an invalid border color input %s",
+                                                       modelObject.getStorageId(),
+                                                       borderColor));
     }
   }
 

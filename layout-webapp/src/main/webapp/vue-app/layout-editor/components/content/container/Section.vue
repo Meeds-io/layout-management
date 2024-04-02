@@ -22,18 +22,21 @@
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     ref="section"
+    :data-storage-id="storageId"
     class="position-relative layout-section pb-5"
-    @mousedown="startSelection">
+    v-on="!isDynamicSection && {
+      'mousedown': startSelection,
+    }">
     <layout-editor-container-base
       ref="container"
       :container="container"
+      :parent-id="parentId"
       :index="index"
       :class="zIndexClass"
       class="position-relative overflow-initial"
       type="section"
-      no-draggable
       @hovered="hoverSection = $event && !drawerOpened">
-      <template v-if="$root.movingParentId === storageId" #footer>
+      <template v-if="$root.movingParentId === storageId && !isDynamicSection" #footer>
         <layout-editor-section-selection-grid
           :section="container"
           class="position-absolute z-index-two full-width full-height" />
@@ -53,7 +56,8 @@
             :index="index"
             :length="length"
             :moving="movingSection"
-            @move-start="movingSection = true" />
+            @move-start="movingSection = true"
+            @move-end="movingSection = false" />
         </div>
       </div>
     </v-hover>
@@ -64,6 +68,10 @@ export default {
   props: {
     container: {
       type: Object,
+      default: null,
+    },
+    parentId: {
+      type: String,
       default: null,
     },
     index: {
@@ -89,6 +97,9 @@ export default {
     },
     drawerOpened() {
       return this.$root.drawerOpened;
+    },
+    isDynamicSection() {
+      return this.container.template === this.$layoutUtils.flexTemplate;
     },
   },
   created() {

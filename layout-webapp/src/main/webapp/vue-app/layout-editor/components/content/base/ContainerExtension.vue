@@ -23,6 +23,8 @@
     <component
       :is="containerType"
       :container="container"
+      :application-title="applicationTitle"
+      :application-category="applicationCategoryTitle"
       :index="index"
       :parent-id="parentId"
       :length="length"
@@ -31,8 +33,9 @@
       :cell-width="cellWidth"
       :rows-count="rowsCount"
       :cols-count="colsCount"
-      @move-start="$emit('move-start')"
-      @initialized="$emit('initialized', container)" />
+      @initialized="$emit('initialized', container)"
+      @move-start="moveStart"
+      @move-end="moveEnd" />
   </KeepAlive>
   <div v-else-if="!storageId && containerType === 'application'" class="d-flex align-center justify-center full-width full-height">
     <v-progress-circular color="primary" indeterminate />
@@ -77,6 +80,14 @@ export default {
       type: Number,
       default: null,
     },
+    applicationTitle: {
+      type: String,
+      default: null,
+    },
+    applicationCategoryTitle: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     storageId() {
@@ -92,6 +103,14 @@ export default {
       return {
         container: this.container,
       };
+    },
+  },
+  methods: {
+    moveStart(event, moveType) {
+      this.$emit('move-start', event, moveType);
+    },
+    moveEnd() {
+      this.$emit('move-end');
     },
   },
 };
