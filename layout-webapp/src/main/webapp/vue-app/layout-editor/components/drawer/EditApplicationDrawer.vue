@@ -14,7 +14,7 @@
         max-width="100%"
         class="ma-4"
         flat>
-        <div class="subtitle-1 font-weight-bold">
+        <div class="subtitle-1 font-weight-bold mb-2">
           {{ $t('layout.margins') }}
         </div>
         <div
@@ -34,10 +34,11 @@
             <v-list-item-content v-if="marginChoice === 'different'" class="my-auto">
               {{ $t('layout.top') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="marginTop"
               :diff="-20"
-              :class="marginChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'" />
+              :class="marginChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
+              class="me-n3" />
           </v-list-item>
           <v-list-item
             v-if="marginChoice === 'different'"
@@ -46,10 +47,10 @@
             <v-list-item-content class="my-auto">
               {{ $t('layout.right') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="marginRight"
               :diff="-20"
-              class="my-auto" />
+              class="my-auto me-n3" />
           </v-list-item>
           <v-list-item
             v-if="marginChoice === 'different'"
@@ -58,10 +59,10 @@
             <v-list-item-content class="my-auto">
               {{ $t('layout.bottom') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="marginBottom"
               :diff="-20"
-              class="my-auto" />
+              class="my-auto me-n3" />
           </v-list-item>
           <v-list-item
             v-if="marginChoice === 'different'"
@@ -70,10 +71,10 @@
             <v-list-item-content class="my-auto">
               {{ $t('layout.left') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="marginLeft"
               :diff="-20"
-              class="my-auto" />
+              class="my-auto me-n3" />
           </v-list-item>
         </div>
         <div class="d-flex align-center mt-4">
@@ -123,9 +124,10 @@
             <v-list-item-content v-if="radiusChoice === 'different'" class="my-auto">
               {{ $t('layout.topRight') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="radiusTopRight"
-              :class="radiusChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'" />
+              :class="radiusChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
+              class="me-n3" />
           </v-list-item>
           <v-list-item
             v-if="radiusChoice === 'different'"
@@ -134,9 +136,9 @@
             <v-list-item-content class="my-auto">
               {{ $t('layout.topLeft') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="radiusTopLeft"
-              class="my-auto" />
+              class="my-auto me-n3" />
           </v-list-item>
           <v-list-item
             v-if="radiusChoice === 'different'"
@@ -145,9 +147,9 @@
             <v-list-item-content class="my-auto">
               {{ $t('layout.bottomRight') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="radiusBottomRight"
-              class="my-auto" />
+              class="my-auto me-n3" />
           </v-list-item>
           <v-list-item
             v-if="radiusChoice === 'different'"
@@ -156,11 +158,72 @@
             <v-list-item-content class="my-auto">
               {{ $t('layout.bottomLeft') }}
             </v-list-item-content>
-            <layout-editor-border-input
+            <layout-editor-number-input
               v-model="radiusBottomLeft"
-              class="my-auto" />
+              class="my-auto me-n3" />
           </v-list-item>
         </div>
+        <template v-if="isDynamicSection">
+          <div class="d-flex align-center mt-4">
+            <div class="subtitle-1 font-weight-bold me-auto mb-2">
+              {{ $t('layout.advancedOptions') }}
+            </div>
+          </div>
+          <div class="d-flex align-center ms-n1">
+            <v-checkbox
+              v-model="fixedHeight"
+              :label="$t('layout.fixedHeight')"
+              on-icon="fa-check-square"
+              off-icon="far fa-square"
+              class="my-0 ml-n2px" />
+          </div>
+          <div v-if="fixedHeight" class="d-flex flex-column justify-center">
+            <v-radio-group
+              v-model="height"
+              class="my-auto text-no-wrap ms-7"
+              mandatory>
+              <v-radio
+                value="150px"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size">{{ $t('layout.fixedHeight150') }}</span>
+                </template>
+              </v-radio>
+              <v-radio
+                value="300px"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size">{{ $t('layout.fixedHeight300') }}</span>
+                </template>
+              </v-radio>
+              <v-radio
+                value="500px"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size">{{ $t('layout.fixedHeight500') }}</span>
+                </template>
+              </v-radio>
+              <v-radio
+                :value="customHeight"
+                class="mx-0">
+                <template #label>
+                  <div class="d-flex full-width align-center">
+                    <span class="text-font-size">{{ $t('layout.fixedHeightCustom') }}</span>
+                    <layout-editor-number-input
+                      v-model="height"
+                      v-if="height === customHeight"
+                      :label="$t('layout.fixedHeight')"
+                      :min="100"
+                      :max="1000"
+                      :step="10"
+                      class="ms-auto my-n2"
+                      editable />
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </div>
+        </template>
       </v-card>
     </template>
   </exo-drawer>
@@ -170,8 +233,10 @@ export default {
   data: () => ({
     drawer: false,
     initialized: false,
-    sectionId: null,
-    parentId: null,
+    fixedHeight: false,
+    customHeightValue: false,
+    height: null,
+    section: null,
     container: null,
     marginChoice: 'same',
     marginTop: 20,
@@ -190,6 +255,15 @@ export default {
     applicationTitle: null,
   }),
   computed: {
+    sectionId() {
+      return this.section?.storageId;
+    },
+    isDynamicSection() {
+      return this.section?.template === this.$layoutUtils.flexTemplate;
+    },
+    customHeight() {
+      return (!this.height || this.height === '150px' || this.height === '300px' || this.height === '500px') ? 400 : this.height;
+    },
     drawerTitle() {
       return this.$t('layout.editApplicationTitle', {
         0: this.applicationTitle,
@@ -250,6 +324,20 @@ export default {
         this.radiusBottomLeft = null;
       }
     },
+    radiusChoice() {
+      if (this.radiusChoice === 'same') {
+        this.radiusTopLeft = this.radiusTopRight;
+        this.radiusBottomRight = this.radiusTopRight;
+        this.radiusBottomLeft = this.radiusTopRight;
+      }
+    },
+    marginChoice() {
+      if (this.marginChoice === 'same') {
+        this.marginRight = this.marginTop;
+        this.marginBottom = this.marginTop;
+        this.marginLeft = this.marginTop;
+      }
+    },
     styleClasses(value, oldVal) {
       if (value && oldVal) {
         this.$root.$emit('layout-section-history-add', this.sectionId);
@@ -259,14 +347,30 @@ export default {
         this.initialized = true;
       }
     },
+    fixedHeight(value) {
+      if (value) {
+        this.height = this.height || '150px';
+      } else {
+        this.height = null;
+      }
+    },
+    height(value) {
+      if (this.initialized) {
+        this.$root.$emit('layout-section-history-add', this.sectionId);
+        this.container.height = value;
+        this.$root.$emit('layout-section-application-update-style', this.container);
+      }
+    },
   },
   methods: {
-    open(parentId, container, applicationCategoryTitle, applicationTitle) {
+    open(section, container, applicationCategoryTitle, applicationTitle) {
       this.initialized = false;
 
-      this.parentId = parentId;
-      this.sectionId = this.$root.hoveredSectionId;
+      this.section = section;
       this.container = container;
+      this.section = section;
+      this.height = container.height;
+      this.fixedHeight = !!this.height;
       this.applicationCategoryTitle = applicationCategoryTitle;
       this.applicationTitle = applicationTitle;
       this.$layoutUtils.parseContainerStyle(this.container, this.styleClasses);

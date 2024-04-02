@@ -1,30 +1,6 @@
 @import 'variables.less';
 @import 'mixins.less';
 
-.layout-application {
-  /* Scrollbar style */
-  .specific-scrollbar();
-
-  overflow-x: unset;
-  /* Default Vertical Scroll behavior */
-  overflow-y: unset;
-  max-height: 100%;
-}
-.grid-cell-height-scroll {
-  .layout-application {
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 100%;
-  }
-}
-.grid-cell-height-auto {
-  aspect-ratio: auto !important;
-
-  .layout-application {
-    max-height: none;
-  }
-}
-
 .container-border-color {
   border: ~"1px solid var(--container-border-color, #FFFFFF)";
 }
@@ -38,6 +14,7 @@
   grid-gap: ~"var(--grid-layout-gap, 20px)";
   margin-bottom: ~"var(--grid-layout-gap, 20px)";
 }
+
 .grid-rows-mixin(){
   --gap-row-count: ~"calc(var(--grid-row-count) - 1)";
   --total-gap-height: ~"calc(var(--gap-row-count)* var(--grid-layout-gap, 20px))";
@@ -47,30 +24,60 @@
   aspect-ratio: ~"calc(var(--grid-col-count) / var(--grid-row-count))";
   overflow: hidden;
 }
+
 .grid-cell-rowspan-mixin(){
   grid-row-end: span ~"var(--grid-cell-rows)";
 }
 
 .layout-sections-parent {
   .PORTLET-FRAGMENT {
+    /* Scrollbar style */
+    .specific-scrollbar();
     border-top-right-radius: ~"var(--appBorderRadiusTopRight, var(--allPagesBorderRadius, 4px)) !important;";
     border-top-left-radius: ~"var(--appBorderRadiusTopLeft, var(--allPagesBorderRadius, 4px)) !important;";
     border-bottom-right-radius: ~"var(--appBorderRadiusBottomRight, var(--allPagesBorderRadius, 4px)) !important;";
     border-bottom-left-radius: ~"var(--appBorderRadiusBottomLeft, var(--allPagesBorderRadius, 4px)) !important;";
     border: ~"1px solid var(--appBorderColor, transparent) !important";
+    height: ~"var(--appHeight, auto) !important";
+    max-height: ~"var(--appHeight, 100%) !important";
+    width: ~"var(--appWidth, auto) !important";
+    max-width: ~"var(--appWidth, unset) !important";
+    overflow-y: ~"var(--appHeightScroll, unset) !important";
+    overflow-x: ~"var(--appWidthScroll, unset) !important";
+    padding-bottom: 0;
   }
+
+  .grid-cell-height-scroll {
+    .PORTLET-FRAGMENT {
+      --appHeightScroll: auto;
+      --appWidthScroll: hidden;
+    }
+    .layout-application {
+      max-height: 100%;
+      width: 100%;
+    }
+  }
+
+  .grid-cell-height-auto {
+    aspect-ratio: auto !important;
+    .PORTLET-FRAGMENT {
+      max-height: none;
+    }
+    .layout-application {
+      max-height: none;
+    }
+  }
+
+}
+
+.grid-cell {
+  display: flex;
 }
 
 .flex-cell {
   display: flex;
   flex-direction: column;
   row-gap: ~"var(--grid-layout-gap, 20px)";
-}
-
-.layout-sections-parent {
-  .PORTLET-FRAGMENT {
-    padding-bottom: 0;
-  }
 }
 
 @media (max-width: @maxTabletWidth) {

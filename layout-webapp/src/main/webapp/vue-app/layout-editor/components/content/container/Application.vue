@@ -13,7 +13,7 @@
         :section="section"
         :parent-id="parentId"
         :application-title="applicationTitle"
-        :application-category="applicationCategoryTitle"
+        :application-category-title="applicationCategoryTitle"
         @move-start="moveStart"
         @move-end="moveEnd" />
     </div>
@@ -27,14 +27,6 @@ export default {
       default: null,
     },
     parentId: {
-      type: String,
-      default: null,
-    },
-    applicationTitle: {
-      type: String,
-      default: null,
-    },
-    applicationCategoryTitle: {
       type: String,
       default: null,
     },
@@ -67,10 +59,12 @@ export default {
       } else {
         const style = {};
         if (this.height) {
-          style.height = this.hasUnit(this.height) ? this.height : `${this.height}px`;
+          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
+          style['--appHeightScroll'] = 'auto';
         }
         if (this.width) {
-          style.width = this.hasUnit(this.width) ? this.width : `${this.width}px`;
+          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
+          style['--appWidthScroll'] = 'auto';
         }
         if (this.borderColor) {
           style['--appBorderColor'] = this.borderColor;
@@ -80,6 +74,15 @@ export default {
     },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
+    },
+    applicationTitle() {
+      return this.container?.title || '';
+    },
+    applicationCategory() {
+      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+    },
+    applicationCategoryTitle() {
+      return this.applicationCategory?.displayName || '';
     },
   },
   watch: {
