@@ -42,8 +42,8 @@ import SectionGridEditor from './components/content/common/SectionGridEditor.vue
 import SectionFlexEditor from './components/content/common/SectionFlexEditor.vue';
 import ApplicationCategoryCard from './components/content/common/ApplicationCategoryCard.vue';
 import ApplicationCard from './components/content/common/ApplicationCard.vue';
-import CellTopMenu from './components/content/common/CellTopMenu.vue';
-import CellMoveButton from './components/content/common/CellMoveButton.vue';
+import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
+import CellResizeButton from './components/content/common/CellResizeButton.vue';
 
 import Page from './components/content/container/Page.vue';
 import Container from './components/content/container/Container.vue';
@@ -84,8 +84,8 @@ const components = {
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
   'layout-editor-application-card': ApplicationCard,
   'layout-editor-application-category-card': ApplicationCategoryCard,
-  'layout-editor-cell-top-menu': CellTopMenu,
-  'layout-editor-cell-move-button': CellMoveButton,
+  'layout-editor-application-menu': ApplicationMenu,
+  'layout-editor-cell-resize-button': CellResizeButton,
   'layout-editor-cells-selection-box': CellsSelectionBox,
   'layout-editor-cells-drop-box': CellsDropBox,
 };

@@ -22,16 +22,20 @@
   <layout-editor-container-base
     ref="container"
     :container="container"
+    :parent-id="parentId"
+    :draggable="isDynamicSection"
+    :application-title="applicationTitle"
+    :application-category="applicationCategoryTitle"
     :hide-children="moving"
     :class="{
       'z-index-two': hover && !$root.drawerOpened,
-      'elevation-1': hasApplication && hover && !$root.movingCell,
+      'pb-12': movingChildren,
     }"
     :style="cssStyle"
     class="position-relative d-flex flex-column"
-    no-draggable
     @hovered="hover = $event"
-    @initialized="computeHasContent">
+    @initialized="computeHasContent"
+    @move-start="moveStart">
     <template #footer>
       <div
         v-if="$root.desktopDisplayMode && !isDynamicSection && hasApplication && !moving"
@@ -54,28 +58,19 @@
         :class="{
           'mt-n5': isDynamicSection,
         }">
-        <layout-editor-cell-move-button
-          v-if="hasApplication || (isDynamicSection && index < (length - 1) && length < 12)"
+        <layout-editor-cell-resize-button
+          v-if="displayResizeButton"
           :container="container"
           :parent-id="parentId"
           :dynamic-section="isDynamicSection"
           :hover="hover"
           :moving="moving"
-          @move-start="moveStart" />
-        <layout-editor-cell-top-menu
-          v-if="hasApplication"
-          :container="container"
-          :dynamic-section="isDynamicSection"
-          :parent-id="parentId"
-          :hover="hover"
-          :moving="moving"
-          :application-title="applicationTitle"
-          :application-category="applicationCategoryTitle"
           @move-start="moveStart" />
       </div>
       <v-hover v-if="$root.desktopDisplayMode && (!hasApplication || isDynamicSection)">
         <v-card
           slot-scope="hoverScope"
+          v-show="!movingChildren"
           :class="{
             'full-height': !hasApplication,
             'mt-n5': hasApplication,
@@ -140,6 +135,9 @@ export default {
     moving() {
       return this.storageId && this.$root.movingCell?.storageId === this.storageId;
     },
+    movingChildren() {
+      return this.storageId && this.isDynamicSection && this.$root.movingParentId === this.parentId;
+    },
     sectionType() {
       return this.$layoutUtils.getSection(this.$root.layout, this.parentId)?.template;
     },
@@ -179,6 +177,12 @@ export default {
     isNextCellOfMovedCell() {
       return this.$root.movingCell && this.storageId === this.$root.nextCellStorageId || false;
     },
+    displayResizeButton() {
+      return this.hasApplication || (this.isDynamicSection && this.index < (this.length - 1) && this.length < 12);
+    },
+    displayToMenu() {
+      return this.hasApplication && !this.isDynamicSection;
+    },
     cssStyle() {
       if (this.isDynamicSection) {
         const cssStyle = {};
@@ -209,17 +213,20 @@ export default {
   methods: {
     moveStart(event, moveType) {
       this.$root.movingParentId = this.parentId;
-      this.$nextTick().then(() => {
-        this.$root.$emit('layout-cell-moving-start', {
-          target: event.target,
-          x: event.x,
-          y: event.y,
-          sectionId: this.parentId,
-          cell: this.container,
-          containerElement: this.$refs.container.$el,
-          moveType,
+      this.$root.moveType = moveType;
+      if (!this.isDynamicSection || moveType === 'resize') {
+        this.$nextTick().then(() => {
+          this.$root.$emit('layout-cell-moving-start', {
+            target: event.target,
+            x: event.x,
+            y: event.y,
+            sectionId: this.parentId,
+            cell: this.container,
+            containerElement: this.$refs.container.$el,
+            moveType,
+          });
         });
-      });
+      }
     },
     computeHasContent() {
       this.hasContentCheckCount = 0;

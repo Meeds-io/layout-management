@@ -215,8 +215,11 @@ export default {
         } else if (!lastCell) {
           console.error('Can not find the last cell to add an application into it', selectedCells, lastCellRowIndex, lastCellColIndex); // eslint-lint-disable no-console
           return;
-        } else if (selectedCells.length > 1) {
-          this.mergeCell(selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
+        } else {
+          this.addSectionVersion(section.storageId);
+          if (selectedCells.length > 1) {
+            this.mergeCell(selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
+          }
         }
         const cell = this.$layoutUtils.getCell(this.layoutToEdit, firstCell.storageId);
         this.$layoutUtils.newApplication(cell, application, isDynamicSection);
@@ -253,14 +256,8 @@ export default {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
     },
-    handleEditApplication(sectionId, container, applicationCategory, applicationTitle) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === sectionId);
-      if (section) {
-        this.$refs.applicationPropertiesDrawer.open(section, container, applicationCategory, applicationTitle);
-      } else {
-        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
-      }
+    handleEditApplication(sectionId, container, applicationCategoryTitle, applicationTitle) {
+      this.$refs.applicationPropertiesDrawer.open(sectionId, container, applicationCategoryTitle, applicationTitle);
     },
     mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
@@ -283,7 +280,7 @@ export default {
       }
     },
     handleSectionUpdated(container, children, index, type) {
-      container.children = children;
+      container.children = children?.filter(c => !!c) || [];
       if (type === 'section' && !container.children?.length) {
         window.setTimeout(() => this.handleRemoveSection(index), 500);
       }
