@@ -49,7 +49,10 @@ export function init() {
         i18n,
         data: () => ({
           containerTypes: extensionRegistry.loadExtensions('layout-editor', 'container'),
+          hoveredParentId: null,
           hoveredSectionId: null,
+          hoveredSection: null,
+          hoveredApplication: null,
           applicationCategories: null,
           branding: null,
           displayMode: 'desktop',

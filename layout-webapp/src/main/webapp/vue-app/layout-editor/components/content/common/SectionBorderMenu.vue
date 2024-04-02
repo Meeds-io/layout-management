@@ -22,7 +22,7 @@
   <div
     v-show="displayBorder"
     :class="moving && 'layout-section-moving' || 'layout-section-hover'"
-    class="absolute-full-size border-radius">
+    class="absolute-full-size layout-no-multi-select border-radius">
     <v-slide-y-transition>
       <div v-if="open" class="position-relative full-width full-height">
         <div class="absolute-horizontal-center t-0 mt-n4">
@@ -85,7 +85,10 @@
                 width="32"
                 class="draggable"
                 icon
-                @mousedown="$emit('move-start')">
+                @mousedown="$emit('move-start')"
+                @mouseup="$emit('move-end')"
+                @mouseout="$emit('move-end')"
+                @focusout="$emit('move-end')">
                 <v-icon size="24">fa-arrows-alt</v-icon>
               </v-btn>
             </template>
