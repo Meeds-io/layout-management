@@ -25,6 +25,7 @@
         <div id="UIPage">
           <layout-editor-container-base
             :container="container"
+            :parent-id="parentId"
             class="UIRowContainer" />
         </div>
       </div>

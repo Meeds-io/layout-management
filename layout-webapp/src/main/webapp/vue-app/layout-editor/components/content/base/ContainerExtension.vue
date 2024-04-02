@@ -31,8 +31,9 @@
       :cell-width="cellWidth"
       :rows-count="rowsCount"
       :cols-count="colsCount"
-      @move-start="$emit('move-start')"
-      @initialized="$emit('initialized', container)" />
+      @initialized="$emit('initialized', container)"
+      @move-start="moveStart"
+      @move-end="moveEnd" />
   </KeepAlive>
   <div v-else-if="!storageId && containerType === 'application'" class="d-flex align-center justify-center full-width full-height">
     <v-progress-circular color="primary" indeterminate />
@@ -92,6 +93,14 @@ export default {
       return {
         container: this.container,
       };
+    },
+  },
+  methods: {
+    moveStart(event, moveType) {
+      this.$emit('move-start', event, moveType);
+    },
+    moveEnd() {
+      this.$emit('move-end');
     },
   },
 };
