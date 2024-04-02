@@ -172,7 +172,7 @@ export function applyGridStyle(container, sectionTemplate) {
   }
 }
 
-export function applyContainerStyle(section, container, containerStyle) {
+export function applyContainerStyle(container, containerStyle) {
   if (!container.cssClass) {
     container.cssClass = '';
   }
@@ -190,6 +190,8 @@ export function applyContainerStyle(section, container, containerStyle) {
   container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
 
   container.cssClass = container.cssClass.replace(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g'), '').replace(/  +/g, ' ');
+  Vue.set(container, 'cssClass', container.cssClass);
+
   const borderRadiusEnabled = containerStyle.radiusTopRight === 0 || containerStyle.radiusTopRight;
 
   Vue.set(container, 'radiusTopRight', borderRadiusEnabled ? containerStyle.radiusTopRight : null);
@@ -230,7 +232,30 @@ export function parseSections(layout) {
 
 export function getSection(layout, id) {
   const parentContainer = getParentContainer(layout);
-  return parentContainer?.children?.find?.(c => c.storageId === id);
+  return parentContainer?.children?.find?.(c => c?.storageId === id);
+}
+
+export function getSectionByContainer(layout, id) {
+  const parentContainer = getParentContainer(layout);
+  return parentContainer?.children?.find?.(c => hasChild(c, id));
+}
+
+export function getContainerById(container, id) {
+  if (container?.storageId === id) {
+    return container;
+  } else if (container?.children?.length) {
+    return container?.children.map(c => getContainerById(c, id)).find(c => !!c);
+  } else {
+    return null;
+  }
+}
+
+export function hasChild(container, id) {
+  if (container?.storageId === id) {
+    return true;
+  } else {
+    return container?.children?.find?.(c => hasChild(c, id));
+  }
 }
 
 export function getCell(container, storageId) {
@@ -427,21 +452,30 @@ export function moveCell(section, sourceCell, targetRowIndex, targetColIndex) {
   applyGridStyle(section);
 }
 
-export function deleteCell(section, cell) {
-  const matrix = parseMatrix(section);
-  for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
-    for (let col = cell.colIndex; col < (cell.colIndex + cell.colsCount); col++) {
-      matrix[row][col] = null;
+export function deleteCell(section, application) {
+  const cell = section?.children?.find?.(c => hasChild(c, application.storageId));
+  if (section.template === flexTemplate) {
+    const index = cell.children.findIndex(c => hasChild(c, application.storageId));
+    if (index >= 0) {
+      cell.children.splice(index, 1);
     }
+    parseSectionMatrix(section, parseMatrix(section));
+  } else {
+    const matrix = parseMatrix(section);
+    for (let row = cell.rowIndex; row < (cell.rowIndex + cell.rowsCount); row++) {
+      for (let col = cell.colIndex; col < (cell.colIndex + cell.colsCount); col++) {
+        matrix[row][col] = null;
+      }
+    }
+    parseSectionMatrix(section, matrix);
   }
-  parseSectionMatrix(section, matrix);
   applyGridStyle(section);
 }
 
 export function resizeCell(section, cell, rowIndex, colIndex) {
   if (section.template === flexTemplate) {
-    cell = section.children.find(c => c.storageId === cell.storageId);
-    const cellIndex = section.children.findIndex(c => c.storageId === cell.storageId);
+    cell = section.children.find(c => c?.storageId === cell.storageId);
+    const cellIndex = section.children.findIndex(c => c?.storageId === cell.storageId);
     const nextCell = section.children[cellIndex + 1];
 
     cell.colsCount = colIndex - cell.colIndex + 1;
