@@ -257,7 +257,8 @@ export default {
       }
     },
     handleEditApplication(sectionId, container, applicationCategoryTitle, applicationTitle) {
-      this.$refs.applicationPropertiesDrawer.open(sectionId, container, applicationCategoryTitle, applicationTitle);
+      const section = this.$layoutUtils.getSection(this.layoutToEdit, sectionId);
+      this.$refs.applicationPropertiesDrawer.open(section, container, applicationCategoryTitle, applicationTitle);
     },
     mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
