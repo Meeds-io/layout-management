@@ -92,6 +92,16 @@ export default {
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
     },
+    drawerOpened() {
+      return this.$root.drawerOpened;
+    },
+  },
+  watch: {
+    drawerOpened() {
+      if (this.drawerOpened) {
+        this.hideMenu();
+      }
+    },
   },
   methods: {
     displayMenu() {
