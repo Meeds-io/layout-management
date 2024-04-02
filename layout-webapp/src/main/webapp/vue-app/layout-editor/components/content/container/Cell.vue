@@ -24,8 +24,6 @@
     :container="container"
     :parent-id="parentId"
     :draggable="isDynamicSection"
-    :application-title="applicationTitle"
-    :application-category="applicationCategoryTitle"
     :hide-children="moving"
     :class="{
       'z-index-two': hover && !$root.drawerOpened,

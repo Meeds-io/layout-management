@@ -25,7 +25,7 @@ import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import PreviewButton from './components/toolbar/actions/PreviewButton.vue';
 
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
-import BorderInput from './components/form/BorderInput.vue';
+import NumberInput from './components/form/NumberInput.vue';
 import ColorPicker from './components/form/ColorPicker.vue';
 
 import Content from './components/content/Content.vue';
@@ -65,7 +65,7 @@ const components = {
   'layout-editor-content': Content,
   'layout-editor-color-picker': ColorPicker,
   'layout-editor-border-radius-selector': BorderRadiusSelector,
-  'layout-editor-border-input': BorderInput,
+  'layout-editor-number-input': NumberInput,
   'layout-editor-container': Container,
   'layout-editor-container-extension': ContainerExtension,
   'layout-editor-container-base': ContainerBase,
