@@ -24,6 +24,7 @@
       v-if="draggable"
       v-model="children"
       :id="id"
+      :data-storage-id="storageId"
       :class="cssClass"
       :style="cssStyle"
       :options="dragOptions"
@@ -31,15 +32,26 @@
       class="position-relative"
       @start="startMoving"
       @end="endMoving">
-      <layout-editor-container-extension
-        v-for="(child, i) in children"
-        :key="child.storageId"
-        :container="child"
-        :parent-id="storageId"
-        :index="i"
-        :length="childrenSize"
-        :class="draggableContainerClass"
-        @move-start="$emit('move-start')" />
+      <slot name="header"></slot>
+      <slot v-if="$slots.content" name="content"></slot>
+      <template v-else-if="hasChildren">
+        <template v-for="(child, i) in children">
+          <layout-editor-container-extension
+            v-if="child"
+            :key="child.storageId"
+            :container="child"
+            :application-title="applicationTitle"
+            :application-category="applicationCategoryTitle"
+            :parent-id="storageId"
+            :index="i"
+            :length="childrenSize"
+            :class="`${draggableContainerClass} ${hideChildren && 'invisible' || ''}`"
+            @initialized="$emit('initialized', child)"
+            @move-start="moveStart"
+            @move-end="moveEnd" />
+        </template>
+      </template>
+      <slot name="footer"></slot>
     </draggable>
     <div
       v-else
@@ -53,13 +65,17 @@
           v-for="(child, i) in children"
           :key="child.storageId"
           :container="child"
+          :application-title="applicationTitle"
+          :application-category="applicationCategoryTitle"
           :parent-id="storageId"
           :index="i"
           :length="childrenSize"
           :class="{
             'invisible': hideChildren
           }"
-          @initialized="$emit('initialized', child)" />
+          @initialized="$emit('initialized', child)"
+          @move-start="moveStart"
+          @move-end="moveEnd" />
       </template>
       <slot name="footer"></slot>
     </div>
@@ -70,6 +86,10 @@ export default {
   props: {
     container: {
       type: Object,
+      default: null,
+    },
+    parentId: {
+      type: String,
       default: null,
     },
     type: {
@@ -84,13 +104,21 @@ export default {
       type: Number,
       default: () => 0,
     },
-    noDraggable: {
+    draggable: {
       type: Boolean,
       default: false,
     },
     hideChildren: {
       type: Boolean,
       default: false,
+    },
+    applicationTitle: {
+      type: String,
+      default: null,
+    },
+    applicationCategoryTitle: {
+      type: String,
+      default: null,
     },
   },
   data: () => ({
@@ -149,20 +177,22 @@ export default {
     cssClass() {
       return `${this.containerCssClass || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
-    draggable() {
-      return !this.noDraggable && this.childrenSize > 1;
+    isCell() {
+      return this.container.template === 'CellContainer';
     },
     draggableContainerClass() {
-      return `draggable-container-${this.storageId}`;
+      return this.isCell && `draggable-container-${this.parentId}` || `draggable-container-${this.storageId}`;
     },
     dragOptions() {
-      return {
+      const dragOptions = {
+        group: `${this.container.template}-${this.parentId}`,
         draggable: `.${this.draggableContainerClass}`,
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
         chosenClass: 'layout-moving-chosen-container',
-        handle: '.draggable',
+        handle: this.isCell && '.draggable-cell' || '.draggable',
       };
+      return dragOptions;
     },
   },
   watch: {
@@ -175,7 +205,7 @@ export default {
       }
     },
     children() {
-      if (JSON.stringify(this.container.children) !== JSON.stringify(this.children)) {
+      if (!this.isCell && JSON.stringify(this.container.children) !== JSON.stringify(this.children)) {
         this.$root.$emit('layout-children-size-updated', this.container, this.children, this.index, this.type);
       }
     },
@@ -185,16 +215,47 @@ export default {
   },
   methods: {
     refreshChildren() {
-      this.children = this.container?.children || [];
+      this.children = this.container?.children?.filter(c => !!c) || [];
     },
     hasUnit(length) {
       return Number.isNaN(Number(length));
     },
+    moveStart(event, moveType) {
+      this.$emit('move-start', event, moveType);
+    },
+    moveEnd() {
+      this.$emit('move-end');
+      this.$root.movingParentId = null;
+    },
     startMoving() {
       this.dragged = true;
+      this.$root.movingParentId = this.parentId;
     },
-    endMoving() {
+    endMoving(event) {
       this.dragged = false;
+      this.$root.movingParentId = null;
+
+      const fromCell = this.$layoutUtils.getContainerById(this.$root.layout, event.from.getAttribute('data-storage-id'));
+      const toCell = this.$layoutUtils.getContainerById(this.$root.layout, event.to.getAttribute('data-storage-id'));
+      const application = this.$layoutUtils.getContainerById(this.$root.layout, event.item.getAttribute('data-storage-id'));
+
+      if (fromCell && toCell && application) {
+        if (this.isCell) {
+          const section = this.$layoutUtils.getSectionByContainer(this.$root.layout, event.item.getAttribute('data-storage-id'));
+          this.$root.$emit('layout-section-history-add', section?.storageId);
+        } else {
+          this.$root.$emit('layout-modified');
+        }
+
+        const fromIndex = fromCell.children.findIndex(c => c?.storageId === application.storageId);
+        if (fromIndex >= 0) {
+          fromCell.children.splice(fromIndex, 1);
+        }
+        const toIndex = toCell.children.findIndex(c => c?.storageId === application.storageId);
+        if (toIndex < 0) {
+          toCell.children.splice(event.newIndex, 0, application);
+        }
+      }
     },
   },
 };
