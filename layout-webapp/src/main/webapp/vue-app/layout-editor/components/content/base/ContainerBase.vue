@@ -160,10 +160,10 @@ export default {
       } else {
         const style = {};
         if (this.height) {
-          style.height = this.hasUnit(this.height) ? this.height : `${this.height}px`;
+          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
         }
         if (this.width) {
-          style.width = this.hasUnit(this.width) ? this.width : `${this.width}px`;
+          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
         }
         if (this.borderColor) {
           style['--appBorderColor'] = this.borderColor;
