@@ -21,16 +21,18 @@
 <template>
   <v-fade-transition>
     <div
-      v-show="hover && !moving && !$root.drawerOpened"
+      ref="menu"
+      v-show="menu"
       class="layout-no-multi-select absolute-horizontal-center z-index-drawer t-0 mt-n4">
-      <v-chip color="white" class="elevation-2">
+      <v-chip color="white" class="elevation-2 no-border">
         <v-btn
           :title="$t('layout.moveCell')"
           :width="iconSize"
           :height="iconSize"
-          class="draggable ms-2"
+          class="ms-2 draggable-cell"
           icon
-          @mousedown.prevent.stop="dragStart">
+          @mousedown="dragStart"
+          @mouseup="dragEnd">
           <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
         </v-btn>
         <v-btn
@@ -39,7 +41,7 @@
           :height="iconSize"
           class="mx-4"
           icon
-          @click.prevent.stop="$root.$emit('layout-edit-application', parentId, container, applicationCategory, applicationTitle)">
+          @click.prevent.stop="$root.$emit('layout-edit-application', sectionId, container, applicationCategoryTitle, applicationTitle)">
           <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
         </v-btn>
         <v-btn
@@ -48,7 +50,7 @@
           :height="iconSize"
           class="me-2"
           icon
-          @click.prevent.stop="$root.$emit('layout-delete-application', parentId, container)">
+          @click.prevent.stop="$root.$emit('layout-delete-application', sectionId, container)">
           <v-icon :size="iconSize" class="icon-default-color">fa-trash</v-icon>
         </v-btn>
       </v-chip>
@@ -62,11 +64,11 @@ export default {
       type: Object,
       default: null,
     },
-    dynamicSection: {
-      type: Boolean,
-      default: false,
+    section: {
+      type: Object,
+      default: null,
     },
-    applicationCategory: {
+    parentId: {
       type: String,
       default: null,
     },
@@ -74,25 +76,55 @@ export default {
       type: String,
       default: null,
     },
-    parentId: {
+    applicationCategoryTitle: {
       type: String,
-      default: null,
-    },
-    hover: {
-      type: Boolean,
-      default: null,
-    },
-    moving: {
-      type: Boolean,
       default: null,
     },
   },
   data: () => ({
     iconSize: 20,
+    menu: false,
   }),
+  computed: {
+    sectionId() {
+      return this.section?.storageId;
+    },
+    isDynamicSection() {
+      return this.section?.template === this.$layoutUtils.flexTemplate;
+    },
+  },
   methods: {
+    displayMenu() {
+      if (this.$root.movingParentId) {
+        return;
+      }
+      this.$root.hoveredSection = this.section;
+      this.$root.hoveredApplication = this.container;
+      this.$root.hoveredParentId = this.parentId;
+      this.menu = true;
+    },
+    hideMenu() {
+      if (this.$root.movingParentId) {
+        return;
+      }
+      this.menu = false;
+    },
+    dragEnd() {
+      if (this.isDynamicSection) {
+        this.$emit('move-end');
+      }
+    },
     dragStart(event) {
-      this.$emit('move-start', event, 'drag');
+      if (event.button !== 0) {
+        return;
+      }
+      if (this.isDynamicSection) {
+        this.$emit('move-start', event, 'drag', this.container);
+      } else {
+        event.preventDefault();
+        event.stopPropagation();
+        this.$root.$emit('layout-editor-application-move-start', event, 'drag', this.container);
+      }
     },
   },
 };
