@@ -109,7 +109,6 @@ export default {
   },
   created() {
     this.$root.$on('layout-section-application-update-style', this.updateStyle);
-    this.$root.$on('layout-editor-application-move-start', this.moveStart);
     this.initStyle();
     this.section = this.$layoutUtils.getSectionByContainer(this.$root.layout, this.parentId);
   },
@@ -121,7 +120,6 @@ export default {
   },
   beforeDestroy() {
     this.$root.$off('layout-section-application-update-style', this.updateStyle);
-    this.$root.$off('layout-editor-application-move-start', this.moveStart);
   },
   methods: {
     installApplication() {
@@ -147,10 +145,8 @@ export default {
     moveEnd() {
       this.$emit('move-end');
     },
-    moveStart(event, moveType, container) {
-      if (container?.storageId === this.container?.storageId) {
-        this.$emit('move-start', event, moveType, this.container);
-      }
+    moveStart(event, moveType) {
+      this.$emit('move-start', event, moveType, this.container);
     },
     hasUnit(length) {
       return Number.isNaN(Number(length));

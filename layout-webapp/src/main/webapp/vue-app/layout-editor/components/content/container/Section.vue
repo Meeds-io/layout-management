@@ -36,7 +36,7 @@
       class="position-relative overflow-initial"
       type="section"
       @hovered="hoverSection = $event && !drawerOpened">
-      <template v-if="$root.movingParentId === storageId && $root.moveType === 'resize'" #footer>
+      <template v-if="$root.movingParentId === storageId && (!isDynamicSection || $root.moveType === 'resize')" #footer>
         <layout-editor-section-selection-grid
           :section="container"
           class="position-absolute z-index-two full-width full-height" />
@@ -50,7 +50,7 @@
         slot-scope="{ hover }"
         class="layout-section-border">
         <div class="position-relative full-height full-width">
-          <layout-editor-section-border-menu
+          <layout-editor-section-menu
             :container="container"
             :hover="!drawerOpened && (hover || hoverSection || movingSection)"
             :index="index"
