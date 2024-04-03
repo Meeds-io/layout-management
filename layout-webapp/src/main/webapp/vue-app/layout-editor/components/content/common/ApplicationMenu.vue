@@ -22,7 +22,7 @@
   <v-fade-transition>
     <div
       ref="menu"
-      v-show="menu"
+      v-show="menu && $root.desktopDisplayMode"
       class="layout-no-multi-select absolute-horizontal-center z-index-drawer t-0 mt-n4">
       <v-chip color="white" class="elevation-2 no-border">
         <v-btn
