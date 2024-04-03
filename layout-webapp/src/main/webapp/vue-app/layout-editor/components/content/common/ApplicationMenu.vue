@@ -128,13 +128,11 @@ export default {
       if (event.button !== 0) {
         return;
       }
-      if (this.isDynamicSection) {
-        this.$emit('move-start', event, 'drag', this.container);
-      } else {
+      if (!this.isDynamicSection) {
         event.preventDefault();
         event.stopPropagation();
-        this.$root.$emit('layout-editor-application-move-start', event, 'drag', this.container);
       }
+      this.$emit('move-start', event, 'drag', this.container);
     },
   },
 };
