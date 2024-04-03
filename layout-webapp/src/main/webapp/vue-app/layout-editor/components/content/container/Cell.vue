@@ -53,6 +53,7 @@
         </div>
       </div>
       <div
+        v-if="$root.desktopDisplayMode"
         :class="{
           'mt-n5': isDynamicSection,
         }">
