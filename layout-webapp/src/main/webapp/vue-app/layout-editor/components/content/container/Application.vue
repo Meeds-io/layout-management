@@ -7,15 +7,17 @@
       :style="cssStyle"
       :data-storage-id="storageId"
       class="layout-application">
-      <layout-editor-application-menu
-        ref="menu"
-        :container="container"
-        :section="section"
-        :parent-id="parentId"
-        :application-title="applicationTitle"
-        :application-category-title="applicationCategoryTitle"
-        @move-start="moveStart"
-        @move-end="moveEnd" />
+      <v-hover v-model="hoverMenu">
+        <layout-editor-application-menu
+          ref="menu"
+          :container="container"
+          :section="section"
+          :parent-id="parentId"
+          :application-title="applicationTitle"
+          :application-category-title="applicationCategoryTitle"
+          @move-start="moveStart"
+          @move-end="moveEnd" />
+      </v-hover>
     </div>
   </v-hover>
 </template>
@@ -39,6 +41,7 @@ export default {
     borderColor: null,
     cssClass: null,
     hover: false,
+    hoverMenu: false,
   }),
   computed: {
     storageId() {
@@ -84,6 +87,9 @@ export default {
     applicationCategoryTitle() {
       return this.applicationCategory?.displayName || '';
     },
+    hoverApp() {
+      return this.hoverMenu || this.hover;
+    },
   },
   watch: {
     applicationInstalled() {
@@ -99,8 +105,8 @@ export default {
         this.installApplication();
       }
     },
-    hover() {
-      if (this.hover) {
+    hoverApp() {
+      if (this.hoverApp) {
         this.$refs.menu.displayMenu();
       } else {
         this.$refs.menu.hideMenu();
