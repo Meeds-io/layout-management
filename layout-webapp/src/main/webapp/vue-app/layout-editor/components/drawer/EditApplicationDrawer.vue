@@ -213,15 +213,20 @@
                       v-model="height"
                       v-if="height === customHeight"
                       :label="$t('layout.fixedHeight')"
-                      :min="100"
-                      :max="1000"
+                      :min="minHeight"
+                      :max="maxHeight"
                       :step="10"
                       class="ms-auto my-n2"
-                      editable />
+                      editable
+                      @valid="invalidCustomHeight = !$event" />
                   </div>
                 </template>
               </v-radio>
             </v-radio-group>
+            <span v-if="invalidCustomHeight" class="error-color mt-n1 ms-8">{{ $t('layout.invalidFixedHeight', {
+              0: minHeightFormatted,
+              1: maxHeightFormatted,
+            }) }}</span>
           </div>
         </template>
       </v-card>
@@ -236,6 +241,9 @@ export default {
     fixedHeight: false,
     customHeightValue: false,
     height: null,
+    minHeight: 100,
+    maxHeight: 1000,
+    invalidCustomHeight: false,
     section: null,
     container: null,
     marginChoice: 'same',
@@ -269,6 +277,23 @@ export default {
         0: this.applicationTitle,
         1: this.applicationCategoryTitle,
       });
+    },
+    minHeightFormatted() {
+      if (this.minHeight === 0 || this.minHeight) {
+        return new Intl.NumberFormat(eXo.env.portal.language, {
+          style: 'decimal',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(this.minHeight);
+      }
+      return null;
+    },
+    maxHeightFormatted() {
+      return new Intl.NumberFormat(eXo.env.portal.language, {
+        style: 'decimal',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(this.maxHeight);
     },
     styleClasses() {
       return this.drawer && this.sectionId && {
