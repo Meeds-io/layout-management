@@ -117,6 +117,9 @@ export default {
       if (this.$root.movingParentId) {
         return;
       }
+      this.$root.hoveredSection = null;
+      this.$root.hoveredApplication = null;
+      this.$root.hoveredParentId = null;
       this.menu = false;
     },
     dragEnd() {
