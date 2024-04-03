@@ -190,6 +190,7 @@ export function applyContainerStyle(container, containerStyle) {
   container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
 
   container.cssClass = container.cssClass.replace(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g'), '').replace(/  +/g, ' ');
+
   Vue.set(container, 'cssClass', container.cssClass);
 
   const borderRadiusEnabled = containerStyle.radiusTopRight === 0 || containerStyle.radiusTopRight;
@@ -205,6 +206,12 @@ export function applyContainerStyle(container, containerStyle) {
     container.cssClass += ` brbr-${parseInt(Math.min(20, Math.max(containerStyle.radiusBottomRight, 0)) / 4)}`;
     container.cssClass += ` brbl-${parseInt(Math.min(20, Math.max(containerStyle.radiusBottomLeft, 0)) / 4)}`;
   }
+
+  container.cssClass = container.cssClass.replace(new RegExp('(^| )hidden-sm-and-down', 'g'), '').replace(/  +/g, ' ');
+  if (containerStyle.hiddenOnMobile) {
+    container.cssClass += ' hidden-sm-and-down';
+  }
+  Vue.set(container, 'cssClass', container.cssClass);
 
   Vue.set(container, 'borderColor', containerStyle.borderColor || null);
 }
