@@ -25,7 +25,7 @@
     class="absolute-full-size layout-no-multi-select border-radius">
     <v-slide-y-transition>
       <div v-if="open" class="position-relative full-width full-height d-flex flex-column">
-        <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center t-0 mt-n4">
+        <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center t-0 mb-auto mt-n4">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
               <v-btn
@@ -41,7 +41,7 @@
             {{ $t('layout.addSectionBefore') }}
           </v-tooltip>
         </div>
-        <div class="position-sticky t-20 b-20 z-index-one d-flex align-center my-auto mx-n5">
+        <div class="position-sticky t-20 b-20 z-index-one d-flex align-center mx-n5">
           <div
             v-if="displayMoveButton"
             class="position-absolute l-0">
@@ -81,7 +81,7 @@
             </v-tooltip>
           </div>
         </div>
-        <div class="position-sticky z-index-two d-flex justify-center b-0 mb-n4">
+        <div class="position-sticky z-index-two d-flex justify-center b-0 mb-n4 mt-auto">
           <v-tooltip top>
             <template #activator="{on, attrs}">
               <v-btn
