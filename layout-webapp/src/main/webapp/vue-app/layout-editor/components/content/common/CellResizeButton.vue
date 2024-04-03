@@ -32,7 +32,7 @@
     :class="{
       'l-0': $vuetify.rtl,
       'r-0': !$vuetify.rtl,
-      'b-0 mb-n3 me-n3': !dynamicSection,
+      'b-0 mb-n2 me-n2': !dynamicSection,
       'absolute-vertical-center full-height me-n5': dynamicSection,
       'fa-rotate-90': !dynamicSection && !$vuetify.rtl,
       'col-resize-cursor grid-gap-width': dynamicSection,

@@ -210,9 +210,9 @@ export default {
   },
   methods: {
     moveStart(event, moveType) {
-      this.$root.movingParentId = this.parentId;
       this.$root.moveType = moveType;
       if (!this.isDynamicSection || moveType === 'resize') {
+        this.$root.movingParentId = this.parentId;
         this.$nextTick().then(() => {
           this.$root.$emit('layout-cell-moving-start', {
             target: event.target,

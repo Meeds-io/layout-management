@@ -96,8 +96,8 @@ export default {
     },
   },
   methods: {
-    moveStart(event, moveType) {
-      this.$emit('move-start', event, moveType);
+    moveStart(event, moveType, container) {
+      this.$emit('move-start', event, moveType, container);
     },
     moveEnd() {
       this.$emit('move-end');
