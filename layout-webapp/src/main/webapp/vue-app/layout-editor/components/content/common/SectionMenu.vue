@@ -25,7 +25,7 @@
     class="absolute-full-size layout-no-multi-select border-radius">
     <v-slide-y-transition>
       <div v-if="open" class="position-relative full-width full-height d-flex flex-column">
-        <div class="position-sticky z-index-two d-flex justify-center t-0 mt-n4">
+        <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center t-0 mt-n4">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
               <v-btn
@@ -134,6 +134,9 @@ export default {
     },
     displayBorder() {
       return this.open || this.hover;
+    },
+    hoveredApplication() {
+      return this.$root.hoveredApplication;
     },
   },
   watch: {
