@@ -163,12 +163,12 @@
               class="my-auto me-n3" />
           </v-list-item>
         </div>
-        <template v-if="isDynamicSection">
-          <div class="d-flex align-center mt-4">
-            <div class="subtitle-1 font-weight-bold me-auto mb-2">
-              {{ $t('layout.advancedOptions') }}
-            </div>
+        <div class="d-flex align-center mt-4">
+          <div class="subtitle-1 font-weight-bold me-auto mb-2">
+            {{ $t('layout.advancedOptions') }}
           </div>
+        </div>
+        <template v-if="isDynamicSection">
           <div class="d-flex align-center ms-n1">
             <v-checkbox
               v-model="fixedHeight"
@@ -229,6 +229,14 @@
             }) }}</span>
           </div>
         </template>
+        <div class="d-flex align-center ms-n1">
+          <v-checkbox
+            v-model="hiddenOnMobile"
+            :label="$t('layout.hiddenOnMobile')"
+            on-icon="fa-check-square"
+            off-icon="far fa-square"
+            class="my-0 ml-n2px" />
+        </div>
       </v-card>
     </template>
   </exo-drawer>
@@ -244,6 +252,7 @@ export default {
     minHeight: 100,
     maxHeight: 1000,
     invalidCustomHeight: false,
+    hiddenOnMobile: false,
     section: null,
     container: null,
     marginChoice: 'same',
@@ -306,6 +315,7 @@ export default {
         radiusBottomRight: this.radiusBottomRight,
         radiusBottomLeft: this.radiusBottomLeft,
         borderColor: this.borderColor,
+        hiddenOnMobile: this.hiddenOnMobile,
       } || null;
     },
   },
@@ -395,6 +405,7 @@ export default {
       this.container = container;
       this.section = section;
       this.height = container.height;
+      this.hiddenOnMobile = container.cssClass?.includes?.('hidden-sm-and-down') || false;
       this.fixedHeight = !!this.height;
       this.applicationCategoryTitle = applicationCategoryTitle;
       this.applicationTitle = applicationTitle;
