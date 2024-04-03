@@ -22,10 +22,11 @@
   <v-fade-transition>
     <div
       ref="menu"
-      v-show="menu && $root.desktopDisplayMode"
+      v-show="menu"
       class="layout-no-multi-select absolute-horizontal-center z-index-drawer t-0 mt-n4">
       <v-chip color="white" class="elevation-2 no-border">
         <v-btn
+          v-show="$root.desktopDisplayMode"
           :title="$t('layout.moveCell')"
           :width="iconSize"
           :height="iconSize"
