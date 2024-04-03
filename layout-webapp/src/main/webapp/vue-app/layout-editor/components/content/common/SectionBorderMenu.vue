@@ -24,8 +24,8 @@
     :class="moving && 'layout-section-moving' || 'layout-section-hover'"
     class="absolute-full-size layout-no-multi-select border-radius">
     <v-slide-y-transition>
-      <div v-if="open" class="position-relative full-width full-height">
-        <div class="absolute-horizontal-center t-0 mt-n4">
+      <div v-if="open" class="position-relative full-width full-height d-flex flex-column">
+        <div class="position-sticky z-index-two d-flex justify-center t-0 mt-n4">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
               <v-btn
@@ -41,7 +41,47 @@
             {{ $t('layout.addSectionBefore') }}
           </v-tooltip>
         </div>
-        <div class="absolute-horizontal-center b-0 mb-n4">
+        <div class="position-sticky t-0 b-0 z-index-one d-flex my-auto mx-n5">
+          <div
+            v-if="displayMoveButton"
+            class="me-auto">
+            <v-tooltip :disabled="moving" bottom>
+              <template #activator="{on, attrs}">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  height="32"
+                  width="32"
+                  class="draggable"
+                  icon
+                  @mousedown="$emit('move-start')"
+                  @mouseup="$emit('move-end')"
+                  @mouseout="$emit('move-end')"
+                  @focusout="$emit('move-end')">
+                  <v-icon size="24">fa-arrows-alt</v-icon>
+                </v-btn>
+              </template>
+              {{ $t('layout.moveSection') }}
+            </v-tooltip>
+          </div>
+          <div class="ms-auto">
+            <v-tooltip bottom>
+              <template #activator="{on, attrs}">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  height="32"
+                  width="32"
+                  icon
+                  @click="$root.$emit('layout-edit-section-drawer', index, length)">
+                  <v-icon size="24">fa-edit</v-icon>
+                </v-btn>
+              </template>
+              {{ $t('layout.editSection') }}
+            </v-tooltip>
+          </div>
+        </div>
+        <div class="position-sticky z-index-two d-flex justify-center b-0 mb-n4">
           <v-tooltip top>
             <template #activator="{on, attrs}">
               <v-btn
@@ -55,44 +95,6 @@
               </v-btn>
             </template>
             {{ $t('layout.addSectionAfter') }}
-          </v-tooltip>
-        </div>
-        <div class="absolute-vertical-center r-0 mr-n5 z-index-two">
-          <v-tooltip bottom>
-            <template #activator="{on, attrs}">
-              <v-btn
-                v-on="on"
-                v-bind="attrs"
-                height="32"
-                width="32"
-                icon
-                @click="$root.$emit('layout-edit-section-drawer', index, length)">
-                <v-icon size="24">fa-edit</v-icon>
-              </v-btn>
-            </template>
-            {{ $t('layout.editSection') }}
-          </v-tooltip>
-        </div>
-        <div
-          v-if="displayMoveButton"
-          class="absolute-vertical-center l-0 ml-n4">
-          <v-tooltip :disabled="moving" bottom>
-            <template #activator="{on, attrs}">
-              <v-btn
-                v-on="on"
-                v-bind="attrs"
-                height="32"
-                width="32"
-                class="draggable"
-                icon
-                @mousedown="$emit('move-start')"
-                @mouseup="$emit('move-end')"
-                @mouseout="$emit('move-end')"
-                @focusout="$emit('move-end')">
-                <v-icon size="24">fa-arrows-alt</v-icon>
-              </v-btn>
-            </template>
-            {{ $t('layout.moveSection') }}
           </v-tooltip>
         </div>
       </div>
