@@ -1,10 +1,7 @@
 @import 'variables.less';
 @import 'mixins.less';
 
-.container-border-color {
-  border: ~"1px solid var(--container-border-color, #FFFFFF)";
-}
-
+/* Grid Mixins */
 .grid-cols-mixin(){
   --gap-col-count: ~"calc(var(--grid-col-count) - 1)";
   --total-gap-width: ~"calc(var(--gap-col-count)* var(--grid-layout-gap, 20px))";
@@ -27,6 +24,11 @@
 
 .grid-cell-rowspan-mixin(){
   grid-row-end: span ~"var(--grid-cell-rows)";
+}
+
+/* Grid Style */
+.layout-application {
+  width: 100%;
 }
 
 .layout-sections-parent {
@@ -54,7 +56,6 @@
     }
     .layout-application {
       max-height: 100%;
-      width: 100%;
     }
   }
 
@@ -80,10 +81,17 @@
   row-gap: ~"var(--grid-layout-gap, 20px)";
 }
 
+.container-border-color {
+  border: ~"1px solid var(--container-border-color, #FFFFFF)";
+}
+
 @media (max-width: @maxTabletWidth) {
   .layout-sections-parent {
     .PORTLET-FRAGMENT {
       margin-bottom: ~"var(--grid-layout-gap, 20px)";
+    }
+    .flex-cell {
+      row-gap: 0;
     }
   }
 }
