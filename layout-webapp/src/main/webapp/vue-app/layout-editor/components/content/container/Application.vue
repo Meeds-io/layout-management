@@ -3,7 +3,7 @@
     <div
       ref="content"
       :id="id"
-      :class="`${cssClass}${hover && isDynamicSection && ' position-relative' || ''}`"
+      :class="`${cssClass}${hover && isDynamicSection && ' position-relative' || ''}${hidden && ' d-none' || ''}`"
       :style="cssStyle"
       :data-storage-id="storageId"
       class="layout-application">
@@ -74,6 +74,9 @@ export default {
         }
         return style;
       }
+    },
+    hidden() {
+      return this.$root.mobileDisplayMode && this.container?.cssClass?.includes?.('hidden-sm-and-down');
     },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
