@@ -530,6 +530,7 @@ export function isBetween(value, b0, b1) {
   
 export function cleanAttributes(container) {
   container = JSON.parse(JSON.stringify(container));
+  applyDesktopStyle(container);
   if (container.children?.length) {
     container.children = container.children.map(c => cleanAttributes(c));
   }
