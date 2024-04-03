@@ -15,6 +15,7 @@
       :step="step"
       :min="min"
       :max="max"
+      :class="valid && 'text-color' || 'error-color'"
       type="text"
       class="layout-number-input pa-0 text-center">
     <div v-else>{{ num }}</div>
@@ -59,6 +60,7 @@ export default {
   },
   data: () => ({
     num: 20,
+    valid: false,
   }),
   watch: {
     num: {
@@ -66,11 +68,20 @@ export default {
       handler() {
         if (this.min && Number(this.num) < Number(this.min)) {
           this.$emit('input', Number(this.min) + this.diff);
+          this.valid = false;
         } else if (this.max && Number(this.num) > Number(this.max)) {
           this.$emit('input', Number(this.max) + this.diff);
+          this.valid = false;
         } else {
           this.$emit('input', Number(this.num) + this.diff);
+          this.valid = true;
         }
+      },
+    },
+    valid: {
+      immediate: true,
+      handler() {
+        this.$emit('valid', this.valid);
       },
     },
   },
