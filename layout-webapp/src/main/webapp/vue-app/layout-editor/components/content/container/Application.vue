@@ -3,7 +3,7 @@
     <div
       ref="content"
       :id="id"
-      :class="`${cssClass}${hover && isDynamicSection && ' position-relative' || ''}${hidden && ' d-none' || ''}`"
+      :class="`${cssClass}${isDynamicSection && (hover || !hasContent) && ' position-relative' || ''}${displayNoContent && ' border-color-grey-lighten' || ''}`"
       :style="cssStyle"
       :data-storage-id="storageId"
       class="layout-application">
@@ -18,6 +18,12 @@
           @move-start="moveStart"
           @move-end="moveEnd" />
       </v-hover>
+      <div v-if="displayNoContent" class="absolute-vertical-center text-no-wrap d-flex">
+        <div class="light-black-background white--text px-2">
+          {{ applicationTitle }}
+        </div>
+        <v-icon size="35" class="layout-no-content-caret icon-default-color my-n2">fa-caret-right</v-icon>
+      </div>
     </div>
   </v-hover>
 </template>
@@ -42,6 +48,8 @@ export default {
     cssClass: null,
     hover: false,
     hoverMenu: false,
+    hasContentCheckCount: 0,
+    hasContent: true,
   }),
   computed: {
     storageId() {
@@ -75,9 +83,6 @@ export default {
         return style;
       }
     },
-    hidden() {
-      return this.$root.mobileDisplayMode && this.container?.cssClass?.includes?.('hidden-sm-and-down');
-    },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
     },
@@ -93,10 +98,14 @@ export default {
     hoverApp() {
       return this.hoverMenu || this.hover;
     },
+    displayNoContent() {
+      return this.isDynamicSection && !this.hasContent && this.$root.desktopDisplayMode;
+    },
   },
   watch: {
     applicationInstalled() {
       this.$emit('initialized');
+      this.computeHasContent();
     },
     storageId(newVal, oldVal) {
       if (!oldVal && newVal) {
@@ -159,6 +168,29 @@ export default {
     },
     hasUnit(length) {
       return Number.isNaN(Number(length));
+    },
+    computeHasContent() {
+      if (!this.isDynamicSection) {
+        return;
+      }
+      this.hasContentCheckCount = 0;
+      this.hasContent = true;
+      this.computeHasContentAsync();
+    },
+    computeHasContentAsync() {
+      if (this.hasContentCheckCount > 10) {
+        this.hasContent = false;
+        return;
+      }
+      this.hasContentCheckCount++;
+      window.setTimeout(() => {
+        if (this.$refs.content) {
+          this.hasContent = this.$refs.content.getBoundingClientRect().height > 10;
+          if (!this.hasContent) {
+            this.computeHasContentAsync();
+          }
+        }
+      }, 200);
     },
   },
 };
