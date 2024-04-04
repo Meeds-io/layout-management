@@ -40,6 +40,37 @@
           v-else-if="sectionType === $layoutUtils.flexTemplate"
           :cols-count="cols"
           @cols-updated="cols = $event" />
+        <template v-if="isDynamicSection">
+          <div class="d-flex align-center mt-4">
+            <div class="subtitle-1 font-weight-bold me-auto mb-2">
+              {{ $t('layout.advancedOptions') }}
+            </div>
+          </div>
+          <div class="d-flex align-center mt-2">
+            {{ $t('layout.scrollStickyBehavior') }}
+          </div>
+          <div class="d-flex flex-column justify-center">
+            <v-radio-group
+              v-model="stickyApplication"
+              class="my-auto text-no-wrap ms-n1 mt-2"
+              mandatory>
+              <v-radio
+                :value="false"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size text-color">{{ $t('layout.scrollNoSticky') }}</span>
+                </template>
+              </v-radio>
+              <v-radio
+                :value="true"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size text-color">{{ $t('layout.scrollStickyLastApp') }}</span>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </div>
+        </template>
       </v-card>
     </template>
     <template #footer>
@@ -79,21 +110,43 @@ export default {
     rows: 0,
     cols: 0,
     canRemove: false,
+    stickyApplication: false,
+    optionsModified: false,
   }),
   computed: {
     colsCount() {
       return this.section.template === this.$layoutUtils.flexTemplate ? this.section.children.length : this.section?.colsCount;
     },
     modified() {
-      return this.section?.rowsCount !== this.rows || this.colsCount !== this.cols;
+      return this.optionsModified || this.section?.rowsCount !== this.rows || this.colsCount !== this.cols;
     },
     sectionType() {
       return this.section?.template;
+    },
+    isDynamicSection() {
+      return this.sectionType === this.$layoutUtils.flexTemplate;
+    },
+  },
+  watch: {
+    stickyApplication() {
+      if (this.drawer) {
+        if (!this.section.cssClass) {
+          this.section.cssClass = '';
+        }
+        if (this.stickyApplication) {
+          this.section.cssClass += ' layout-sticky-application';
+        } else {
+          this.section.cssClass = this.section.cssClass.replace(/layout-sticky-application/g, '');
+        }
+        this.optionsModified = true;
+      }
     },
   },
   methods: {
     open(section, index, length) {
       this.section = JSON.parse(JSON.stringify(section));
+      this.stickyApplication = this.section.cssClass?.includes?.('layout-sticky-application');
+      this.optionsModified = false;
       this.originalSection = JSON.parse(JSON.stringify(section));
       this.index = index;
       if (this.section.template === this.$layoutUtils.flexTemplate) {
