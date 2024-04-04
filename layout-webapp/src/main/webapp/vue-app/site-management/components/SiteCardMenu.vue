@@ -64,21 +64,6 @@
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        v-if="canEditLayout"
-        class="subtitle-2 px-3"
-        @click="editSiteLayout">
-        <v-icon
-          size="13"
-          class="me-2 ms-0"
-          color="primary">
-          fas fa-table
-        </v-icon>
-        <v-list-item-title
-          class="subtitle-2">
-          <span class="ps-1">{{ $t('siteManagement.label.editLayout') }}</span>
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item
         v-if="!isGroupSite && !isGlobalSite"
         class="subtitle-2 px-3"
         @click="$root.$emit('open-manage-permissions-drawer', site, true)">
