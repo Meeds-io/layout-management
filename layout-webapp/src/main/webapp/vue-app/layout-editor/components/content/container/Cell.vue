@@ -160,7 +160,7 @@ export default {
       return this.container?.storageId;
     },
     applicationTitle() {
-      return this.container?.children?.[0]?.title || '';
+      return !this.isDynamicSection && this.container?.children?.[0]?.title || '';
     },
     applicationCategory() {
       return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
@@ -228,6 +228,9 @@ export default {
       }
     },
     computeHasContent() {
+      if (this.isDynamicSection) {
+        return;
+      }
       this.hasContentCheckCount = 0;
       this.hasContent = true;
       this.computeHasContentAsync();
