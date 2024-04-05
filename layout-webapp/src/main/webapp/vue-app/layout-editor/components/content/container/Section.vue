@@ -33,7 +33,7 @@
       :container="container"
       :parent-id="parentId"
       :index="index"
-      :class="zIndexClass"
+      :class="`${zIndexClass} ${mobileInColumns && mobileSectionColumnClass || ''}`"
       class="position-relative overflow-initial"
       type="section"
       @hovered="hoverSection = $event && !drawerOpened">
@@ -62,6 +62,10 @@
         </div>
       </div>
     </v-hover>
+    <layout-section-mobile-column-menu-drawer
+      v-if="mobileInColumns"
+      v-model="mobileSectionColumnClass"
+      :container="container" />
   </div>
 </template>
 <script>
@@ -87,6 +91,7 @@ export default {
   data: () => ({
     hoverSection: false,
     movingSection: false,
+    mobileSectionColumnClass: null,
     sectionWidth: 0,
   }),
   computed: {
@@ -101,6 +106,11 @@ export default {
     },
     isDynamicSection() {
       return this.container.template === this.$layoutUtils.flexTemplate;
+    },
+    mobileInColumns() {
+      return this.isDynamicSection
+        && this.$root.mobileDisplayMode
+        && this.container?.cssClass?.includes?.('layout-mobile-columns');
     },
   },
   created() {

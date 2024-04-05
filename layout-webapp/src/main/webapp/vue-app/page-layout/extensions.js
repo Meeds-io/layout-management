@@ -25,6 +25,13 @@ extensionRegistry.registerExtension('page-layout', 'container', {
 });
 
 extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 200,
+  type: 'section',
+  isValid: container => container.template === 'FlexContainer',
+  containerType: 'page-layout-dynamic-section',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
   rank: 600,
   type: 'application',
   isValid: container => !container.template && (container.contentId?.includes?.('/') || container.storageId),
