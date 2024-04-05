@@ -47,6 +47,30 @@
             </div>
           </div>
           <div class="d-flex align-center mt-2">
+            {{ $t('layout.mobileView') }}
+          </div>
+          <div class="d-flex flex-column justify-center">
+            <v-radio-group
+              v-model="mobileInColumns"
+              class="my-auto text-no-wrap ms-n1 mt-2"
+              mandatory>
+              <v-radio
+                :value="false"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size text-color">{{ $t('layout.listAppsInRows') }}</span>
+                </template>
+              </v-radio>
+              <v-radio
+                :value="true"
+                class="mx-0">
+                <template #label>
+                  <span class="text-font-size text-color">{{ $t('layout.listAppsInColumns') }}</span>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </div>
+          <div class="d-flex align-center mt-2">
             {{ $t('layout.scrollStickyBehavior') }}
           </div>
           <div class="d-flex flex-column justify-center">
@@ -110,6 +134,7 @@ export default {
     rows: 0,
     cols: 0,
     canRemove: false,
+    mobileInColumns: false,
     stickyApplication: false,
     optionsModified: false,
   }),
@@ -141,11 +166,25 @@ export default {
         this.optionsModified = true;
       }
     },
+    mobileInColumns() {
+      if (this.drawer) {
+        if (!this.section.cssClass) {
+          this.section.cssClass = '';
+        }
+        if (this.mobileInColumns) {
+          this.section.cssClass += ' layout-mobile-columns';
+        } else {
+          this.section.cssClass = this.section.cssClass.replace(/layout-mobile-columns/g, '');
+        }
+        this.optionsModified = true;
+      }
+    },
   },
   methods: {
     open(section, index, length) {
       this.section = JSON.parse(JSON.stringify(section));
       this.stickyApplication = this.section.cssClass?.includes?.('layout-sticky-application');
+      this.mobileInColumns = this.section.cssClass?.includes?.('layout-mobile-columns');
       this.optionsModified = false;
       this.originalSection = JSON.parse(JSON.stringify(section));
       this.index = index;
