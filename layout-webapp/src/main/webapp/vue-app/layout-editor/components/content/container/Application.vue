@@ -1,9 +1,29 @@
+<!--
+
+ This file is part of the Meeds project (https://meeds.io/).
+
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
 <template>
   <v-hover v-model="hover">
     <div
       ref="content"
       :id="id"
-      :class="`${cssClass}${isDynamicSection && (hover || !hasContent) && ' position-relative' || ''}${displayNoContent && ' border-color-grey-lighten' || ''}`"
+      :class="`${cssClass}${isDynamicSection && (hover || !hasContent) && ' position-relative' || ''}${displayNoContent && ' z-index-one' || ''}`"
       :style="cssStyle"
       :data-storage-id="storageId"
       class="layout-application">
@@ -18,11 +38,13 @@
           @move-start="moveStart"
           @move-end="moveEnd" />
       </v-hover>
-      <div v-if="displayNoContent" class="absolute-vertical-center text-no-wrap d-flex">
-        <div class="light-black-background white--text px-2">
-          {{ applicationTitle }}
+      <div v-if="displayNoContent" class="full-width text-no-wrap border-color-grey-lighten ms-1">
+        <div class="absolute-vertical-center d-flex ms-n1">
+          <div class="light-black-background white--text px-2">
+            {{ applicationTitle }}
+          </div>
+          <v-icon size="35" class="layout-no-content-caret icon-default-color my-n2">{{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}</v-icon>
         </div>
-        <v-icon size="35" class="layout-no-content-caret icon-default-color my-n2">fa-caret-right</v-icon>
       </div>
     </div>
   </v-hover>
