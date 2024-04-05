@@ -157,16 +157,12 @@ export function applyDesktopStyle(container) {
   applyGridStyle(container);
 }
 
-export function applyGridStyle(container, sectionTemplate) {
+export function applyGridStyle(container) {
   if (container.template === gridTemplate || container.template === flexTemplate) {
     container.children?.forEach(c => applyGridStyle(c, container.template));
     applyBreakpointClasses(container, container.template === gridTemplate && 'grid-rows' || null, 'grid-cols');
   } else if (container.template === cellTemplate) {
     applyBreakpointClasses(container, 'grid-cell-rowspan', 'grid-cell-colspan');
-    cleanCellHeightStyle(container);
-    if (sectionTemplate === gridTemplate) {
-      applyCellHeightStyle(container);
-    }
   } else {
     container.children?.forEach?.(applyGridStyle);
   }
@@ -699,18 +695,6 @@ function parseBreakpointClasses(container, classPrefix) {
     return bp;
   } else {
     throw Error(`CSS classes '${container.cssClass || ''}' not compatible. Fallback to old editor.`);
-  }
-}
-
-function cleanCellHeightStyle(container) {
-  container.cssClass = container.cssClass
-    .replace(' grid-cell-height-auto', '')
-    .replace(' grid-cell-height-scroll', '');
-}
-
-function applyCellHeightStyle(container) {
-  if (container.height !== 'auto') {
-    container.cssClass += ' grid-cell-height-scroll';
   }
 }
 
