@@ -204,9 +204,9 @@ export default {
     },
     apply() {
       const section = JSON.parse(JSON.stringify(this.section));
-      if (section.template === this.$layoutUtils.flexTemplate) {
+      if (section.template === this.$layoutUtils.flexTemplate && this.section.children.length !== this.cols) {
         this.$layoutUtils.editDynamicSection(section, this.cols);
-      } else {
+      } else if (section.template === this.$layoutUtils.gridTemplate) {
         this.$layoutUtils.editGridSection(section, this.rows, this.cols);
       }
       this.$root.$emit('layout-replace-section', this.index, section);
