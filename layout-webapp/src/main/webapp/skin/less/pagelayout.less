@@ -44,31 +44,18 @@
     overflow-x: ~"var(--appWidthScroll, unset) !important";
     padding-bottom: 0;
   }
-
-  .grid-cell-height-scroll {
-    .PORTLET-FRAGMENT {
-      --appHeightScroll: auto;
-      --appWidthScroll: hidden;
-    }
-    .layout-application {
-      max-height: 100%;
-    }
-  }
-
-  .grid-cell-height-auto {
-    aspect-ratio: auto !important;
-    .PORTLET-FRAGMENT {
-      max-height: none;
-    }
-    .layout-application {
-      max-height: none;
-    }
-  }
-
 }
 
 .grid-cell {
   display: flex;
+
+  .PORTLET-FRAGMENT {
+    --appHeightScroll: auto;
+    --appWidthScroll: hidden;
+  }
+  .layout-application {
+    max-height: 100%;
+  }
 }
 
 .flex-cell {
