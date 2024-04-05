@@ -1,30 +1,26 @@
+/**
+ * This file is part of the Meeds project (https://meeds.io/).
+ *
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
 @import 'variables.less';
 @import 'mixins.less';
 
-/* Grid Mixins */
-.grid-cols-mixin(){
-  --gap-col-count: ~"calc(var(--grid-col-count) - 1)";
-  --total-gap-width: ~"calc(var(--gap-col-count)* var(--grid-layout-gap, 20px))";
-  --grid-cell--max-width: ~"calc((100% - var(--total-gap-width)) / var(--grid-col-count))";
-  --grid-cell--min-width: ~"var(--grid-cell--max-width)";
-  grid-template-columns: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-width), var(--grid-cell--max-width)), 1fr))";
-  grid-gap: ~"var(--grid-layout-gap, 20px)";
-  margin-bottom: ~"var(--grid-layout-gap, 20px)";
-}
-
-.grid-rows-mixin(){
-  --gap-row-count: ~"calc(var(--grid-row-count) - 1)";
-  --total-gap-height: ~"calc(var(--gap-row-count)* var(--grid-layout-gap, 20px))";
-  --grid-cell--max-height: ~"calc((100% - var(--total-gap-height)) / var(--grid-row-count))";
-  --grid-cell--min-height: ~"var(--grid-cell--max-height)";
-  grid-template-rows: ~"repeat(auto-fill, minmax(max(var(--grid-cell--min-height), var(--grid-cell--max-height)), 1fr))";
-  aspect-ratio: ~"calc(var(--grid-col-count) / var(--grid-row-count))";
-  overflow: hidden;
-}
-
-.grid-cell-rowspan-mixin(){
-  grid-row-end: span ~"var(--grid-cell-rows)";
-}
+@import 'commonLayout.less';
 
 /* Grid Style */
 .layout-application {
@@ -85,6 +81,10 @@
   border: ~"1px solid var(--container-border-color, #FFFFFF)";
 }
 
+.z-index-floating-button {
+  z-index: 1010;
+}
+
 @media (max-width: @maxTabletWidth) {
   .layout-sections-parent {
     .PORTLET-FRAGMENT {
@@ -93,6 +93,7 @@
     .flex-cell {
       row-gap: 0;
     }
+    .layout-mobile-columns();
   }
 }
 
@@ -318,6 +319,12 @@
 }
 .row-gap-5 {
   row-gap: 20px;
+}
+.t-quarter {
+  top: 25%;
+}
+.b-quarter {
+  bottom: 25%;
 }
 
 .grid-cols(@breakpoint, @count) when (@count > 0) {
