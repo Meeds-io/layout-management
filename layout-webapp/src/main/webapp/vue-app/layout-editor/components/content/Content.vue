@@ -34,6 +34,8 @@
       ref="applicationDrawer" />
     <layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
+    <layout-editor-portlet-edit-drawer
+      ref="portletPropertiesDrawer" />
   </v-card>
 </template>
 <script>
@@ -120,6 +122,7 @@ export default {
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
     this.$root.$on('layout-modified', this.setAsModified);
+    this.$root.$on('layout-editor-portlet-properties-updated', this.setAsModified);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   methods: {
