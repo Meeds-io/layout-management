@@ -48,6 +48,7 @@
 
 .grid-cell {
   display: flex;
+  aspect-ratio: 1;
   float: unset; // FIXME: WebUI Workaround until cleanup made
   min-height: unset; // FIXME: WebUI Workaround until cleanup made
   margin-left: unset; // FIXME: WebUI Workaround until cleanup made
@@ -318,29 +319,4 @@
 }
 .b-quarter {
   bottom: 25%;
-}
-
-.grid-cols(@breakpoint, @count) when (@count > 0) {
-   .grid-cols(@breakpoint, (@count - 1));
-    .grid-cols-@{breakpoint}-@{count} {
-      --grid-col-count: @count;
-    }
-}
-.grid-rows(@breakpoint, @count) when (@count > 0) {
-   .grid-rows(@breakpoint, (@count - 1));
-    .grid-rows-@{breakpoint}-@{count} {
-      --grid-row-count: @count;
-    }
-}
-.grid-cell-colspan(@breakpoint, @count) when (@count > 0) {
-   .grid-cell-colspan(@breakpoint, (@count - 1));
-    .grid-cell-colspan-@{breakpoint}-@{count} {
-      grid-column-end: span @count;
-    }
-}
-.grid-cell-rowspan(@breakpoint, @count) when (@count > 0) {
-   .grid-cell-rowspan(@breakpoint, (@count - 1));
-    .grid-cell-rowspan-@{breakpoint}-@{count} {
-      grid-row-end: span @count;
-    }
 }
