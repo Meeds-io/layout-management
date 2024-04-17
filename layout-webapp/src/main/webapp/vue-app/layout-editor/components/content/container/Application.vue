@@ -70,12 +70,19 @@ export default {
     cssClass: null,
     hover: false,
     hoverMenu: false,
+    hoverGridCell: false,
     hasContentCheckCount: 0,
     hasContent: true,
   }),
   computed: {
     storageId() {
       return this.container?.storageId;
+    },
+    hoveredParentId() {
+      return this.$root.hoveredParentId;
+    },
+    applicationId() {
+      return this.container?.children?.[0]?.storageId || this.container?.storageId;
     },
     nodeId() {
       return this.$root.draftNodeId;
@@ -84,7 +91,7 @@ export default {
       return this.$root.draftNodeUri;
     },
     id() {
-      return this.container?.id || `Container${this.storageId}`;
+      return `UIPortlet-${this.container?.id || this.storageId}`;
     },
     cssStyle() {
       if (!this.height && !this.width && !this.borderColor) {
@@ -118,7 +125,7 @@ export default {
       return this.applicationCategory?.displayName || '';
     },
     hoverApp() {
-      return this.hoverMenu || this.hover;
+      return this.hoverMenu || this.hover || this.hoverGridCell;
     },
     displayNoContent() {
       return this.isDynamicSection && !this.hasContent && this.$root.desktopDisplayMode;
@@ -139,6 +146,11 @@ export default {
         this.installApplication();
       }
     },
+    hoveredParentId() {
+      if (!this.isDynamicSection) {
+        this.hoverGridCell = this.hoveredParentId === this.parentId;
+      }
+    },
     hoverApp() {
       if (this.hoverApp) {
         this.$refs.menu.displayMenu();
@@ -149,6 +161,7 @@ export default {
   },
   created() {
     this.$root.$on('layout-section-application-update-style', this.updateStyle);
+    this.$root.$on('layout-editor-portlet-properties-updated', this.updateApplication);
     this.initStyle();
     this.section = this.$layoutUtils.getSectionByContainer(this.$root.layout, this.parentId);
   },
@@ -160,8 +173,16 @@ export default {
   },
   beforeDestroy() {
     this.$root.$off('layout-section-application-update-style', this.updateStyle);
+    this.$root.$off('layout-editor-portlet-properties-updated', this.updateApplication);
   },
   methods: {
+    updateApplication(applicationId) {
+      if (applicationId !== this.applicationId) {
+        return;
+      }
+      this.applicationInstalled = false;
+      this.installApplication();
+    },
     installApplication() {
       if (!this.applicationInstalled
           && this.$refs.content

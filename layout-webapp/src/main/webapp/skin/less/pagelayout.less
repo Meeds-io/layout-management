@@ -48,6 +48,9 @@
 
 .grid-cell {
   display: flex;
+  float: unset; // FIXME: WebUI Workaround until cleanup made
+  min-height: unset; // FIXME: WebUI Workaround until cleanup made
+  margin-left: unset; // FIXME: WebUI Workaround until cleanup made
 
   .PORTLET-FRAGMENT {
     --appHeightScroll: auto;
@@ -61,6 +64,9 @@
 .flex-cell {
   display: flex;
   flex-direction: column;
+  float: unset; // FIXME: WebUI Workaround until cleanup made
+  min-height: unset; // FIXME: WebUI Workaround until cleanup made
+  margin-left: unset; // FIXME: WebUI Workaround until cleanup made
   row-gap: ~"var(--grid-layout-gap, 20px)";
 }
 
