@@ -26,7 +26,7 @@ export default {
       return this.container?.storageId;
     },
     id() {
-      return this.container?.id || `Container${this.storageId}`;
+      return `UIPortlet-${this.container?.id || this.storageId}`;
     },
     height() {
       return this.container.height;
