@@ -19,20 +19,30 @@
 
 -->
 <template>
-  <exo-drawer
-    ref="drawer"
-    v-model="drawer"
-    go-back-button
-    allow-expand
-    right
-    @expand-updated="expand = $event">
-    <template #title>
-      <span :title="drawerTitle" class="text-truncate">
-        {{ drawerTitle }}
-      </span>
-    </template>
-    <template v-if="drawer" #content>
+  <v-dialog
+    v-model="dialog"
+    :width="width"
+    content-class="uiPopup full-width full-height"
+    persistent
+    max-width="100vw">
+    <v-card flat>
+      <v-flex class="ms-5 me-0 drawerHeader flex-grow-0">
+        <v-list-item class="pe-0 ps-1">
+          <v-list-item-content class="drawerTitle align-start text-header-title text-truncate">
+            {{ drawerTitle }}
+          </v-list-item-content>
+          <v-list-item-action class="drawerIcons align-end d-flex flex-row">
+            <v-btn
+              :title="$t('label.close')"
+              icon>
+              <v-icon @click="close()">mdi-close</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-flex>
+      <v-divider class="my-0" />
       <v-card
+        v-if="dialog"
         :id="applicationId"
         data-mode="EDIT"
         max-width="100%"
@@ -43,13 +53,13 @@
           :id="id"
           class="layout-application"></div>
       </v-card>
-    </template>
-  </exo-drawer>
+    </v-card>
+  </v-dialog>
 </template>
 <script>
 export default {
   data: () => ({
-    drawer: false,
+    dialog: false,
     expand: false,
     applicationId: null,
     applicationCategoryTitle: null,
@@ -67,10 +77,9 @@ export default {
     },
   },
   watch: {
-    drawer() {
-      if (this.drawer) {
+    dialog() {
+      if (this.dialog) {
         window.eXo.env.portal.maximizedPortletMode = 'EDIT';
-        this.$refs.drawer.toogleExpand();
         window.setTimeout(() => this.installApplication(), 200);
       } else {
         window.eXo.env.portal.maximizedPortletMode = null;
@@ -89,10 +98,10 @@ export default {
       this.applicationId = applicationId;
       this.applicationCategoryTitle = applicationCategoryTitle;
       this.applicationTitle = applicationTitle;
-      this.$nextTick(() => this.$refs.drawer.open());
+      this.$nextTick(() => this.dialog = true);
     },
     close() {
-      this.$refs.drawer.close();
+      this.dialog = false;
     },
     installApplication() {
       if (this.$refs.content) {
