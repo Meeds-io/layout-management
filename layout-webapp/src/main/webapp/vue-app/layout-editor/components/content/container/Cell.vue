@@ -205,6 +205,13 @@ export default {
     hasApplication() {
       this.computeHasContent();
     },
+    hover() {
+      if (this.hover) {
+        this.$root.hoveredParentId = this.storageId;
+      } else if (this.$root.hoveredParentId === this.storageId) {
+        this.$root.hoveredParentId = null;
+      }
+    },
   },
   mounted() {
     this.computeHasContent();

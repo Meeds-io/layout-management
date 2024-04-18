@@ -105,7 +105,7 @@
           v-for="i in length"
           :key="i"
           :id="`grid-cell-${i}`"
-          class="grey-background aspect-ratio-1 grid-cell-lg-colspan-1 grid-cell-lg-rowspan-1 opacity-5"></div>
+          class="grey-background aspect-ratio-1 grid-cell grid-cell-colspan-lg-1 grid-cell-lg-rowspan-1 opacity-5"></div>
       </div>
     </div>
   </div>
