@@ -17,8 +17,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function installApplication(navUri, applicationStorageId, applicationElement) {
-  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true`, {
+export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode) {
+  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}`, {
     credentials: 'include',
     method: 'GET',
     redirect: 'manual'
@@ -30,19 +30,25 @@ export function installApplication(navUri, applicationStorageId, applicationElem
         throw new Error('The retrieved page is not a portal page');
       }
     })
-    .then(applicationContent => handleApplicationContent(applicationContent, applicationElement))
-    .catch(e => console.error('Error navigating to ', navUri, '.', e));
+    .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
 }
 
-function handleApplicationContent(applicationContent, applicationElement) {
+function handleApplicationContent(applicationContent, applicationElement, applicationMode) {
   const newHeadContent = applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>'));
   let newBodyContent = applicationContent.substring(applicationContent.search('<body') + applicationContent.match(/<body.*>/g)[0].length, applicationContent.lastIndexOf('</body>'));
   newBodyContent = installNewCSS(newHeadContent, newBodyContent);
   installNewJS(newHeadContent);
+  if (applicationMode === 'EDIT') {
+    installNewJS(newBodyContent, 'jsManager', true);
+  }
 
   const newHtmlDocument = document.createElement('div');
   newHtmlDocument.innerHTML = newBodyContent;
   const portletContent = newHtmlDocument.querySelector('.UIWorkingWorkspace .PORTLET-FRAGMENT');
+  const oldPortletContent = applicationElement.querySelector('.PORTLET-FRAGMENT');
+  if (oldPortletContent) {
+    oldPortletContent.remove();
+  }
   applicationElement.append(portletContent);
 
   window.setTimeout(() => {
@@ -91,16 +97,19 @@ function installNewCSS(newHeadContent, newBodyContent) {
   return newBodyContent;
 }
 
-function installNewJS(newHeadContent) {
-  const replacableScriptsIterator = newHeadContent.matchAll(/<script[^>]*id="[^>]*"[^>]*>/g);
+function installNewJS(scriptsContent, specificId, forceReload) {
+  const replacableScriptsIterator = scriptsContent.matchAll(/<script[^>]*id="[^>]*"[^>]*>/g);
   let scriptIteratorElement = replacableScriptsIterator.next().value;
   while (scriptIteratorElement) {
     const script = scriptIteratorElement[0];
     const id = script.match(/id="([^"]*)"/i)[1];
-    let scriptElement = id && (document.querySelector(`#${id.trim()}`) || document.querySelector(`[data-id=${id.trim()}]`));
-    if (!scriptElement) {
-      const scriptContent = newHeadContent.substring(scriptIteratorElement.index, newHeadContent.indexOf('</script>', scriptIteratorElement.index));
+    let scriptElement = ((specificId && specificId === id) || id) && (document.querySelector(`#${id.trim()}`) || document.querySelector(`[data-id=${id.trim()}]`));
+    if (!scriptElement || forceReload) {
+      const scriptContent = scriptsContent.substring(scriptIteratorElement.index, scriptsContent.indexOf('</script>', scriptIteratorElement.index));
       scriptElement = document.createElement('script');
+      if (id) {
+        scriptElement.setAttribute('id', id);
+      }
       scriptElement.innerText = scriptContent.substring(scriptContent.indexOf('>') + 1).replace(/(\r)?(\n)?/g, '');
       document.head.append(scriptElement);
       replaceScriptElements(scriptElement);
@@ -122,7 +131,7 @@ function replaceScriptElements(node) {
 
 function cloneScriptElement(node) {
   const scriptElement  = document.createElement('script');
-  scriptElement.innerText = node.innerHTML;
+  scriptElement.innerText = node.innerHTML.replace(/<br>/g, '');
   const scriptAttrs = node.attributes;
   for (let i = 0; i < scriptAttrs.length; i++)  {
     scriptElement.setAttribute(scriptAttrs[i].name, scriptAttrs[i].value);
