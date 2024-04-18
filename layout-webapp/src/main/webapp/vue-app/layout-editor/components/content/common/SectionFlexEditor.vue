@@ -69,7 +69,7 @@
           :key="i"
           :id="`grid-cell-${i}`"
           height="100px"
-          class="grey-background grid-cell-lg-colspan-1 grid-cell-lg-rowspan-1 opacity-5"
+          class="grey-background grid-cell grid-cell-colspan-lg-1 grid-cell-lg-rowspan-1 opacity-5"
           flat />
       </div>
     </div>

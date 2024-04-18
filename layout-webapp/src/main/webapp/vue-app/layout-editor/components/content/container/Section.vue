@@ -23,7 +23,6 @@
   <div
     ref="section"
     :data-storage-id="storageId"
-    :class="$root.desktopDisplayMode && 'pb-5'"
     class="position-relative layout-section"
     v-on="!isDynamicSection && {
       'mousedown': startSelection,
