@@ -24,10 +24,17 @@
     v-model="drawer"
     allow-expand
     right>
-    <template slot="title">
+    <template #title>
       <span :title="drawerTitle" class="text-truncate">
         {{ drawerTitle }}
       </span>
+    </template>
+    <template v-if="canEditPortletProperties" #titleIcons>
+      <v-btn
+        icon
+        @click="$root.$emit('layout-editor-portlet-edit', applicationId, applicationCategoryTitle, applicationTitle)">
+        <v-icon size="20">fa-edit</v-icon>
+      </v-btn>
     </template>
     <template v-if="drawer" #content>
       <v-card
@@ -292,6 +299,21 @@ export default {
     applicationTitle: null,
   }),
   computed: {
+    applicationId() {
+      return this.container?.children?.[0]?.storageId || this.container?.storageId;
+    },
+    applicationCategory() {
+      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+    },
+    application() {
+      return this.applicationCategory?.applications?.find?.(a => a?.displayName === this.applicationTitle);
+    },
+    supportedModes() {
+      return this.application?.supportedModes || [];
+    },
+    canEditPortletProperties() {
+      return this.supportedModes.find(m => m === 'edit');
+    },
     sectionId() {
       return this.section?.storageId;
     },
