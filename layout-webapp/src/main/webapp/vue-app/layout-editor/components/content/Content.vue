@@ -34,8 +34,8 @@
       ref="applicationDrawer" />
     <layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
-    <layout-editor-portlet-edit-drawer
-      ref="portletPropertiesDrawer" />
+    <layout-editor-portlet-edit-dialog />
+    <layout-editor-page-template-drawer />
   </v-card>
 </template>
 <script>

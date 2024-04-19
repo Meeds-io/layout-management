@@ -1,8 +1,9 @@
 <!--
+
  This file is part of the Meeds project (https://meeds.io/).
- 
+
  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
- 
+
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -11,53 +12,42 @@
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
  along with this program; if not, write to the Free Software Foundation,
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 -->
 <template>
-  <div v-if="!isNewPageElement || hasMoreThanOneTemplate">
-    <site-navigation-existing-page-element
-      v-if="!isNewPageElement"
-      :selected-page="selectedPage" />
-    <site-navigation-new-page-element
-      v-else-if="hasMoreThanOneTemplate" />
-  </div>
+  <v-tooltip bottom>
+    <template #activator="{on, attrs}">
+      <div
+        v-bind="attrs"
+        v-on="on"
+        class="me-3">
+        <v-btn
+          :disabled="disabled"
+          :aria-label="$t('layout.saveAsTemplate')"
+          icon
+          @click="savePageTemplate">
+          <v-icon>fa-columns</v-icon>
+        </v-btn>
+      </div>
+    </template>
+    <span>{{ $t('layout.saveAsTemplate') }}</span>
+  </v-tooltip>
 </template>
-
 <script>
 export default {
   props: {
-    elementType: {
-      type: String,
-      default: () => 'PAGE',
+    disabled: {
+      type: Boolean,
+      default: false,
     },
-    selectedPage: {
-      type: Object,
-      default: null,
-    }
-  },
-  computed: {
-    isNewPageElement() {
-      return this.elementType === 'PAGE';
-    },
-    templatesCount() {
-      return this.$root.pageTemplates?.length || 0;
-    },
-    hasMoreThanOneTemplate() {
-      return this.templatesCount > 1;
-    },
-  },
-  created() {
-    this.getPageTemplates();
   },
   methods: {
-    getPageTemplates() {
-      if (!this.$root.pageTemplates) {
-        return this.$pageTemplateService.getPageTemplates()
-          .then(pageTemplates => this.$root.pageTemplates = pageTemplates || []);
-      }
+    savePageTemplate() {
+      this.$root.$emit('layout-page-template-drawer-open');
     },
   },
 };
