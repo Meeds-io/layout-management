@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -44,13 +43,10 @@ import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.rest.api.EntityBuilder;
 import org.exoplatform.social.rest.entity.SiteEntity;
-import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.rest.model.LayoutModel;
-import io.meeds.layout.rest.model.PageTemplateModel;
 import io.meeds.layout.rest.model.SiteRestEntity;
-import io.meeds.layout.service.LayoutI18NService;
 import io.meeds.layout.service.PageLayoutService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,17 +54,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class RestEntityBuilder {
 
   private RestEntityBuilder() {
-  }
-
-  public static List<PageTemplateModel> toPageTemplateModel(List<SelectItemOption<String>> pageTemplates,
-                                                            LayoutI18NService layoutI18NService,
-                                                            Locale locale) {
-    return pageTemplates.stream()
-                        .filter(Objects::nonNull)
-                        .map(pageTemplate -> new PageTemplateModel(layoutI18NService.getLabel(pageTemplate.getLabel(),
-                                                                                              locale),
-                                                                   pageTemplate.getValue()))
-                        .toList();
   }
 
   public static NodeLabel toNodeLabel(Map<Locale, State> nodeLabels) {
@@ -150,7 +135,7 @@ public class RestEntityBuilder {
     return layoutModel.toPage();
   }
 
-  private static boolean isCompatibleWithEditor(Page page) {
+  private static boolean isCompatibleWithEditor(Page page) { // NOSONAR
     ArrayList<ModelObject> children = page.getChildren();
     if (CollectionUtils.isEmpty(children)) {
       return true;

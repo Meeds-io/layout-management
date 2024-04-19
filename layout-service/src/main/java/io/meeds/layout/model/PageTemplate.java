@@ -25,23 +25,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageCreateModel {
+public class PageTemplate {
 
-  private String   pageName;
+  private long   id;
 
-  private String   pageTitle;
+  private String content;
 
-  private String   pageSiteType;
+  private String name;
 
-  private String   pageSiteName;
+  private String description;
 
-  private String   pageType;
+  private long   illustrationId;
 
-  private String   link;
+  public PageTemplate(long id, String content) {
+    this.id = id;
+    this.content = content;
+  }
 
-  private Long     pageTemplateId;
-
-  private String   editPermission;
-
-  private String[] accessPermissions;
 }
