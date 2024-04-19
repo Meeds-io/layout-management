@@ -162,6 +162,12 @@
         <module>vueDraggable</module>
       </depends>
       <depends>
+        <module>translationField</module>
+      </depends>
+      <depends>
+        <module>attachImage</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>
@@ -189,9 +195,6 @@
       </depends>
       <depends>
         <module>commonLayoutComponents</module>
-      </depends>
-      <depends>
-        <module>vueDraggable</module>
       </depends>
       <depends>
         <module>vue</module>

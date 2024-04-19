@@ -20,44 +20,75 @@
   <div>
     <span class="font-weight-bold text-start text-color body-2 mt-8">{{ $t('siteNavigation.label.pageTemplate') }}</span>
     <v-select
-      v-model="pageTemplate"
-      :items="$root.pageTemplates"
-      item-text="label"
+      v-model="pageTemplateId"
+      :items="items"
+      item-text="name"
       item-value="value"
-      dense
       class="caption pt-1 mb-5"
-      outlined />
+      mandatory
+      outlined
+      dense />
     <v-img
-      :src="pageTemplateSkeleton"
-      class="align-center mx-auto"
+      :src="illustrationSrc"
+      class="align-center mb-5 mx-auto"
       max-height="350"
       max-width="500" />
+    <div
+      v-if="description"
+      v-sanitized-html="description"
+      class="mb-5"></div>
   </div>
 </template>
 
 <script>
 export default {
   data: () => ({
-    pageTemplate: 'empty',
+    pageTemplateId: null,
   }),
   computed: {
-    pageTemplateSkeleton() {
-      return `/layout/images/page-templates/${this.pageTemplate}.png`;
-    }
+    pageTemplates() {
+      return this.$root.pageTemplates;
+    },
+    items() {
+      return this.pageTemplates?.map?.(t => ({
+        name: t.name,
+        value: t.id,
+      }));
+    },
+    pageTemplate() {
+      return this.pageTemplates?.find?.(t => t.id === Number(this.pageTemplateId));
+    },
+    description() {
+      return this.pageTemplate?.description;
+    },
+    illustrationId() {
+      return this.pageTemplate?.illustrationId;
+    },
+    illustrationSrc() {
+      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.pageTemplateId}/${this.illustrationId}` || null;
+    },
   },
   watch: {
     pageTemplate() {
       if (this.pageTemplate) {
         this.$root.$emit('page-template-changed', this.pageTemplate);
       }
-    }
+    },
+    items: {
+      immediate: true,
+      handler() {
+        if (this.items?.length) {
+          this.pageTemplateId = this.items[0].value;
+        }
+      },
+    },
   },
   created() {
     this.$root.$on('reset-element-drawer', this.reset);
   },
   methods: {
     reset() {
-      this.pageTemplate = 'empty';
+      this.pageTemplate = null;
     },
   }
 };

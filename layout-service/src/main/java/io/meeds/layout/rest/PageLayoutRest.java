@@ -20,7 +20,6 @@
 package io.meeds.layout.rest;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +40,11 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.rest.model.LayoutModel;
-import io.meeds.layout.rest.model.PageTemplateModel;
 import io.meeds.layout.rest.util.RestEntityBuilder;
-import io.meeds.layout.service.LayoutI18NService;
 import io.meeds.layout.service.PageLayoutService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,9 +61,6 @@ public class PageLayoutRest {
 
   @Autowired
   private PageLayoutService pageLayoutService;
-
-  @Autowired
-  private LayoutI18NService layoutI18NService;
 
   @GetMapping
   @Secured("users")
@@ -228,17 +221,6 @@ public class PageLayoutRest {
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
     }
-  }
-
-  @GetMapping("/templates")
-  @Secured("users")
-  @Operation(summary = "Retrieve page templates", method = "GET", description = "This retrieves page templates")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public List<PageTemplateModel> getPageTemplates(HttpServletRequest request) {
-    Locale locale = request.getLocale();
-    List<SelectItemOption<String>> pageTemplates = pageLayoutService.getPageTemplates();
-    return RestEntityBuilder.toPageTemplateModel(pageTemplates, layoutI18NService, locale);
   }
 
 }

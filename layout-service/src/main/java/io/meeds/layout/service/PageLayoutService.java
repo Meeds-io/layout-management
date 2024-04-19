@@ -45,16 +45,19 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.portal.page.PageTemplateService;
-import org.exoplatform.webui.core.model.SelectItemOption;
 
 import io.meeds.layout.model.PageCreateModel;
+import io.meeds.layout.model.PageTemplate;
 import io.meeds.layout.model.PermissionUpdateModel;
+import io.meeds.layout.rest.model.LayoutModel;
+import io.meeds.layout.util.JsonUtils;
 
 import lombok.SneakyThrows;
 
 @Service
 public class PageLayoutService {
+
+  private static final String     EMPTY_PAGE_TEMPLATE         = "empty";
 
   private static final Pattern    COLOR_MATCHER_VALIDATOR     = Pattern.compile("[#0-9a-zA-Z]+");
 
@@ -142,7 +145,7 @@ public class PageLayoutService {
                                    pageModel.getPageSiteName(),
                                    pageName,
                                    getPageType(pageModel.getPageType()),
-                                   pageModel.getPageTemplate(),
+                                   pageModel.getPageTemplateId(),
                                    pageModel.getLink());
 
     page.setTitle(pageModel.getPageTitle());
@@ -262,25 +265,28 @@ public class PageLayoutService {
     layoutService.save(pageContext);
   }
 
-  public List<SelectItemOption<String>> getPageTemplates() {
-    return pageTemplateService.getPageTemplates();
-  }
-
   @SneakyThrows
   private Page createPageInstance(String siteType,
                                   String siteName,
                                   String pageName,
                                   PageType pageType,
-                                  String pageTemplate,
+                                  Long pageTemplateId,
                                   String pageLink) throws IllegalArgumentException {
     Page page;
     if (pageType == PageType.PAGE) {
-      if (StringUtils.isBlank(pageTemplate)) {
-        throw new IllegalArgumentException("pageTemplate is mandatory");
+      if (pageTemplateId == null) {
+        throw new IllegalArgumentException("pageTemplateId is mandatory");
       }
-      page = userPortalConfigService.createPageTemplate(pageTemplate,
+      PageTemplate pageTemplate = pageTemplateService.getPageTemplate(pageTemplateId);
+      if (pageTemplate == null) {
+        throw new ObjectNotFoundException("pageTemplate not found");
+      }
+      page = userPortalConfigService.createPageTemplate(EMPTY_PAGE_TEMPLATE,
                                                         siteType,
                                                         siteName);
+      Page pageLayout = JsonUtils.fromJsonString(pageTemplate.getContent(), LayoutModel.class)
+                                 .toPage();
+      page.setChildren(pageLayout.getChildren());
       page.setName(pageName);
     } else if (pageType == PageType.LINK) {
       page = new Page(siteType, siteName, pageName);
