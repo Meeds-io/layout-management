@@ -60,7 +60,7 @@ export function updatePageLayout(pageRef, pageLayout, publish) {
   });
 }
 
-export function createPage(pageName, pageTitle, pageSiteName, pageSiteType, pageType, link, pageTemplate) {
+export function createPage(pageName, pageTitle, pageSiteName, pageSiteType, pageType, link, pageTemplateId) {
   return fetch('/layout/rest/pages', {
     credentials: 'include',
     method: 'POST',
@@ -69,7 +69,7 @@ export function createPage(pageName, pageTitle, pageSiteName, pageSiteType, page
     },
     body: JSON.stringify({
       pageName,
-      pageTemplate,
+      pageTemplateId,
       pageType,
       pageTitle,
       pageSiteType,

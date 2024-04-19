@@ -16,32 +16,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.model;
+package io.meeds.layout.dao;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PageCreateModel {
+import io.meeds.layout.entity.PageTemplateEntity;
 
-  private String   pageName;
-
-  private String   pageTitle;
-
-  private String   pageSiteType;
-
-  private String   pageSiteName;
-
-  private String   pageType;
-
-  private String   link;
-
-  private Long     pageTemplateId;
-
-  private String   editPermission;
-
-  private String[] accessPermissions;
+@Repository
+public interface PageTemplateDAO extends JpaRepository<PageTemplateEntity, Long> {
 }

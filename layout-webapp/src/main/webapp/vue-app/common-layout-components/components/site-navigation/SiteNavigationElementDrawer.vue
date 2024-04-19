@@ -237,7 +237,7 @@ export default {
           'pageType': this.elementType
         });
       } else {
-        this.$pageLayoutService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate || null)
+        this.$pageLayoutService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate?.id)
           .then((createdPage) => {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             this.$root.$emit('save-node-with-page', {
@@ -245,7 +245,7 @@ export default {
               'nodeTarget': this.target,
               'pageType': this.elementType,
               'createdPage': createdPage,
-              'openEditLayout': this.pageTemplate === 'empty' || this.pageTemplate === 'analytics' || this.pageTemplate === 'normal'
+              'openEditLayout': this.elementType === 'PAGE',
             });
           }).catch(() => {
             this.$root.$emit('alert-message', this.$t('siteNavigation.label.pageCreation.error'), 'error');

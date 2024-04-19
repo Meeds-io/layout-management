@@ -531,14 +531,15 @@ export function isBetween(value, b0, b1) {
   return value >= b0 && value <= b1;
 }
   
-export function cleanAttributes(container) {
+export function cleanAttributes(container, cleanStorage) {
   container = JSON.parse(JSON.stringify(container));
   applyDesktopStyle(container);
   if (container.children?.length) {
-    container.children = container.children.map(c => cleanAttributes(c));
+    container.children = container.children.map(c => cleanAttributes(c, cleanStorage));
   }
-  if (container.randomId) {
-    container.storageId = null;
+  if (container.randomId || cleanStorage) {
+    delete container.storageId;
+    delete container.storageName;
   }
   Object.keys(container).forEach(key => {
     if (key
