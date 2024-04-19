@@ -16,11 +16,8 @@
 package io.meeds.layout;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import io.meeds.spring.AvailableIntegration;
 import io.meeds.spring.kernel.PortalApplicationContextInitializer;
@@ -28,14 +25,12 @@ import io.meeds.spring.kernel.PortalApplicationContextInitializer;
 @SpringBootApplication(scanBasePackages = {
   LayoutApplication.MODULE_NAME,
   AvailableIntegration.KERNEL_MODULE,
+  AvailableIntegration.JPA_MODULE,
+  AvailableIntegration.LIQUIBASE_MODULE,
   AvailableIntegration.WEB_SECURITY_MODULE,
   AvailableIntegration.WEB_TRANSACTION_MODULE,
-}, exclude = {
-  LiquibaseAutoConfiguration.class,
-  DataSourceAutoConfiguration.class,
-  DataSourceTransactionManagerAutoConfiguration.class,
-  HibernateJpaAutoConfiguration.class
 })
+@EnableJpaRepositories(basePackages = LayoutApplication.MODULE_NAME)
 @PropertySource("classpath:application.properties")
 @PropertySource("classpath:application-common.properties")
 @PropertySource("classpath:layout.properties")

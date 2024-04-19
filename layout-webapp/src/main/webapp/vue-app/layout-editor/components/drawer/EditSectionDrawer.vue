@@ -21,7 +21,7 @@
 <template>
   <exo-drawer
     ref="drawer"
-    id="defaultSpacesRegistrationDrawer"
+    id="editSectionDrawer"
     v-model="drawer"
     right
     disable-pull-to-refresh>
