@@ -21,6 +21,7 @@
 <template>
   <exo-drawer
     ref="drawer"
+    id="addApplicationDrawer"
     v-model="drawer"
     allow-expand
     right

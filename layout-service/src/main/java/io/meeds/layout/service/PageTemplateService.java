@@ -1,0 +1,127 @@
+/**
+ * This file is part of the Meeds project (https://meeds.io/).
+ *
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+package io.meeds.layout.service;
+
+import java.util.List;
+import java.util.Locale;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.social.attachment.AttachmentService;
+
+import io.meeds.layout.model.PageTemplate;
+import io.meeds.layout.plugin.PageTemplateAttachmentPlugin;
+import io.meeds.layout.plugin.PageTemplateTranslationPlugin;
+import io.meeds.layout.storage.PageTemplateStorage;
+import io.meeds.social.translation.model.TranslationField;
+import io.meeds.social.translation.service.TranslationService;
+
+@Service
+public class PageTemplateService {
+
+  @Autowired
+  private LayoutAclService    layoutAclService;
+
+  @Autowired
+  private TranslationService  translationService;
+
+  @Autowired
+  private AttachmentService   attachmentService;
+
+  @Autowired
+  private LocaleConfigService localeConfigService;
+
+  @Autowired
+  private PageTemplateStorage pageTemplateStorage;
+
+  public List<PageTemplate> getPageTemplates() {
+    return getPageTemplates(null, false);
+  }
+
+  public List<PageTemplate> getPageTemplates(boolean expand) {
+    return getPageTemplates(null, expand);
+  }
+
+  public List<PageTemplate> getPageTemplates(Locale locale, boolean expand) {
+    List<PageTemplate> pageTemplates = pageTemplateStorage.getPageTemplates();
+    if (expand) {
+      pageTemplates.forEach(pageTemplate -> {
+        pageTemplate.setName(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.TITLE_FIELD_NAME, locale));
+        pageTemplate.setDescription(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.DESCRIPTION_FIELD_NAME, locale));
+        List<String> attachmentFileIds = attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE,
+                                                                                String.valueOf(pageTemplate.getId()));
+        if (CollectionUtils.isNotEmpty(attachmentFileIds)) {
+          pageTemplate.setIllustrationId(Long.parseLong(attachmentFileIds.get(0)));
+        }
+      });
+    }
+    return pageTemplates;
+  }
+
+  public PageTemplate getPageTemplate(long id) {
+    return pageTemplateStorage.getPageTemplate(id);
+  }
+
+  public PageTemplate createPageTemplate(PageTemplate pageTemplate, String username) throws IllegalAccessException {
+    if (!layoutAclService.isAdministrator(username)) {
+      throw new IllegalAccessException("User isn't authorized to create a page template");
+    }
+    return pageTemplateStorage.createPageTemplate(pageTemplate);
+  }
+
+  public PageTemplate updatePageTemplate(PageTemplate pageTemplate, String username) throws ObjectNotFoundException,
+                                                                                       IllegalAccessException {
+    if (!layoutAclService.isAdministrator(username)) {
+      throw new IllegalAccessException("User isn't authorized to update a page template");
+    }
+    return pageTemplateStorage.updatePageTemplate(pageTemplate);
+  }
+
+  public String getLabel(long templateId, String fieldName, Locale locale) {
+    if (locale == null) {
+      locale = localeConfigService.getDefaultLocaleConfig().getLocale();
+    }
+    try {
+      TranslationField translationField = translationService.getTranslationField(PageTemplateTranslationPlugin.OBJECT_TYPE,
+                                                                                 templateId,
+                                                                                 fieldName);
+      if (MapUtils.isNotEmpty(translationField.getLabels())) {
+        String label = translationField.getLabels().get(locale);
+        if (label == null) {
+          Locale defaultLocale = localeConfigService.getDefaultLocaleConfig().getLocale();
+          label = translationField.getLabels().get(defaultLocale);
+        }
+        if (label == null) {
+          label = translationField.getLabels().values().iterator().next();
+        }
+        return label;
+      } else {
+        return null;
+      }
+    } catch (ObjectNotFoundException e) {
+      return null;
+    }
+  }
+
+}
