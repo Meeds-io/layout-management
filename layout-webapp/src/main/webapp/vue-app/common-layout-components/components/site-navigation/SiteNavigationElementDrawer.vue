@@ -20,7 +20,8 @@
   <exo-drawer
     ref="siteNavigationAddElementDrawer"
     id="siteNavigationAddElementDrawer"
-    :right="!$vuetify.rtl"
+    :loading="loading"
+    right
     eager
     allow-expand
     @closed="close">
@@ -83,6 +84,7 @@
     <template slot="footer">
       <div class="d-flex justify-end">
         <v-btn
+          :disabled="loading"
           class="btn ms-2"
           @click="close">
           {{ $t('siteNavigation.label.btn.cancel') }}
@@ -236,7 +238,9 @@ export default {
           'nodeTarget': this.target,
           'pageType': this.elementType
         });
+        this.loading = false;
       } else {
+        this.loading = true;
         this.$pageLayoutService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate?.id)
           .then((createdPage) => {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
@@ -249,9 +253,8 @@ export default {
             });
           }).catch(() => {
             this.$root.$emit('alert-message', this.$t('siteNavigation.label.pageCreation.error'), 'error');
-          });
+          }).finally(() => this.loading = false);
       }
-      this.loading = false;
     },
     updateElement() {
       if (this.elementType === 'LINK') {

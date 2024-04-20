@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
@@ -39,6 +40,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.rest.api.EntityBuilder;
@@ -127,8 +129,48 @@ public class RestEntityBuilder {
     }
   }
 
-  public static LayoutModel toLayoutModel(Page page) {
-    return new LayoutModel(page);
+  public static LayoutModel toLayoutModel(Page page, LayoutService layoutService, String expand) {
+    LayoutModel layoutModel = new LayoutModel(page);
+    if (StringUtils.contains(expand, "contentId")) {
+      Map<String, String> contentIds = new HashMap<>();
+      computeApplicationContentId(layoutService, page.getChildren(), contentIds);
+      applyApplicationContentId(layoutModel.getChildren(), contentIds);
+    }
+    return layoutModel;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void computeApplicationContentId(LayoutService layoutService,
+                                                  ArrayList<ModelObject> children,
+                                                  Map<String, String> contentIds) {
+    if (CollectionUtils.isEmpty(children)) {
+      return;
+    }
+    for (ModelObject layoutModel : children) {
+      if (layoutModel instanceof Container container) {
+        computeApplicationContentId(layoutService, container.getChildren(), contentIds);
+      } else if (layoutModel instanceof Application application) { // NOSONAR
+        String storageId = application.getStorageId();
+        if (StringUtils.isNotBlank(storageId)) {
+          String contentId = layoutService.getId(application.getState());
+          contentIds.put(storageId, contentId);
+        }
+      }
+    }
+  }
+
+  private static void applyApplicationContentId(List<LayoutModel> children,
+                                                Map<String, String> contentIds) {
+    if (CollectionUtils.isEmpty(children)) {
+      return;
+    }
+    for (LayoutModel layoutModel : children) {
+      if (contentIds.containsKey(layoutModel.getStorageId())) {
+        layoutModel.setContentId(contentIds.get(layoutModel.getStorageId()));
+      } else if (CollectionUtils.isNotEmpty(layoutModel.getChildren())) { // NOSONAR
+        applyApplicationContentId(layoutModel.getChildren(), contentIds);
+      }
+    }
   }
 
   public static Page fromLayoutModel(LayoutModel layoutModel) {
@@ -144,30 +186,34 @@ public class RestEntityBuilder {
         return false;
       }
       ModelObject parentContainer = children.get(0);
-      if (parentContainer == null
-          || !(parentContainer instanceof Container vAppContainer)
-          || !StringUtils.contains(vAppContainer.getCssClass(), "VuetifyApp")) {
+      if (parentContainer != null
+          && parentContainer instanceof Container appContainer
+          && StringUtils.contains(appContainer.getTemplate(), "UIPageLayout.gtmpl")) {
+        return isChildrenOfTypeSection(appContainer);
+      } else if (parentContainer == null
+                 || !(parentContainer instanceof Container vAppContainer)
+                 || !StringUtils.contains(vAppContainer.getCssClass(), "VuetifyApp")) {
         return false;
-      }
-      children = vAppContainer.getChildren();
-      if (CollectionUtils.isEmpty(children)) {
+      } else if (CollectionUtils.isEmpty(vAppContainer.getChildren())) {
         return true;
+      } else {
+        parentContainer = vAppContainer.getChildren().get(0);
+        if (parentContainer == null
+            || !(parentContainer instanceof Container appContainer)
+            || !StringUtils.contains(appContainer.getCssClass(), "v-application")) {
+          return false;
+        }
+        return isChildrenOfTypeSection(appContainer);
       }
-      parentContainer = children.get(0);
-      if (parentContainer == null
-          || !(parentContainer instanceof Container appContainer)
-          || !StringUtils.contains(appContainer.getCssClass(), "v-application")) {
-        return false;
-      }
-      children = appContainer.getChildren();
-      if (CollectionUtils.isEmpty(children)) {
-        return true;
-      }
-      return children.stream()
-                     .allMatch(c -> c instanceof Container container
-                                    && (StringUtils.equals("GridContainer", container.getTemplate())
-                                        || StringUtils.equals("FlexContainer", container.getTemplate())));
     }
+  }
+
+  private static boolean isChildrenOfTypeSection(Container appContainer) {
+    return appContainer.getChildren()
+                       .stream()
+                       .allMatch(c -> c instanceof Container container
+                                      && (StringUtils.equals("GridContainer", container.getTemplate())
+                                          || StringUtils.equals("FlexContainer", container.getTemplate())));
   }
 
 }
