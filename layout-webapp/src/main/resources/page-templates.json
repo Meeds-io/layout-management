@@ -1,0 +1,27 @@
+{
+   "descriptors":[
+      {
+         "id":"columns",
+         "order":20,
+         "names":{
+            "en":"layout.pageTemplate.columns.title"
+         },
+         "descriptions":{
+            "en":"layout.pageTemplate.columns.description"
+         },
+         "illustrationPath":"war:/../images/page-templates/columns.png",
+         "contentPath":"war:/conf/layout/page-templates/columns.xml"
+      }, {
+         "id":"grid",
+         "order":30,
+         "names":{
+            "en":"layout.pageTemplate.grid.title"
+         },
+         "descriptions":{
+            "en":"layout.pageTemplate.grid.description"
+         },
+         "illustrationPath":"war:/../images/page-templates/grid.png",
+         "contentPath":"war:/conf/layout/page-templates/grid.xml"
+      }
+   ]
+}

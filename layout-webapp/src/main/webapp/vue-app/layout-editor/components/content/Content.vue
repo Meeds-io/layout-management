@@ -22,10 +22,11 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="transparent mx-auto"
+    class="transparent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="layoutToEdit" />
+      :container="layoutToEdit"
+      class="layout-sections-parent" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
@@ -355,7 +356,7 @@ export default {
 
       this.loading++;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit);
-      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
+      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
         .then(layout => this.setLayout(layout))
         .finally(() => window.setTimeout(() => this.loading--, 200));
     },

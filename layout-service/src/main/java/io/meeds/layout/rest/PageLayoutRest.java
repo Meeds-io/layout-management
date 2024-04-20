@@ -40,6 +40,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
@@ -61,6 +62,9 @@ public class PageLayoutRest {
 
   @Autowired
   private PageLayoutService pageLayoutService;
+
+  @Autowired
+  private LayoutService     layoutService;
 
   @GetMapping
   @Secured("users")
@@ -96,10 +100,13 @@ public class PageLayoutRest {
                                    HttpServletRequest request,
                                    @Parameter(description = "page reference", required = true)
                                    @RequestParam("pageRef")
-                                   String pageRef) {
+                                   String pageRef,
+                                   @Parameter(description = "expand options", required = true)
+                                   @RequestParam("expand")
+                                   String expand) {
     try {
       Page page = pageLayoutService.getPageLayout(PageKey.parse(pageRef), request.getRemoteUser());
-      return RestEntityBuilder.toLayoutModel(page);
+      return RestEntityBuilder.toLayoutModel(page, layoutService, expand);
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -156,9 +163,13 @@ public class PageLayoutRest {
                                       @Parameter(description = "page display name", required = true)
                                       @RequestParam("pageRef")
                                       String pageRef,
-                                      @Parameter(description = "Whether the page layout update is a draft page publication or not", required = false)
+                                      @Parameter(description = "Whether the page layout update is a draft page publication or not",
+                                                 required = false)
                                       @RequestParam(name = "publish", required = false)
                                       Optional<Boolean> publish,
+                                      @Parameter(description = "expand options", required = true)
+                                      @RequestParam("expand")
+                                      String expand,
                                       @RequestBody
                                       LayoutModel layoutModel) {
     try {
@@ -166,7 +177,7 @@ public class PageLayoutRest {
                                          RestEntityBuilder.fromLayoutModel(layoutModel),
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
-      return getPageLayout(request, pageRef);
+      return getPageLayout(request, pageRef, expand);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ObjectNotFoundException e) {
