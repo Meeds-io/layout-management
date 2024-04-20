@@ -47,7 +47,6 @@ import ApplicationCard from './components/content/common/ApplicationCard.vue';
 import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
 import CellResizeButton from './components/content/common/CellResizeButton.vue';
 
-import Page from './components/content/container/Page.vue';
 import Container from './components/content/container/Container.vue';
 import Section from './components/content/container/Section.vue';
 import Cell from './components/content/container/Cell.vue';
@@ -76,7 +75,6 @@ const components = {
   'layout-editor-container': Container,
   'layout-editor-container-extension': ContainerExtension,
   'layout-editor-container-base': ContainerBase,
-  'layout-editor-container-page': Page,
   'layout-editor-container-section': Section,
   'layout-editor-container-cell': Cell,
   'layout-editor-container-application': Application,

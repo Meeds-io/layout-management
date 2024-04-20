@@ -183,7 +183,11 @@ public class LayoutAclService {
     return userAcl.getAdminGroups();
   }
 
-  private ConversationState getConversationState(String username) {
+  public ConversationState getSuperUserConversationState() {
+    return new ConversationState(getUserIdentity(userAcl.getSuperUser()));
+  }
+
+  public ConversationState getConversationState(String username) {
     return new ConversationState(getUserIdentity(username));
   }
 
