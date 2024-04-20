@@ -22,10 +22,11 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="transparent mx-auto"
+    class="transparent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="layoutToEdit" />
+      :container="layoutToEdit"
+      class="layout-sections-parent" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
@@ -65,7 +66,7 @@ export default {
       return this.$root.mobileDisplayMode;
     },
     maxWidth() {
-      return this.mobileDisplayMode && '500px' || 'initial';
+      return this.mobileDisplayMode && '500px !important' || 'initial';
     },
     parentClass() {
       return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
@@ -355,7 +356,7 @@ export default {
 
       this.loading++;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit);
-      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate)
+      return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
         .then(layout => this.setLayout(layout))
         .finally(() => window.setTimeout(() => this.loading--, 200));
     },

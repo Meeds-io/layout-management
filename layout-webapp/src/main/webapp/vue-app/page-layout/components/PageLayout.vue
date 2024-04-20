@@ -34,7 +34,11 @@ export default {
   }),
   computed: {
     pageLayout() {
-      return this.page?.children?.[0]?.children?.[0];
+      if (this.page?.children?.[0]?.children?.[0]?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl') {
+        return this.page?.children?.[0]?.children?.[0];
+      } else {
+        return this.page?.children?.[0];
+      }
     },
   },
   created() {

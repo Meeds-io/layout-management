@@ -150,7 +150,7 @@ export default {
       this.$refs.drawer.close();
     },
     save() {
-      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout);
+      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true);
       const savePageRequest =
         this.templateId ? this.$pageTemplateService.updatePageTemplate(pageLayout, this.templateId)
           : this.$pageTemplateService.createPageTemplate(pageLayout);

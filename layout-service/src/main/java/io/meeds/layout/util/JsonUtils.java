@@ -57,4 +57,9 @@ public class JsonUtils {
     return OBJECT_MAPPER.readValue(value, resultClass);
   }
 
+  @SneakyThrows
+  public static final String toJsonString(Object object) {
+    return OBJECT_MAPPER.writeValueAsString(object);
+  }
+
 }
