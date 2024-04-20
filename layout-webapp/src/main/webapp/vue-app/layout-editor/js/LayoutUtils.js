@@ -20,7 +20,7 @@
 export const breakpoints = ['md', 'lg', 'xl'];
 
 export const currentBreakpoint = 'xl';
-export const pageLayoutTemplate = 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl';
+export const sectionsParentTemplate = 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl';
 export const simpleTemplate = 'system:/groovy/portal/webui/container/UIContainer.gtmpl';
 export const gridTemplate = 'GridContainer';
 export const flexTemplate = 'FlexContainer';
@@ -125,20 +125,21 @@ export function initPageContext(navUri) {
 }
 
 export function getParentContainer(layout) {
+  if (!layout) {
+    return null;
+  }
   if (!layout.children) {
     layout.children = [];
   }
-  const parentContainer = layout.children[0]?.children?.[0];
-  if (!parentContainer?.cssClass?.includes?.('v-application')) {
-    return;
+  if (layout.children[0]?.template === sectionsParentTemplate) {
+    return layout.children[0];
   } else {
-    return parentContainer;
+    return getParentContainer(layout.children?.[0]);
   }
 }
 
 export function newParentContainer(layout) {
-  const vuetifyAppContainer = newContainer(simpleTemplate, 'VuetifyApp', layout, 0);
-  const parent = newContainer(pageLayoutTemplate, 'v-application v-application--is-ltr v-application--wrap singlePageApplication layout-sections-parent', vuetifyAppContainer, 0);
+  const parent = newContainer(sectionsParentTemplate, '', layout, 0);
   newSection(parent, 0, 12, 12, gridTemplate);
 }
 

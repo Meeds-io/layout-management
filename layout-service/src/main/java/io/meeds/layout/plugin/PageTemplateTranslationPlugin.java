@@ -25,9 +25,6 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 
 import io.meeds.layout.service.LayoutAclService;
 import io.meeds.social.translation.plugin.TranslationPlugin;
-import io.meeds.social.translation.service.TranslationService;
-
-import jakarta.annotation.PostConstruct;
 
 @Component
 public class PageTemplateTranslationPlugin extends TranslationPlugin {
@@ -40,14 +37,6 @@ public class PageTemplateTranslationPlugin extends TranslationPlugin {
 
   @Autowired
   private LayoutAclService   layoutAclService;
-
-  @Autowired
-  private TranslationService translationService;
-
-  @PostConstruct
-  public void init() {
-    translationService.addPlugin(this);
-  }
 
   @Override
   public String getObjectType() {

@@ -23,6 +23,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,8 +56,7 @@ public class PageTemplateRest {
   @GetMapping
   @Secured("users")
   @Operation(summary = "Retrieve page templates", method = "GET", description = "This retrieves page templates")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
   public List<PageTemplate> getPageTemplates(HttpServletRequest request) {
     return pageTemplateService.getPageTemplates(request.getLocale(), true);
   }
@@ -65,8 +65,7 @@ public class PageTemplateRest {
   @Secured("users")
   @Operation(summary = "Create a page template", method = "POST", description = "This creates a new page template")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "page created"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+                          @ApiResponse(responseCode = "400", description = "Invalid query input") })
   public PageTemplate createPageTemplate(
                                          HttpServletRequest request,
                                          @RequestBody
@@ -83,7 +82,7 @@ public class PageTemplateRest {
   @Operation(summary = "Update a page template", method = "PUT", description = "This updates an existing page template")
   @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "page updated"),
                           @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+                          @ApiResponse(responseCode = "404", description = "Object Not found") })
   public void updatePageTemplate(
                                  HttpServletRequest request,
                                  @Parameter(description = "Page template identifier")
@@ -94,6 +93,26 @@ public class PageTemplateRest {
     try {
       pageTemplate.setId(id);
       pageTemplateService.updatePageTemplate(pageTemplate, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @DeleteMapping("{id}")
+  @Secured("users")
+  @Operation(summary = "Deletes a page template", method = "DELETE", description = "This deletes an existing page template")
+  @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "page deleted"),
+                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
+                          @ApiResponse(responseCode = "404", description = "Object Not found") })
+  public void deletePageTemplate(
+                                 HttpServletRequest request,
+                                 @Parameter(description = "Page template identifier")
+                                 @PathVariable("id")
+                                 long id) {
+    try {
+      pageTemplateService.deletePageTemplate(id, request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
