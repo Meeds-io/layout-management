@@ -24,11 +24,8 @@ import org.springframework.stereotype.Component;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.attachment.AttachmentPlugin;
-import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.service.LayoutAclService;
-
-import jakarta.annotation.PostConstruct;
 
 @Component
 public class PageTemplateAttachmentPlugin extends AttachmentPlugin {
@@ -37,14 +34,6 @@ public class PageTemplateAttachmentPlugin extends AttachmentPlugin {
 
   @Autowired
   private LayoutAclService   layoutAclService;
-
-  @Autowired
-  private AttachmentService  attachmentService;
-
-  @PostConstruct
-  public void init() {
-    attachmentService.addPlugin(this);
-  }
 
   @Override
   public String getObjectType() {

@@ -23,7 +23,6 @@
     :container="container"
     :parent-id="parentId"
     :index="index"
-    :context="context"
     :draggable="childrenSize > 1" />
 </template>
 <script>
@@ -35,10 +34,6 @@ export default {
     },
     index: {
       type: Number,
-      default: null,
-    },
-    context: {
-      type: String,
       default: null,
     },
   },

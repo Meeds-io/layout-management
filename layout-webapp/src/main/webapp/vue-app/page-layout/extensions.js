@@ -34,6 +34,6 @@ extensionRegistry.registerExtension('page-layout', 'container', {
 extensionRegistry.registerExtension('page-layout', 'container', {
   rank: 600,
   type: 'application',
-  isValid: container => !container.template && (container.contentId?.includes?.('/') || container.storageId),
+  isValid: container => !container.template,
   containerType: 'page-layout-application',
 });
