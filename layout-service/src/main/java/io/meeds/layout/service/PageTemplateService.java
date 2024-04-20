@@ -24,9 +24,12 @@ import java.util.Locale;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.attachment.AttachmentService;
 
@@ -39,6 +42,8 @@ import io.meeds.social.translation.service.TranslationService;
 
 @Service
 public class PageTemplateService {
+
+  private static final Log    LOG = ExoLogger.getLogger(PageTemplateService.class);
 
   @Autowired
   private LayoutAclService    layoutAclService;
@@ -54,6 +59,9 @@ public class PageTemplateService {
 
   @Autowired
   private PageTemplateStorage pageTemplateStorage;
+
+  @Value("${meeds.pages.import.override:false}")
+  private boolean             forceReimportTemplates;
 
   public List<PageTemplate> getPageTemplates() {
     return getPageTemplates(null, false);
@@ -87,14 +95,43 @@ public class PageTemplateService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to create a page template");
     }
+    return createPageTemplate(pageTemplate);
+  }
+
+  public PageTemplate createPageTemplate(PageTemplate pageTemplate) {
     return pageTemplateStorage.createPageTemplate(pageTemplate);
   }
 
+  public void deletePageTemplate(long templateId, String username) throws IllegalAccessException, ObjectNotFoundException {
+    if (!layoutAclService.isAdministrator(username)) {
+      throw new IllegalAccessException("User isn't authorized to create a page template");
+    }
+    deletePageTemplate(templateId);
+  }
+
+  public void deletePageTemplate(long templateId) throws ObjectNotFoundException {
+    try {
+      attachmentService.deleteAttachments(PageTemplateAttachmentPlugin.OBJECT_TYPE, String.valueOf(templateId));
+    } catch (Exception e) {
+      LOG.debug("Error while deleting attachments of deleted Page Template", e);
+    }
+    try {
+      translationService.deleteTranslationLabels(PageTemplateTranslationPlugin.OBJECT_TYPE, templateId);
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("Error while deleting translation labels of deleted Page Template", e);
+    }
+    pageTemplateStorage.removePageTemplate(templateId);
+  }
+
   public PageTemplate updatePageTemplate(PageTemplate pageTemplate, String username) throws ObjectNotFoundException,
-                                                                                       IllegalAccessException {
+  IllegalAccessException {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to update a page template");
     }
+    return pageTemplateStorage.updatePageTemplate(pageTemplate);
+  }
+
+  public PageTemplate updatePageTemplate(PageTemplate pageTemplate) throws ObjectNotFoundException {
     return pageTemplateStorage.updatePageTemplate(pageTemplate);
   }
 

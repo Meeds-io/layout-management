@@ -51,7 +51,7 @@ export default {
     },
     items() {
       return this.pageTemplates?.map?.(t => ({
-        name: t.name,
+        name: this.$te(t.name) ? this.$t(t.name) : t.name,
         value: t.id,
       }));
     },
@@ -59,7 +59,7 @@ export default {
       return this.pageTemplates?.find?.(t => t.id === Number(this.pageTemplateId));
     },
     description() {
-      return this.pageTemplate?.description;
+      return this.$te(this.pageTemplate?.description) ? this.$t(this.pageTemplate?.description) : this.pageTemplate?.description;
     },
     illustrationId() {
       return this.pageTemplate?.illustrationId;

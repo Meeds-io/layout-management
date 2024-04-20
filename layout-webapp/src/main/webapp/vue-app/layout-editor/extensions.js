@@ -25,30 +25,9 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 200,
-  type: 'page-layout',
-  isValid: container => container?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl',
-  containerType: 'layout-editor-container',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 100,
-  type: 'page',
-  isValid: container => container.type === 'PAGE',
-  containerType: 'layout-editor-container-page',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 300,
   type: 'grid-section',
-  isValid: container => container?.template === 'GridContainer',
-  containerType: 'layout-editor-container-section',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 400,
-  type: 'flex-section',
-  isValid: container => container?.template === 'FlexContainer',
+  isValid: container => container?.template === 'GridContainer' || container?.template === 'FlexContainer',
   containerType: 'layout-editor-container-section',
 });
 
@@ -62,6 +41,6 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 600,
   type: 'application',
-  isValid: container => !container.template && (container.contentId?.includes?.('/') || container.storageId),
+  isValid: container => !container.type && !container.template,
   containerType: 'layout-editor-container-application',
 });
