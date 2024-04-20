@@ -41,8 +41,8 @@ export function getPages(siteType, siteName, pageDisplayName) {
   });
 }
 
-export function updatePageLayout(pageRef, pageLayout, publish) {
-  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}&publish=${publish || false}`, {
+export function updatePageLayout(pageRef, pageLayout, expand, publish) {
+  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}&publish=${publish || false}&expand=${expand || ''}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {
@@ -134,8 +134,8 @@ export function getPage(pageRef) {
   });
 }
 
-export function getPageLayout(pageRef) {
-  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}`, {
+export function getPageLayout(pageRef, expand) {
+  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}&expand=${expand || ''}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {

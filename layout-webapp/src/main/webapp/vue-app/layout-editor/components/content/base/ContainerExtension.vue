@@ -26,7 +26,6 @@
       :index="index"
       :parent-id="parentId"
       :length="length"
-      :context="context"
       :cell-height="cellHeight"
       :cell-width="cellWidth"
       :rows-count="rowsCount"
@@ -55,10 +54,6 @@ export default {
       default: null,
     },
     parentId: {
-      type: String,
-      default: null,
-    },
-    context: {
       type: String,
       default: null,
     },

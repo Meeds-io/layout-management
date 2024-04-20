@@ -287,6 +287,7 @@ public class PageLayoutService {
       Page pageLayout = JsonUtils.fromJsonString(pageTemplate.getContent(), LayoutModel.class)
                                  .toPage();
       page.setChildren(pageLayout.getChildren());
+      page.resetStorage();
       page.setName(pageName);
     } else if (pageType == PageType.LINK) {
       page = new Page(siteType, siteName, pageName);
