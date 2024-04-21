@@ -19,13 +19,16 @@
 
 -->
 <template>
-  <v-card :id="applicationId" flat>
+  <v-card :id="portletName" flat>
     <div class="d-flex flex-no-wrap">
       <v-avatar
         class="ApplicationCardImage mx-1 my-auto"
         size="45"
         tile>
-        <i :class="applicationIcon"></i>
+        <img
+          :src="`/${webApplicationName}/skin/DefaultSkin/portletIcons/${portletName}.png`"
+          :alt="portletName"
+          :onerror="`src = '${defaultImageSrc}'`">
       </v-avatar>
       <div class="flex-grow-1 ApplicationCardBody text-truncate">
         <div
@@ -62,9 +65,13 @@ export default {
   },
   data: () => ({
     displayActionMenu: false,
+    defaultImageSrc: '/sites/images/application/DefaultPortlet.png',
   }),
   computed: {
-    applicationId() {
+    webApplicationName() {
+      return this.application?.contentId?.split?.('/')?.[0];
+    },
+    portletName() {
       return this.application?.contentId?.split?.('/')?.[1];
     },
     applicationName() {
@@ -72,13 +79,6 @@ export default {
     },
     applicationDescription() {
       return this.application?.description;
-    },
-    applicationIcon() {
-      if (!this.applicationId) {
-        return '';
-      }
-      const iconSuffix = `${this.applicationId.charAt(0).toUpperCase()}${this.applicationId.substring(1)}`;
-      return `uiIconApp${iconSuffix} uiIconDefaultApp`;
     },
   },
 };
