@@ -33,14 +33,12 @@ export function installApplication(navUri, applicationStorageId, applicationElem
     .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
 }
 
-function handleApplicationContent(applicationContent, applicationElement, applicationMode) {
+function handleApplicationContent(applicationContent, applicationElement) {
   const newHeadContent = applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>'));
   let newBodyContent = applicationContent.substring(applicationContent.search('<body') + applicationContent.match(/<body.*>/g)[0].length, applicationContent.lastIndexOf('</body>'));
   newBodyContent = installNewCSS(newHeadContent, newBodyContent);
   installNewJS(newHeadContent);
-  if (applicationMode === 'EDIT') {
-    installNewJS(newBodyContent, 'jsManager', true);
-  }
+  installNewJS(newBodyContent, 'jsManager', true);
 
   const newHtmlDocument = document.createElement('div');
   newHtmlDocument.innerHTML = newBodyContent;
@@ -112,7 +110,6 @@ function installNewJS(scriptsContent, specificId, forceReload) {
       }
       scriptElement.innerText = scriptContent.substring(scriptContent.indexOf('>') + 1).replace(/(\r)?(\n)?/g, '');
       document.head.append(scriptElement);
-      replaceScriptElements(scriptElement);
     }
     scriptIteratorElement = replacableScriptsIterator.next().value;
   }
