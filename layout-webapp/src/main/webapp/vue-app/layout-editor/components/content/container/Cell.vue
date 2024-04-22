@@ -109,7 +109,9 @@
             class="d-flex align-center justify-center full-width full-height">
             <v-icon
               class="icon-default-color"
-              size="20">fa-vector-square</v-icon>
+              size="20">
+              fa-vector-square
+            </v-icon>
           </div>
         </v-card>
       </v-hover>
@@ -145,7 +147,10 @@ export default {
       return this.storageId && this.$root.movingCell?.storageId === this.storageId;
     },
     movingChildren() {
-      return this.storageId && this.isDynamicSection && this.$root.movingParentId === this.parentId;
+      return this.storageId
+        && this.isDynamicSection
+        && this.$root.movingParentId
+        && this.$root.movingParentDynamic;
     },
     sectionType() {
       return this.$layoutUtils.getSection(this.$root.layout, this.parentId)?.template;
@@ -231,6 +236,8 @@ export default {
       this.$root.moveType = moveType;
       if (!this.isDynamicSection || moveType === 'resize') {
         this.$root.movingParentId = this.parentId;
+        const section = this.$layoutUtils.getContainerById(this.$root.layout, this.parentId);
+        this.$root.movingParentDynamic = section?.template === this.$layoutUtils.flexTemplate;
         this.$nextTick().then(() => {
           this.$root.$emit('layout-cell-moving-start', {
             target: event.target,
