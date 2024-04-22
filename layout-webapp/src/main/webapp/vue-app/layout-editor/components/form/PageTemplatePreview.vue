@@ -76,7 +76,7 @@ export default {
       return this.attachments?.[0]?.id;
     },
     illustrationSrc() {
-      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.templateId}/${this.illustrationId}` || '';
+      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.templateId}/${this.illustrationId}` || '/layout/images/page-templates/DefaultPreview.webp';
     },
   },
   watch: {
