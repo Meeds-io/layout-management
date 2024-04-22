@@ -76,9 +76,11 @@
             'grey-background': !isSelectedCell && !hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
             'light-grey-background': !isSelectedCell && hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
             'transparent': $root.movingCell && $root.selectedSectionId === parentId && !isSelectedCell,
+            'crosshair-cursor': !isDynamicSection,
             'grey': isSelectedCell,
             'invisible': moving,
           }"
+          :title="!isDynamicSection && $t('layout.cellHoverTooltip')"
           class="full-width"
           flat
           v-on="!multiSelectEnabled && {
@@ -101,6 +103,14 @@
               <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
             </div>
           </v-card>
+          <div
+            v-else
+            :aria-label="$t('layout.cellHoverTooltip')"
+            class="d-flex align-center justify-center full-width full-height">
+            <v-icon
+              class="icon-default-color"
+              size="20">fa-vector-square</v-icon>
+          </div>
         </v-card>
       </v-hover>
     </template>
