@@ -173,7 +173,7 @@ export default {
     },
     dragOptions() {
       const dragOptions = {
-        group: `${this.container.template}-${this.parentId}`,
+        group: `${this.container.template}`,
         draggable: `.${this.draggableContainerClass}`,
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
@@ -218,6 +218,8 @@ export default {
     startMoving() {
       this.dragged = true;
       this.$root.movingParentId = this.parentId;
+      const section = this.$layoutUtils.getContainerById(this.$root.layout, this.parentId);
+      this.$root.movingParentDynamic = section?.template === this.$layoutUtils.flexTemplate;
     },
     endMoving(event) {
       this.dragged = false;
