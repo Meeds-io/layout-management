@@ -63,6 +63,7 @@ export function init() {
           draftNodeId: null,
           draftNodeUri: null,
           movingParentId: null,
+          movingParentDynamic: false,
           drawerOpened: 0,
           selectedSectionId: null,
           selectedCellCoordinates: [],
