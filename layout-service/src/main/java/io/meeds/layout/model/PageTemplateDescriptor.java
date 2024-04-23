@@ -39,6 +39,6 @@ public class PageTemplateDescriptor {
 
   private String              illustrationPath;
 
-  private String              contentPath;
+  private String              layoutPath;
 
 }
