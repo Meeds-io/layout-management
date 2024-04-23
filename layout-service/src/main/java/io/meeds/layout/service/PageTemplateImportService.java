@@ -43,8 +43,8 @@ import org.exoplatform.commons.api.settings.data.Scope;
 import org.exoplatform.commons.utils.IOUtil;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.configuration.ConfigurationManager;
+import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelUnmarshaller;
-import org.exoplatform.portal.config.model.PageContainerTemplate;
 import org.exoplatform.portal.config.model.UnmarshalledObject;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -237,10 +237,10 @@ public class PageTemplateImportService {
       pageTemplate = new PageTemplate();
       isNew = true;
     }
-    try (InputStream is = configurationManager.getInputStream(d.getContentPath())) {
+    try (InputStream is = configurationManager.getInputStream(d.getLayoutPath())) {
       String xml = IOUtil.getStreamContentAsString(is);
-      PageContainerTemplate page = fromXML(xml);
-      pageTemplate.setContent(JsonUtils.toJsonString(new LayoutModel(page)));
+      Container layout = fromXML(xml);
+      pageTemplate.setContent(JsonUtils.toJsonString(new LayoutModel(layout)));
     }
     if (isNew) {
       return pageTemplateService.createPageTemplate(pageTemplate);
@@ -282,9 +282,8 @@ public class PageTemplateImportService {
   }
 
   @SneakyThrows
-  private PageContainerTemplate fromXML(String xml) {
-    UnmarshalledObject<PageContainerTemplate> obj = ModelUnmarshaller.unmarshall(PageContainerTemplate.class,
-                                                                                 xml.getBytes(StandardCharsets.UTF_8));
+  private Container fromXML(String xml) {
+    UnmarshalledObject<Container> obj = ModelUnmarshaller.unmarshall(Container.class, xml.getBytes(StandardCharsets.UTF_8));
     return obj.getObject();
   }
 
