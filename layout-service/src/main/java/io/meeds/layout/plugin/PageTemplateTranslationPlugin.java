@@ -54,12 +54,12 @@ public class PageTemplateTranslationPlugin extends TranslationPlugin {
   }
 
   @Override
-  public long getAudienceId(long programId) throws ObjectNotFoundException {
+  public long getAudienceId(long templateId) throws ObjectNotFoundException {
     return 0;
   }
 
   @Override
-  public long getSpaceId(long programId) throws ObjectNotFoundException {
+  public long getSpaceId(long templateId) throws ObjectNotFoundException {
     return 0;
   }
 
