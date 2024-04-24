@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       flat
       dense
       class="mt-2">
-      <span class="font-weight-bold text-capitalize">  {{ site.displayName || site.name }} </span>
+      <span class="font-weight-bold">  {{ site.displayName || site.name }} </span>
       <v-spacer />
       <site-management-site-card-menu
         :site="site" />
