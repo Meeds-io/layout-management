@@ -18,6 +18,8 @@
  */
 package io.meeds.layout.model;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,15 +29,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PermissionUpdateModel {
 
-  private String siteType;
+  private String       siteType;
 
-  private String siteName;
+  private String       siteName;
 
-  private String accessPermissions;
+  private List<String> accessPermissions;
 
-  private String editPermission;
+  private String       editPermission;
 
-  public PermissionUpdateModel(String accessPermissions, String editPermission) {
+  public PermissionUpdateModel(List<String> accessPermissions, String editPermission) {
     this.accessPermissions = accessPermissions;
     this.editPermission = editPermission;
   }

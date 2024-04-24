@@ -294,7 +294,7 @@ public class PageLayoutServiceTest {
 
   @Test
   public void updatePagePermissions() throws IllegalAccessException, ObjectNotFoundException {
-    String accessPermissions = "access, permissions";
+    List<String> accessPermissions = Arrays.asList("access", "permissions");
     String editPermission = "edit permission";
     PermissionUpdateModel permissionModel = new PermissionUpdateModel(accessPermissions, editPermission);
     assertThrows(ObjectNotFoundException.class,
