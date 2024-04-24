@@ -247,11 +247,7 @@ public class PageLayoutService {
       throw new IllegalAccessException();
     }
     PageState pageState = pageContext.getState();
-    List<String> accessPermissionsList = List.of(permissionUpdateModel.getAccessPermissions().split(","))
-                                             .stream()
-                                             .map(String::trim)
-                                             .distinct()
-                                             .toList();
+    List<String> accessPermissionsList = permissionUpdateModel.getAccessPermissions();
     String editPermission = permissionUpdateModel.getEditPermission();
 
     pageContext.setState(new PageState(pageState.getDisplayName(),

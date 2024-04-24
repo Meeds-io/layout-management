@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -201,7 +202,7 @@ public class SiteLayoutServiceTest {
   @Test
   @SneakyThrows
   public void updateSitePermissions() {
-    String accessPermissions = "access, permissions";
+    List<String> accessPermissions = Arrays.asList("access", "permissions");
     String editPermission = "edit permission";
     PermissionUpdateModel permissionModel = new PermissionUpdateModel(SITE_KEY.getTypeName(),
                                                                       SITE_KEY.getName(),
