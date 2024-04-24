@@ -18,13 +18,9 @@
  */
 package io.meeds.layout.service;
 
-import java.util.ArrayList;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.exoplatform.application.registry.Application;
 import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
@@ -38,6 +34,7 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityRegistry;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 @Service
@@ -52,13 +49,14 @@ public class LayoutAclService {
   @Autowired
   private Authenticator    authenticator;
 
+  @Setter
   private IdentityRegistry identityRegistry;
 
   @PostConstruct
   public void init() {
     // Can't be autowired from Kernel IoC, thus inject it once Spring Bean
     // initialized
-    identityRegistry = ExoContainerContext.getService(IdentityRegistry.class);
+    setIdentityRegistry(ExoContainerContext.getService(IdentityRegistry.class));
   }
 
   public boolean canAddSite(String username) {
@@ -159,16 +157,6 @@ public class LayoutAclService {
     }
   }
 
-  public boolean canViewApplication(Application application, String username) {
-    ArrayList<String> permissions = application.getAccessPermissions();
-    if (CollectionUtils.isEmpty(permissions)) {
-      return isAdministrator(username);
-    } else {
-      Identity identity = getUserIdentity(username);
-      return permissions.stream().anyMatch(p -> userAcl.hasPermission(identity, p));
-    }
-  }
-
   public boolean isAdministrator(String username) {
     ConversationState currentConversationState = ConversationState.getCurrent();
     ConversationState.setCurrent(getConversationState(username));
@@ -187,7 +175,7 @@ public class LayoutAclService {
     return new ConversationState(getUserIdentity(userAcl.getSuperUser()));
   }
 
-  public ConversationState getConversationState(String username) {
+  private ConversationState getConversationState(String username) {
     return new ConversationState(getUserIdentity(username));
   }
 

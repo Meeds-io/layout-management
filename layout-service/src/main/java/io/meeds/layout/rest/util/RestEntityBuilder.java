@@ -20,33 +20,25 @@
 package io.meeds.layout.rest.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import org.exoplatform.commons.utils.CommonsUtils;
-import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.services.resources.LocaleConfig;
-import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.rest.api.EntityBuilder;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
-import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.model.SiteRestEntity;
 import io.meeds.layout.service.PageLayoutService;
@@ -56,42 +48,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class RestEntityBuilder {
 
   private RestEntityBuilder() {
-  }
-
-  public static NodeLabel toNodeLabel(Map<Locale, State> nodeLabels) {
-    LocaleConfigService localeConfigService = CommonsUtils.getService(LocaleConfigService.class);
-    Locale defaultLocale = localeConfigService.getDefaultLocaleConfig() == null ? Locale.ENGLISH :
-                                                                                localeConfigService.getDefaultLocaleConfig()
-                                                                                                   .getLocale();
-    String defaultLanguage = defaultLocale.getLanguage();
-    Map<String, String> supportedLanguages =
-                                           localeConfigService.getLocalConfigs()
-                                               == null ?
-                                                       Collections.singletonMap(defaultLocale.getLanguage(),
-                                                                                defaultLocale.getDisplayName()) :
-                                                       localeConfigService.getLocalConfigs()
-                                                                          .stream()
-                                                                          .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
-                                                                                                                      "ma"))
-                                                                          .collect(Collectors.toMap(LocaleConfig::getLocaleName,
-                                                                                                    localeConfig -> localeConfig.getLocale()
-                                                                                                                                .getDisplayName()));
-    Map<String, String> localized = new HashMap<>();
-    NodeLabel nodeLabelRestEntity = new NodeLabel();
-    if (nodeLabels != null && nodeLabels.size() != 0) {
-      for (Map.Entry<Locale, State> entry : nodeLabels.entrySet()) {
-        Locale locale = entry.getKey();
-        State state = entry.getValue();
-        localized.put(I18N.toTagIdentifier(locale), state.getName());
-      }
-      if (!nodeLabels.containsKey(defaultLocale)) {
-        localized.put(I18N.toTagIdentifier(defaultLocale), null);
-      }
-      nodeLabelRestEntity.setLabels(localized);
-    }
-    nodeLabelRestEntity.setDefaultLanguage(defaultLanguage);
-    nodeLabelRestEntity.setSupportedLanguages(supportedLanguages);
-    return nodeLabelRestEntity;
   }
 
   public static SiteRestEntity toSiteEntity(PageLayoutService pageLayoutService,
