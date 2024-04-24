@@ -57,7 +57,7 @@ import lombok.SneakyThrows;
 @Service
 public class PageLayoutService {
 
-  private static final String     EMPTY_PAGE_TEMPLATE         = "empty";
+  public static final String      EMPTY_PAGE_TEMPLATE         = "empty";
 
   private static final Pattern    COLOR_MATCHER_VALIDATOR     = Pattern.compile("[#0-9a-zA-Z]+");
 
@@ -148,6 +148,7 @@ public class PageLayoutService {
                                    pageModel.getPageTemplateId(),
                                    pageModel.getLink());
 
+    page.setName(pageName);
     page.setTitle(pageModel.getPageTitle());
     String[] accessPermissions = pageModel.getAccessPermissions() == null ?
                                                                           portalConfig.getAccessPermissions() :
@@ -248,6 +249,7 @@ public class PageLayoutService {
     PageState pageState = pageContext.getState();
     List<String> accessPermissionsList = List.of(permissionUpdateModel.getAccessPermissions().split(","))
                                              .stream()
+                                             .map(String::trim)
                                              .distinct()
                                              .toList();
     String editPermission = permissionUpdateModel.getEditPermission();
@@ -293,6 +295,7 @@ public class PageLayoutService {
       page = new Page(siteType, siteName, pageName);
       page.setLink(pageLink);
     } else {
+      // Unreachable but kept in case of behavior changes
       throw new IllegalArgumentException("pageType is mandatory");
     }
     page.setType(pageType.name());
@@ -300,7 +303,7 @@ public class PageLayoutService {
   }
 
   private PageType getPageType(String pageType) {
-    return StringUtils.isBlank(pageType) ? null : PageType.valueOf(pageType.toUpperCase());
+    return StringUtils.isBlank(pageType) ? PageType.PAGE : PageType.valueOf(pageType.toUpperCase());
   }
 
   private void validateCSSInputs(ModelObject modelObject) {

@@ -142,7 +142,7 @@ public class PageTemplateImportService {
     }
   }
 
-  private List<PageTemplateDescriptor> parseDescriptors(URL url) {
+  protected List<PageTemplateDescriptor> parseDescriptors(URL url) {
     try (InputStream inputStream = url.openStream()) {
       String content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
       PageTemplateDescriptorList list = JsonUtils.fromJsonString(content, PageTemplateDescriptorList.class);
@@ -153,7 +153,7 @@ public class PageTemplateImportService {
     }
   }
 
-  private void importDescriptor(PageTemplateDescriptor descriptor) {
+  protected void importDescriptor(PageTemplateDescriptor descriptor) {
     String descriptorId = descriptor.getId();
     long oldTemplateId = getAlreadyImportedTemplateId(descriptorId);
     if (forceReimportTemplates || oldTemplateId == 0) {
@@ -163,7 +163,7 @@ public class PageTemplateImportService {
     }
   }
 
-  private void importPageTemplate(PageTemplateDescriptor d, long oldTemplateId) {
+  protected void importPageTemplate(PageTemplateDescriptor d, long oldTemplateId) {
     ConversationState currentConversationState = ConversationState.getCurrent();
     ConversationState.setCurrent(layoutAclService.getSuperUserConversationState());
     try {
@@ -190,7 +190,7 @@ public class PageTemplateImportService {
     }
   }
 
-  private void saveTemplateNames(PageTemplateDescriptor d, PageTemplate pageTemplate) {
+  protected void saveTemplateNames(PageTemplateDescriptor d, PageTemplate pageTemplate) {
     d.getNames()
      .forEach((k, v) -> saveTranslationLabel(PageTemplateTranslationPlugin.OBJECT_TYPE,
                                              pageTemplate.getId(),
@@ -208,7 +208,7 @@ public class PageTemplateImportService {
                                                                defaultName));
   }
 
-  private void saveTemplateDescriptions(PageTemplateDescriptor d, PageTemplate pageTemplate) {
+  protected void saveTemplateDescriptions(PageTemplateDescriptor d, PageTemplate pageTemplate) {
     d.getDescriptions()
      .forEach((k, v) -> saveTranslationLabel(PageTemplateTranslationPlugin.OBJECT_TYPE,
                                              pageTemplate.getId(),
@@ -227,7 +227,7 @@ public class PageTemplateImportService {
   }
 
   @SneakyThrows
-  private PageTemplate createPageTemplate(PageTemplateDescriptor d, long oldTemplateId) {
+  protected PageTemplate createPageTemplate(PageTemplateDescriptor d, long oldTemplateId) {
     PageTemplate pageTemplate = null;
     if (oldTemplateId > 0) {
       pageTemplate = pageTemplateService.getPageTemplate(oldTemplateId);
@@ -250,7 +250,7 @@ public class PageTemplateImportService {
   }
 
   @SneakyThrows
-  private void saveTranslationLabel(String objectType, long id, String fieldName, Locale locale, String label) {
+  protected void saveTranslationLabel(String objectType, long id, String fieldName, Locale locale, String label) {
     translationService.saveTranslationLabel(objectType,
                                             id,
                                             fieldName,
@@ -258,7 +258,7 @@ public class PageTemplateImportService {
                                             label);
   }
 
-  private void saveTemplateIllustration(long pageTemplateId, String imagePath) {
+  protected void saveTemplateIllustration(long pageTemplateId, String imagePath) {
     try {
       URL resource = configurationManager.getResource(imagePath);
       String uploadId = "PageTemplateIllustration" + RANDOM.nextLong();
@@ -282,12 +282,12 @@ public class PageTemplateImportService {
   }
 
   @SneakyThrows
-  private Container fromXML(String xml) {
+  protected Container fromXML(String xml) {
     UnmarshalledObject<Container> obj = ModelUnmarshaller.unmarshall(Container.class, xml.getBytes(StandardCharsets.UTF_8));
     return obj.getObject();
   }
 
-  private long getAlreadyImportedTemplateId(String descriptorId) {
+  protected long getAlreadyImportedTemplateId(String descriptorId) {
     try {
       SettingValue<?> settingValue = settingService.get(PAGE_TEMPLATE_CONTEXT, PAGE_TEMPLATE_IMPORT_SCOPE, descriptorId);
       return settingValue == null || settingValue.getValue() == null ? 0l : Long.parseLong(settingValue.getValue().toString());
