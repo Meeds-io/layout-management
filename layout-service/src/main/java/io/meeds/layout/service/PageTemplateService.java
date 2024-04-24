@@ -24,7 +24,6 @@ import java.util.Locale;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -59,9 +58,6 @@ public class PageTemplateService {
 
   @Autowired
   private PageTemplateStorage pageTemplateStorage;
-
-  @Value("${meeds.pages.import.override:false}")
-  private boolean             forceReimportTemplates;
 
   public List<PageTemplate> getPageTemplates() {
     return getPageTemplates(null, false);
@@ -120,22 +116,22 @@ public class PageTemplateService {
     } catch (ObjectNotFoundException e) {
       LOG.debug("Error while deleting translation labels of deleted Page Template", e);
     }
-    pageTemplateStorage.removePageTemplate(templateId);
+    pageTemplateStorage.deletePageTemplate(templateId);
   }
 
   public PageTemplate updatePageTemplate(PageTemplate pageTemplate, String username) throws ObjectNotFoundException,
-  IllegalAccessException {
+                                                                                     IllegalAccessException {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to update a page template");
     }
-    return pageTemplateStorage.updatePageTemplate(pageTemplate);
+    return updatePageTemplate(pageTemplate);
   }
 
   public PageTemplate updatePageTemplate(PageTemplate pageTemplate) throws ObjectNotFoundException {
     return pageTemplateStorage.updatePageTemplate(pageTemplate);
   }
 
-  public String getLabel(long templateId, String fieldName, Locale locale) {
+  private String getLabel(long templateId, String fieldName, Locale locale) {
     if (locale == null) {
       locale = localeConfigService.getDefaultLocaleConfig().getLocale();
     }
@@ -143,7 +139,7 @@ public class PageTemplateService {
       TranslationField translationField = translationService.getTranslationField(PageTemplateTranslationPlugin.OBJECT_TYPE,
                                                                                  templateId,
                                                                                  fieldName);
-      if (MapUtils.isNotEmpty(translationField.getLabels())) {
+      if (translationField != null && MapUtils.isNotEmpty(translationField.getLabels())) {
         String label = translationField.getLabels().get(locale);
         if (label == null) {
           Locale defaultLocale = localeConfigService.getDefaultLocaleConfig().getLocale();
