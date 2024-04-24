@@ -99,7 +99,6 @@
                 <include>siteNavigation.less</include>
                 <include>siteManagement.less</include>
                 <include>editor.less</include>
-                <include>pagelayout.less</include>
               </includes>
             </configuration>
             <goals>
