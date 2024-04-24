@@ -18,8 +18,6 @@
  */
 package io.meeds.layout.service;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,7 +69,7 @@ public class SiteLayoutService {
 
   @SneakyThrows
   public PortalConfig createSite(SiteCreateModel createModel, String username) throws IllegalAccessException,
-                                                                       ObjectAlreadyExistsException {
+                                                                               ObjectAlreadyExistsException {
     if (!aclService.canAddSite(username)) {
       throw new IllegalAccessException();
     } else if (layoutService.getPortalConfig(createModel.getPortalConfig().getName()) != null) {
@@ -104,7 +102,7 @@ public class SiteLayoutService {
   }
 
   public void updateSite(SiteUpdateModel updateModel, String username) throws IllegalAccessException,
-                                                                                        ObjectNotFoundException {
+                                                                       ObjectNotFoundException {
     SiteKey siteKey = new SiteKey(updateModel.getSiteType(), updateModel.getSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
@@ -149,12 +147,8 @@ public class SiteLayoutService {
     if (!StringUtils.isBlank(permissionUpdateModel.getEditPermission())) {
       portalConfig.setEditPermission(permissionUpdateModel.getEditPermission());
     }
-    if (!StringUtils.isBlank(permissionUpdateModel.getAccessPermissions())) {
-      String[] accessPermissions = List.of(permissionUpdateModel.getAccessPermissions().split(","))
-                                       .stream()
-                                       .distinct()
-                                       .toArray(String[]::new);
-      portalConfig.setAccessPermissions(accessPermissions);
+    if (permissionUpdateModel.getAccessPermissions() != null) {
+      portalConfig.setAccessPermissions(permissionUpdateModel.getAccessPermissions().toArray(new String[0]));
     }
     layoutService.save(portalConfig);
   }
