@@ -111,8 +111,8 @@ export function updatePagePermissions(pageRef, editPermission, accessPermissions
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      editPermission,
-      accessPermissions,
+      editPermission: editPermission || null,
+      accessPermissions: accessPermissions || null,
     }),
   }).then((resp) => {
     if (!resp?.ok) {
