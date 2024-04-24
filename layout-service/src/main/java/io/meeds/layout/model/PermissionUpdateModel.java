@@ -18,17 +18,26 @@
  */
 package io.meeds.layout.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PermissionUpdateModel {
 
   private String siteType;
 
   private String siteName;
 
+  private String accessPermissions;
+
   private String editPermission;
 
-  private String accessPermissions;
+  public PermissionUpdateModel(String accessPermissions, String editPermission) {
+    this.accessPermissions = accessPermissions;
+    this.editPermission = editPermission;
+  }
 
 }

@@ -61,7 +61,7 @@ public class PageTemplateStorage {
     return new PageTemplate(entity.getId(), entity.getContent());
   }
 
-  public void removePageTemplate(long templateId) throws ObjectNotFoundException {
+  public void deletePageTemplate(long templateId) throws ObjectNotFoundException {
     if (!pageTemplateDAO.existsById(templateId)) {
       throw new ObjectNotFoundException(String.format("Page template with id %s doesn't exist", templateId));
     }

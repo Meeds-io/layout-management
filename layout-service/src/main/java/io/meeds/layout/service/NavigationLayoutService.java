@@ -25,12 +25,15 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.commons.utils.I18N;
 import org.exoplatform.portal.application.PortalRequestHandler;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.State;
@@ -43,6 +46,8 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.DescriptionService;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.services.resources.LocaleConfig;
+import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
@@ -51,7 +56,6 @@ import io.meeds.common.ContainerTransactional;
 import io.meeds.layout.model.NavigationCreateModel;
 import io.meeds.layout.model.NavigationUpdateModel;
 import io.meeds.layout.model.NodeLabel;
-import io.meeds.layout.rest.util.RestEntityBuilder;
 
 @Service
 public class NavigationLayoutService {
@@ -68,6 +72,9 @@ public class NavigationLayoutService {
 
   @Autowired
   private PageLayoutService              pageLayoutService;
+
+  @Autowired
+  private LocaleConfigService            localeConfigService;
 
   @Autowired
   private DescriptionService             descriptionService;
@@ -103,10 +110,14 @@ public class NavigationLayoutService {
                                                         nodeModel.getPreviousNodeId(),
                                                         nodeModel.getNodeId(),
                                                         nodeState);
-    NodeData nodeData = nodeDatas[1];
-    saveNodeLabels(nodeData.getId(), nodeModel.getLabels());
+    if (nodeDatas == null || nodeDatas.length < 2) {
+      throw new IllegalStateException("Missing created node");
+    } else {
+      NodeData nodeData = nodeDatas[1];
+      saveNodeLabels(nodeData.getId(), nodeModel.getLabels());
 
-    return navigationService.getNodeById(Long.parseLong(nodeData.getId()));
+      return navigationService.getNodeById(Long.parseLong(nodeData.getId()));
+    }
   }
 
   public NodeData createDraftNode(Long nodeId, String username) throws ObjectNotFoundException,
@@ -176,7 +187,15 @@ public class NavigationLayoutService {
     }
     if (delay > 0) {
       QUEUE.put(nodeId, username);
-      CompletableFuture.delayedExecutor(delay, TimeUnit.SECONDS).execute(() -> deleteNode(nodeId));
+      CompletableFuture.delayedExecutor(delay, TimeUnit.SECONDS).execute(() -> {
+        if (QUEUE.containsKey(nodeId)) {
+          try {
+            deleteNode(nodeId);
+          } finally {
+            QUEUE.remove(nodeId);
+          }
+        }
+      });
     } else {
       deleteNode(nodeId);
     }
@@ -198,14 +217,18 @@ public class NavigationLayoutService {
     NodeData nodeData = navigationService.getNodeById(nodeId);
     if (nodeData == null) {
       throw new ObjectNotFoundException(String.format(NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND, nodeId));
-    } else if (!aclService.canEditNavigation(nodeData.getSiteKey(), username)) {
-      throw new IllegalAccessException();
+    } else {
+      if (destinationParentId == null) {
+        destinationParentId = Long.parseLong(nodeData.getParentId());
+      }
+      NodeData destinationNodeData = navigationService.getNodeById(destinationParentId);
+      if (destinationNodeData == null) {
+        throw new ObjectNotFoundException(String.format(NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND, destinationParentId));
+      } else if (!aclService.canEditNavigation(destinationNodeData.getSiteKey(), username)) {
+        throw new IllegalAccessException();
+      }
     }
-    long parentId = Long.parseLong(nodeData.getParentId());
-    if (destinationParentId == null) {
-      destinationParentId = parentId;
-    }
-    navigationService.moveNode(nodeId, parentId, destinationParentId, previousNodeId);
+    navigationService.moveNode(nodeId, Long.parseLong(nodeData.getParentId()), destinationParentId, previousNodeId);
   }
 
   public NodeData getNode(long nodeId,
@@ -230,10 +253,10 @@ public class NavigationLayoutService {
       throw new IllegalAccessException();
     }
     Map<Locale, State> nodeLabels = descriptionService.getDescriptions(String.valueOf(nodeId));
-    return RestEntityBuilder.toNodeLabel(nodeLabels);
+    return toNodeLabel(nodeLabels);
   }
 
-  public String getNodeUri(Long nodeId, String username) throws IllegalAccessException, ObjectNotFoundException {
+  public String getNodeUri(long nodeId, String username) throws IllegalAccessException, ObjectNotFoundException {
     NodeData node = getNode(nodeId, username);
     return getNodeUri(node);
   }
@@ -251,18 +274,12 @@ public class NavigationLayoutService {
     params.put(PortalRequestHandler.REQUEST_SITE_TYPE, siteKey.getTypeName());
     params.put(PortalRequestHandler.REQUEST_PATH, uriBuilder.toString().replaceFirst("/", ""));
     params.put(PortalRequestHandler.LANG, Locale.ENGLISH.toLanguageTag());
-    return router.render(params).replace("/en", "").replace("?lang=en", "");
+    return router.render(params).replace("/en", "").replace("?lang=en", "").replace("&lang=en", "");
   }
 
   @ContainerTransactional
   public void deleteNode(long nodeId) {
-    if (QUEUE.containsKey(nodeId)) {
-      try {
-        navigationService.deleteNode(nodeId);
-      } finally {
-        QUEUE.remove(nodeId);
-      }
-    }
+    navigationService.deleteNode(nodeId);
   }
 
   private NodeState buildNodeState(String label, // NOSONAR
@@ -366,6 +383,40 @@ public class NavigationLayoutService {
       NodeData parentNode = navigationService.getNodeById(Long.parseLong(node.getParentId()));
       buildUri(parentNode, uriBuilder);
     }
+  }
+
+  public NodeLabel toNodeLabel(Map<Locale, State> nodeLabels) {
+    Locale defaultLocale = localeConfigService.getDefaultLocaleConfig() == null ? Locale.ENGLISH :
+                                                                                localeConfigService.getDefaultLocaleConfig()
+                                                                                                   .getLocale();
+    String defaultLanguage = defaultLocale.getLanguage();
+    Map<String, String> supportedLanguages =
+                                           CollectionUtils.isEmpty(localeConfigService.getLocalConfigs()) ?
+                                                       Collections.singletonMap(defaultLocale.getLanguage(),
+                                                                                defaultLocale.getDisplayName()) :
+                                                       localeConfigService.getLocalConfigs()
+                                                                          .stream()
+                                                                          .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
+                                                                                                                      "ma"))
+                                                                          .collect(Collectors.toMap(LocaleConfig::getLocaleName,
+                                                                                                    localeConfig -> localeConfig.getLocale()
+                                                                                                                                .getDisplayName()));
+    Map<String, String> localized = new HashMap<>();
+    NodeLabel nodeLabel = new NodeLabel();
+    if (nodeLabels != null && nodeLabels.size() != 0) {
+      for (Map.Entry<Locale, State> entry : nodeLabels.entrySet()) {
+        Locale locale = entry.getKey();
+        State state = entry.getValue();
+        localized.put(I18N.toTagIdentifier(locale), state.getName());
+      }
+      if (!nodeLabels.containsKey(defaultLocale) && !localized.isEmpty()) {
+        localized.put(I18N.toTagIdentifier(defaultLocale), localized.values().iterator().next());
+      }
+      nodeLabel.setLabels(localized);
+    }
+    nodeLabel.setDefaultLanguage(defaultLanguage);
+    nodeLabel.setSupportedLanguages(supportedLanguages);
+    return nodeLabel;
   }
 
 }
