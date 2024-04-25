@@ -71,7 +71,6 @@ public class SiteLayoutRest {
   private PageLayoutService pageLayoutService;
 
   @GetMapping("{siteId}")
-  @Secured("users")
   @Operation(summary = "Gets a specific site by its id", description = "Gets site by id", method = "GET")
   @ApiResponses(value = {
                           @ApiResponse(responseCode = "200", description = "Request fulfilled"),
@@ -79,13 +78,13 @@ public class SiteLayoutRest {
                           @ApiResponse(responseCode = "500", description = "Internal server error"),
   })
   public ResponseEntity<SiteRestEntity> getSiteById(
-                                                HttpServletRequest request,
-                                                @Parameter(description = "site id")
-                                                @PathVariable("siteId")
-                                                long siteId,
-                                                @Parameter(description = "Language used to retrieve names", required = false)
-                                                @RequestParam(name = "lang", required = false)
-                                                String lang) throws Exception {
+                                                    HttpServletRequest request,
+                                                    @Parameter(description = "site id")
+                                                    @PathVariable("siteId")
+                                                    long siteId,
+                                                    @Parameter(description = "Language used to retrieve names", required = false)
+                                                    @RequestParam(name = "lang", required = false)
+                                                    String lang) throws Exception {
     try {
       PortalConfig site = siteLayoutService.getSite(siteId, request.getRemoteUser());
       Locale locale;
@@ -109,7 +108,6 @@ public class SiteLayoutRest {
   }
 
   @GetMapping
-  @Secured("users")
   @Operation(summary = "Gets a specific site by its type and name", description = "Gets site its type and name", method = "GET")
   @ApiResponses(value = {
                           @ApiResponse(responseCode = "200", description = "Request fulfilled"),

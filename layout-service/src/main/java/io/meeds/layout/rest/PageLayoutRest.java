@@ -67,7 +67,6 @@ public class PageLayoutRest {
   private LayoutService     layoutService;
 
   @GetMapping
-  @Secured("users")
   @Operation(summary = "Retrieve pages", method = "GET", description = "This retrieves pages")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled") })
   public List<PageContext> getPages(
@@ -92,7 +91,6 @@ public class PageLayoutRest {
   }
 
   @GetMapping("layout")
-  @Secured("users")
   @Operation(summary = "Retrieve page layout by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })
@@ -115,7 +113,6 @@ public class PageLayoutRest {
   }
 
   @GetMapping("byRef")
-  @Secured("users")
   @Operation(summary = "Retrieve page by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })

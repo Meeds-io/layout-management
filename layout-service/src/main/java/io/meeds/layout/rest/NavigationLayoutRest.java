@@ -200,7 +200,6 @@ public class NavigationLayoutRest {
   }
 
   @GetMapping("{nodeId}")
-  @Secured("users")
   @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "403", description = "Forbidden"),
@@ -221,7 +220,6 @@ public class NavigationLayoutRest {
   }
 
   @GetMapping("{nodeId}/uri")
-  @Secured("users")
   @Operation(summary = "Retrieve node uri", method = "GET",
              description = "This retrieves node Uri that will allow to access the page")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
@@ -243,7 +241,6 @@ public class NavigationLayoutRest {
   }
 
   @GetMapping("{nodeId}/labels")
-  @Secured("users")
   @Operation(summary = "Retrieve node labels", method = "GET", description = "This retrieves node labels")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "403", description = "Forbidden"),

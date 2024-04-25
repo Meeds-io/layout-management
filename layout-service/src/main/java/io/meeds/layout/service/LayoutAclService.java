@@ -18,6 +18,7 @@
  */
 package io.meeds.layout.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.services.security.IdentityRegistry;
 
 import jakarta.annotation.PostConstruct;
@@ -181,6 +183,9 @@ public class LayoutAclService {
 
   @SneakyThrows
   private Identity getUserIdentity(String username) {
+    if (StringUtils.isBlank(username) || IdentityConstants.ANONIM.equals(username)) {
+      return null;
+    }
     Identity identity = identityRegistry.getIdentity(username);
     if (identity != null) {
       return identity;
