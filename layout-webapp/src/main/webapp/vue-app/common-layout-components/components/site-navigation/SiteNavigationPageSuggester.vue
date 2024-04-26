@@ -1,24 +1,26 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-flex id="siteNavigationsPagesSuggesterAutoComplete">
     <v-autocomplete
       ref="selectPage"
-      v-model="page"
+      v-model="selectedPage"
       :placeholder="suggesterLabels.placeholder"
       :items="items"
       :loading="loadingSuggestions"
@@ -37,8 +39,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
       dense
       flat
       required
+      attach
       @update:search-input="searchTerm = $event"
-      attach>
+      @blur="$refs.selectPage.isFocused = false">
       <template slot="no-data">
         <v-list-item class="pa-0">
           <v-list-item-title
@@ -69,13 +72,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </span>
   </v-flex>
 </template>
-
 <script>
 export default {
-  model: {
-    prop: 'page',
-    event: 'change'
-  },
   props: {
     page: {
       type: Object,
@@ -97,6 +95,7 @@ export default {
   data() {
     return {
       pages: [],
+      selectedPage: null,
       searchTerm: null,
       loadingSuggestions: false,
       startSearchAfterInMilliseconds: 300,
@@ -113,10 +112,10 @@ export default {
       };
     },
     items() {
-      this.pages.forEach(page => {
-        page.displayName = page.displayName || page.name;
-      });
-      return this.pages.slice();
+      return this.pages.slice().map(page => ({
+        displayName: page?.state?.displayName || page?.state?.name,
+        pageRef: `${page?.key?.site?.typeName}::${page?.key?.site?.name}::${page?.key?.name}`,
+      }));
     },
   },
   watch: {
@@ -129,40 +128,44 @@ export default {
         }
       }
     },
-    page() {
-      this.$emit('change', this.page);
+    page: {
+      immediate: true,
+      handler() {
+        if (this.page?.pageRef && this.selectedPage?.pageRef !== this.page?.pageRef) {
+          this.selectedPage = this.page;
+        } else if (!this.page && this.selectedPage) {
+          this.selectedPage = null;
+        }
+      },
+    },
+    selectedPage() {
+      this.$root.$emit('existing-page-selected', this.selectedPage);
     },
     siteType() {
-      this.page = null;
+      this.selectedPage = null;
     },
     allSites() {
-      this.page = null;
+      this.selectedPage = null;
       this.searchTerm = ' ';
     },
     siteName() {
-      this.page = null;
+      this.selectedPage = null;
       this.pages = [];
       this.searchTerm = ' ';
     },
-  },
-  mounted() {
-    $('#siteNavigationsPagesSuggesterAutoComplete input').on('blur', () => {
-      this.$refs.selectPage.isFocused = false;
-    });
   },
   created() {
     this.$root.$on('set-selected-page', this.emitSelectedValue);
   },
   methods: {
     remove() {
-      this.page = null;
-      this.$emit('change', this.page);
+      this.selectedPage = null;
     },
     searchPages() {
       if (this.allSites || (!this.allSites && this.siteType && this.siteName)) {
         this.loadingSuggestions = true;
         this.pages = [];
-        this.$siteNavigationService.getPages(this.siteType, this.siteName, this.searchTerm)
+        this.$pageLayoutService.getPages(this.siteType, this.siteName, this.searchTerm)
           .then(pages => this.pages = pages)
           .finally(() => this.loadingSuggestions = false);
       }
@@ -178,8 +181,8 @@ export default {
       }, this.endTypingKeywordTimeout);
     },
     emitSelectedValue(value) {
-      this.page = value;
-      this.pages.push(this.page);
+      this.selectedPage = value;
+      this.pages.push(this.selectedPage);
     },
   }
 };

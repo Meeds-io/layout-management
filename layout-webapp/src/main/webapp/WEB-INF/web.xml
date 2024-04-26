@@ -38,7 +38,10 @@
 
   <filter-mapping>
     <filter-name>ResourceRequestFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>*.css</url-pattern>
+    <url-pattern>*.js</url-pattern>
+    <url-pattern>*.html</url-pattern>
+    <url-pattern>/images/*</url-pattern>
   </filter-mapping>
 
   <servlet>
@@ -51,12 +54,5 @@
     <servlet-name>GateInServlet</servlet-name>
     <url-pattern>/gateinservlet</url-pattern>
   </servlet-mapping>
-
-  <jsp-config>
-    <taglib>
-      <taglib-uri>http://java.sun.com/portlet_2_0</taglib-uri>
-      <taglib-location>/WEB-INF/tld/portlet_2_0.tld</taglib-location>
-    </taglib>
-  </jsp-config>
 
 </web-app>

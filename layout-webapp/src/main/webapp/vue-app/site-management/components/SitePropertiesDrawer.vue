@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <exo-drawer
@@ -227,10 +229,7 @@ export default {
         this.editMode = true;
         if (!freshInstance) {
           this.$refs.sitePropertiesDrawer.open();
-          return this.$siteService.getSiteById(parseInt(site.siteId), {
-            expandNavigations: false,
-            excludeEmptyNavigationSites: false,
-            lang: 'en' })
+          return this.$siteLayoutService.getSiteById(site.siteId, 'en')
             .then(freshSite => this.open(freshSite, true));
         }
         this.site = site;
@@ -293,7 +292,7 @@ export default {
     updateSite() {
       this.loading = true;
       this.$refs.sitePropertiesDrawer.startLoading();
-      return this.$siteManagementService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.displayed, this.displayed && this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
+      return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.displayed, this.displayed && this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'label', this.siteTitleTranslations))
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'description', this.siteDescriptionTranslations))
         .then(() => {
@@ -301,6 +300,7 @@ export default {
           this.$root.$emit('refresh-sites');
           this.close();
         }).catch((e) => {
+          console.error(e);
           const message = e.message ==='401' &&  this.$t('siteManagement.label.updateSite.unauthorized') || this.$t('siteManagement.label.updateSite.error');
           this.$root.$emit('alert-message', message, 'error');
         })
@@ -318,7 +318,7 @@ export default {
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
       this.$refs.sitePropertiesDrawer.startLoading();
-      return this.$siteManagementService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, this.displayed, this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
+      return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, this.displayed, this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
         .then((site) =>{
           this.siteId = site.siteId;
           if (this.siteTitleTranslations.length) {
@@ -331,7 +331,8 @@ export default {
           this.$root.$emit('refresh-sites');
           this.$root.$emit('close-site-template-drawer', this.close);
           this.close();
-        }).catch(() => {
+        }).catch(e => {
+          console.error(e);
           const message = this.$t('siteManagement.label.createSite.error');
           this.$root.$emit('alert-message', message, 'error');
         })

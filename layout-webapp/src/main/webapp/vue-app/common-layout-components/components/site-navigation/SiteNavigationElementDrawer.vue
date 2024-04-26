@@ -1,24 +1,27 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <exo-drawer
     ref="siteNavigationAddElementDrawer"
     id="siteNavigationAddElementDrawer"
-    :right="!$vuetify.rtl"
+    :loading="loading"
+    right
     eager
     allow-expand
     @closed="close">
@@ -71,17 +74,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               outlined
               dense />
           </template>
-          <template v-else>
-            <site-navigation-page-element
-              :element-type="elementType"
-              :selected-page="selectedPage" />
-          </template>
+          <site-navigation-page-element
+            v-else
+            :element-type="elementType"
+            :selected-page="selectedPage" />
         </v-form>
       </v-card>
     </template>
     <template slot="footer">
       <div class="d-flex justify-end">
         <v-btn
+          :disabled="loading"
           class="btn ms-2"
           @click="close">
           {{ $t('siteNavigation.label.btn.cancel') }}
@@ -157,14 +160,13 @@ export default {
     },
     disabled() {
       return !this.isValidForm || this.isLinkElement && !this.link || this.elementType === 'existingPage' && !this.selectedPage || false;
-    }
+    },
   },
   created() {
     this.$root.$on('open-add-element-drawer', this.open);
     this.$root.$on('close-add-element-drawer', this.close);
     this.$root.$on('page-template-changed', this.changePageTemplate);
     this.$root.$on('existing-page-selected', this.changeSelectedPage);
-
   },
   methods: {
     open(elementName, elementTitle, navigationNode, editMode) {
@@ -176,20 +178,23 @@ export default {
       this.editMode = editMode;
       if (editMode && this.navigationNode?.pageKey) {
         const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
-        this.$siteNavigationService.getPageByRef(pageRef).then((page) => {
-          this.selectedPage = page.state;
-          this.selectedPage.displayName = page.state.displayName || page.key.name;
-          this.pageToEdit = page;
-          this.elementType = page.state?.type === 'LINK' && 'LINK' || 'existingPage';
-          this.link = page?.state?.link;
-          this.$nextTick().then(() => {
-            this.$refs.siteNavigationAddElementDrawer.open();
-            this.$nextTick()
-              .then(() => {
-                this.$root.$emit('set-selected-page', page.state);
-              });
+        this.$pageLayoutService.getPage(pageRef)
+          .then((page) => {
+            this.selectedPage = {
+              pageRef,
+              displayName: page.state.displayName || page.key.name,
+            };
+            this.pageToEdit = page;
+            this.elementType = page.state?.type === 'LINK' && 'LINK' || 'existingPage';
+            this.link = page?.state?.link;
+            this.$nextTick().then(() => {
+              this.$refs.siteNavigationAddElementDrawer.open();
+              this.$nextTick()
+                .then(() => {
+                  this.$root.$emit('set-selected-page', page.state);
+                });
+            });
           });
-        });
       } else {
         this.$refs.siteNavigationAddElementDrawer.open();
       }
@@ -227,14 +232,16 @@ export default {
     },
     createElement() {
       if (this.elementType === 'existingPage') {
-        const pageRef = this.selectedPage?.pageContext?.key?.ref || `${this.selectedPage?.pageContext?.key.site.typeName}::${this.selectedPage?.pageContext?.key.site.name}::${this.selectedPage?.pageContext?.key.name}`;
+        const pageRef = this.selectedPage?.pageRef;
         this.$root.$emit('save-node-with-page', {
           'pageRef': pageRef,
           'nodeTarget': this.target,
           'pageType': this.elementType
         });
+        this.loading = false;
       } else {
-        this.$siteNavigationService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate || null)
+        this.loading = true;
+        this.$pageLayoutService.createPage(this.elementName, this.elementTitle, this.navigationNode.siteKey.name, this.navigationNode.siteKey.type, this.elementType, this.elementType === 'LINK' && this.link || null, this.elementType === 'PAGE' && this.pageTemplate?.id)
           .then((createdPage) => {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             this.$root.$emit('save-node-with-page', {
@@ -242,13 +249,12 @@ export default {
               'nodeTarget': this.target,
               'pageType': this.elementType,
               'createdPage': createdPage,
-              'openEditLayout': this.pageTemplate === 'empty' || this.pageTemplate === 'analytics' || this.pageTemplate === 'normal'
+              'openEditLayout': this.elementType === 'PAGE',
             });
           }).catch(() => {
             this.$root.$emit('alert-message', this.$t('siteNavigation.label.pageCreation.error'), 'error');
-          });
+          }).finally(() => this.loading = false);
       }
-      this.loading = false;
     },
     updateElement() {
       if (this.elementType === 'LINK') {
@@ -260,7 +266,7 @@ export default {
       } else if (this.elementType === 'PAGE') {
         this.createElement();
       } else if (this.elementType === 'existingPage') {
-        const pageRef = this.selectedPage?.pageContext?.key?.ref || `${(this.selectedPage?.pageContext?.key?.site.typeName || this.pageToEdit?.key.site.typeName)}::${(this.selectedPage?.pageContext?.key?.site.name || this.pageToEdit?.key.site.name)}::${(this.selectedPage?.pageContext?.key?.name || this.pageToEdit?.key.name)}`;
+        const pageRef = this.selectedPage?.pageRef;
         this.$root.$emit('save-node-with-page', {
           'pageRef': pageRef,
           'nodeTarget': this.target,
@@ -270,7 +276,7 @@ export default {
     },
     updatePageLink() {
       const pageRef = this.pageToEdit?.key?.ref || `${this.pageToEdit?.key.site.typeName}::${this.pageToEdit?.key.site.name}::${this.pageToEdit?.key.name}`;
-      this.$siteNavigationService.updatePageLink(pageRef, this.link)
+      this.$pageLayoutService.updatePageLink(pageRef, this.link)
         .then(() => {
           this.$root.$emit('save-node-with-page', {
             'pageRef': pageRef,

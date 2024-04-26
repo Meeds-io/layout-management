@@ -1,0 +1,170 @@
+/**
+ * This file is part of the Meeds project (https://meeds.io/).
+ *
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ */
+
+@import 'variables.less';
+@import 'mixins.less';
+@import 'core/layout/mixins.less';
+
+#layoutEditor {
+  user-select: none;
+}
+
+.layout-section-border {
+  position: absolute;
+  padding: 12px;
+  top: -22px;
+  right: -24px;
+  bottom: -2px;
+  left: -24px;
+}
+
+.layout-mobile-view {
+  .specific-scrollbar();
+  height: ~"calc(100vh - 82px)";
+  max-height: ~"calc(100vh - 82px)";
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .PORTLET-FRAGMENT {
+    margin-bottom: ~"var(--grid-layout-gap, 20px) ! important";
+  }
+  .flex-cell {
+    row-gap: 0;
+  }
+  .hidden-sm-and-down {
+    display: none !important;
+  }
+  .layout-mobile-columns();
+}
+
+.layout-moving-chosen-container {
+  border: thin solid @secondaryColor !important;
+}
+
+.layout-moving-ghost-container {
+  box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12) !important;
+  border: thin solid @primaryColor !important;
+}
+
+.layout-no-content-caret {
+  margin-left: -1px;
+  padding-top: 1px;
+}
+
+.layout-number-input {
+  width: 36px;
+}
+
+// TODO Delete those classes when the Applications Drawer is reworked
+// (forked from Spaces Administration Application Style)
+.ApplicationCard {
+  min-width: 232px;
+  max-width: 232px;
+  width: 232px;
+  height: 92px;
+  border-radius: 4px !important;
+  border: 1px solid @btnBorder;
+
+  &.dashed-border {
+    border-style: dashed;
+  }
+
+  .ApplicationCardImage {
+    max-width: 45px;
+    width: 45px;
+  }
+  .ApplicationCardBody, .ApplicationCardTitle, .ApplicationCardDescription {
+    max-width: 133px;
+    width: 133px;
+  }
+  .ApplicationCardAction {
+    max-width: 36px;
+    width: 36px;
+  }
+  .v-menu__content {
+    top: 30px !important;
+    right: 10px ~'!important; /** orientation=lt */ ';
+    left: auto  ~'!important; /** orientation=lt */ ';
+    left: 10px ~'!important; /** orientation=rt */ ';
+    right: auto  ~'!important; /** orientation=rt */ ';
+  }
+
+  &.ApplicationCardEmbedded {
+    min-width: auto;
+    max-width: none;
+    width: auto;
+    height: 82px;
+    margin: 8px -16px;
+
+    .ApplicationCardBody {
+      max-width: ~"calc(100% - 121px)";
+    }
+    .ApplicationCardTitle, .ApplicationCardDescription {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+}
+
+.t-20 {
+  top: 20px;
+}
+.b-20 {
+  bottom: 20px;
+}
+.grid-gap-width {
+  width: ~"var(--grid-layout-gap, 20px)";
+}
+
+.layout-column-resize {
+  background-repeat: repeat !important;
+  opacity: 0.8 !important;
+  background-image: repeating-linear-gradient(45deg, #707070 25%, transparent 25%, transparent 75%, #707070 75%, #707070), repeating-linear-gradient(45deg, #707070 25%, #e5e5f7 25%, #e5e5f7 75%, #707070 75%, #707070) !important;
+  background-position: 0 0, 2px 2px !important;
+  background-size: 4px 4px !important;
+}
+
+.layout-section {
+
+  .layout-section-hover {
+    border: thin solid @greyColorOpacity2 !important;
+  }
+
+  &.layout-moving-chosen-container {
+    > div {
+      border: none !important;
+    }
+
+    .layout-section-moving {
+      border: thin solid @secondaryColor !important;
+    }
+  }
+
+  &.layout-moving-ghost-container {
+    > div {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .layout-section-moving {
+      border: thin solid @primaryColor !important;
+      box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12) !important;
+    }
+  }
+}

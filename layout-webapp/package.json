@@ -1,7 +1,7 @@
 {
-  "name": "layout-management",
+  "name": "layout",
   "version": "1.0.0",
-  "description": "eXo layout management",
+  "description": "Meeds layout editor",
   "repository": {
     "type": "git",
     "url": "https://github.com/exoplatform/layout-management"

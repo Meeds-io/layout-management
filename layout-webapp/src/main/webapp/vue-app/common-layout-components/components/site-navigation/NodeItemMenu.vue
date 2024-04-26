@@ -1,39 +1,41 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-menu
     v-model="displayActionMenu"
     transition="slide-x-reverse-transition"
     :right="!$vuetify.rtl"
+    class="px-0 mx-2 overflow-visible"
     offset-x
-    offset-y
-    class="px-0 mx-2 overflow-visible">
+    offset-y>
     <template #activator="{ on, attrs }">
       <v-btn
         v-show="hover"
         v-bind="attrs"
         icon
         v-on="on">
-        <v-icon>mdi-dots-vertical</v-icon>
+        <v-icon size="16" class="icon-default-color">fas fa-ellipsis-v</v-icon>
       </v-btn>
     </template>
     <v-list class="pa-0" dense>
       <v-list-item
-        v-if="canEditPage"
+        v-if="canEditPage && isPageCompatible"
         class="subtitle-2" 
         @click="editLayout">
         <v-icon
@@ -176,6 +178,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    pagesCompatibility: {
+      type: Object,
+      default: null
+    },
     navigationNode: {
       type: Object,
       default: null,
@@ -202,6 +208,15 @@ export default {
     nodeLabels: {}
   }),
   computed: {
+    pageRef() {
+      if (this.navigationNode?.pageKey) {
+        return this.navigationNode.pageKey.ref || `${this.navigationNode.pageKey.site.typeName}::${this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
+      }
+      return null;
+    },
+    isPageCompatible() {
+      return this.pagesCompatibility?.[this.pageRef];
+    },
     pageName() {
       return this.navigationNode?.pageKey?.name;
     },
@@ -214,6 +229,9 @@ export default {
     nodeUri() {
       return this.navigationNode?.uri;
     },
+    nodeId() {
+      return this.navigationNode?.id;
+    },
     nodeSiteType() {
       return this.navigationNode?.siteKey?.typeName;
     },
@@ -221,19 +239,27 @@ export default {
       return this.navigationNode?.siteKey?.name;
     },
     canEditPage() {
-      return this.navigationNode?.canEditPage;
+      return this.navigationNode?.canEditPage && this.pageRef;
     },
   },
-  created() {
-    $(document).on('mousedown', () => {
+  watch: {
+    displayActionMenu() {
       if (this.displayActionMenu) {
-        window.setTimeout(() => {
-          this.displayActionMenu = false;
-        },200);
+        document.addEventListener('mousedown', this.closeMenu);
+      } else {
+        document.removeEventListener('mousedown', this.closeMenu);
       }
-    });
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.closeMenu);
   },
   methods: {
+    closeMenu() {
+      window.setTimeout(() => {
+        this.displayActionMenu = false;
+      },200);
+    },
     moveUpNode() {
       this.$root.$emit('moveup-node', this.navigationNode.id);
     },
@@ -246,7 +272,7 @@ export default {
       const message = this.$t('siteNavigation.label.deleteSuccess');
       const undoMessage = this.$t('siteNavigation.label.undoDelete');
       const undoMessageSuccess = this.$t('siteNavigation.deleteCanceled');
-      this.$siteNavigationService.deleteNode(this.navigationNode.id, deleteDelay)
+      this.$navigationLayoutService.deleteNode(this.navigationNode.id, deleteDelay)
         .then(() => {
           document.dispatchEvent(new CustomEvent('alert-message', {detail: {
             alertType: 'success',
@@ -264,8 +290,7 @@ export default {
       }, redirectionTime);
     },
     editLayout() {
-      const uiPageId = $('.UIPage').attr('id').split('UIPage-')[1];
-      return this.$siteNavigationService.editLayout(uiPageId, this.pageName, this.pageSiteType, this.pageSiteName, this.nodeUri, this.nodeSiteType, this.nodeSiteName);    
+      return this.$pageLayoutService.editPageLayout(this.nodeId, this.pageRef);
     },
     openManagePermissionsDrawer(){
       this.$root.$emit('open-manage-permissions-drawer', JSON.parse(JSON.stringify(this.navigationNode)));
@@ -278,14 +303,14 @@ export default {
     },
     pasteNode() {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(navNode => navNode.name === this.nodeToPaste.name);
+        const index = this?.navigationNode?.children?.findIndex?.(navNode => navNode.name === this.nodeToPaste.name);
         if (index !== -1) {
           this.$root.$emit('alert-message', this.$t('siteNavigation.label.pasteNode.error'), 'error');
           return;
         } 
       }
       if (this.pasteMode === 'Cut') {
-        this.$siteNavigationService.moveNode(this.nodeToPaste.id, this.navigationNode.id, null).then(() => {
+        this.$navigationLayoutService.moveNode(this.nodeToPaste.id, this.navigationNode.id, null).then(() => {
           this.$root.$emit('refresh-navigation-nodes');
         });
       } else if (this.pasteMode === 'Copy') {
@@ -302,19 +327,17 @@ export default {
       const startScheduleDate = nodeToPaste.startPublicationTime !== -1 ? new Date(nodeToPaste.startPublicationTime) : null;
       const endScheduleDate = nodeToPaste.endPublicationTime !== -1 ? new Date(nodeToPaste.endPublicationTime) : null;
       const isPasteMode = true;
-      this.$siteNavigationService.getNodeLabels(nodeToPaste.id)
+      this.$navigationLayoutService.getNodeLabels(nodeToPaste.id)
         .then(data => {
           this.nodeLabels = {
             labels: data.labels
           };
         })
         .then(() => {
-          this.$siteNavigationService.createNode(navigationNodeId, null, nodeToPaste.label, nodeToPaste.name, visible, isScheduled, startScheduleDate, endScheduleDate, this.nodeLabels, pageRef, nodeToPaste.target, isPasteMode)
-            .then(navigationNodes => {
+          this.$navigationLayoutService.createNode(navigationNodeId, null, nodeToPaste.label, nodeToPaste.name, nodeToPaste.icon, visible, isScheduled, startScheduleDate, endScheduleDate, this.nodeLabels?.labels, pageRef, nodeToPaste.target, isPasteMode)
+            .then(createdNode => {
               if (nodeToPaste.children.length > 0) {
-                nodeToPaste.children.forEach(children => {
-                  this.pasteCopiedNode(navigationNodes[1].id, children);
-                });
+                nodeToPaste.children.forEach(children => this.pasteCopiedNode(createdNode.id, children));
               }
             })
             .finally(() => {
@@ -324,7 +347,7 @@ export default {
 
     },
     undoDeleteNode(nodeId, successMsg) {
-      return this.$siteNavigationService.undoDeleteNode(nodeId)
+      return this.$navigationLayoutService.undoDeleteNode(nodeId)
         .then(() => {
           this.$root.$emit('refresh-navigation-nodes');
           this.$root.$emit('close-alert-message');

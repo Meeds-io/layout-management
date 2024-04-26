@@ -1,24 +1,26 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <div class="d-contents">
     <tr>
       <td>
-        <v-hover>
+        <v-hover :disabled="$root.mobileDisplayMode">
           <v-row
             slot-scope="{ hover }"
             class="d-flex pt-2 px-0 text-truncate v-list-item v-list-item--dense d-flex flex-nowrap"
@@ -70,6 +72,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
               class="my-0 py-0">
               <site-navigation-node-item-menu
                 :navigation-node="navigationNode"
+                :pages-compatibility="pagesCompatibility"
                 :hover="hover"
                 :can-move-up="canMoveUp"
                 :can-move-down="canMoveDown"
@@ -127,6 +130,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         v-for="child in navigationNode.children"
         :key="child.id"
         :navigation-node="child"
+        :pages-compatibility="pagesCompatibility"
         :can-move-up="canMoveUpChildNode(child)"
         :can-move-down="canMoveDownChildNode(child)"
         :cols="cols + 1"
@@ -142,6 +146,10 @@ export default {
     navigationNode: {
       type: Object,
       default: null,
+    },
+    pagesCompatibility: {
+      type: Object,
+      default: null
     },
     canMoveUp: {
       type: Boolean,
@@ -257,10 +265,10 @@ export default {
     },
     moveUpChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(navigationNode => navigationNode.id === navigationNodeId);
+        const index = this.navigationNode?.children?.findIndex?.(navigationNode => navigationNode.id === navigationNodeId);
         if (index !== -1) {
           const previousNodeId = index > 1 ? this.navigationNode.children[index - 2].id : null;
-          this.$siteNavigationService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
+          this.$navigationLayoutService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
             this.$root.$emit('refresh-navigation-nodes');
           });
         }
@@ -269,10 +277,10 @@ export default {
     },
     moveDownChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(navigationNode => navigationNode.id === navigationNodeId);
+        const index = this.navigationNode?.children?.findIndex?.(navigationNode => navigationNode.id === navigationNodeId);
         if (index !== -1) {
           const previousNodeId = this.navigationNode.children[index + 1].id;
-          this.$siteNavigationService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
+          this.$navigationLayoutService.moveNode(navigationNodeId, null, previousNodeId).then(() => {
             this.$root.$emit('refresh-navigation-nodes');
           });
         }
@@ -280,7 +288,7 @@ export default {
     },
     deleteChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
-        const index = this.navigationNode.children.findIndex(child => child.id === navigationNodeId);
+        const index = this.navigationNode?.children?.findIndex?.(child => child.id === navigationNodeId);
         if (index >= 0) {
           this.navigationNode.children.splice(index, 1);
         }

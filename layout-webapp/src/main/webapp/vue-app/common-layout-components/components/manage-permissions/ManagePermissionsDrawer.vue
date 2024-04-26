@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <exo-drawer
@@ -159,7 +161,7 @@ export default {
         }
       }
     },
-    save(){
+    save() {
       if (this.isSite) {
         this.saveSitePermission();
       } else {
@@ -181,7 +183,7 @@ export default {
         });
       }
       const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
-      return this.$siteNavigationService.updateNodePagePermission(pageRef, pageEditPermission, pageAccessPermissions)
+      return this.$pageLayoutService.updatePagePermissions(pageRef, pageEditPermission, pageAccessPermissions)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteNavigation.label.updatePermission.success'), 'success');
           this.$root.$emit('refresh-navigation-nodes');
@@ -209,7 +211,7 @@ export default {
           }
         });
       }
-      return this.$siteNavigationService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermissionChanged && siteEditPermission || null, this.accessPermissionChanged && siteAccessPermissions || null)
+      return this.$siteLayoutService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermissionChanged && siteEditPermission || null, this.accessPermissionChanged && siteAccessPermissions || null)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteManagement.label.updatePermission.success'), 'success');
           this.$root.$emit('refresh-sites');
@@ -223,7 +225,7 @@ export default {
           this.$refs.managePermissionsDrawer.endLoading();
         });
     },
-    convertPermission(permission){
+    convertPermission(permission) {
       if (permission.group.providerId === 'space') {
         return `${permission.membershipType}:/spaces/${permission.group.remoteId}`;
       } else {

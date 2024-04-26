@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <v-menu
@@ -59,21 +61,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <v-list-item-title
           class="subtitle-2">
           <span class="ps-1">{{ $t('siteManagement.label.navigation') }}</span>
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item
-        v-if="canEditLayout"
-        class="subtitle-2 px-3"
-        @click="editSiteLayout">
-        <v-icon
-          size="13"
-          class="me-2 ms-0"
-          color="primary">
-          fas fa-table
-        </v-icon>
-        <v-list-item-title
-          class="subtitle-2">
-          <span class="ps-1">{{ $t('siteManagement.label.editLayout') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
@@ -144,16 +131,24 @@ export default {
       return this.site.canEdit;
     },
   },
-  created() {
-    $(document).on('mousedown', () => {
+  watch: {
+    displayActionMenu() {
       if (this.displayActionMenu) {
-        window.setTimeout(() => {
-          this.displayActionMenu = false;
-        }, 200);
+        document.addEventListener('mousedown', this.closeMenu);
+      } else {
+        document.removeEventListener('mousedown', this.closeMenu);
       }
-    });
+    },
+  },
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.closeMenu);
   },
   methods: {
+    closeMenu() {
+      window.setTimeout(() => {
+        this.displayActionMenu = false;
+      },200);
+    },
     openSiteNavigationDrawer() {
       const params = {
         siteName: this.site.name,
@@ -167,7 +162,7 @@ export default {
       this.$root.$emit('open-site-properties-drawer', this.site);
     },
     editSiteLayout() {
-      this.$siteManagementService.editSiteLayout(this.site.name);
+      this.$siteLayoutService.editSiteLayout(this.site.name, this.site.type);
     }
   }
 };

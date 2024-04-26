@@ -1,26 +1,28 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <div>
-    <site-navigation-new-page-element
-      v-if="isNewPageElement" />
+  <div v-if="!isNewPageElement || hasMoreThanOneTemplate">
     <site-navigation-existing-page-element
-      v-else
+      v-if="!isNewPageElement"
       :selected-page="selectedPage" />
+    <site-navigation-new-page-element
+      v-else-if="hasMoreThanOneTemplate" />
   </div>
 </template>
 
@@ -29,17 +31,34 @@ export default {
   props: {
     elementType: {
       type: String,
-      default: 'PAGE'
+      default: () => 'PAGE',
     },
     selectedPage: {
       type: Object,
-      default: null
+      default: null,
     }
   },
   computed: {
     isNewPageElement() {
       return this.elementType === 'PAGE';
-    }
-  }
+    },
+    templatesCount() {
+      return this.$root.pageTemplates?.length || 0;
+    },
+    hasMoreThanOneTemplate() {
+      return this.templatesCount > 1;
+    },
+  },
+  created() {
+    this.getPageTemplates();
+  },
+  methods: {
+    getPageTemplates() {
+      if (!this.$root.pageTemplates) {
+        return this.$pageTemplateService.getPageTemplates()
+          .then(pageTemplates => this.$root.pageTemplates = pageTemplates || []);
+      }
+    },
+  },
 };
 </script>

@@ -22,125 +22,6 @@
 <portlet-app version="1.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
   <portlet>
-    <description xml:lang="EN">Group Navigation Portlet</description>
-    <portlet-name>GroupNavigationPortlet</portlet-name>
-    <display-name xml:lang="EN">Group Navigation Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/layout/GroupNavigationPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-
-    <resource-bundle>locale.portlet.layout.GroupNavigationPortlet</resource-bundle>
-    <portlet-info>
-      <title>Group Navigation Portlet</title>
-      <short-title>Group Navigation Portlet</short-title>
-      <keywords>Administration</keywords>
-    </portlet-info>
-    <portlet-preferences>
-      <preference>
-        <name>level</name>
-        <value>2</value>
-      </preference>
-    </portlet-preferences>
-    <supported-publishing-event>
-      <name>NavigationChange</name>
-    </supported-publishing-event>
-  </portlet>
-
-  <portlet>
-    <description xml:lang="EN">Portal Navigation Portlet</description>
-    <portlet-name>PortalNavigationPortlet</portlet-name>
-    <display-name xml:lang="EN">Portal Navigation Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/layout/PortalNavigationPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-
-    <resource-bundle>locale.portlet.layout.PortalNavigationPortlet</resource-bundle>
-    <portlet-info>
-      <title>Portal Navigation Portlet</title>
-      <short-title>Portal Navigation Portlet</short-title>
-      <keywords>System</keywords>
-    </portlet-info>
-
-    <portlet-preferences>
-      <preference>
-        <name>level</name>
-        <value>2</value>
-      </preference>
-    </portlet-preferences>
-  </portlet>
-
-  <portlet>
-    <description xml:lang="EN">Page Management Portlet</description>
-    <portlet-name>PageManagementPortlet</portlet-name>
-    <display-name xml:lang="EN">Page Management Portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/layout/PageManagementPortlet/webui/configuration.xml</value>
-    </init-param>
-
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-
-    <resource-bundle>locale.portlet.layout.PortalNavigationPortlet</resource-bundle>
-    <portlet-info>
-      <title>Page Management Portlet</title>
-      <short-title>Page Management Portlet</short-title>
-      <keywords>Administration</keywords>
-    </portlet-info>
-    <supported-publishing-event>
-      <name>NavigationChange</name>
-    </supported-publishing-event>
-  </portlet>
-
-  <portlet>
-    <description xml:lang="EN">Quick edit layout Toolbar portlet</description>
-    <portlet-name>QuickEditLayoutPortlet</portlet-name>
-    <display-name xml:lang="EN">Quick edit layout portlet</display-name>
-    <portlet-class>org.exoplatform.webui.application.portlet.PortletApplicationController</portlet-class>
-    <init-param>
-      <name>webui.configuration</name>
-      <value>/WEB-INF/conf/portlet/layout/QuickEditLayoutPortlet/webui/configuration.xml</value>
-    </init-param>
-    <expiration-cache>0</expiration-cache>
-    <supports>
-      <mime-type>text/html</mime-type>
-      <portlet-mode>help</portlet-mode>
-    </supports>
-    <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.layout.QuickEditLayoutPortlet</resource-bundle>
-    <portlet-info>
-      <title>Quick edit layout - toolbar portlet</title>
-      <short-title>Quick edit layout</short-title>
-    </portlet-info>
-  </portlet>
-
-  <portlet>
     <portlet-name>SiteNavigation</portlet-name>
     <display-name>Site Navigation Portlet</display-name>
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
@@ -152,7 +33,7 @@
       <mime-type>text/html</mime-type>
     </supports>
     <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.layout.SiteNavigationPortlet</resource-bundle>
+    <resource-bundle>locale.portlet.SiteNavigation</resource-bundle>
     <portlet-info>
       <title>site navigation</title>
       <keywords>site navigation Management</keywords>
@@ -160,7 +41,7 @@
   </portlet>
 
    <portlet>
-    <portlet-name>SiteManagementPortlet</portlet-name>
+    <portlet-name>SiteManagement</portlet-name>
     <display-name>Site Management Portlet</display-name>
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
     <init-param>
@@ -171,19 +52,30 @@
       <mime-type>text/html</mime-type>
     </supports>
     <supported-locale>en</supported-locale>
-    <resource-bundle>locale.portlet.layout.SiteManagementPortlet</resource-bundle>
+    <resource-bundle>locale.portlet.SiteManagement</resource-bundle>
     <portlet-info>
       <title>site management</title>
       <keywords>site management</keywords>
     </portlet-info>
   </portlet>
 
-  <event-definition>
-    <name>NavigationChange</name>
-  </event-definition>
+  <portlet>
+    <portlet-name>LayoutEditor</portlet-name>
+    <display-name>Layout Editor Portlet</display-name>
+    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+    <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/html/layoutEditor.html</value>
+    </init-param>
+    <supports>
+      <mime-type>text/html</mime-type>
+    </supports>
+    <supported-locale>en</supported-locale>
+    <resource-bundle>locale.portlet.LayoutEditor</resource-bundle>
+    <portlet-info>
+      <title>site navigation</title>
+      <keywords>site navigation Management</keywords>
+    </portlet-info>
+  </portlet>
 
-  <public-render-parameter>
-    <identifier>navigation_uri</identifier>
-    <qname xmlns:prp='http://www.gatein.org/xml/ns/prp_1_0'>prp:navigation_uri</qname>
-  </public-render-parameter>
 </portlet-app>

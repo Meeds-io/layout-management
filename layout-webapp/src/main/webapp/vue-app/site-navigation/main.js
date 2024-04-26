@@ -1,18 +1,20 @@
 /*
- * Copyright (C) 2023 eXo Platform SAS.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
+ * This file is part of the Meeds project (https://meeds.io/).
+ * 
+ * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 import './initComponents.js';
@@ -39,26 +41,25 @@ extensionRegistry.registerComponent('manageSpaceDrawers', 'manage-space-drawers'
   rank: 20,
 });
 
-Vue.use(Vuetify);
-const vuetify = new Vuetify(eXo.env.portal.vuetifyPreset);
-
 const appId = 'siteNavigation';
 
 //getting language of the PLF
 const lang = eXo && eXo.env.portal.language || 'en';
 
 //should expose the locale ressources as REST API
-const urls = [`${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.layout.SiteNavigationPortlet-${lang}.json`];
-
-exoi18n.loadLanguageAsync(lang, urls);
+const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigation-${lang}.json`;
 
 export function init(canManageSiteNavigation) {
-  exoi18n.loadLanguageAsync(lang, urls).then(i18n => {
-    // init Vue app when locale ressources are ready
-    Vue.createApp({
-      template: `<site-navigation id="${appId}" :can-manage-site-navigation="${canManageSiteNavigation}"/>`,
-      vuetify,
-      i18n},
-    `#${appId}`, 'site-navigation');
-  });
+  exoi18n.loadLanguageAsync(lang, url)
+    .then(i18n => {
+      // init Vue app when locale ressources are ready
+      Vue.createApp({
+        template: `<site-navigation id="${appId}" :can-manage-site-navigation="${canManageSiteNavigation}"/>`,
+        vuetify: Vue.prototype.vuetifyOptions,
+        i18n,
+        data: () => ({
+          pageTemplates: null,
+        }),
+      }, `#${appId}`, 'site-navigation');
+    });
 }

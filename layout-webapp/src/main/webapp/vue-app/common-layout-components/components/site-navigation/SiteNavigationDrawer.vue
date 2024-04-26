@@ -1,18 +1,20 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <exo-drawer
@@ -62,6 +64,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </v-toolbar>
         <site-navigation-nodes-list
           :navigation-nodes="navigationNodesToDisplay"
+          :pages-compatibility="pagesCompatibility"
           :expanded="$refs.siteNavigationDrawer && $refs.siteNavigationDrawer?.expand"
           :loading="loading"
           :hide-children="hideChildren" />
@@ -75,8 +78,10 @@ export default {
   data() {
     return {
       navigationNodes: [],
+      pagesCompatibility: {},
       navigationNodesToDisplay: [],
       siteName: null,
+      siteType: null,
       siteId: null,
       includeGlobal: false,
       loading: false,
@@ -121,6 +126,7 @@ export default {
   methods: {
     open(event) {
       this.siteName = event?.siteName || eXo.env.portal.siteKeyName;
+      this.siteType = event?.siteType || 'PORTAL';
       this.siteId = event?.siteId || eXo.env.portal.siteId;
       this.includeGlobal = event?.includeGlobal || false;
       this.getNavigationNodes();
@@ -139,14 +145,11 @@ export default {
     },
     getNavigationNodes() {
       this.loading = true;
-      return this.$siteService.getSiteById(this.siteId, {
-        expandNavigations: true,
-        excludeEmptyNavigationSites: true,
-        lang: eXo.env.portal.language,
-      })
+      return this.$siteLayoutService.getSiteById(this.siteId)
         .then(site => {
           this.site = site;
           this.navigationNodes = site.siteNavigations || [];
+          this.pagesCompatibility = site.pagesCompatibility || {};
           this.filterNavigationNodes();
         })
         .finally(() => this.loading = false);

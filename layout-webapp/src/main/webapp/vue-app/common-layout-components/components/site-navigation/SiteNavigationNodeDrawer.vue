@@ -1,24 +1,27 @@
 <!--
-Copyright (C) 2023 eXo Platform SAS.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+ This file is part of the Meeds project (https://meeds.io/).
+ 
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ 
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ 
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
   <div>
     <exo-drawer
       id="siteNavigationAddNodeDrawer"
       ref="siteNavigationAddNodeDrawer"
+      :loading="loading"
       right
       allow-expand
       @expand-updated="expanded = $event"
@@ -225,8 +228,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             {{ $t('siteNavigation.label.btn.cancel') }}
           </v-btn>
           <v-btn
-            :disabled="disabled"
             v-if="displayNextBtn"
+            :disabled="disabled"
             :loading="loading"
             class="btn btn-primary ms-2"
             @click="openAddElementDrawer">
@@ -267,6 +270,7 @@ export default {
       startScheduleTime: new Date(new Date().getTime() + 900000),
       endScheduleTime: new Date(new Date().getTime() + 1800000),
       navigationNode: null,
+      loading: false,
       nodeLabel: null,
       nodeId: null,
       visible: true,
@@ -282,7 +286,7 @@ export default {
       isValidInputs: true,
       nodeIdRules: [
         value => {
-          const isNodeExisting = this.navigationNode.children.find(node => node.name === value);
+          const isNodeExisting = this.navigationNode?.children?.find?.(node => node.name === value);
           if (value != null && (/\s+/.test(value) || /[^a-zA-Z0-9_-]/.test(value) || /[\u0300-\u036f]/.test(value.normalize('NFD')))){
             return this.$t('siteNavigation.unauthorizedCharacters.error.message');
           } else if (isNodeExisting) {
@@ -403,25 +407,27 @@ export default {
       };
       if (this.editMode) {
         const pageRef = pageData?.pageRef ||  (this.nodeType === 'pageOrLink' ? this.navigationNode.pageKey?.ref || `${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey?.name}` : '');
-        this.$siteNavigationService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
+        this.loading = true;
+        this.$navigationLayoutService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
           .then(() => {
             this.openTargetPage(pageData);
             this.$root.$emit('refresh-navigation-nodes');
-          })
-          .finally(() => {
             this.$root.$emit('close-add-element-drawer');
             this.close();
-          });
+          })
+          .catch(() => this.$root.$emit('alert-message', this.$t('siteNavigation.errorUpdatingNode'), 'error'))
+          .finally(() => this.loading = false);
       } else {
-        this.$siteNavigationService.createNode(this.navigationNode.id, previousNodeId, this.nodeLabel, this.nodeId, this.nodeIcon, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels, pageData?.pageRef, pageData?.pageRef && pageData?.nodeTarget || 'SAME_TAB')
-          .then(() => {
-            this.openTargetPage(pageData);
+        this.loading = true;
+        this.$navigationLayoutService.createNode(this.navigationNode.id, previousNodeId, this.nodeLabel, this.nodeId, this.nodeIcon, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.pageRef, pageData?.pageRef && pageData?.nodeTarget || 'SAME_TAB')
+          .then(createdNode => {
+            this.openTargetPage(pageData, createdNode.id);
             this.$root.$emit('refresh-navigation-nodes');
-          })
-          .finally(() => {
             this.$root.$emit('close-add-element-drawer');
             this.close();
-          });
+          })
+          .catch(() => this.$root.$emit('alert-message', this.$t('siteNavigation.errorCreatingNode'), 'error'))
+          .finally(() => this.loading = false);
       }
     },
     openAddElementDrawer() {
@@ -443,7 +449,7 @@ export default {
       this.$refs.translationDrawer.open();
     },
     getNodeLabels() {
-      this.$siteNavigationService.getNodeLabels(this.navigationNode.id)
+      this.$navigationLayoutService.getNodeLabels(this.navigationNode.id)
         .then(data => {
           if (this.editMode && data.labels != null) {
             this.valuesPerLanguage = data.labels;
@@ -464,12 +470,10 @@ export default {
       this.labels = this.valuesPerLanguage;
       this.nodeLabel = this.valuesPerLanguage[eXo.env.portal.language];
     },
-    openTargetPage(pageData) {
+    openTargetPage(pageData, nodeId) {
       if (pageData?.pageRef) {
-        if (pageData?.pageType === 'PAGE' && pageData?.createdPage && pageData?.openEditLayout) {
-          const uiPageId = $('.UIPage').attr('id').split('UIPage-')[1];
-          const createdPage = pageData.createdPage;
-          return this.$siteNavigationService.editLayout(uiPageId, createdPage.key.name, createdPage.key.site.typeName, createdPage.key.site.name, `${this.navigationNode.uri}/${this.nodeId}`, this.navigationNode.siteKey.typeName, this.navigationNode.siteKey.name);
+        if (pageData?.pageType === 'PAGE' && pageData?.pageRef && pageData?.openEditLayout) {
+          return this.$pageLayoutService.editPageLayout(nodeId || this.nodeId, pageData?.pageRef);
         } else {
           let targetPageUrl ;
           if (pageData?.pageType === 'LINK' ) {
