@@ -35,12 +35,12 @@
         </div>
         <v-radio-group v-model="sectionType" class="my-auto text-no-wrap ms-n1">
           <v-radio
-            :label="$t('layout.fixedSectionTypeChoice')"
-            value="GridContainer"
-            class="mx-0" />
-          <v-radio
             :label="$t('layout.dynamicSectionTypeChoice')"
             value="FlexContainer"
+            class="mx-0" />
+          <v-radio
+            :label="$t('layout.fixedSectionTypeChoice')"
+            value="GridContainer"
             class="mx-0" />
         </v-radio-group>
 
@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     open(parentContainer, index) {
-      this.sectionType = this.$layoutUtils.gridTemplate;
+      this.sectionType = this.$layoutUtils.flexTemplate;
       this.parentContainer = parentContainer;
       this.index = index;
       this.$nextTick().then(() => this.$refs.drawer.open());
