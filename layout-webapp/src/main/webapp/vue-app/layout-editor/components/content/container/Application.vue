@@ -63,6 +63,7 @@ export default {
   },
   data: () => ({
     applicationInstalled: false,
+    installing: false,
     section: null,
     height: null,
     width: null,
@@ -185,6 +186,7 @@ export default {
     },
     installApplication() {
       if (!this.applicationInstalled
+          && !this.installing
           && this.$refs.content
           && this.nodeUri
           && this.storageId) {

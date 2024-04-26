@@ -115,6 +115,13 @@ export function init() {
           },
         },
         watch: {
+          movingParentId() {
+            if (this.movingParentId) {
+              this.$root.$emit('layout-editor-moving-start', this.movingParentId);
+            } else {
+              this.$root.$emit('layout-editor-moving-end', this.movingParentId);
+            }
+          },
           layout(newVal, oldVal) {
             if (!oldVal) {
               window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);

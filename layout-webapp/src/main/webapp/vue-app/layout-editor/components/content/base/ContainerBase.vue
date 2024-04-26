@@ -43,7 +43,8 @@
             :parent-id="storageId"
             :index="i"
             :length="childrenSize"
-            :class="`${draggableContainerClass} ${hideChildren && 'invisible' || ''}`"
+            :class="hideChildren && 'invisible'"
+            class="draggable-container-flex"
             @initialized="$emit('initialized', child)"
             @move-start="moveStart"
             @move-end="moveEnd" />
@@ -168,13 +169,10 @@ export default {
     isCell() {
       return this.container.template === this.$layoutUtils.cellTemplate;
     },
-    draggableContainerClass() {
-      return this.isCell && `draggable-container-${this.parentId}` || `draggable-container-${this.storageId}`;
-    },
     dragOptions() {
       const dragOptions = {
         group: `${this.container.template}`,
-        draggable: `.${this.draggableContainerClass}`,
+        draggable: '.draggable-container-flex',
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
         chosenClass: 'layout-moving-chosen-container',
@@ -199,7 +197,11 @@ export default {
     },
   },
   created() {
+    this.$root.$on('layout-editor-moving-end', this.refreshChildren);
     this.refreshChildren();
+  },
+  beforeDestroy() {
+    this.$root.$off('layout-editor-moving-end', this.refreshChildren);
   },
   methods: {
     refreshChildren() {

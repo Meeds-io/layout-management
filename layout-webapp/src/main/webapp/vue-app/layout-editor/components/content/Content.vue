@@ -194,7 +194,6 @@ export default {
         alertLinkTarget: '_blank',
         alertType: 'success',
       }}));
-      this.$navigationLayoutService.deleteNode(this.$root.draftNodeId);
     },
     handleApplyGridStyle() {
       this.$layoutUtils.applyGridStyle(this.layoutToEdit);
