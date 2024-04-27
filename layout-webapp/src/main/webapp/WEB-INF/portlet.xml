@@ -65,7 +65,7 @@
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
     <init-param>
       <name>portlet-view-dispatched-file-path</name>
-      <value>/html/layoutEditor.html</value>
+      <value>/WEB-INF/jsp/layoutEditor.jsp</value>
     </init-param>
     <supports>
       <mime-type>text/html</mime-type>

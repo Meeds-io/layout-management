@@ -22,9 +22,7 @@
   <v-expansion-panel
     v-if="hasApplications"
     class="border-color border-radius mt-4">
-    <v-expansion-panel-header>
-      {{ categoryName }}
-    </v-expansion-panel-header>
+    <v-expansion-panel-header v-sanitized-html="categoryName" />
     <v-divider v-if="expanded" />
     <v-expansion-panel-content>
       <div
@@ -54,7 +52,7 @@ export default {
   },
   computed: {
     categoryName() {
-      return this.category && this.category.name;
+      return this.category.label;
     },
     applications() {
       return this.category?.applications || [];

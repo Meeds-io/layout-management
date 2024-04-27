@@ -67,8 +67,21 @@ export default {
     draftPageRef() {
       return this.draftPageKey?.ref || (this.draftPageKey && `${this.draftPageKey.site.typeName}::${this.draftPageKey.site.name}::${this.draftPageKey.name}`);
     },
+    pageLoaded() {
+      return !!this.draftPageRef && !!this.page;
+    },
   },
   watch: {
+    pageLoaded() {
+      if (this.pageLoaded) {
+        this.$pageLayoutService.getPageLayout(this.pageRef, 'contentId')
+          .then(layout => {
+            const draftPageLayout = this.$layoutUtils.cleanAttributes(layout, true, false);
+            return this.$pageLayoutService.updatePageLayout(this.draftPageRef, draftPageLayout, 'contentId')
+              .then(draftLayout => this.setDraftLayout(draftLayout));
+          });
+      }
+    },
     pageRef: {
       immediate: true,
       handler() {
@@ -84,8 +97,6 @@ export default {
       handler() {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
-          this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
-            .then(draftLayout => this.draftLayout = draftLayout);
         }
       },
     },
