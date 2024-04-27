@@ -531,12 +531,14 @@ export function isValidTargetMovingCell(section, movingCell, targetRowIndex, tar
 export function isBetween(value, b0, b1) {
   return value >= b0 && value <= b1;
 }
-  
-export function cleanAttributes(container, cleanStorage) {
+
+export function cleanAttributes(container, cleanStorage, cleanStyle) {
   container = JSON.parse(JSON.stringify(container));
-  applyDesktopStyle(container);
+  if (cleanStyle) {
+    applyDesktopStyle(container);
+  }
   if (container.children?.length) {
-    container.children = container.children.map(c => cleanAttributes(c, cleanStorage));
+    container.children = container.children.map(c => cleanAttributes(c, cleanStorage, cleanStyle));
   }
   if (container.randomId || cleanStorage) {
     delete container.storageId;
