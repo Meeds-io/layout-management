@@ -28,7 +28,6 @@
         <template slot="item" slot-scope="props">
           <site-navigation-node-item
             :navigation-node="props.item"
-            :pages-compatibility="pagesCompatibility"
             :can-move-up="canMoveUpNode(props.item)"
             :can-move-down="canMoveDownNode(props.item)"
             :hide-children="hideChildren"
@@ -43,10 +42,6 @@
 export default {
   props: {
     navigationNodes: {
-      type: Object,
-      default: null
-    },
-    pagesCompatibility: {
       type: Object,
       default: null
     },

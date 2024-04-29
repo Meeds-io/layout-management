@@ -64,7 +64,6 @@
         </v-toolbar>
         <site-navigation-nodes-list
           :navigation-nodes="navigationNodesToDisplay"
-          :pages-compatibility="pagesCompatibility"
           :expanded="$refs.siteNavigationDrawer && $refs.siteNavigationDrawer?.expand"
           :loading="loading"
           :hide-children="hideChildren" />
@@ -72,13 +71,11 @@
     </template>
   </exo-drawer>
 </template>
-
 <script>
 export default {
   data() {
     return {
       navigationNodes: [],
-      pagesCompatibility: {},
       navigationNodesToDisplay: [],
       siteName: null,
       siteType: null,
@@ -149,7 +146,6 @@ export default {
         .then(site => {
           this.site = site;
           this.navigationNodes = site.siteNavigations || [];
-          this.pagesCompatibility = site.pagesCompatibility || {};
           this.filterNavigationNodes();
         })
         .finally(() => this.loading = false);

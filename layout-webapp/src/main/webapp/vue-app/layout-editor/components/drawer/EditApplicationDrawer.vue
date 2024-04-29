@@ -325,9 +325,11 @@ export default {
       return (!this.height || this.height === '150px' || this.height === '300px' || this.height === '500px') ? 400 : this.height;
     },
     drawerTitle() {
-      return this.$t('layout.editApplicationTitle', {
+      return this.applicationCategoryTitle?.length && this.$t('layout.editApplicationTitle', {
         0: this.applicationTitle,
         1: this.applicationCategoryTitle,
+      }) || this.$t('layout.editApplicationTitleNoCategory', {
+        0: this.applicationTitle,
       });
     },
     minHeightFormatted() {
