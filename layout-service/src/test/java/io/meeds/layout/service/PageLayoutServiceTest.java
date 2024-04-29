@@ -26,7 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -43,9 +44,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
@@ -84,6 +87,9 @@ public class PageLayoutServiceTest {
 
   @MockBean
   private UserPortalConfigService userPortalConfigService;
+
+  @MockBean
+  private AddOnService            addOnService;
 
   @Autowired
   private PageLayoutService       pageLayoutService;
@@ -150,6 +156,19 @@ public class PageLayoutServiceTest {
     assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
     when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
     assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+  }
+
+  @Test
+  public void getPageLayoutWithDynamicContainer() {
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    Container dynamicContainer = mock(Container.class);
+    when(dynamicContainer.getFactoryId()).thenReturn("addonContainer");
+    when(dynamicContainer.getName()).thenReturn("testAddonContainer");
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
+    Application<?> application = mock(Application.class);
+    when(addOnService.getApplications("testAddonContainer")).thenReturn(Collections.singletonList(application));
+    pageLayoutService.getPageLayout(PAGE_KEY);
+    verify(dynamicContainer).setChildren(argThat(children -> children != null && children.size() == 1 && children.get(0) == application));
   }
 
   @Test
