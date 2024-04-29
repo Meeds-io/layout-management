@@ -37,6 +37,15 @@
       ref="applicationPropertiesDrawer" />
     <layout-editor-portlet-edit-dialog />
     <layout-editor-page-template-drawer />
+    <changes-reminder
+      ref="changesReminder"
+      :reminder="reminder"
+      @opened="changesReminderOpened = true">
+      <div>{{ $t('layout.reminder.description.part1') }}</div>
+      <div>{{ $t('layout.reminder.description.part2') }}</div>
+      <div>{{ $t('layout.reminder.description.part3') }}</div>
+      <div>{{ $t('layout.reminder.description.part4') }}</div>
+    </changes-reminder>
   </v-card>
 </template>
 <script>
@@ -57,7 +66,8 @@ export default {
   },
   data: () => ({
     layoutToEdit: null,
-    isCompatible: false,
+    isCompatible: true,
+    changesReminderOpened: false,
     modified: false,
     loading: 1,
   }),
@@ -70,6 +80,13 @@ export default {
     },
     parentClass() {
       return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
+    },
+    reminder() {
+      return {
+        name: 'layoutEditorFeature' ,
+        title: this.$t('layout.reminder.title'),
+        img: '/layout/images/EditLayout.gif',
+      };
     },
   },
   watch: {
@@ -98,6 +115,9 @@ export default {
     mobileDisplayMode() {
       this.switchDisplayMode();
     },
+    isCompatible() {
+      this.openChangesReminder();
+    },
   },
   created() {
     this.$root.$on('layout-add-section-drawer', this.addSection);
@@ -121,10 +141,29 @@ export default {
     this.$root.$on('layout-editor-portlet-properties-updated', this.setAsModified);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
+  mounted() {
+    this.openChangesReminder();
+  },
   methods: {
+    openChangesReminder() {
+      if (!this.isCompatible && !this.changesReminderOpened && this.$refs.changesReminder) {
+        this.$refs.changesReminder.open();
+      }
+    },
     setLayout(layout) {
       this.initContainer(layout);
       this.isCompatible = this.$layoutUtils.parseSections(layout);
+      if (!this.isCompatible) {
+        const applications = this.$layoutUtils.getApplications(layout);
+        layout.children = [];
+        const parentContainer = this.$layoutUtils.newParentContainer(layout);
+        const section = this.$layoutUtils.newSection(parentContainer, 0, 1, 1, this.$layoutUtils.flexTemplate);
+        section.children[0].children = applications || [];
+        if (applications?.length && applications?.length > 1) {
+          this.$layoutUtils.newSection(parentContainer, 1, 1, 2, this.$layoutUtils.flexTemplate);
+        }
+        this.modified = true;
+      }
       if (this.layoutToEdit) {
         Object.assign(this.layoutToEdit, layout);
       } else {
