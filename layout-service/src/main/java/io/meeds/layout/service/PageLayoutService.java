@@ -20,6 +20,7 @@ package io.meeds.layout.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.javascript.jscomp.jarjar.com.google.re2j.Pattern;
 
+import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
@@ -81,6 +83,9 @@ public class PageLayoutService {
   @Autowired
   private UserPortalConfigService userPortalConfigService;
 
+  @Autowired
+  private AddOnService            addOnService;
+
   public List<PageContext> getPages(String siteTypeName,
                                     String siteName,
                                     String pageDisplayName,
@@ -122,7 +127,11 @@ public class PageLayoutService {
   }
 
   public Page getPageLayout(PageKey pageKey) {
-    return layoutService.getPage(pageKey);
+    Page page = layoutService.getPage(pageKey);
+    if (page != null) {
+      expandAddonContainerChildren(page);
+    }
+    return page;
   }
 
   @SneakyThrows
@@ -165,7 +174,7 @@ public class PageLayoutService {
   public PageKey clonePage(PageKey pageKey,
                            String username) throws IllegalAccessException,
                                             ObjectNotFoundException {
-    Page page = layoutService.getPage(pageKey);
+    Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
     } else if (!aclService.canEditPage(pageKey, username)) {
@@ -300,6 +309,22 @@ public class PageLayoutService {
 
   private PageType getPageType(String pageType) {
     return StringUtils.isBlank(pageType) ? PageType.PAGE : PageType.valueOf(pageType.toUpperCase());
+  }
+
+  private void expandAddonContainerChildren(Container container) {
+    if (StringUtils.equals(container.getFactoryId(), "addonContainer")) {
+      List<Application<?>> applications = addOnService.getApplications(container.getName());
+      if (CollectionUtils.isNotEmpty(applications)) {
+        container.setChildren(new ArrayList<>(applications));
+      }
+    } else if (container.getChildren() != null) {
+      container.getChildren()
+               .stream()
+               .filter(Objects::nonNull)
+               .filter(Container.class::isInstance)
+               .map(Container.class::cast)
+               .forEach(this::expandAddonContainerChildren);
+    }
   }
 
   private void validateCSSInputs(ModelObject modelObject) {

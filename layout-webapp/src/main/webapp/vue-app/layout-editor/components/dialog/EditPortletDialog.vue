@@ -67,9 +67,11 @@ export default {
   }),
   computed: {
     drawerTitle() {
-      return this.$t('layout.editPortletTitle', {
+      return this.applicationCategoryTitle?.length && this.$t('layout.editPortletTitle', {
         0: this.applicationTitle,
         1: this.applicationCategoryTitle,
+      }) || this.$t('layout.editPortletTitleNoCategory', {
+        0: this.applicationTitle,
       });
     },
     nodeUri() {

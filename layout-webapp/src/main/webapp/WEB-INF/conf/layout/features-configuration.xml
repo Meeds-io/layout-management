@@ -32,4 +32,14 @@
       </properties-param>
     </init-params>
   </component>
+  <component>
+    <key>LayoutEditorChangesAnnounced</key>
+    <type>org.exoplatform.container.ExtendedPropertyConfigurator</type>
+    <init-params>
+      <properties-param>
+        <name>LayoutEditorChangesAnnounced</name>
+        <property name="exo.feature.LayoutEditorChangesAnnounced.enabled" value="${exo.feature.LayoutEditorChangesAnnounced.enabled:false}" />
+      </properties-param>
+    </init-params>
+  </component>
 </configuration>
