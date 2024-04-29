@@ -43,13 +43,12 @@ import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.social.rest.entity.SiteEntity;
 
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
 import io.meeds.layout.model.SiteUpdateModel;
-import io.meeds.layout.rest.model.SiteRestEntity;
 import io.meeds.layout.rest.util.RestEntityBuilder;
-import io.meeds.layout.service.PageLayoutService;
 import io.meeds.layout.service.SiteLayoutService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,9 +66,6 @@ public class SiteLayoutRest {
   @Autowired
   private SiteLayoutService siteLayoutService;
 
-  @Autowired
-  private PageLayoutService pageLayoutService;
-
   @GetMapping("{siteId}")
   @Operation(summary = "Gets a specific site by its id", description = "Gets site by id", method = "GET")
   @ApiResponses(value = {
@@ -77,14 +73,14 @@ public class SiteLayoutRest {
                           @ApiResponse(responseCode = "403", description = "Forbidden"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"),
   })
-  public ResponseEntity<SiteRestEntity> getSiteById(
-                                                    HttpServletRequest request,
-                                                    @Parameter(description = "site id")
-                                                    @PathVariable("siteId")
-                                                    long siteId,
-                                                    @Parameter(description = "Language used to retrieve names", required = false)
-                                                    @RequestParam(name = "lang", required = false)
-                                                    String lang) throws Exception {
+  public ResponseEntity<SiteEntity> getSiteById(
+                                                HttpServletRequest request,
+                                                @Parameter(description = "site id")
+                                                @PathVariable("siteId")
+                                                long siteId,
+                                                @Parameter(description = "Language used to retrieve names", required = false)
+                                                @RequestParam(name = "lang", required = false)
+                                                String lang) throws Exception {
     try {
       PortalConfig site = siteLayoutService.getSite(siteId, request.getRemoteUser());
       Locale locale;
@@ -93,10 +89,9 @@ public class SiteLayoutRest {
       } else {
         locale = Locale.forLanguageTag(lang);
       }
-      SiteRestEntity siteEntity = RestEntityBuilder.toSiteEntity(pageLayoutService,
-                                                                 site,
-                                                                 request,
-                                                                 locale);
+      SiteEntity siteEntity = RestEntityBuilder.toSiteEntity(site,
+                                                             request,
+                                                             locale);
       return ResponseEntity.ok()
                            .eTag(String.valueOf(Objects.hash(siteEntity, locale)))
                            .body(siteEntity);
@@ -114,17 +109,17 @@ public class SiteLayoutRest {
                           @ApiResponse(responseCode = "403", description = "Forbidden"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"),
   })
-  public ResponseEntity<SiteRestEntity> getSite(
-                                                HttpServletRequest request,
-                                                @Parameter(description = "site type")
-                                                @RequestParam("siteType")
-                                                String siteType,
-                                                @Parameter(description = "site name")
-                                                @RequestParam("siteName")
-                                                String siteName,
-                                                @Parameter(description = "Language used to retrieve names", required = false)
-                                                @RequestParam(name = "lang", required = false)
-                                                String lang) throws Exception {
+  public ResponseEntity<SiteEntity> getSite(
+                                            HttpServletRequest request,
+                                            @Parameter(description = "site type")
+                                            @RequestParam("siteType")
+                                            String siteType,
+                                            @Parameter(description = "site name")
+                                            @RequestParam("siteName")
+                                            String siteName,
+                                            @Parameter(description = "Language used to retrieve names", required = false)
+                                            @RequestParam(name = "lang", required = false)
+                                            String lang) throws Exception {
     try {
       PortalConfig site = siteLayoutService.getSite(new SiteKey(siteType, siteName), request.getRemoteUser());
       Locale locale;
@@ -133,10 +128,9 @@ public class SiteLayoutRest {
       } else {
         locale = Locale.forLanguageTag(lang);
       }
-      SiteRestEntity siteEntity = RestEntityBuilder.toSiteEntity(pageLayoutService,
-                                                                 site,
-                                                                 request,
-                                                                 locale);
+      SiteEntity siteEntity = RestEntityBuilder.toSiteEntity(site,
+                                                             request,
+                                                             locale);
       return ResponseEntity.ok()
                            .eTag(String.valueOf(Objects.hash(siteEntity, locale)))
                            .body(siteEntity);
@@ -214,17 +208,16 @@ public class SiteLayoutRest {
   @Operation(summary = "create a site", method = "POST", description = "This create a new site")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "500", description = "Internal server error"), })
-  public ResponseEntity<SiteRestEntity> createSite(
-                                                   HttpServletRequest request,
-                                                   @Parameter(description = "site to create", required = true)
-                                                   @RequestBody
-                                                   SiteCreateModel createModel) throws Exception {
+  public ResponseEntity<SiteEntity> createSite(
+                                               HttpServletRequest request,
+                                               @Parameter(description = "site to create", required = true)
+                                               @RequestBody
+                                               SiteCreateModel createModel) throws Exception {
     try {
       PortalConfig site = siteLayoutService.createSite(createModel, request.getRemoteUser());
-      SiteRestEntity siteEntity = RestEntityBuilder.toSiteEntity(pageLayoutService,
-                                                                 site,
-                                                                 request,
-                                                                 request.getLocale());
+      SiteEntity siteEntity = RestEntityBuilder.toSiteEntity(site,
+                                                             request,
+                                                             request.getLocale());
       return ResponseEntity.ok()
                            .eTag(String.valueOf(Objects.hash(siteEntity, request.getLocale())))
                            .body(siteEntity);

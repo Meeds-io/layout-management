@@ -33,15 +33,11 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.rest.model.UserNodeRestEntity;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.api.EntityBuilder;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
 import io.meeds.layout.rest.model.LayoutModel;
-import io.meeds.layout.rest.model.SiteRestEntity;
-import io.meeds.layout.service.PageLayoutService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -50,39 +46,17 @@ public class RestEntityBuilder {
   private RestEntityBuilder() {
   }
 
-  public static SiteRestEntity toSiteEntity(PageLayoutService pageLayoutService,
-                                            PortalConfig site,
-                                            HttpServletRequest request,
-                                            Locale locale) throws Exception {
-    SiteEntity siteEntity = EntityBuilder.buildSiteEntity(site,
-                                                          request,
-                                                          true,
-                                                          null,
-                                                          true,
-                                                          false,
-                                                          false,
-                                                          locale);
-    SiteRestEntity siteRestEntity = new SiteRestEntity(siteEntity);
-    List<UserNodeRestEntity> siteNavigations = siteEntity.getSiteNavigations();
-    computeCompatibilityWithEditor(pageLayoutService, siteRestEntity, siteNavigations);
-    return siteRestEntity;
-  }
-
-  private static void computeCompatibilityWithEditor(PageLayoutService pageLayoutService,
-                                                     SiteRestEntity siteRestEntity,
-                                                     List<UserNodeRestEntity> siteNavigations) {
-    if (CollectionUtils.isNotEmpty(siteNavigations)) {
-      siteNavigations.forEach(n -> {
-        PageKey pageKey = n.getPageKey();
-        if (n.isCanEditPage()) {
-          Page page = pageLayoutService.getPageLayout(pageKey);
-          siteRestEntity.getPagesCompatibility().put(pageKey.format(), page != null && isCompatibleWithEditor(page));
-        } else if (pageKey != null) {
-          siteRestEntity.getPagesCompatibility().put(pageKey.format(), false);
-        }
-        computeCompatibilityWithEditor(pageLayoutService, siteRestEntity, n.getChildren());
-      });
-    }
+  public static SiteEntity toSiteEntity(PortalConfig site,
+                                        HttpServletRequest request,
+                                        Locale locale) throws Exception {
+    return EntityBuilder.buildSiteEntity(site,
+                                         request,
+                                         true,
+                                         null,
+                                         true,
+                                         false,
+                                         false,
+                                         locale);
   }
 
   public static LayoutModel toLayoutModel(Page page, LayoutService layoutService, String expand) {
@@ -131,45 +105,6 @@ public class RestEntityBuilder {
 
   public static Page fromLayoutModel(LayoutModel layoutModel) {
     return layoutModel.toPage();
-  }
-
-  private static boolean isCompatibleWithEditor(Page page) { // NOSONAR
-    ArrayList<ModelObject> children = page.getChildren();
-    if (CollectionUtils.isEmpty(children)) {
-      return true;
-    } else {
-      if (children.size() != 1) {
-        return false;
-      }
-      ModelObject parentContainer = children.get(0);
-      if (parentContainer != null
-          && parentContainer instanceof Container appContainer
-          && StringUtils.contains(appContainer.getTemplate(), "UIPageLayout.gtmpl")) {
-        return isChildrenOfTypeSection(appContainer);
-      } else if (parentContainer == null
-                 || !(parentContainer instanceof Container vAppContainer)
-                 || !StringUtils.contains(vAppContainer.getCssClass(), "VuetifyApp")) {
-        return false;
-      } else if (CollectionUtils.isEmpty(vAppContainer.getChildren())) {
-        return true;
-      } else {
-        parentContainer = vAppContainer.getChildren().get(0);
-        if (parentContainer == null
-            || !(parentContainer instanceof Container appContainer)
-            || !StringUtils.contains(appContainer.getCssClass(), "v-application")) {
-          return false;
-        }
-        return isChildrenOfTypeSection(appContainer);
-      }
-    }
-  }
-
-  private static boolean isChildrenOfTypeSection(Container appContainer) {
-    return appContainer.getChildren()
-                       .stream()
-                       .allMatch(c -> c instanceof Container container
-                                      && (StringUtils.equals("GridContainer", container.getTemplate())
-                                          || StringUtils.equals("FlexContainer", container.getTemplate())));
   }
 
 }
