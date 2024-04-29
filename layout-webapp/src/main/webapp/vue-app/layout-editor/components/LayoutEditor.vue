@@ -111,10 +111,11 @@ export default {
           }
           if (this.nodeId && !this.$root.nodeUri) {
             this.$navigationLayoutService.getNodeUri(this.nodeId)
-              .then(uri =>
-                this.$layoutUtils.initPageContext(uri)
-                  .finally(() => this.$root.nodeUri = uri)
-              );
+              .then(uri => {
+                uri = uri.replace(/^\/global\//g, `/${eXo.env.portal.portalName}/`);
+                return this.$layoutUtils.initPageContext(uri)
+                  .finally(() => this.$root.nodeUri = uri);
+              });
           }
           this.$navigationLayoutService.getNode(this.nodeId)
             .then(node => this.node = node)
@@ -131,7 +132,7 @@ export default {
           this.$root.draftNodeId = this.draftNodeId;
           if (this.draftNodeId && !this.$root.draftNodeUri) {
             this.$navigationLayoutService.getNodeUri(this.draftNodeId)
-              .then(uri => this.$root.draftNodeUri = uri);
+              .then(uri => this.$root.draftNodeUri = uri.replace(/^\/global\//g, `/${eXo.env.portal.portalName}/`));
           }
         }
       },

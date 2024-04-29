@@ -139,8 +139,19 @@ export function getParentContainer(layout) {
 }
 
 export function newParentContainer(layout) {
-  const parent = newContainer(sectionsParentTemplate, '', layout, 0);
-  newSection(parent, 0, 12, 12, gridTemplate);
+  return newContainer(sectionsParentTemplate, '', layout, 0);
+}
+
+export function getApplications(container, applications) {
+  if (!applications) {
+    applications = [];
+  }
+  if (container.contentId) {
+    applications.push(container);
+  } else if (container.children?.length) {
+    container.children.forEach(c => getApplications(c, applications));
+  }
+  return applications;
 }
 
 export function applyMobileStyle(container) {
@@ -543,6 +554,7 @@ export function cleanAttributes(container, cleanStorage, cleanStyle) {
   if (container.randomId || cleanStorage) {
     delete container.storageId;
     delete container.storageName;
+    delete container.factoryId;
   }
   Object.keys(container).forEach(key => {
     if (key
