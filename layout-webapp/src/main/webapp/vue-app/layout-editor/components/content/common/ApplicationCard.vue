@@ -20,15 +20,17 @@
 -->
 <template>
   <v-card :id="portletName" flat>
-    <div class="d-flex flex-no-wrap">
+    <div class="d-flex flex-no-wrap full-width">
       <v-avatar
         class="ApplicationCardImage mx-1 my-auto"
         size="45"
         tile>
-        <img
-          :src="`/${webApplicationName}/skin/DefaultSkin/portletIcons/${portletName}.png`"
+        <v-img
+          :src="imgSrc"
           :alt="portletName"
-          :onerror="`src = '${defaultImageSrc}'`">
+          max-height="45"
+          max-width="45"
+          @error="displayDefault = true" />
       </v-avatar>
       <div class="flex-grow-1 ApplicationCardBody text-truncate">
         <div
@@ -65,9 +67,13 @@ export default {
   },
   data: () => ({
     displayActionMenu: false,
+    displayDefault: false,
     defaultImageSrc: '/sites/images/application/DefaultPortlet.png',
   }),
   computed: {
+    imgSrc() {
+      return this.displayDefault && this.defaultImageSrc || `/${this.webApplicationName}/skin/DefaultSkin/portletIcons/${this.portletName}.png`;
+    },
     webApplicationName() {
       return this.application?.contentId?.split?.('/')?.[0];
     },

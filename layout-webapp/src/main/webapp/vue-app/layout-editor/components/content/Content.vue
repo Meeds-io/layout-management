@@ -91,12 +91,7 @@ export default {
       handler() {
         if (this.layout) {
           const layout = JSON.parse(JSON.stringify(this.layout));
-          if (!layout.children?.length) {
-            this.$layoutUtils.newParentContainer(layout);
-            this.saveDraft(layout);
-          } else {
-            this.setLayout(layout);
-          }
+          this.setLayout(layout);
         }
       },
     },
@@ -354,7 +349,7 @@ export default {
       this.resetSectionHistory();
 
       this.loading++;
-      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit);
+      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
         .then(layout => this.setLayout(layout))
         .finally(() => window.setTimeout(() => this.loading--, 200));
