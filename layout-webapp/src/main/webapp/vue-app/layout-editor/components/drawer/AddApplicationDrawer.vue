@@ -41,13 +41,31 @@
           focusable
           flat>
           <layout-editor-application-category-card
-            v-for="(category, index) in $root.applicationCategories"
+            v-for="(category, index) in applicationCategories"
+            :key="category.id"
+            :category="category"
+            :expanded="expanded === index"
+            @addApplication="addApplication" />
+          <layout-editor-application-category-card
+            v-for="(category, index) in otherCategories"
             :key="category.id"
             :category="category"
             :expanded="expanded === index"
             @addApplication="addApplication" />
         </v-expansion-panels>
       </v-card>
+      <layout-editor-application-add-all-drawer
+        v-if="layoutAllAppsDrawer"
+        ref="allAppsDrawer" />
+    </template>
+    <template v-if="canLoadMore && layoutAllAppsDrawer" #footer>
+      <div class="d-flex align-center justify-center">
+        <v-btn
+          class="btn"
+          @click="loadMore">
+          {{ $t('layout.loadMore') }}
+        </v-btn>
+      </div>
     </template>
   </exo-drawer>
 </template>
@@ -56,7 +74,38 @@ export default {
   data: () => ({
     drawer: false,
     expanded: 0,
+    canLoadMore: true,
+    layoutAllAppsDrawer: eXo.env.portal.layoutAllAppsDrawer,
+    allApplications: [],
   }),
+  computed: {
+    applicationCategories() {
+      const applicationCategories = this.$root.applicationCategories.slice();
+      applicationCategories.forEach(c => c.label = this.$te(`layout.${c.name}`) ? this.$t(`layout.${c.name}`) : c.name);
+      return applicationCategories;
+    },
+    applications() {
+      return this.applicationCategories.flatMap(c => c.applications);
+    },
+    otherApplications() {
+      return this.allApplications.filter(a => !this.applications.find(app => app.contentId === a.contentId));
+    },
+    otherCategories() {
+      return this.otherApplications.reduce((otherCategories, application) => {
+        const category = otherCategories.find(c => c.name === application.categoryName);
+        if (category) {
+          category.applications.push(application);
+        } else {
+          otherCategories.push({
+            name: application.categoryName,
+            label: `<strong>${this.$t('layout.otherApplications')}:</strong> ${this.$te(`layout.${application.categoryName}`) ? this.$t(`layout.${application.categoryName}`) : application.categoryName}`,
+            applications: [application],
+          });
+        }
+        return otherCategories;
+      }, []);
+    },
+  },
   methods: {
     open() {
       this.$refs.drawer.endLoading();
@@ -68,6 +117,15 @@ export default {
       window.setTimeout(() => {
         this.close();
       }, 200);
+    },
+    loadMore() {
+      this.$refs.drawer.startLoading();
+      this.$applicationRegistryService.getApplications('supportedModes')
+        .then(applications => this.allApplications = applications)
+        .finally(() => {
+          this.canLoadMore = false;
+          this.$refs.drawer.endLoading();
+        });
     },
     close() {
       this.$refs.drawer.close();

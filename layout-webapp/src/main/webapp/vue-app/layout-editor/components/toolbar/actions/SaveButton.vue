@@ -43,7 +43,7 @@ export default {
   methods: {
     savePage() {
       this.loading = true;
-      const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout);
+      const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, 'contentId', true)
         .then(() => this.$root.$emit('layout-page-saved'))
         .catch(() => this.$root.$emit('alert-message', this.$t('layout.pageSavingError'), 'error'))
