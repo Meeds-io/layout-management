@@ -51,7 +51,7 @@ export default {
       return this.section.colsCount;
     },
     gridClass() {
-      return `d-md-grid grid-cols-md-${this.cols} grid-rows-md-${this.rows}`;
+      return `d-md-grid pb-0 grid-cols-md-${this.cols} grid-rows-md-${this.rows}`;
     },
     length() {
       return this.rows * this.cols;

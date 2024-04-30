@@ -165,7 +165,7 @@ public class PageLayoutServiceTest {
     when(dynamicContainer.getFactoryId()).thenReturn("addonContainer");
     when(dynamicContainer.getName()).thenReturn("testAddonContainer");
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
-    Application<?> application = mock(Application.class);
+    Application<Portlet> application = mock(Application.class);
     when(addOnService.getApplications("testAddonContainer")).thenReturn(Collections.singletonList(application));
     pageLayoutService.getPageLayout(PAGE_KEY);
     verify(dynamicContainer).setChildren(argThat(children -> children != null && children.size() == 1 && children.get(0) == application));
