@@ -47,6 +47,7 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
@@ -313,7 +314,7 @@ public class PageLayoutService {
 
   private void expandAddonContainerChildren(Container container) {
     if (StringUtils.equals(container.getFactoryId(), "addonContainer")) {
-      List<Application<?>> applications = addOnService.getApplications(container.getName());
+      List<Application<Portlet>> applications = addOnService.getApplications(container.getName());
       if (CollectionUtils.isNotEmpty(applications)) {
         container.setChildren(new ArrayList<>(applications));
       }

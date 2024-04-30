@@ -80,10 +80,10 @@ public class RestEntityBuilder {
       if (layoutModel instanceof Container container) {
         computeApplicationContentId(layoutService, container.getChildren(), contentIds);
       } else if (layoutModel instanceof Application application) { // NOSONAR
-        String storageId = application.getStorageId();
-        if (StringUtils.isNotBlank(storageId)) {
+        String portletId = application.getStorageId() == null ? application.getId() : application.getStorageId();
+        if (StringUtils.isNotBlank(portletId)) {
           String contentId = layoutService.getId(application.getState());
-          contentIds.put(storageId, contentId);
+          contentIds.put(portletId, contentId);
         }
       }
     }
