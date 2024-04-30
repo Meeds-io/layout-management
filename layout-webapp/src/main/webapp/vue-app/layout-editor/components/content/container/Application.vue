@@ -39,7 +39,7 @@
           @move-end="moveEnd" />
       </v-hover>
       <div v-if="displayNoContent" class="full-width text-no-wrap border-color-grey-lighten ms-1">
-        <div class="absolute-vertical-center d-flex full-width ms-n1">
+        <div class="layout-no-content absolute-vertical-center d-flex full-width ms-n1">
           <div class="light-black-background white--text px-2">
             {{ applicationTitle }}
           </div>
@@ -92,7 +92,7 @@ export default {
       return this.$root.draftNodeUri;
     },
     id() {
-      return `UIPortlet-${this.container?.id || this.storageId}`;
+      return `UIPortlet-${this.container?.id || this.storageId || parseInt(Math.random() * 10000)}`;
     },
     cssStyle() {
       if (!this.height && !this.width && !this.borderColor) {
@@ -230,7 +230,7 @@ export default {
       this.hasContentCheckCount++;
       window.setTimeout(() => {
         if (this.$refs.content) {
-          this.hasContent = this.$refs.content.getBoundingClientRect().height > 10;
+          this.hasContent = this.$refs.content.getBoundingClientRect().height > 30;
           if (!this.hasContent) {
             this.computeHasContentAsync();
           }

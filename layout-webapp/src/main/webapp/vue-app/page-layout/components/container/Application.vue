@@ -45,8 +45,14 @@ export default {
     storageId() {
       return this.container?.storageId;
     },
+    portletId() {
+      return this.storageId || this.container?.id;
+    },
+    contentId() {
+      return this.container?.contentId;
+    },
     id() {
-      return `UIPortlet-${this.container?.id || this.storageId}`;
+      return `UIPortlet-${this.container?.id || this.storageId || `${this.parentId}-${parseInt(Math.random() * 10000)}`}`;
     },
     height() {
       return this.container.height;
@@ -86,9 +92,12 @@ export default {
   methods: {
     installApplication() {
       if (this.$refs.content
-          && this.nodeUri
-          && this.storageId) {
-        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs.content);
+          && this.nodeUri) {
+        if (this.portletId) {
+          this.$applicationUtils.installApplication(this.nodeUri, this.portletId, this.$refs.content);
+        } else {
+          console.warn(`Application '${this.contentId}' doesn't have a storageId neither and id`);
+        }
       }
     },
     hasUnit(length) {

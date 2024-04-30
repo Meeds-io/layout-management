@@ -24,3 +24,19 @@ if (!Vue.prototype.$layoutUtils) {
     value: layoutUtils,
   });
 }
+
+Vue.prototype.$updateApplicationVisibility = function(visible, element) {
+  if (!element) {
+    element = this?.$root?.$el;
+  }
+  if (!element?.className?.includes?.('PORTLET-FRAGMENT')) {
+    element = element?.parentElement;
+  }
+  if (element?.parentElement) {
+    if (visible) {
+      element.closest?.('.PORTLET-FRAGMENT')?.parentElement?.classList?.remove?.('hidden-sm-and-down');
+    } else {
+      element.closest?.('.PORTLET-FRAGMENT')?.parentElement?.classList?.add?.('hidden-sm-and-down');
+    }
+  }
+};
