@@ -54,6 +54,7 @@ export function init() {
           hoveredSection: null,
           hoveredApplication: null,
           applicationCategories: null,
+          allApplications: null,
           branding: null,
           displayMode: 'desktop',
           layout: null,
@@ -134,6 +135,8 @@ export function init() {
           document.addEventListener('drawerClosed', this.setDrawerClosed);
           this.$applicationRegistryService.getCategories('supportedModes')
             .then(categories => this.applicationCategories = categories);
+          this.$applicationRegistryService.getApplications('supportedModes')
+            .then(applications => this.allApplications = applications);
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);
         },

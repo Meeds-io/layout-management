@@ -303,11 +303,14 @@ export default {
     applicationId() {
       return this.container?.children?.[0]?.storageId || this.container?.storageId;
     },
-    applicationCategory() {
-      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+    applicationContentId() {
+      return this.container?.children?.[0]?.contentId || this.container?.contentId;
     },
     application() {
-      return this.applicationCategory?.applications?.find?.(a => a?.displayName === this.applicationTitle);
+      return this.$root.allApplications?.find?.(a => a?.contentId === this.applicationContentId);
+    },
+    applicationCategory() {
+      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
     },
     supportedModes() {
       return this.application?.supportedModes || [];
