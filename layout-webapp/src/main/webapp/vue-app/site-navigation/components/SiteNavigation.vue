@@ -19,7 +19,8 @@
 <template>
   <v-app v-if="canManageSiteNavigation && !isMobile">
     <site-navigation-button
-      icon-class="text-color" />
+      icon-class="text-color"
+      embedded />
     <site-navigation-drawers-actions />
   </v-app>
 </template>
