@@ -20,14 +20,15 @@
   <v-tooltip bottom>
     <template #activator="{ on, attrs }">
       <v-card
-        v-on="on"
+        :height="embedded && 22 || 'auto'"
+        :class="embedded && 'position-relative mx-2'"
+        class="transparent"
+        flat
         v-bind="attrs"
-        class="mx-2 position-relative"
-        height="22"
-        flat>
+        v-on="on">
         <v-btn
           :disabled="disabled"
-          class="absolute-vertical-center mt-1"
+          :class="embedded && 'absolute-vertical-center mt-1'"
           outlined
           icon
           @click="openSiteNavigationDrawer">
@@ -48,6 +49,10 @@
 export default {
   props: {
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    embedded: {
       type: Boolean,
       default: false,
     },
