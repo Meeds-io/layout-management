@@ -48,18 +48,18 @@ const lang = eXo && eXo.env.portal.language || 'en';
 
 //should expose the locale ressources as REST API
 const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigation-${lang}.json`;
+const i18nPromise = exoi18n.loadLanguageAsync(lang, url);
 
 export function init(canManageSiteNavigation) {
-  exoi18n.loadLanguageAsync(lang, url)
-    .then(i18n => {
-      // init Vue app when locale ressources are ready
-      Vue.createApp({
-        template: `<site-navigation id="${appId}" :can-manage-site-navigation="${canManageSiteNavigation}"/>`,
-        vuetify: Vue.prototype.vuetifyOptions,
-        i18n,
-        data: () => ({
-          pageTemplates: null,
-        }),
-      }, `#${appId}`, 'site-navigation');
-    });
+  i18nPromise.then(i18n => {
+    // init Vue app when locale ressources are ready
+    Vue.createApp({
+      template: `<site-navigation id="${appId}" :can-manage-site-navigation="${canManageSiteNavigation}"/>`,
+      vuetify: Vue.prototype.vuetifyOptions,
+      i18n,
+      data: () => ({
+        pageTemplates: null,
+      }),
+    }, `#${appId}`, 'site-navigation');
+  });
 }
