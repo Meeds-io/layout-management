@@ -36,6 +36,8 @@
     <v-list class="pa-0" dense>
       <v-list-item
         v-if="isPortalSite && !isGlobalSite"
+        :aria-label="$t('siteManagement.label.properties')"
+        role="button"
         class="subtitle-2 px-3"
         @click="openSitePropertiesDrawer">
         <v-icon
@@ -50,6 +52,8 @@
         </v-list-item-title>
       </v-list-item>
       <v-list-item
+        :aria-label="$t('siteManagement.label.navigation')"
+        role="button"
         class="subtitle-2 px-3"
         @click="openSiteNavigationDrawer">
         <v-icon
@@ -65,6 +69,8 @@
       </v-list-item>
       <v-list-item
         v-if="!isGroupSite && !isGlobalSite"
+        :aria-label="$t('siteManagement.label.manageAccess')"
+        role="button"
         class="subtitle-2 px-3"
         @click="$root.$emit('open-manage-permissions-drawer', site, true)">
         <v-icon
@@ -80,6 +86,8 @@
       </v-list-item>
       <v-list-item
         v-if="canDelete"
+        :aria-label="$t('siteManagement.label.delete')"
+        role="button"
         class="subtitle-2 px-3"
         @click="$root.$emit('delete-site', site)">
         <v-icon
