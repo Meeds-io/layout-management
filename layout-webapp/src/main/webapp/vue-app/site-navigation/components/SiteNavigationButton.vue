@@ -26,8 +26,10 @@
         height="22"
         flat>
         <v-btn
+          :aria-label="$t('siteNavigation.button.tooltip.label')"
           :disabled="disabled"
           class="absolute-vertical-center mt-1"
+          role="button"
           outlined
           icon
           @click="openSiteNavigationDrawer">
