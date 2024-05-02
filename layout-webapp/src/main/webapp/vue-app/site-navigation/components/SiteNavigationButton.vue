@@ -27,8 +27,10 @@
         v-bind="attrs"
         v-on="on">
         <v-btn
+          :aria-label="$t('siteNavigation.button.tooltip.label')"
           :disabled="disabled"
           :class="embedded && 'absolute-vertical-center mt-1'"
+          role="button"
           outlined
           icon
           @click="openSiteNavigationDrawer">
