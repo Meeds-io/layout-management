@@ -74,12 +74,8 @@ export default {
   watch: {
     pageLoaded() {
       if (this.pageLoaded) {
-        this.$pageLayoutService.getPageLayout(this.pageRef, 'contentId')
-          .then(layout => {
-            const draftPageLayout = this.$layoutUtils.cleanAttributes(layout, true, false);
-            return this.$pageLayoutService.updatePageLayout(this.draftPageRef, draftPageLayout, 'contentId')
-              .then(draftLayout => this.setDraftLayout(draftLayout));
-          });
+        this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
+          .then(draftLayout => this.setDraftLayout(draftLayout));
       }
     },
     pageRef: {
