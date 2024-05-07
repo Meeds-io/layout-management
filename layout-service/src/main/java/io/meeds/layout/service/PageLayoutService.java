@@ -19,6 +19,7 @@
 package io.meeds.layout.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -188,6 +189,7 @@ public class PageLayoutService {
     page.resetStorage();
     page.setName(page.getName() + "_draft_" + username);
     page.setTitle(page.getTitle() + " Draft " + username);
+    replaceAddonContainerChildren(page);
 
     layoutService.save(new PageContext(page.getPageKey(), Utils.toPageState(page)), page);
     return page.getPageKey();
@@ -325,6 +327,34 @@ public class PageLayoutService {
                .filter(Container.class::isInstance)
                .map(Container.class::cast)
                .forEach(this::expandAddonContainerChildren);
+    }
+  }
+
+  private void replaceAddonContainerChildren(Container container) {
+    ArrayList<ModelObject> subContainers = container.getChildren();
+    if (subContainers == null) {
+      return;
+    }
+    LinkedHashMap<Integer, List<Application<Portlet>>> addonContainerChildren = new LinkedHashMap<>();
+    for (int i = subContainers.size() - 1; i >= 0; i--) {
+      ModelObject modelObject = subContainers.get(i);
+      if (modelObject instanceof Container subContainer) {
+        if (StringUtils.equals(subContainer.getFactoryId(), "addonContainer")) {
+          List<Application<Portlet>> applications = addOnService.getApplications(subContainer.getName());
+          if (CollectionUtils.isNotEmpty(applications)) {
+            addonContainerChildren.put(i, applications);
+          }
+        } else {
+          replaceAddonContainerChildren(subContainer);
+        }
+      }
+    }
+    if (!addonContainerChildren.isEmpty()) {
+      addonContainerChildren.forEach((index, applications) -> {
+                              subContainers.remove(index.intValue());
+                              subContainers.addAll(index, applications);
+                            });
+      container.setChildren(subContainers);
     }
   }
 
