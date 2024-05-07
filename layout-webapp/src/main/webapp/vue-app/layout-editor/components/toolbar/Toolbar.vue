@@ -55,6 +55,9 @@ export default {
     },
   },
   computed: {
+    defaultLanguage() {
+      return eXo.env.portal.defaultLanguage;
+    },
     pageName() {
       return this.nodeLabels?.labels && (this.nodeLabels.labels[eXo.env.portal.language] || this.nodeLabels.labels[this.defaultLanguage]) || this.page?.title;
     },
