@@ -158,6 +158,7 @@ public class PageLayoutServiceTest {
     assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void getPageLayoutWithDynamicContainer() {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
@@ -168,7 +169,8 @@ public class PageLayoutServiceTest {
     Application<Portlet> application = mock(Application.class);
     when(addOnService.getApplications("testAddonContainer")).thenReturn(Collections.singletonList(application));
     pageLayoutService.getPageLayout(PAGE_KEY);
-    verify(dynamicContainer).setChildren(argThat(children -> children != null && children.size() == 1 && children.get(0) == application));
+    verify(dynamicContainer).setChildren(argThat(children -> children != null && children.size() == 1
+                                                             && children.get(0) == application));
   }
 
   @Test
@@ -228,6 +230,23 @@ public class PageLayoutServiceTest {
     verify(page).resetStorage();
     verify(page).setName(PAGE_KEY.getName() + "_draft_" + TEST_USER);
     verify(layoutService).save(any(PageContext.class), eq(page));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void clonePageWithDynamicContainer() throws IllegalAccessException, ObjectNotFoundException {
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    Container dynamicContainer = mock(Container.class);
+    when(dynamicContainer.getFactoryId()).thenReturn("addonContainer");
+    when(dynamicContainer.getName()).thenReturn("testAddonContainer");
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
+    Application<Portlet> application = mock(Application.class);
+    when(addOnService.getApplications("testAddonContainer")).thenReturn(Collections.singletonList(application));
+    when(aclService.canEditPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    when(page.getName()).thenReturn(PAGE_KEY.getName());
+
+    pageLayoutService.clonePage(PAGE_KEY, TEST_USER);
+    verify(page).setChildren(argThat(children -> children != null && children.size() == 1 && children.get(0) == application));
   }
 
   @SuppressWarnings("unchecked")
