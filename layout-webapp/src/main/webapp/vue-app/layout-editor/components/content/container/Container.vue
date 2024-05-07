@@ -32,6 +32,10 @@ export default {
       type: Object,
       default: null,
     },
+    parentId: {
+      type: String,
+      default: null,
+    },
     index: {
       type: Number,
       default: null,
