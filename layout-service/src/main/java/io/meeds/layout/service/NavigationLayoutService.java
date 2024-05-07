@@ -22,18 +22,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.commons.utils.I18N;
+import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.portal.application.PortalRequestHandler;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.State;
@@ -46,8 +48,8 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.DescriptionService;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
-import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleManager;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.QualifiedName;
 import org.exoplatform.web.controller.router.Router;
@@ -72,6 +74,9 @@ public class NavigationLayoutService {
 
   @Autowired
   private PageLayoutService              pageLayoutService;
+
+  @Autowired
+  private ResourceBundleManager          resourceBundleManager;
 
   @Autowired
   private LocaleConfigService            localeConfigService;
@@ -243,17 +248,37 @@ public class NavigationLayoutService {
     return nodeData;
   }
 
-  public NodeLabel getNodeLabels(long nodeId,
-                                 String username) throws ObjectNotFoundException,
-                                                  IllegalAccessException {
+  public NodeLabel getNodeLabels(long nodeId, String username) throws ObjectNotFoundException, IllegalAccessException {
     NodeData nodeData = navigationService.getNodeById(nodeId);
     if (nodeData == null) {
       throw new ObjectNotFoundException(String.format(NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND, nodeId));
-    } else if (!aclService.canViewNavigation(nodeData.getSiteKey(), nodeData.getState().getPageRef(), username)) {
-      throw new IllegalAccessException();
+    } else {
+      SiteKey siteKey = nodeData.getSiteKey();
+      if (!aclService.canViewNavigation(siteKey, nodeData.getState().getPageRef(), username)) {
+        throw new IllegalAccessException();
+      }
     }
     Map<Locale, State> nodeLabels = descriptionService.getDescriptions(String.valueOf(nodeId));
-    return toNodeLabel(nodeLabels);
+    if (MapUtils.isEmpty(nodeLabels)) {
+      Map<Locale, State> nodeLocalizedLabels = new HashMap<>();
+      localeConfigService.getLocalConfigs().forEach(localeConfig -> {
+        Locale locale = localeConfig.getLocale();
+        String label = nodeData.getState().getLabel();
+        if (ExpressionUtil.isResourceBindingExpression(label)) {
+          SiteKey siteKey = nodeData.getSiteKey();
+          ResourceBundle nodeLabelResourceBundle = resourceBundleManager.getNavigationResourceBundle(locale.toLanguageTag(),
+                                                                                                     siteKey.getTypeName(),
+                                                                                                     siteKey.getName());
+          if (nodeLabelResourceBundle != null) {
+            label = ExpressionUtil.getExpressionValue(nodeLabelResourceBundle, label);
+          }
+        }
+        nodeLocalizedLabels.put(locale, new State(label, null));
+      });
+      return toNodeLabel(nodeLocalizedLabels);
+    } else {
+      return toNodeLabel(nodeLabels);
+    }
   }
 
   public String getNodeUri(long nodeId, String username) throws IllegalAccessException, ObjectNotFoundException {
@@ -392,25 +417,27 @@ public class NavigationLayoutService {
     String defaultLanguage = defaultLocale.getLanguage();
     Map<String, String> supportedLanguages =
                                            CollectionUtils.isEmpty(localeConfigService.getLocalConfigs()) ?
-                                                       Collections.singletonMap(defaultLocale.getLanguage(),
-                                                                                defaultLocale.getDisplayName()) :
-                                                       localeConfigService.getLocalConfigs()
-                                                                          .stream()
-                                                                          .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocaleName(),
-                                                                                                                      "ma"))
-                                                                          .collect(Collectors.toMap(LocaleConfig::getLocaleName,
-                                                                                                    localeConfig -> localeConfig.getLocale()
-                                                                                                                                .getDisplayName()));
+                                                                                                          Collections.singletonMap(defaultLocale.toLanguageTag(),
+                                                                                                                                   defaultLocale.getDisplayName()) :
+                                                                                                          localeConfigService.getLocalConfigs()
+                                                                                                                             .stream()
+                                                                                                                             .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocale()
+                                                                                                                                                                                     .toLanguageTag(),
+                                                                                                                                                                         "ma"))
+                                                                                                                             .collect(Collectors.toMap(c -> c.getLocale()
+                                                                                                                                                             .toLanguageTag(),
+                                                                                                                                                       localeConfig -> localeConfig.getLocale()
+                                                                                                                                                                                   .getDisplayName()));
     Map<String, String> localized = new HashMap<>();
     NodeLabel nodeLabel = new NodeLabel();
-    if (nodeLabels != null && nodeLabels.size() != 0) {
+    if (MapUtils.isNotEmpty(nodeLabels)) {
       for (Map.Entry<Locale, State> entry : nodeLabels.entrySet()) {
         Locale locale = entry.getKey();
         State state = entry.getValue();
-        localized.put(I18N.toTagIdentifier(locale), state.getName());
+        localized.put(locale.toLanguageTag(), state.getName());
       }
       if (!nodeLabels.containsKey(defaultLocale) && !localized.isEmpty()) {
-        localized.put(I18N.toTagIdentifier(defaultLocale), localized.values().iterator().next());
+        localized.put(defaultLocale.toLanguageTag(), localized.values().iterator().next());
       }
       nodeLabel.setLabels(localized);
     }
