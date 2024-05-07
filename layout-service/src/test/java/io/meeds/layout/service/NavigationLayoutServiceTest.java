@@ -55,6 +55,7 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleManager;
 import org.exoplatform.web.WebAppController;
 import org.exoplatform.web.controller.router.Router;
 
@@ -89,6 +90,9 @@ public class NavigationLayoutServiceTest {
 
   @MockBean
   private WebAppController        webController;
+
+  @MockBean
+  private ResourceBundleManager   resourceBundleManager;
 
   @MockBean
   private LocaleConfigService     localeConfigService;
@@ -148,6 +152,9 @@ public class NavigationLayoutServiceTest {
     when(nodeData.getState()).thenReturn(nodeState);
     when(nodeData.getSiteKey()).thenReturn(SITE_KEY);
     when(nodeState.getPageRef()).thenReturn(PAGE_KEY);
+    when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
+    when(defaultLocaleConfig.getLocale()).thenReturn(Locale.FRENCH);
+
     assertThrows(ObjectNotFoundException.class, () -> navigationLayoutService.createDraftNode(2l, TEST_USER));
 
     when(navigationService.getNodeById(2l)).thenReturn(nodeData);
@@ -258,6 +265,9 @@ public class NavigationLayoutServiceTest {
     when(nodeData.getSiteKey()).thenReturn(SITE_KEY);
     when(nodeData.getState()).thenReturn(nodeState);
     when(nodeState.getPageRef()).thenReturn(PAGE_KEY);
+    when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
+    when(defaultLocaleConfig.getLocale()).thenReturn(Locale.FRENCH);
+
     assertThrows(IllegalAccessException.class, () -> navigationLayoutService.getNodeLabels(2, TEST_USER));
     verify(descriptionService, never()).getDescriptions("2");
 
@@ -267,11 +277,9 @@ public class NavigationLayoutServiceTest {
 
     when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
     when(defaultLocaleConfig.getLocale()).thenReturn(Locale.FRENCH);
-    when(defaultLocaleConfig.getLocaleName()).thenReturn(Locale.FRENCH.toLanguageTag());
 
     LocaleConfig otherLocaleConfig = mock(LocaleConfig.class);
     when(otherLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
-    when(otherLocaleConfig.getLocaleName()).thenReturn(Locale.ENGLISH.toLanguageTag());
     when(localeConfigService.getLocalConfigs()).thenReturn(Arrays.asList(defaultLocaleConfig, otherLocaleConfig));
     String nodeName = "testLabel";
     when(descriptionService.getDescriptions("2")).thenReturn(Collections.singletonMap(Locale.ENGLISH,

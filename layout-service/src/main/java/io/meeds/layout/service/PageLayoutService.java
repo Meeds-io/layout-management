@@ -19,7 +19,9 @@
 package io.meeds.layout.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.javascript.jscomp.jarjar.com.google.re2j.Pattern;
 
+import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
@@ -45,6 +48,7 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
@@ -80,6 +84,9 @@ public class PageLayoutService {
 
   @Autowired
   private UserPortalConfigService userPortalConfigService;
+
+  @Autowired
+  private AddOnService            addOnService;
 
   public List<PageContext> getPages(String siteTypeName,
                                     String siteName,
@@ -122,7 +129,11 @@ public class PageLayoutService {
   }
 
   public Page getPageLayout(PageKey pageKey) {
-    return layoutService.getPage(pageKey);
+    Page page = layoutService.getPage(pageKey);
+    if (page != null) {
+      expandAddonContainerChildren(page);
+    }
+    return page;
   }
 
   @SneakyThrows
@@ -165,7 +176,7 @@ public class PageLayoutService {
   public PageKey clonePage(PageKey pageKey,
                            String username) throws IllegalAccessException,
                                             ObjectNotFoundException {
-    Page page = layoutService.getPage(pageKey);
+    Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
     } else if (!aclService.canEditPage(pageKey, username)) {
@@ -178,6 +189,7 @@ public class PageLayoutService {
     page.resetStorage();
     page.setName(page.getName() + "_draft_" + username);
     page.setTitle(page.getTitle() + " Draft " + username);
+    replaceAddonContainerChildren(page);
 
     layoutService.save(new PageContext(page.getPageKey(), Utils.toPageState(page)), page);
     return page.getPageKey();
@@ -300,6 +312,50 @@ public class PageLayoutService {
 
   private PageType getPageType(String pageType) {
     return StringUtils.isBlank(pageType) ? PageType.PAGE : PageType.valueOf(pageType.toUpperCase());
+  }
+
+  private void expandAddonContainerChildren(Container container) {
+    if (StringUtils.equals(container.getFactoryId(), "addonContainer")) {
+      List<Application<Portlet>> applications = addOnService.getApplications(container.getName());
+      if (CollectionUtils.isNotEmpty(applications)) {
+        container.setChildren(new ArrayList<>(applications));
+      }
+    } else if (container.getChildren() != null) {
+      container.getChildren()
+               .stream()
+               .filter(Objects::nonNull)
+               .filter(Container.class::isInstance)
+               .map(Container.class::cast)
+               .forEach(this::expandAddonContainerChildren);
+    }
+  }
+
+  private void replaceAddonContainerChildren(Container container) {
+    ArrayList<ModelObject> subContainers = container.getChildren();
+    if (subContainers == null) {
+      return;
+    }
+    LinkedHashMap<Integer, List<Application<Portlet>>> addonContainerChildren = new LinkedHashMap<>();
+    for (int i = subContainers.size() - 1; i >= 0; i--) {
+      ModelObject modelObject = subContainers.get(i);
+      if (modelObject instanceof Container subContainer) {
+        if (StringUtils.equals(subContainer.getFactoryId(), "addonContainer")) {
+          List<Application<Portlet>> applications = addOnService.getApplications(subContainer.getName());
+          if (CollectionUtils.isNotEmpty(applications)) {
+            addonContainerChildren.put(i, applications);
+          }
+        } else {
+          replaceAddonContainerChildren(subContainer);
+        }
+      }
+    }
+    if (!addonContainerChildren.isEmpty()) {
+      addonContainerChildren.forEach((index, applications) -> {
+                              subContainers.remove(index.intValue());
+                              subContainers.addAll(index, applications);
+                            });
+      container.setChildren(subContainers);
+    }
   }
 
   private void validateCSSInputs(ModelObject modelObject) {

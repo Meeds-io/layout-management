@@ -52,11 +52,7 @@
           <span v-if="applicationCategoryTitle" class="caption">({{ applicationCategoryTitle }})</span>
         </div>
       </div>
-      <div
-        v-if="$root.desktopDisplayMode"
-        :class="{
-          'mt-n5': isDynamicSection,
-        }">
+      <div v-if="$root.desktopDisplayMode">
         <layout-editor-cell-resize-button
           v-if="displayResizeButton"
           :container="container"

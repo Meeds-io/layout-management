@@ -25,7 +25,7 @@
     content-class="uiPopup full-width full-height"
     persistent
     max-width="100vw">
-    <v-card flat>
+    <v-card class="full-height full-width" flat>
       <v-flex class="ms-5 me-0 drawerHeader flex-grow-0">
         <v-list-item class="pe-0 ps-1">
           <v-list-item-content class="drawerTitle align-start text-header-title text-truncate">
@@ -67,9 +67,11 @@ export default {
   }),
   computed: {
     drawerTitle() {
-      return this.$t('layout.editPortletTitle', {
+      return this.applicationCategoryTitle?.length && this.$t('layout.editPortletTitle', {
         0: this.applicationTitle,
         1: this.applicationCategoryTitle,
+      }) || this.$t('layout.editPortletTitleNoCategory', {
+        0: this.applicationTitle,
       });
     },
     nodeUri() {

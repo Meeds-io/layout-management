@@ -89,7 +89,7 @@ export default {
   }),
   computed: {
     gridClass() {
-      return `d-md-grid grid-cols-md-${this.cols}`;
+      return `d-md-grid pb-0 grid-cols-md-${this.cols}`;
     },
   },
   watch: {

@@ -72,7 +72,6 @@
               class="my-0 py-0">
               <site-navigation-node-item-menu
                 :navigation-node="navigationNode"
-                :pages-compatibility="pagesCompatibility"
                 :hover="hover"
                 :can-move-up="canMoveUp"
                 :can-move-down="canMoveDown"
@@ -130,7 +129,6 @@
         v-for="child in navigationNode.children"
         :key="child.id"
         :navigation-node="child"
-        :pages-compatibility="pagesCompatibility"
         :can-move-up="canMoveUpChildNode(child)"
         :can-move-down="canMoveDownChildNode(child)"
         :cols="cols + 1"
@@ -146,10 +144,6 @@ export default {
     navigationNode: {
       type: Object,
       default: null,
-    },
-    pagesCompatibility: {
-      type: Object,
-      default: null
     },
     canMoveUp: {
       type: Boolean,

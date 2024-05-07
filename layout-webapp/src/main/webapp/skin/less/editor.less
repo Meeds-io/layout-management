@@ -42,10 +42,13 @@
   overflow-x: hidden;
 
   .PORTLET-FRAGMENT {
-    margin-bottom: ~"var(--grid-layout-gap, 20px) ! important";
+    margin-bottom: ~"var(--grid-layout-gap, 20px) !important";
   }
   .flex-cell {
     row-gap: 0;
+    .layout-application {
+      padding-bottom: 0 !important;
+    }
   }
   .hidden-sm-and-down {
     display: none !important;
@@ -62,6 +65,10 @@
   border: thin solid @primaryColor !important;
 }
 
+.layout-no-content {
+  margin-top: -10px;
+}
+
 .layout-no-content-caret {
   margin-left: -1px;
   padding-top: 1px;
@@ -69,6 +76,10 @@
 
 .layout-number-input {
   width: 36px;
+}
+
+.d-md-grid {
+  padding-bottom: 20px;
 }
 
 // TODO Delete those classes when the Applications Drawer is reworked
@@ -131,7 +142,9 @@
 .grid-gap-width {
   width: ~"var(--grid-layout-gap, 20px)";
 }
-
+.grid-gap-1 {
+  --grid-layout-gap: 4px;
+}
 .layout-column-resize {
   background-repeat: repeat !important;
   opacity: 0.8 !important;

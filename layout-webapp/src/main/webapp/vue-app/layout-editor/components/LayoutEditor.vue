@@ -26,11 +26,11 @@
     <div>
       <layout-editor-toolbar
         :disable-save="!modified"
-        :page="page"
+        :page="pageContext"
         :node="node"
         :node-labels="nodeLabels" />
       <layout-editor-content
-        :page="page"
+        :page="pageContext"
         :node="draftNode"
         :layout="draftLayout"
         @modified="modified = true" />
@@ -42,7 +42,7 @@
 export default {
   data: () => ({
     node: null,
-    page: null,
+    pageContext: null,
     draftNode: null,
     draftLayout: null,
     nodeLabels: null,
@@ -67,28 +67,15 @@ export default {
     draftPageRef() {
       return this.draftPageKey?.ref || (this.draftPageKey && `${this.draftPageKey.site.typeName}::${this.draftPageKey.site.name}::${this.draftPageKey.name}`);
     },
-    pageLoaded() {
-      return !!this.draftPageRef && !!this.page;
-    },
   },
   watch: {
-    pageLoaded() {
-      if (this.pageLoaded) {
-        this.$pageLayoutService.getPageLayout(this.pageRef, 'contentId')
-          .then(layout => {
-            const draftPageLayout = this.$layoutUtils.cleanAttributes(layout, true, false);
-            return this.$pageLayoutService.updatePageLayout(this.draftPageRef, draftPageLayout, 'contentId')
-              .then(draftLayout => this.setDraftLayout(draftLayout));
-          });
-      }
-    },
     pageRef: {
       immediate: true,
       handler() {
         if (this.pageRef) {
           this.$root.pageRef = this.pageRef;
           this.$pageLayoutService.getPage(this.pageRef)
-            .then(page => this.page = page);
+            .then(page => this.pageContext = page);
         }
       },
     },
@@ -97,6 +84,8 @@ export default {
       handler() {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
+          this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
+            .then(draftLayout => this.setDraftLayout(draftLayout));
         }
       },
     },
@@ -111,10 +100,11 @@ export default {
           }
           if (this.nodeId && !this.$root.nodeUri) {
             this.$navigationLayoutService.getNodeUri(this.nodeId)
-              .then(uri =>
-                this.$layoutUtils.initPageContext(uri)
-                  .finally(() => this.$root.nodeUri = uri)
-              );
+              .then(uri => {
+                uri = uri.replace(/^\/global\//g, `/${eXo.env.portal.portalName}/`);
+                return this.$layoutUtils.initPageContext(uri)
+                  .finally(() => this.$root.nodeUri = uri);
+              });
           }
           this.$navigationLayoutService.getNode(this.nodeId)
             .then(node => this.node = node)
@@ -131,7 +121,7 @@ export default {
           this.$root.draftNodeId = this.draftNodeId;
           if (this.draftNodeId && !this.$root.draftNodeUri) {
             this.$navigationLayoutService.getNodeUri(this.draftNodeId)
-              .then(uri => this.$root.draftNodeUri = uri);
+              .then(uri => this.$root.draftNodeUri = uri.replace(/^\/global\//g, `/${eXo.env.portal.portalName}/`));
           }
         }
       },
