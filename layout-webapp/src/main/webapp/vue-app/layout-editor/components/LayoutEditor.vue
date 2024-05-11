@@ -23,7 +23,7 @@
     class="transparent"
     role="main"
     flat>
-    <div>
+    <div class="content-box-sizing">
       <layout-editor-toolbar
         :disable-save="!modified"
         :page="pageContext"

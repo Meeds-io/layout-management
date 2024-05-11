@@ -22,7 +22,7 @@
   <div
     v-show="multiCellsSelect"
     :style="boxStyle"
-    class="layout-selecting-container grey opacity-5 elevation-2 position-absolute z-index-modal">
+    class="layout-selecting-container border-box-sizing grey opacity-5 elevation-2 position-absolute z-index-modal">
   </div>
 </template>
 <script>

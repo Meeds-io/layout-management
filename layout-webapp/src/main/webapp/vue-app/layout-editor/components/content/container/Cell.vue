@@ -27,7 +27,6 @@
     :hide-children="moving"
     :class="{
       'z-index-two': hover && !$root.drawerOpened,
-      'pb-12': movingChildren,
     }"
     :style="cssStyle"
     class="position-relative d-flex flex-column"
