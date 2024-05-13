@@ -22,7 +22,7 @@
   <div
     ref="movingBox"
     :style="boxStyle"
-    class="layout-selecting-container d-flex position-absolute elevation-2 z-index-modal">
+    class="layout-selecting-container border-box-sizing d-flex position-absolute elevation-2 z-index-modal">
   </div>
 </template>
 <script>
