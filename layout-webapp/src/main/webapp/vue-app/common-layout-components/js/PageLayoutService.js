@@ -69,7 +69,7 @@ export function createPage(pageName, pageTitle, pageSiteName, pageSiteType, page
     },
     body: JSON.stringify({
       pageName,
-      pageTemplateId,
+      pageTemplateId: pageTemplateId || 0,
       pageType,
       pageTitle,
       pageSiteType,
