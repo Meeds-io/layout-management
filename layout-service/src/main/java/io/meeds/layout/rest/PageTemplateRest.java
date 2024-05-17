@@ -61,6 +61,19 @@ public class PageTemplateRest {
     return pageTemplateService.getPageTemplates(request.getLocale(), true);
   }
 
+  @GetMapping("{id}")
+  @Secured("users")
+  @Operation(summary = "Retrieve a page template designated by its id", method = "GET",
+             description = "This will retrieve a page template designated by its id")
+  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
+  public PageTemplate getPageTemplate(
+                                      HttpServletRequest request,
+                                      @Parameter(description = "Page template identifier")
+                                      @PathVariable("id")
+                                      long id) {
+    return pageTemplateService.getPageTemplate(id, request.getLocale(), true);
+  }
+
   @PostMapping
   @Secured("users")
   @Operation(summary = "Create a page template", method = "POST", description = "This creates a new page template")
