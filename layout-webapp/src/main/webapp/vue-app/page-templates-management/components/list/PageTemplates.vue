@@ -54,6 +54,14 @@ export default {
           class: 'page-template-description-header',
           width: '70%'
         },
+        {
+          text: this.$t('pageTemplates.label.category'),
+          value: 'category',
+          align: 'left',
+          sortable: false,
+          class: 'page-template-category-header',
+          width: '120px'
+        },
       ];
     },
     filteredPageTemplates() {
