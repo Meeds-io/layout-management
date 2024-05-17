@@ -79,4 +79,15 @@
     </sql>
   </changeSet>
 
+  <changeSet
+    author="layout"
+    id="1.0.0-6">
+    <addColumn tableName="LAYOUT_PAGE_TEMPLATES">
+      <column
+        name="SYSTEM_PAGE_TEMPLATE"
+        type="BOOLEAN"
+        defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

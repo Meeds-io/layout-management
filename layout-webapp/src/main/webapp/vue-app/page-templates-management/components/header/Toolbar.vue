@@ -28,6 +28,7 @@
       placeholder: $t('pageTemplates.filter.placeholder'),
       tooltip: $t('pageTemplates.filter.placeholder'),
     }"
+    class="px-1"
     @filter-text-input="$emit('page-templates-filter', $event)">
     <template #left>
       <v-btn
