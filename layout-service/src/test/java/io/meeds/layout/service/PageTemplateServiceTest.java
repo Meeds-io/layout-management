@@ -177,6 +177,66 @@ public class PageTemplateServiceTest {
   }
 
   @Test
+  public void getPageTemplateWithExpand() throws ObjectNotFoundException {
+    PageTemplate template = new PageTemplate(2l, false, LAYOUT_CATEGORY, LAYOUT_CONTENT);
+    when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
+    when(defaultLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
+
+    when(pageTemplateStorage.getPageTemplate(2l)).thenReturn(template);
+
+    PageTemplate retrievedPageTemplate = pageTemplateService.getPageTemplate(2l);
+    assertNotNull(retrievedPageTemplate);
+    assertEquals(template.getId(), retrievedPageTemplate.getId());
+    assertEquals(template.getContent(), retrievedPageTemplate.getContent());
+    assertNull(retrievedPageTemplate.getName());
+    assertNull(retrievedPageTemplate.getDescription());
+    assertEquals(0l, retrievedPageTemplate.getIllustrationId());
+
+    when(translationService.getTranslationField(PageTemplateTranslationPlugin.OBJECT_TYPE,
+                                                template.getId(),
+                                                PageTemplateTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
+    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.FRENCH, true);
+    assertNotNull(retrievedPageTemplate);
+
+    reset(translationService);
+
+    TranslationField titleTranslationField = mock(TranslationField.class);
+    when(translationService.getTranslationField(PageTemplateTranslationPlugin.OBJECT_TYPE,
+                                                template.getId(),
+                                                PageTemplateTranslationPlugin.TITLE_FIELD_NAME)).thenReturn(titleTranslationField);
+    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.FRENCH, true);
+    assertNotNull(retrievedPageTemplate);
+    assertEquals(template.getId(), retrievedPageTemplate.getId());
+    assertEquals(template.getContent(), retrievedPageTemplate.getContent());
+    assertNull(retrievedPageTemplate.getName());
+    assertNull(retrievedPageTemplate.getDescription());
+    assertEquals(0l, retrievedPageTemplate.getIllustrationId());
+
+    String frTitle = "testTitle";
+    when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
+
+    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.FRENCH, true);
+    assertEquals(frTitle, retrievedPageTemplate.getName());
+
+    TranslationField descriptionTranslationField = mock(TranslationField.class);
+    when(translationService.getTranslationField(PageTemplateTranslationPlugin.OBJECT_TYPE,
+                                                template.getId(),
+                                                PageTemplateTranslationPlugin.DESCRIPTION_FIELD_NAME)).thenReturn(descriptionTranslationField);
+    String enDesc = "testDescription";
+    when(descriptionTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.ENGLISH, enDesc));
+
+    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.ENGLISH, true);
+    assertNotNull(retrievedPageTemplate);
+    assertEquals(enDesc, retrievedPageTemplate.getDescription());
+
+    when(attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE,
+                                                "2")).thenReturn(Collections.singletonList("32"));
+    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.GERMAN, true);
+    assertNotNull(retrievedPageTemplate);
+    assertEquals(32l, retrievedPageTemplate.getIllustrationId());
+  }
+
+  @Test
   public void getPageTemplate() {
     when(pageTemplateStorage.getPageTemplate(2l)).thenReturn(pageTemplate);
     PageTemplate retrievedPageTemplate = pageTemplateService.getPageTemplate(3l);
