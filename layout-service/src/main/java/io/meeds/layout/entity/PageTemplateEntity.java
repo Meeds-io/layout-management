@@ -45,6 +45,9 @@ public class PageTemplateEntity {
   @Column(name = "DISABLED")
   private boolean disabled;
 
+  @Column(name = "SYSTEM_PAGE_TEMPLATE")
+  private boolean system;
+
   @Column(name = "CATEGORY")
   private String  category;
 
