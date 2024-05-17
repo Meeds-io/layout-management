@@ -56,7 +56,7 @@ export default {
     getPageTemplates() {
       if (!this.$root.pageTemplates) {
         return this.$pageTemplateService.getPageTemplates()
-          .then(pageTemplates => this.$root.pageTemplates = pageTemplates || []);
+          .then(pageTemplates => this.$root.pageTemplates = pageTemplates && pageTemplates.filter(t => !t.disabled) || []);
       }
     },
   },

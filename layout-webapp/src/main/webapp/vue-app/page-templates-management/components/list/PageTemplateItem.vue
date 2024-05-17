@@ -11,9 +11,9 @@
     </td>
     <!-- name -->
     <td
+      :width="$root.isMobile && '100%' || 'auto'"
       align="left"
       class="text-truncate"
-      width="auto"
       v-sanitized-html="name"></td>
     <!-- description -->
     <td
@@ -21,6 +21,13 @@
       align="left"
       class="text-truncate"
       v-sanitized-html="description"></td>
+    <td
+      v-if="!$root.isMobile"
+      align="left"
+      class="text-truncate"
+      width="120px">
+      {{ category }}
+    </td>
   </tr>
 </template>
 <script>
@@ -46,6 +53,12 @@ export default {
     },
     illustrationSrc() {
       return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.pageTemplateId}/${this.illustrationId}` || '/layout/images/page-templates/DefaultPreview.webp';
+    },
+    category() {
+      const i18nKey = `layout.pageTemplate.category.${this.pageTemplate?.category}`;
+      return this.pageTemplate?.category
+        && (this.$te(i18nKey) ? this.$t(i18nKey) : this.pageTemplate.category)
+        || this.$t('layout.pageTemplate.category.customized');
     },
   },
 };
