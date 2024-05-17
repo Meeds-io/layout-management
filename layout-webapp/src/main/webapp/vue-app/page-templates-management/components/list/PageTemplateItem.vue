@@ -30,14 +30,69 @@
     </td>
     <td
       v-if="!$root.isMobile"
-      align="left"
-      class="d-flex align-center ps-2"
-      width="120px">
+      align="center"
+      width="50px">
       <v-switch
         v-model="enabled"
         :loading="loading"
         class="mt-0 mx-auto"
         @click="changeStatus" />
+    </td>
+    <td
+      v-if="!$root.isMobile"
+      align="center"
+      width="50px">
+      <v-menu
+        v-model="menu"
+        :left="!$vuetify.rtl"
+        :right="$vuetify.rtl"
+        bottom
+        offset-y
+        attach>
+        <template #activator="{ on, attrs }">
+          <v-btn
+            :aria-label="$t('pageTemplates.menu.open')"
+            icon
+            small
+            class="mx-auto"
+            v-bind="attrs"
+            v-on="on">
+            <v-icon size="16" class="icon-default-color">fas fa-ellipsis-v</v-icon>
+          </v-btn>
+        </template>
+        <v-hover v-if="menu" @input="hoverMenu = $event">
+          <v-list
+            class="pa-0"
+            dense
+            @mouseout="menu = false"
+            @focusout="menu = false">
+            <v-tooltip :disabled="!pageTemplate.system" bottom>
+              <template #activator="{ on, attrs }">
+                <div
+                  v-on="on"
+                  v-bind="attrs">
+                  <v-list-item
+                    :disabled="pageTemplate.system"
+                    dense
+                    @click="$emit('delete')">
+                    <v-icon
+                      :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
+                      size="13">
+                      fa-trash
+                    </v-icon>
+                    <v-list-item-title
+                      :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
+                      class="pl-3">
+                      {{ $t('pageTemplate.label.delete') }}
+                    </v-list-item-title>
+                  </v-list-item>
+                </div>
+              </template>
+              <span>{{ $t('pageTemplate.label.system.noDelete') }}</span>
+            </v-tooltip>
+          </v-list>
+        </v-hover>
+      </v-menu>
     </td>
   </tr>
 </template>
@@ -49,6 +104,10 @@ export default {
       default: null,
     },
   },
+  data: () => ({
+    menu: false,
+    hoverMenu: false,
+  }),
   computed: {
     pageTemplateId() {
       return this.pageTemplate?.id;
@@ -73,6 +132,17 @@ export default {
       return this.pageTemplate?.category
         && (this.$te(i18nKey) ? this.$t(i18nKey) : this.pageTemplate.category)
         || this.$t('layout.pageTemplate.category.customized');
+    },
+  },
+  watch: {
+    hoverMenu() {
+      if (!this.hoverMenu) {
+        window.setTimeout(() => {
+          if (!this.hoverMenu) {
+            this.menu = false;
+          }
+        }, 200);
+      }
     },
   },
   methods: {

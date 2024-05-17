@@ -1,19 +1,31 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="filteredPageTemplates"
-    :loading="loading"
-    :disable-sort="$root.isMobile"
-    :hide-default-header="$root.isMobile"
-    disable-pagination
-    hide-default-footer
-    class="pageTemplatesTable px-5">
-    <template slot="item" slot-scope="props">
-      <page-templates-management-item
-        :key="props.item.name"
-        :page-template="props.item" />
-    </template>
-  </v-data-table>
+  <div>
+    <v-data-table
+      :headers="headers"
+      :items="filteredPageTemplates"
+      :loading="loading"
+      :disable-sort="$root.isMobile"
+      :hide-default-header="$root.isMobile"
+      disable-pagination
+      hide-default-footer
+      class="pageTemplatesTable px-5">
+      <template slot="item" slot-scope="props">
+        <page-templates-management-item
+          :key="props.item.name"
+          :page-template="props.item"
+          @delete="pageTemplateToDelete = props.item"
+          @page-templates-loading="loading = $event" />
+      </template>
+    </v-data-table>
+    <exo-confirm-dialog
+      ref="deleteConfirmDialog"
+      :title="$t('pageTemplate.label.confirmDeleteTitle')"
+      :message="$t('pageTemplate.label.confirmDeleteMessage', {0: `<br><strong>${nameToDelete}</strong>`})"
+      :ok-label="$t('pageTemplate.label.confirm')"
+      :cancel-label="$t('pageTemplate.label.cancel')"
+      @ok="deletePageTemplate(pageTemplateToDelete)"
+      @closed="pageTemplateToDelete = null" />
+  </div>
 </template>
 <script>
 export default {
@@ -25,6 +37,7 @@ export default {
   },
   data: () => ({
     pageTemplates: [],
+    pageTemplateToDelete: null,
     loading: false,
   }),
   computed: {
@@ -68,7 +81,15 @@ export default {
           align: 'center',
           sortable: true,
           class: 'page-template-category-header',
-          width: '120px'
+          width: '60px'
+        },
+        {
+          text: this.$t('pageTemplates.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'page-template-actions-header',
+          width: '50px'
         },
       ];
     },
@@ -79,6 +100,18 @@ export default {
         return name?.toLowerCase?.()?.includes(this.keyword.toLowerCase())
           || this.$utils.htmlToText(description)?.toLowerCase?.()?.includes(this.keyword.toLowerCase());
       }) || this.pageTemplates;
+    },
+    nameToDelete() {
+      return this.pageTemplateToDelete && this.$te(this.pageTemplateToDelete?.name) ? this.$t(this.pageTemplateToDelete?.name) : this.pageTemplateToDelete?.name;
+    },
+  },
+  watch: {
+    pageTemplateToDelete() {
+      if (this.pageTemplateToDelete) {
+        this.$nextTick().then(() => {
+          this.$refs.deleteConfirmDialog.open();
+        });
+      }
     },
   },
   created() {
@@ -93,6 +126,16 @@ export default {
       this.loading = true;
       return this.$pageTemplateService.getPageTemplates()
         .then(pageTemplates => this.pageTemplates = pageTemplates || [])
+        .finally(() => this.loading = false);
+    },
+    deletePageTemplate(pageTemplate) {
+      this.loading = true;
+      this.$pageTemplateService.deletePageTemplate(pageTemplate.id)
+        .then(() => {
+          this.$root.$emit('page-templates-refresh');
+          this.$root.$emit('alert-message', this.$t('pageTemplate.status.delete.success'), 'success');
+        })
+        .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.status.delete.error'), 'error'))
         .finally(() => this.loading = false);
     },
   },
