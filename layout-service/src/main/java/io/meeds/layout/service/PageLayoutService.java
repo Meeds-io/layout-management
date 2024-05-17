@@ -291,6 +291,9 @@ public class PageLayoutService {
       if (pageTemplate == null) {
         throw new ObjectNotFoundException("pageTemplate not found");
       }
+      if (pageTemplate.isDisabled()) {
+        throw new IllegalArgumentException("pageTemplate with designated Id is disabled");
+      }
       page = userPortalConfigService.createPageTemplate(EMPTY_PAGE_TEMPLATE,
                                                         siteType,
                                                         siteName);
