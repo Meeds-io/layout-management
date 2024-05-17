@@ -238,6 +238,7 @@ public class PageTemplateImportService {
       isNew = true;
     }
     pageTemplate.setCategory(d.getCategory());
+    pageTemplate.setSystem(d.isSystem());
     try (InputStream is = configurationManager.getInputStream(d.getLayoutPath())) {
       String xml = IOUtil.getStreamContentAsString(is);
       Container layout = fromXML(xml);
