@@ -30,14 +30,19 @@
     </td>
     <td
       v-if="!$root.isMobile"
-      align="left"
-      class="d-flex align-center ps-2"
-      width="120px">
+      align="center"
+      width="50px">
       <v-switch
         v-model="enabled"
         :loading="loading"
         class="mt-0 mx-auto"
         @click="changeStatus" />
+    </td>
+    <td
+      v-if="!$root.isMobile"
+      align="center"
+      width="50px">
+      <page-templates-management-item-menu :page-template="pageTemplate" />
     </td>
   </tr>
 </template>
@@ -49,6 +54,10 @@ export default {
       default: null,
     },
   },
+  data: () => ({
+    menu: false,
+    hoverMenu: false,
+  }),
   computed: {
     pageTemplateId() {
       return this.pageTemplate?.id;
@@ -73,6 +82,17 @@ export default {
       return this.pageTemplate?.category
         && (this.$te(i18nKey) ? this.$t(i18nKey) : this.pageTemplate.category)
         || this.$t('layout.pageTemplate.category.customized');
+    },
+  },
+  watch: {
+    hoverMenu() {
+      if (!this.hoverMenu) {
+        window.setTimeout(() => {
+          if (!this.hoverMenu) {
+            this.menu = false;
+          }
+        }, 200);
+      }
     },
   },
   methods: {
