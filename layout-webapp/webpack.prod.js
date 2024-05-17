@@ -9,6 +9,7 @@ const config = {
     siteManagement: './src/main/webapp/vue-app/site-management/main.js',
     layoutEditor: './src/main/webapp/vue-app/layout-editor/main.js',
     pageLayout: './src/main/webapp/vue-app/page-layout/main.js',
+    pageTemplatesManagement: './src/main/webapp/vue-app/page-templates-management/main.js',
   },
   mode: 'production',
   context: path.resolve(__dirname, '.'),
