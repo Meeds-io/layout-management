@@ -28,7 +28,7 @@
       placeholder: $t('pageTemplates.filter.placeholder'),
       tooltip: $t('pageTemplates.filter.placeholder'),
     }"
-    @filter-text-input-end-typing="$emit('page-templates-filter', $event)">
+    @filter-text-input="$emit('page-templates-filter', $event)">
     <template #left>
       <v-btn
         id="applicationToolbarLeftButton"
