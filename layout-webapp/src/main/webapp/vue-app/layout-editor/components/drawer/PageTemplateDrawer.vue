@@ -152,7 +152,12 @@ export default {
     save() {
       const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
       const savePageRequest =
-        this.templateId ? this.$pageTemplateService.updatePageTemplate(pageLayout, this.templateId)
+        this.templateId ?
+          this.$pageTemplateService.getPageTemplate(this.templateId)
+            .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
+              ...pageTemplate,
+              content: JSON.stringify(pageLayout),
+            }))
           : this.$pageTemplateService.createPageTemplate(pageLayout);
       return savePageRequest
         .then(pageTemplate => {
