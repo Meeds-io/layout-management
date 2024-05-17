@@ -111,7 +111,7 @@ public class PageTemplateServiceTest {
 
   @Test
   public void getPageTemplatesWithExpand() throws ObjectNotFoundException {
-    PageTemplate template = new PageTemplate(2l, false, LAYOUT_CATEGORY, LAYOUT_CONTENT);
+    PageTemplate template = new PageTemplate(2l, false, false, LAYOUT_CATEGORY, LAYOUT_CONTENT);
     when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
     when(defaultLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
 
@@ -178,7 +178,7 @@ public class PageTemplateServiceTest {
 
   @Test
   public void getPageTemplateWithExpand() throws ObjectNotFoundException {
-    PageTemplate template = new PageTemplate(2l, false, LAYOUT_CATEGORY, LAYOUT_CONTENT);
+    PageTemplate template = new PageTemplate(2l, false, false, LAYOUT_CATEGORY, LAYOUT_CONTENT);
     when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
     when(defaultLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
 
@@ -261,7 +261,15 @@ public class PageTemplateServiceTest {
     assertThrows(IllegalAccessException.class, () -> pageTemplateService.deletePageTemplate(2l, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    assertThrows(ObjectNotFoundException.class, () -> pageTemplateService.deletePageTemplate(2l, testuser));
+
+    when(pageTemplateStorage.getPageTemplate(2l)).thenReturn(pageTemplate);
+    when(pageTemplate.isSystem()).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageTemplateService.deletePageTemplate(2l, testuser));
+
+    when(pageTemplate.isSystem()).thenReturn(false);
     pageTemplateService.deletePageTemplate(2l, testuser);
+
     verify(attachmentService, times(1)).deleteAttachments(PageTemplateAttachmentPlugin.OBJECT_TYPE, "2");
     verify(translationService, times(1)).deleteTranslationLabels(PageTemplateTranslationPlugin.OBJECT_TYPE, 2l);
     verify(pageTemplateStorage, times(1)).deletePageTemplate(2l);
@@ -272,6 +280,7 @@ public class PageTemplateServiceTest {
     assertThrows(IllegalAccessException.class, () -> pageTemplateService.deletePageTemplate(2l, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    when(pageTemplateStorage.getPageTemplate(2l)).thenReturn(pageTemplate);
     doThrow(RuntimeException.class).when(attachmentService).deleteAttachments(anyString(), any());
     doThrow(ObjectNotFoundException.class).when(translationService).deleteTranslationLabels(anyString(), anyLong());
     pageTemplateService.deletePageTemplate(2l, testuser);

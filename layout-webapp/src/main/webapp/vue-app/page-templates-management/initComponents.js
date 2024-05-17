@@ -23,12 +23,14 @@ import Toolbar from './components/header/Toolbar.vue';
 import PageTemplates from './components/list/PageTemplates.vue';
 
 import PageTemplateItem from './components/list/PageTemplateItem.vue';
+import PageTemplateItemMenu from './components/list/PageTemplateItemMenu.vue';
 
 const components = {
   'page-templates-management': PageTemplatesManagement,
   'page-templates-management-toolbar': Toolbar,
   'page-templates-management-list': PageTemplates,
   'page-templates-management-item': PageTemplateItem,
+  'page-templates-management-item-menu': PageTemplateItemMenu,
 };
 
 for (const key in components) {

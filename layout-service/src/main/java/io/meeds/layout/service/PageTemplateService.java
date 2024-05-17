@@ -102,6 +102,13 @@ public class PageTemplateService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to create a page template");
     }
+    PageTemplate pageTemplate = getPageTemplate(templateId);
+    if (pageTemplate == null) {
+      throw new ObjectNotFoundException("Page template doesn't exist");
+    }
+    if (pageTemplate.isSystem()) {
+      throw new IllegalAccessException("Can't delete a system page template");
+    }
     deletePageTemplate(templateId);
   }
 

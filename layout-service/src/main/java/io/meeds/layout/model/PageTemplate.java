@@ -31,6 +31,8 @@ public class PageTemplate {
 
   private boolean disabled;
 
+  private boolean system;
+
   private String  category;
 
   private String  content;
@@ -41,10 +43,15 @@ public class PageTemplate {
 
   private long    illustrationId;
 
-  public PageTemplate(long id, boolean disabled, String category, String content) {
+  public PageTemplate(long id,
+                      boolean disabled,
+                      boolean system,
+                      String category,
+                      String content) {
     this.id = id;
     this.content = content;
     this.disabled = disabled;
+    this.system = system;
     this.category = category;
   }
 
