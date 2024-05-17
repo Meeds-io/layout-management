@@ -55,12 +55,14 @@ import io.meeds.social.translation.model.TranslationField;
 import io.meeds.social.translation.service.TranslationService;
 
 @SpringBootTest(classes = {
-  PageTemplateService.class,
+                            PageTemplateService.class,
 })
 @ExtendWith(MockitoExtension.class)
 public class PageTemplateServiceTest {
 
-  private static final String LAYOUT_CONTENT = "...layout...";
+  private static final String LAYOUT_CONTENT  = "...layout...";
+
+  private static final String LAYOUT_CATEGORY = "CATEGORY";
 
   @MockBean
   private LayoutAclService    layoutAclService;
@@ -89,13 +91,13 @@ public class PageTemplateServiceTest {
   @Autowired
   private PageTemplateService pageTemplateService;
 
-  private String              testuser       = "testuser";
+  private String              testuser        = "testuser";
 
   @Test
   public void getPageTemplates() {
     when(pageTemplate.getId()).thenReturn(2l);
     when(pageTemplate.getContent()).thenReturn(LAYOUT_CONTENT);
-    
+
     when(pageTemplateStorage.getPageTemplates()).thenReturn(Collections.singletonList(pageTemplate));
     List<PageTemplate> pageTemplates = pageTemplateService.getPageTemplates();
     assertNotNull(pageTemplates);
@@ -109,7 +111,7 @@ public class PageTemplateServiceTest {
 
   @Test
   public void getPageTemplatesWithExpand() throws ObjectNotFoundException {
-    PageTemplate template = new PageTemplate(2l, LAYOUT_CONTENT);
+    PageTemplate template = new PageTemplate(2l, false, LAYOUT_CATEGORY, LAYOUT_CONTENT);
     when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
     when(defaultLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
 
@@ -166,7 +168,8 @@ public class PageTemplateServiceTest {
     assertEquals(1, pageTemplates.size());
     assertEquals(enDesc, pageTemplates.get(0).getDescription());
 
-    when(attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE, "2")).thenReturn(Collections.singletonList("32"));
+    when(attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE,
+                                                "2")).thenReturn(Collections.singletonList("32"));
     pageTemplates = pageTemplateService.getPageTemplates(Locale.GERMAN, true);
     assertNotNull(pageTemplates);
     assertEquals(1, pageTemplates.size());
@@ -196,7 +199,7 @@ public class PageTemplateServiceTest {
   @Test
   public void deletePageTemplate() throws ObjectNotFoundException, IllegalAccessException {
     assertThrows(IllegalAccessException.class, () -> pageTemplateService.deletePageTemplate(2l, testuser));
-    
+
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
     pageTemplateService.deletePageTemplate(2l, testuser);
     verify(attachmentService, times(1)).deleteAttachments(PageTemplateAttachmentPlugin.OBJECT_TYPE, "2");

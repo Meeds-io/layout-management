@@ -37,6 +37,8 @@ public class PageTemplateDescriptor {
 
   private Map<String, String> descriptions;
 
+  private String              category;
+
   private String              illustrationPath;
 
   private String              layoutPath;
