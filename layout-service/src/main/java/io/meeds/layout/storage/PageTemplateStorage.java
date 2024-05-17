@@ -40,6 +40,7 @@ public class PageTemplateStorage {
     return entities.stream()
                    .map(e -> new PageTemplate(e.getId(),
                                               e.isDisabled(),
+                                              e.isSystem(),
                                               e.getCategory(),
                                               e.getContent()))
                    .toList();
@@ -49,6 +50,7 @@ public class PageTemplateStorage {
     return pageTemplateDAO.findById(id)
                           .map(e -> new PageTemplate(e.getId(),
                                                      e.isDisabled(),
+                                                     e.isSystem(),
                                                      e.getCategory(),
                                                      e.getContent()))
                           .orElse(null);
@@ -57,11 +59,13 @@ public class PageTemplateStorage {
   public PageTemplate createPageTemplate(PageTemplate pageTemplate) {
     PageTemplateEntity entity = new PageTemplateEntity(null,
                                                        pageTemplate.isDisabled(),
+                                                       pageTemplate.isSystem(),
                                                        pageTemplate.getCategory(),
                                                        pageTemplate.getContent());
     entity = pageTemplateDAO.save(entity);
     return new PageTemplate(entity.getId(),
                             entity.isDisabled(),
+                            entity.isSystem(),
                             entity.getCategory(),
                             entity.getContent());
   }
@@ -72,11 +76,13 @@ public class PageTemplateStorage {
     }
     PageTemplateEntity entity = new PageTemplateEntity(pageTemplate.getId(),
                                                        pageTemplate.isDisabled(),
+                                                       pageTemplate.isSystem(),
                                                        pageTemplate.getCategory(),
                                                        pageTemplate.getContent());
     entity = pageTemplateDAO.save(entity);
     return new PageTemplate(entity.getId(),
                             entity.isDisabled(),
+                            entity.isSystem(),
                             entity.getCategory(),
                             entity.getContent());
   }
