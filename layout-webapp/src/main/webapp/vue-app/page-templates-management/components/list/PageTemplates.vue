@@ -1,7 +1,7 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="pageTemplates"
+    :items="filteredPageTemplates"
     :loading="loading"
     :disable-sort="$root.isMobile"
     :hide-default-header="$root.isMobile"
@@ -55,6 +55,14 @@ export default {
           width: '70%'
         },
       ];
+    },
+    filteredPageTemplates() {
+      return this.keyword?.length && this.pageTemplates.filter(t => {
+        const name = this.$te(t.name) ? this.$t(t.name) : t.name;
+        const description = this.$te(t.description) ? this.$t(t.description) : t.description;
+        return name?.toLowerCase?.()?.includes(this.keyword.toLowerCase())
+          || this.$utils.htmlToText(description)?.toLowerCase?.()?.includes(this.keyword.toLowerCase());
+      }) || this.pageTemplates;
     },
   },
   created() {
