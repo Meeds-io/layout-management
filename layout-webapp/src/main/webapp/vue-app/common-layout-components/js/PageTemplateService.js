@@ -76,3 +76,14 @@ export function updatePageTemplate(pageTemplate) {
     }
   });
 }
+
+export function deletePageTemplate(id) {
+  return fetch(`/layout/rest/pageTemplates/${id}`, {
+    credentials: 'include',
+    method: 'DELETE',
+  }).then((resp) => {
+    if (!resp?.ok) {
+      throw new Error('Error when creating page template');
+    }
+  });
+}
