@@ -24,9 +24,20 @@
     <td
       v-if="!$root.isMobile"
       align="left"
-      class="text-truncate"
+      class="text-truncate text-center"
       width="120px">
       {{ category }}
+    </td>
+    <td
+      v-if="!$root.isMobile"
+      align="left"
+      class="d-flex align-center ps-2"
+      width="120px">
+      <v-switch
+        v-model="enabled"
+        :loading="loading"
+        class="mt-0 mx-auto"
+        @click="changeStatus" />
     </td>
   </tr>
 </template>
@@ -41,6 +52,9 @@ export default {
   computed: {
     pageTemplateId() {
       return this.pageTemplate?.id;
+    },
+    enabled() {
+      return !this.pageTemplate?.disabled;
     },
     name() {
       return this.$te(this.pageTemplate?.name) ? this.$t(this.pageTemplate?.name) : this.pageTemplate?.name;
@@ -59,6 +73,23 @@ export default {
       return this.pageTemplate?.category
         && (this.$te(i18nKey) ? this.$t(i18nKey) : this.pageTemplate.category)
         || this.$t('layout.pageTemplate.category.customized');
+    },
+  },
+  methods: {
+    changeStatus() {
+      this.$root.$emit('close-alert-message');
+      this.loading = true;
+      this.$pageTemplateService.getPageTemplate(this.pageTemplate.id)
+        .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
+          ...pageTemplate,
+          disabled: this.enabled,
+        }))
+        .then(() => {
+          this.$root.$emit('page-templates-refresh');
+          this.$root.$emit('alert-message', this.$t('pageTemplate.status.update.success'), 'success');
+        })
+        .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.status.update.error'), 'error'))
+        .finally(() => this.loading = false);
     },
   },
 };

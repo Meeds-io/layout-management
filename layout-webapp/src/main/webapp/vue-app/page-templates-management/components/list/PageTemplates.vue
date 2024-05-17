@@ -57,8 +57,16 @@ export default {
         {
           text: this.$t('pageTemplates.label.category'),
           value: 'category',
-          align: 'left',
-          sortable: false,
+          align: 'center',
+          sortable: true,
+          class: 'page-template-category-header',
+          width: '120px'
+        },
+        {
+          text: this.$t('pageTemplates.label.status'),
+          value: 'disabled',
+          align: 'center',
+          sortable: true,
           class: 'page-template-category-header',
           width: '120px'
         },
@@ -74,7 +82,11 @@ export default {
     },
   },
   created() {
+    this.$root.$on('page-templates-refresh', this.refreshPageTemplates);
     this.refreshPageTemplates();
+  },
+  beforeDestroy() {
+    this.$root.$off('page-templates-refresh', this.refreshPageTemplates);
   },
   methods: {
     refreshPageTemplates() {
