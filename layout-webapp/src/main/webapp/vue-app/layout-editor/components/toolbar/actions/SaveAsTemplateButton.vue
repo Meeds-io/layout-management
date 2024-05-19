@@ -47,7 +47,10 @@ export default {
   },
   methods: {
     savePageTemplate() {
-      this.$root.$emit('layout-page-template-drawer-open');
+      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
+      this.$root.$emit('layout-page-template-drawer-open', {
+        content: JSON.stringify(pageLayout),
+      });
     },
   },
 };

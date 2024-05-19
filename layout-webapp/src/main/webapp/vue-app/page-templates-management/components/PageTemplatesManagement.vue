@@ -32,6 +32,7 @@
         ref="list"
         :keyword="keyword" />
     </v-card>
+    <layout-editor-page-template-drawer />
   </v-app>
 </template>
 <script>
