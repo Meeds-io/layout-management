@@ -65,6 +65,10 @@ export default {
       type: Number,
       default: null,
     },
+    duplicate: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     sendingImage: false,
@@ -91,7 +95,12 @@ export default {
     init() {
       if (this.templateId) {
         return this.$fileAttachmentService.getAttachments('pageTemplate', this.templateId)
-          .then(data => this.attachments = data?.attachments || []);
+          .then(data => this.attachments = data?.attachments || [])
+          .then(() => {
+            if (this.duplicate && this.illustrationId) {
+              return this.getIllustrationFile().then(this.uploadFile);
+            }
+          });
       }
     },
     uploadFile(file) {
@@ -138,6 +147,13 @@ export default {
           }
         });
       }
+    },
+    getIllustrationFile() {
+      return fetch(this.illustrationSrc, {
+        'method': 'GET',
+        'credentials': 'include'
+      })
+        .then(resp => resp.ok && resp.blob());
     },
   },
 };

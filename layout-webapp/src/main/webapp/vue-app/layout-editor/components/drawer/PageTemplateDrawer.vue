@@ -27,7 +27,7 @@
     right
     disable-pull-to-refresh>
     <template #title>
-      {{ templateId && $t('layout.editTemplateTitle') || $t('layout.saveAsTemplateTitle') }}
+      {{ duplicate && $t('layout.duplicateTemplateTitle') || templateId && $t('layout.editTemplateTitle') || $t('layout.saveAsTemplateTitle') }}
     </template>
     <template v-if="drawer" #content>
       <div class="pa-4" flat>
@@ -84,6 +84,7 @@
         <layout-editor-page-template-preview
           ref="pagePreview"
           v-model="illustrationUploadId"
+          :duplicate="duplicate"
           :template-id="templateId" />
       </div>
     </template>
@@ -119,6 +120,7 @@ export default {
     maxTitleLength: 250,
     maxDescriptionLength: 1000,
     illustrationUploadId: null,
+    duplicate: null,
     templateId: null,
     pageLayoutContent: null,
   }),
@@ -139,17 +141,19 @@ export default {
     this.$root.$off('layout-page-template-drawer-open', this.open);
   },
   methods: {
-    open(pageTemplate) {
-      this.templateId = pageTemplate.id;
+    open(pageTemplate, duplicate) {
+      this.templateId = pageTemplate.id || null;
       this.pageLayoutContent = pageTemplate.content;
+      this.duplicate = duplicate;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     close() {
       this.$refs.drawer.close();
     },
     save() {
+      this.saving = true;
       const savePageRequest =
-        this.templateId ?
+        (!this.duplicate && this.templateId) ?
           this.$pageTemplateService.getPageTemplate(this.templateId)
             .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
               ...pageTemplate,
@@ -167,9 +171,11 @@ export default {
         .then(() => this.$translationService.saveTranslations('pageTemplate', this.templateId, 'description', this.descriptionTranslations))
         .then(() => this.$refs?.pagePreview?.save())
         .then(() => {
+          this.$root.$emit('page-templates-saved');
           this.close();
           this.$root.$emit('alert-message', this.$t('layout.pageTemplateCreatedSuccessfully'), 'success');
-        });
+        })
+        .finally(() => this.saving = false);
     },
   },
 };
