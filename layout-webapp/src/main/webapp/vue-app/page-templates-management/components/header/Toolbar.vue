@@ -30,19 +30,21 @@
     }"
     class="px-1"
     @filter-text-input="$emit('page-templates-filter', $event)">
-    <template #left>
+    <template v-if="!$root.isMobile" #left>
       <v-btn
         id="applicationToolbarLeftButton"
         :aria-label="$t('pageTemplates.add')"
+        :class="$root.isMobile && 'px-0'"
         class="btn btn-primary text-truncate"
         disabled
         @click="$emit('add-page-template')">
         <v-icon
-          class="me-2"
           size="18">
           fa-plus
         </v-icon>
-        <span class="text-truncate text-none">
+        <span
+          v-if="!$root.isMobile"
+          class="text-truncate text-none ms-2">
           {{ $t('pageTemplates.add') }}
         </span>
       </v-btn>
