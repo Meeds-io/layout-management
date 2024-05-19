@@ -51,7 +51,7 @@ export function createPageTemplate(pageContent) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      content: JSON.stringify(pageContent),
+      content: pageContent,
     }),
   }).then((resp) => {
     if (resp?.ok) {

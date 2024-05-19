@@ -266,7 +266,7 @@ public class NavigationLayoutService {
         String label = nodeData.getState().getLabel();
         if (ExpressionUtil.isResourceBindingExpression(label)) {
           SiteKey siteKey = nodeData.getSiteKey();
-          ResourceBundle nodeLabelResourceBundle = resourceBundleManager.getNavigationResourceBundle(locale.toLanguageTag(),
+          ResourceBundle nodeLabelResourceBundle = resourceBundleManager.getNavigationResourceBundle(getLocaleName(locale),
                                                                                                      siteKey.getTypeName(),
                                                                                                      siteKey.getName());
           if (nodeLabelResourceBundle != null) {
@@ -444,6 +444,10 @@ public class NavigationLayoutService {
     nodeLabel.setDefaultLanguage(defaultLanguage);
     nodeLabel.setSupportedLanguages(supportedLanguages);
     return nodeLabel;
+  }
+
+  private String getLocaleName(Locale locale) {
+    return locale.toLanguageTag().replace("-", "_"); // Use same name as localeConfigService
   }
 
 }
