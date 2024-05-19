@@ -27,7 +27,7 @@
     right
     disable-pull-to-refresh>
     <template #title>
-      {{ $t('layout.saveAsTemplateTitle') }}
+      {{ templateId && $t('layout.editTemplateTitle') || $t('layout.saveAsTemplateTitle') }}
     </template>
     <template v-if="drawer" #content>
       <div class="pa-4" flat>
@@ -120,12 +120,8 @@ export default {
     maxDescriptionLength: 1000,
     illustrationUploadId: null,
     templateId: null,
+    pageLayoutContent: null,
   }),
-  computed: {
-    pageRef() {
-      return this.$root.layout.pageRef;
-    },
-  },
   watch: {
     description() {
       if (this.$refs.descriptionTranslation) {
@@ -143,22 +139,23 @@ export default {
     this.$root.$off('layout-page-template-drawer-open', this.open);
   },
   methods: {
-    open() {
+    open(pageTemplate) {
+      this.templateId = pageTemplate.id;
+      this.pageLayoutContent = pageTemplate.content;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     close() {
       this.$refs.drawer.close();
     },
     save() {
-      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
       const savePageRequest =
         this.templateId ?
           this.$pageTemplateService.getPageTemplate(this.templateId)
             .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
               ...pageTemplate,
-              content: JSON.stringify(pageLayout),
+              content: this.pageLayoutContent,
             }))
-          : this.$pageTemplateService.createPageTemplate(pageLayout);
+          : this.$pageTemplateService.createPageTemplate(this.pageLayoutContent);
       return savePageRequest
         .then(pageTemplate => {
           if (pageTemplate) {
