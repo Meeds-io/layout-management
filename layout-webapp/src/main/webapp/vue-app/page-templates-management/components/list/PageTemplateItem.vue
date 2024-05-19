@@ -1,7 +1,10 @@
 <template>
   <tr>
     <!-- Illustration -->
-    <td align="center" width="70px">
+    <td
+      v-if="!$root.isMobile"
+      align="center"
+      width="70px">
       <div :aria-label="$t('pageTemplate.label.preview', {0: name})">
         <v-img
           :src="illustrationSrc"
@@ -39,7 +42,6 @@
         @click="changeStatus" />
     </td>
     <td
-      v-if="!$root.isMobile"
       align="center"
       width="50px">
       <page-templates-management-item-menu :page-template="pageTemplate" />
