@@ -24,13 +24,20 @@ import PageTemplates from './components/list/PageTemplates.vue';
 
 import PageTemplateItem from './components/list/PageTemplateItem.vue';
 import PageTemplateItemMenu from './components/list/PageTemplateItemMenu.vue';
+import PageTemplateDrawer from '../layout-editor/components/drawer/PageTemplateDrawer.vue';
+import PageTemplatePreview from '../layout-editor/components/form/PageTemplatePreview.vue';
 
 const components = {
   'page-templates-management': PageTemplatesManagement,
+
   'page-templates-management-toolbar': Toolbar,
   'page-templates-management-list': PageTemplates,
+
   'page-templates-management-item': PageTemplateItem,
   'page-templates-management-item-menu': PageTemplateItemMenu,
+
+  'layout-editor-page-template-drawer': PageTemplateDrawer,
+  'layout-editor-page-template-preview': PageTemplatePreview,
 };
 
 for (const key in components) {

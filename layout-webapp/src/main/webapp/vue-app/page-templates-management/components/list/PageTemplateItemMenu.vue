@@ -3,9 +3,7 @@
     v-model="menu"
     :left="!$vuetify.rtl"
     :right="$vuetify.rtl"
-    bottom
-    offset-y
-    attach>
+    offset-y>
     <template #activator="{ on, attrs }">
       <v-btn
         :aria-label="$t('pageTemplates.menu.open')"
@@ -23,6 +21,16 @@
         dense
         @mouseout="menu = false"
         @focusout="menu = false">
+        <v-list-item
+          dense
+          @click="$root.$emit('layout-page-template-drawer-open', pageTemplate)">
+          <v-icon size="13">
+            fa-edit
+          </v-icon>
+          <v-list-item-title class="ps-2">
+            {{ $t('pageTemplate.label.editProperties') }}
+          </v-list-item-title>
+        </v-list-item>
         <v-tooltip :disabled="!pageTemplate.system" bottom>
           <template #activator="{ on, attrs }">
             <div
@@ -39,7 +47,7 @@
                 </v-icon>
                 <v-list-item-title
                   :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
-                  class="pl-3">
+                  class="ps-2">
                   {{ $t('pageTemplate.label.delete') }}
                 </v-list-item-title>
               </v-list-item>
