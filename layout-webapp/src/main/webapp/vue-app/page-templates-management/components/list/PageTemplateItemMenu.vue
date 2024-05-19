@@ -31,6 +31,16 @@
             {{ $t('pageTemplate.label.editProperties') }}
           </v-list-item-title>
         </v-list-item>
+        <v-list-item
+          dense
+          @click="$root.$emit('layout-page-template-drawer-open', pageTemplate, true)">
+          <v-icon size="13">
+            fa-copy
+          </v-icon>
+          <v-list-item-title class="ps-2">
+            {{ $t('pageTemplate.label.duplicate') }}
+          </v-list-item-title>
+        </v-list-item>
         <v-tooltip :disabled="!pageTemplate.system" bottom>
           <template #activator="{ on, attrs }">
             <div
