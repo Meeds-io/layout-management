@@ -104,11 +104,13 @@ export default {
     },
   },
   created() {
+    this.$root.$on('page-templates-saved', this.refreshPageTemplates);
     this.$root.$on('page-templates-refresh', this.refreshPageTemplates);
     this.$root.$on('page-templates-delete', this.deletePageTemplateConfirm);
     this.refreshPageTemplates();
   },
   beforeDestroy() {
+    this.$root.$off('page-templates-saved', this.refreshPageTemplates);
     this.$root.$off('page-templates-refresh', this.refreshPageTemplates);
     this.$root.$off('page-templates-delete', this.deletePageTemplateConfirm);
   },
