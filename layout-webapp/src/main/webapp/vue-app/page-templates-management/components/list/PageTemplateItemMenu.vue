@@ -1,8 +1,10 @@
 <template>
-  <v-menu
+  <component
     v-model="menu"
+    :is="$root.isMobile && 'v-bottom-sheet' || 'v-menu'"
     :left="!$vuetify.rtl"
     :right="$vuetify.rtl"
+    :content-class="menuId"
     offset-y>
     <template #activator="{ on, attrs }">
       <v-btn
@@ -21,53 +23,70 @@
         dense
         @mouseout="menu = false"
         @focusout="menu = false">
-        <v-list-item
-          dense
-          @click="$root.$emit('layout-page-template-drawer-open', pageTemplate)">
-          <v-icon size="13">
-            fa-edit
-          </v-icon>
-          <v-list-item-title class="ps-2">
-            {{ $t('pageTemplate.label.editProperties') }}
-          </v-list-item-title>
-        </v-list-item>
-        <v-list-item
-          dense
-          @click="$root.$emit('layout-page-template-drawer-open', pageTemplate, true)">
-          <v-icon size="13">
-            fa-copy
-          </v-icon>
-          <v-list-item-title class="ps-2">
-            {{ $t('pageTemplate.label.duplicate') }}
-          </v-list-item-title>
-        </v-list-item>
-        <v-tooltip :disabled="!pageTemplate.system" bottom>
-          <template #activator="{ on, attrs }">
-            <div
-              v-on="on"
-              v-bind="attrs">
-              <v-list-item
-                :disabled="pageTemplate.system"
-                dense
-                @click="$root.$emit('page-templates-delete', pageTemplate)">
-                <v-icon
-                  :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
-                  size="13">
-                  fa-trash
-                </v-icon>
-                <v-list-item-title
-                  :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
-                  class="ps-2">
-                  {{ $t('pageTemplate.label.delete') }}
-                </v-list-item-title>
-              </v-list-item>
+        <v-subheader v-if="$root.isMobile">
+          <div class="d-flex full-width">
+            <div class="d-flex flex-grow-1 flex-shrink-1 align-center subtitle-1 text-truncate">
+              {{ $t('pageTemplate.label.templateMenu', {0: name}) }}
             </div>
-          </template>
-          <span>{{ $t('pageTemplate.label.system.noDelete') }}</span>
-        </v-tooltip>
+            <div class="flex-shrink-0">
+              <v-btn
+                :aria-label="$t('pageTemplate.label.closeMenu')"
+                icon
+                @click="menu = false">
+                <v-icon>fa-times</v-icon>
+              </v-btn>
+            </div>
+          </div>
+        </v-subheader>
+        <v-list-item-group v-model="listItem">
+          <v-list-item
+            dense
+            @click="$root.$emit('layout-page-template-drawer-open', pageTemplate)">
+            <v-icon size="13">
+              fa-edit
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('pageTemplate.label.editProperties') }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            dense
+            @click="$root.$emit('layout-page-template-drawer-open', pageTemplate, true)">
+            <v-icon size="13">
+              fa-copy
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('pageTemplate.label.duplicate') }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-tooltip :disabled="!pageTemplate.system" bottom>
+            <template #activator="{ on, attrs }">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-list-item
+                  :disabled="pageTemplate.system"
+                  dense
+                  @click="$root.$emit('page-templates-delete', pageTemplate)">
+                  <v-icon
+                    :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
+                    size="13">
+                    fa-trash
+                  </v-icon>
+                  <v-list-item-title
+                    :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
+                    class="ps-2">
+                    {{ $t('pageTemplate.label.delete') }}
+                  </v-list-item-title>
+                </v-list-item>
+              </div>
+            </template>
+            <span>{{ $t('pageTemplate.label.system.noDelete') }}</span>
+          </v-tooltip>
+        </v-list-item-group>
       </v-list>
     </v-hover>
-  </v-menu>
+  </component>
 </template>
 <script>
 export default {
@@ -80,13 +99,24 @@ export default {
   data: () => ({
     menu: false,
     hoverMenu: false,
+    listItem: null,
+    menuId: `PageTemplateMenu${parseInt(Math.random() * 10000)}`,
   }),
   computed: {
     pageTemplateId() {
       return this.pageTemplate?.id;
     },
+    name() {
+      return this.$te(this.pageTemplate?.name) ? this.$t(this.pageTemplate?.name) : this.pageTemplate?.name;
+    },
   },
   watch: {
+    listItem() {
+      if (this.menu) {
+        this.menu = false;
+        this.listItem = null;
+      }
+    },
     menu() {
       if (this.menu) {
         this.$root.$emit('page-management-menu-opened', this.pageTemplateId);
@@ -106,11 +136,18 @@ export default {
   },
   created() {
     this.$root.$on('page-management-menu-opened', this.checkMenuStatus);
+    document.addEventListener('click', this.closeMenuOnClick);
   },
   beforeDestroy() {
     this.$root.$off('page-management-menu-opened', this.checkMenuStatus);
+    document.removeEventListener('click', this.closeMenuOnClick);
   },
   methods: {
+    closeMenuOnClick(e) {
+      if (e.target && !e.target.closest(`.${this.menuId}`)) {
+        this.menu = false;
+      }
+    },
     checkMenuStatus(templateId) {
       if (this.menu && templateId !== this.pageTemplate.id) {
         this.menu = false;

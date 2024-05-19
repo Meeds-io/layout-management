@@ -40,7 +40,24 @@ export default {
   }),
   computed: {
     headers() {
-      return [
+      return this.$root.isMobile && [
+        {
+          text: this.$t('pageTemplates.label.name'),
+          value: 'name',
+          align: 'left',
+          sortable: true,
+          class: 'page-template-name-header',
+          width: '20%'
+        },
+        {
+          text: this.$t('pageTemplates.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'page-template-actions-header',
+          width: '50px'
+        },
+      ] || [
         {
           text: '',
           value: 'illustrationId',
