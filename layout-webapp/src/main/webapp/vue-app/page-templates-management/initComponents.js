@@ -27,6 +27,9 @@ import PageTemplateItemMenu from './components/list/PageTemplateItemMenu.vue';
 import PageTemplateDrawer from '../layout-editor/components/drawer/PageTemplateDrawer.vue';
 import PageTemplatePreview from '../layout-editor/components/form/PageTemplatePreview.vue';
 
+import PageTemplateIllustration from './components/list/PageTemplateIllustration.vue';
+import PageTemplateIllustrationPreviewDialog from './components/list/PageTemplateIllustrationPreviewDialog.vue';
+
 const components = {
   'page-templates-management': PageTemplatesManagement,
 
@@ -35,6 +38,8 @@ const components = {
 
   'page-templates-management-item': PageTemplateItem,
   'page-templates-management-item-menu': PageTemplateItemMenu,
+  'page-templates-management-item-illustration': PageTemplateIllustration,
+  'page-templates-management-illustration-preview': PageTemplateIllustrationPreviewDialog,
 
   'layout-editor-page-template-drawer': PageTemplateDrawer,
   'layout-editor-page-template-preview': PageTemplatePreview,
