@@ -11,9 +11,13 @@
     <!-- name -->
     <td
       :width="$root.isMobile && '100%' || 'auto'"
-      align="left"
-      class="text-truncate"
-      v-sanitized-html="name"></td>
+      align="left">
+      <v-card
+        v-sanitized-html="name"
+        class="text-truncate transparent"
+        flat
+        @click="$root.$emit('page-templates-illustration-preview', illustrationSrc)" />
+    </td>
     <!-- description -->
     <td
       v-if="!$root.isMobile"
@@ -69,6 +73,12 @@ export default {
     },
     description() {
       return this.$te(this.pageTemplate?.description) ? this.$t(this.pageTemplate?.description) : this.pageTemplate?.description;
+    },
+    illustrationId() {
+      return this.pageTemplate?.illustrationId;
+    },
+    illustrationSrc() {
+      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.pageTemplateId}/${this.illustrationId}` || '/layout/images/page-templates/DefaultPreview.webp';
     },
     category() {
       const i18nKey = `layout.pageTemplate.category.${this.pageTemplate?.category}`;
