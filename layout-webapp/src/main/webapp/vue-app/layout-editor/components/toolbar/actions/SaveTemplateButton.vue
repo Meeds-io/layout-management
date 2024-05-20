@@ -56,10 +56,14 @@ export default {
         this.$root.$emit('close-alert-message');
         this.loading = true;
         this.$pageTemplateService.getPageTemplate(this.$root.pageTemplateId)
-          .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
-            ...pageTemplate,
-            content: JSON.stringify(pageLayout),
-          }))
+          .then(pageTemplate => {
+            pageTemplate.content = JSON.stringify(pageLayout);
+            return this.$pageTemplateService.updatePageTemplate(pageTemplate)
+              .then(() => {
+                this.$root.$emit('page-templates-updated', pageTemplate);
+                return pageTemplate;
+              });
+          })
           .then(() => {
             this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.success'), 'success');
           })

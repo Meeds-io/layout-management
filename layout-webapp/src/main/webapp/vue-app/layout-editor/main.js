@@ -18,6 +18,7 @@
  */
 
 import './initComponents.js';
+import '../common/initComponents.js';
 import './extensions.js';
 import './services.js';
 
