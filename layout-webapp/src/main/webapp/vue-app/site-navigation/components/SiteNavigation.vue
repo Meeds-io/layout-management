@@ -22,6 +22,7 @@
       icon-class="text-color"
       embedded />
     <site-navigation-drawers-actions />
+    <layout-analytics application-name="siteNavigation" />
   </v-app>
 </template>
 <script>
