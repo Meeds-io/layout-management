@@ -20,7 +20,7 @@
 -->
 <template>
   <v-btn
-    :disabled="disabled"
+    :disabled="disabled && !newTemplate"
     :loading="loading"
     :aria-label="$t('layout.save')"
     class="btn btn-primary d-flex align-center"
@@ -40,21 +40,32 @@ export default {
   data: () => ({
     loading: false,
   }),
+  computed: {
+    newTemplate() {
+      return !this.$root.pageTemplate?.name;
+    },
+  },
   methods: {
     savePageTemplate() {
       const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
-      this.$root.$emit('close-alert-message');
-      this.loading = true;
-      this.$pageTemplateService.getPageTemplate(this.$root.pageTemplateId)
-        .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
-          ...pageTemplate,
+      if (this.newTemplate) {
+        this.$root.$emit('layout-page-template-drawer-open', {
           content: JSON.stringify(pageLayout),
-        }))
-        .then(() => {
-          this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.success'), 'success');
-        })
-        .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.error'), 'error'))
-        .finally(() => this.loading = false);
+        });
+      } else {
+        this.$root.$emit('close-alert-message');
+        this.loading = true;
+        this.$pageTemplateService.getPageTemplate(this.$root.pageTemplateId)
+          .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
+            ...pageTemplate,
+            content: JSON.stringify(pageLayout),
+          }))
+          .then(() => {
+            this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.success'), 'success');
+          })
+          .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.error'), 'error'))
+          .finally(() => this.loading = false);
+      }
     },
   },
 };
