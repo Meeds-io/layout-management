@@ -26,12 +26,21 @@
     width="100vw"
     flat>
     <v-icon class="icon-default-color">fa-pager</v-icon>
-    <span class="px-2">{{ $t('layout.editPageName', {0: pageName}) }}</span>
+    <span v-if="pageTemplate" class="px-2">{{ $t('layout.editPageTemplate', {0: pageTemplate.name}) }}</span>
+    <span v-else-if="!pageTemplateId" class="px-2">{{ $t('layout.editPageName', {0: pageName}) }}</span>
     <v-spacer />
     <layout-editor-toolbar-history-buttons class="me-3" />
-    <layout-editor-toolbar-save-template-button class="me-3" />
-    <layout-editor-toolbar-preview-button class="me-3" />
-    <layout-editor-toolbar-save-button :disabled="disableSave" />
+    <layout-editor-toolbar-save-as-template-button
+      v-if="!pageTemplateId"
+      class="me-3" />
+    <layout-editor-toolbar-preview-button
+      class="me-3" />
+    <layout-editor-toolbar-save-template-button
+      v-if="pageTemplateId"
+      :disabled="disableSave" />
+    <layout-editor-toolbar-save-button
+      v-else
+      :disabled="disableSave" />
   </v-card>
 </template>
 <script>
@@ -57,6 +66,12 @@ export default {
   computed: {
     defaultLanguage() {
       return eXo.env.portal.defaultLanguage;
+    },
+    pageTemplateId() {
+      return this.$root.pageTemplateId;
+    },
+    pageTemplate() {
+      return this.$root.pageTemplate;
     },
     pageName() {
       return this.nodeLabels?.labels && (this.nodeLabels.labels[eXo.env.portal.language] || this.nodeLabels.labels[this.defaultLanguage]) || this.page?.title;

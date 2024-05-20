@@ -38,6 +38,7 @@
       <v-switch
         v-model="enabled"
         :loading="loading"
+        :aria-label="enabled && $t('pageTemplate.label.disableTemplate') || $t('pageTemplate.label.enableTemplate')"
         class="mt-0 mx-auto"
         @click="changeStatus" />
     </td>

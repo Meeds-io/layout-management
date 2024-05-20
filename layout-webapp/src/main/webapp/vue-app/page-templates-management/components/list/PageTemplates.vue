@@ -149,9 +149,9 @@ export default {
       this.$pageTemplateService.deletePageTemplate(pageTemplate.id)
         .then(() => {
           this.$root.$emit('page-templates-refresh');
-          this.$root.$emit('alert-message', this.$t('pageTemplate.status.delete.success'), 'success');
+          this.$root.$emit('alert-message', this.$t('pageTemplate.delete.success'), 'success');
         })
-        .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.status.delete.error'), 'error'))
+        .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.delete.error'), 'error'))
         .finally(() => this.loading = false);
     },
   },

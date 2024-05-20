@@ -59,6 +59,8 @@ export function init() {
           displayMode: 'desktop',
           layout: null,
           pageRef: null,
+          pageTemplate: null,
+          pageTemplateId: null,
           draftPageRef: null,
           draftNode: null,
           draftNodeId: null,
