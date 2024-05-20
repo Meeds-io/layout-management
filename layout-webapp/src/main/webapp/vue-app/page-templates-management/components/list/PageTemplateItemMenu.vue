@@ -39,6 +39,34 @@
           </div>
         </v-subheader>
         <v-list-item-group v-model="listItem">
+          <v-tooltip
+            v-if="!$root.isMobile"
+            :disabled="!pageTemplate.system"
+            bottom>
+            <template #activator="{ on, attrs }">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-list-item
+                  :href="editLayoutLink"
+                  :disabled="pageTemplate.system"
+                  target="_blank"
+                  dense>
+                  <v-icon
+                    :class="pageTemplate.system && 'disabled--text'"
+                    size="13">
+                    fa-columns
+                  </v-icon>
+                  <v-list-item-title
+                    :class="pageTemplate.system && 'disabled--text'"
+                    class="ps-2">
+                    {{ $t('pageTemplate.label.editLayout') }}
+                  </v-list-item-title>
+                </v-list-item>
+              </div>
+            </template>
+            <span>{{ $t('pageTemplate.label.system.noEditLayout') }}</span>
+          </v-tooltip>
           <v-list-item
             dense
             @click="$root.$emit('layout-page-template-drawer-open', pageTemplate)">
@@ -108,6 +136,9 @@ export default {
     },
     name() {
       return this.$te(this.pageTemplate?.name) ? this.$t(this.pageTemplate?.name) : this.pageTemplate?.name;
+    },
+    editLayoutLink() {
+      return `/portal/administration/layout-editor?pageTemplateId=${this.pageTemplateId}`;
     },
   },
   watch: {
