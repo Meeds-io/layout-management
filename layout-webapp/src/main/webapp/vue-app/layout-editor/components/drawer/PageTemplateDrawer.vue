@@ -142,7 +142,7 @@ export default {
   },
   methods: {
     open(pageTemplate, duplicate) {
-      this.templateId = pageTemplate.id || null;
+      this.templateId = pageTemplate.id || this.$root.pageTemplate?.id || null;
       this.pageLayoutContent = pageTemplate.content;
       this.duplicate = duplicate;
       this.$nextTick().then(() => this.$refs.drawer.open());
@@ -155,10 +155,15 @@ export default {
       const savePageRequest =
         (!this.duplicate && this.templateId) ?
           this.$pageTemplateService.getPageTemplate(this.templateId)
-            .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
-              ...pageTemplate,
-              content: this.pageLayoutContent,
-            }))
+            .then(pageTemplate => {
+              const newTemplate = (this.$root.pageTemplate && !this.$root.pageTemplate.name);
+              const disabled = newTemplate ? false : pageTemplate.disabled;
+              return this.$pageTemplateService.updatePageTemplate({
+                ...pageTemplate,
+                disabled,
+                content: this.pageLayoutContent,
+              });
+            })
           : this.$pageTemplateService.createPageTemplate(this.pageLayoutContent);
       return savePageRequest
         .then(pageTemplate => {
@@ -170,6 +175,12 @@ export default {
         .then(() => this.$translationService.saveTranslations('pageTemplate', this.templateId, 'title', this.titleTranslations))
         .then(() => this.$translationService.saveTranslations('pageTemplate', this.templateId, 'description', this.descriptionTranslations))
         .then(() => this.$refs?.pagePreview?.save())
+        .then(() => {
+          if (this.$root.pageTemplate) {
+            return this.$pageTemplateService.getPageTemplate(this.templateId)
+              .then(pageTemplate => this.$root.pageTemplate = pageTemplate);
+          }
+        })
         .then(() => {
           this.$root.$emit('page-templates-saved');
           this.close();
