@@ -20,14 +20,13 @@
 -->
 <template>
   <v-btn
-    v-if="canSave"
     :disabled="disabled"
     :loading="loading"
-    :aria-label="$t('layout.publish')"
+    :aria-label="$t('layout.save')"
     class="btn btn-primary d-flex align-center"
     elevation="0"
-    @click="savePage">
-    <span class="text-none">{{ $t('layout.publish') }}</span>
+    @click="savePageTemplate">
+    <span class="text-none">{{ $t('layout.save') }}</span>
   </v-btn>
 </template>
 <script>
@@ -41,22 +40,21 @@ export default {
   data: () => ({
     loading: false,
   }),
-  computed: {
-    canSave() {
-      return eXo.env.portal.selectedNodeId !== this.$root.nodeId;
-    },
-  },
   methods: {
-    savePage() {
-      if (!this.canSave) {
-        return;
-      }
+    savePageTemplate() {
+      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
+      this.$root.$emit('close-alert-message');
       this.loading = true;
-      const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout, false, true);
-      return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, 'contentId', true)
-        .then(() => this.$root.$emit('layout-page-saved'))
-        .catch(() => this.$root.$emit('alert-message', this.$t('layout.pageSavingError'), 'error'))
-        .finally(() => window.setTimeout(() => this.loading = false));
+      this.$pageTemplateService.getPageTemplate(this.$root.pageTemplateId)
+        .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
+          ...pageTemplate,
+          content: JSON.stringify(pageLayout),
+        }))
+        .then(() => {
+          this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.success'), 'success');
+        })
+        .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.error'), 'error'))
+        .finally(() => this.loading = false);
     },
   },
 };
