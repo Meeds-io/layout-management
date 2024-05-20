@@ -37,6 +37,7 @@ export default {
     pageTemplates: [],
     pageTemplateToDelete: null,
     loading: false,
+    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
     headers() {
@@ -109,7 +110,9 @@ export default {
       ];
     },
     noEmptyPageTemplates() {
-      return this.pageTemplates?.filter?.(t => t.name);
+      const pageTemplates = this.pageTemplates?.filter?.(t => t.name) || [];
+      pageTemplates.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return pageTemplates;
     },
     filteredPageTemplates() {
       return this.keyword?.length && this.noEmptyPageTemplates.filter(t => {
@@ -129,6 +132,7 @@ export default {
     this.$root.$on('page-templates-updated', this.refreshPageTemplates);
     this.$root.$on('page-templates-enabled', this.refreshPageTemplates);
     this.$root.$on('page-templates-disabled', this.refreshPageTemplates);
+    this.$root.$on('page-templates-saved', this.refreshPageTemplates);
     this.$root.$on('page-templates-delete', this.deletePageTemplateConfirm);
     this.$root.$on('page-templates-create', this.createPageTemplate);
     this.refreshPageTemplates();
@@ -139,6 +143,7 @@ export default {
     this.$root.$off('page-templates-updated', this.refreshPageTemplates);
     this.$root.$off('page-templates-enabled', this.refreshPageTemplates);
     this.$root.$off('page-templates-disabled', this.refreshPageTemplates);
+    this.$root.$off('page-templates-saved', this.refreshPageTemplates);
     this.$root.$off('page-templates-delete', this.deletePageTemplateConfirm);
     this.$root.$off('page-templates-create', this.createPageTemplate);
   },
