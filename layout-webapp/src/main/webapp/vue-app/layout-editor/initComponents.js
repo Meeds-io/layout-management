@@ -22,6 +22,7 @@ import LayoutEditor from './components/LayoutEditor.vue';
 import Toolbar from './components/toolbar/Toolbar.vue';
 import SaveButton from './components/toolbar/actions/SaveButton.vue';
 import SaveAsTemplateButton from './components/toolbar/actions/SaveAsTemplateButton.vue';
+import SaveTemplateButton from './components/toolbar/actions/SaveTemplateButton.vue';
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import PreviewButton from './components/toolbar/actions/PreviewButton.vue';
 
@@ -64,7 +65,8 @@ const components = {
   'layout-editor': LayoutEditor,
   'layout-editor-toolbar': Toolbar,
   'layout-editor-toolbar-save-button': SaveButton,
-  'layout-editor-toolbar-save-template-button': SaveAsTemplateButton,
+  'layout-editor-toolbar-save-as-template-button': SaveAsTemplateButton,
+  'layout-editor-toolbar-save-template-button': SaveTemplateButton,
   'layout-editor-toolbar-history-buttons': HistoryButtons,
   'layout-editor-toolbar-preview-button': PreviewButton,
   'layout-editor-content': Content,
