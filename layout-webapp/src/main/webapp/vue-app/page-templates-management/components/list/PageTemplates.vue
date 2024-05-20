@@ -124,15 +124,21 @@ export default {
     },
   },
   created() {
-    this.$root.$on('page-templates-saved', this.refreshPageTemplates);
-    this.$root.$on('page-templates-refresh', this.refreshPageTemplates);
+    this.$root.$on('page-templates-deleted', this.refreshPageTemplates);
+    this.$root.$on('page-templates-created', this.refreshPageTemplates);
+    this.$root.$on('page-templates-updated', this.refreshPageTemplates);
+    this.$root.$on('page-templates-enabled', this.refreshPageTemplates);
+    this.$root.$on('page-templates-disabled', this.refreshPageTemplates);
     this.$root.$on('page-templates-delete', this.deletePageTemplateConfirm);
     this.$root.$on('page-templates-create', this.createPageTemplate);
     this.refreshPageTemplates();
   },
   beforeDestroy() {
-    this.$root.$off('page-templates-saved', this.refreshPageTemplates);
-    this.$root.$off('page-templates-refresh', this.refreshPageTemplates);
+    this.$root.$off('page-templates-deleted', this.refreshPageTemplates);
+    this.$root.$off('page-templates-created', this.refreshPageTemplates);
+    this.$root.$off('page-templates-updated', this.refreshPageTemplates);
+    this.$root.$off('page-templates-enabled', this.refreshPageTemplates);
+    this.$root.$off('page-templates-disabled', this.refreshPageTemplates);
     this.$root.$off('page-templates-delete', this.deletePageTemplateConfirm);
     this.$root.$off('page-templates-create', this.createPageTemplate);
   },
@@ -153,7 +159,7 @@ export default {
       this.loading = true;
       this.$pageTemplateService.deletePageTemplate(pageTemplate.id)
         .then(() => {
-          this.$root.$emit('page-templates-refresh');
+          this.$root.$emit('page-templates-deleted', pageTemplate);
           this.$root.$emit('alert-message', this.$t('pageTemplate.delete.success'), 'success');
         })
         .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.delete.error'), 'error'))
