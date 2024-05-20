@@ -56,7 +56,7 @@ export default {
       return this.getQueryParam('pageId') || this.pageKey?.ref || (this.pageKey && `${this.pageKey.site.typeName}::${this.pageKey.site.name}::${this.pageKey.name}`);
     },
     nodeId() {
-      return this.getQueryParam('nodeId');
+      return this.getQueryParam('nodeId') || (this.pageTemplateId && eXo.env.portal.selectedNodeId);
     },
     draftNodeId() {
       return this.draftNode?.id;
