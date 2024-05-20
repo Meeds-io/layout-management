@@ -93,12 +93,14 @@ export default {
       this.$root.$emit('close-alert-message');
       this.loading = true;
       this.$pageTemplateService.getPageTemplate(this.pageTemplate.id)
-        .then(pageTemplate => this.$pageTemplateService.updatePageTemplate({
-          ...pageTemplate,
-          disabled: this.enabled,
-        }))
+        .then(pageTemplate => {
+          pageTemplate.disabled = this.enabled;
+          return this.$pageTemplateService.updatePageTemplate(pageTemplate)
+            .then(() => {
+              this.$root.$emit(`page-templates-${this.enabled && 'disabled' || 'enabled'}`, pageTemplate);
+            });
+        })
         .then(() => {
-          this.$root.$emit('page-templates-refresh');
           this.$root.$emit('alert-message', this.$t('pageTemplate.status.update.success'), 'success');
         })
         .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.status.update.error'), 'error'))

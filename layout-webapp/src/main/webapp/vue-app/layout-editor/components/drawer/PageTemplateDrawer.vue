@@ -157,14 +157,22 @@ export default {
           this.$pageTemplateService.getPageTemplate(this.templateId)
             .then(pageTemplate => {
               const newTemplate = (this.$root.pageTemplate && !this.$root.pageTemplate.name);
-              const disabled = newTemplate ? false : pageTemplate.disabled;
-              return this.$pageTemplateService.updatePageTemplate({
-                ...pageTemplate,
-                disabled,
-                content: this.pageLayoutContent,
-              });
+              pageTemplate.disabled = newTemplate ? false : pageTemplate.disabled;
+              pageTemplate.content = this.pageLayoutContent;
+              return this.$pageTemplateService.updatePageTemplate(pageTemplate)
+                .then(() => {
+                  if (newTemplate) {
+                    this.$root.$emit('page-templates-created', pageTemplate);
+                  } else {
+                    this.$root.$emit('page-templates-updated', pageTemplate);
+                  }
+                });
             })
-          : this.$pageTemplateService.createPageTemplate(this.pageLayoutContent);
+          : this.$pageTemplateService.createPageTemplate(this.pageLayoutContent)
+            .then(pageTemplate => {
+              this.$root.$emit('page-templates-created', pageTemplate, this.$root.pageRef);
+              return pageTemplate;
+            });
       return savePageRequest
         .then(pageTemplate => {
           if (pageTemplate) {
