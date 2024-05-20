@@ -108,13 +108,16 @@ export default {
         },
       ];
     },
+    noEmptyPageTemplates() {
+      return this.pageTemplates?.filter?.(t => t.name);
+    },
     filteredPageTemplates() {
-      return this.keyword?.length && this.pageTemplates.filter(t => {
+      return this.keyword?.length && this.noEmptyPageTemplates.filter(t => {
         const name = this.$te(t.name) ? this.$t(t.name) : t.name;
         const description = this.$te(t.description) ? this.$t(t.description) : t.description;
         return name?.toLowerCase?.()?.includes(this.keyword.toLowerCase())
           || this.$utils.htmlToText(description)?.toLowerCase?.()?.includes(this.keyword.toLowerCase());
-      }) || this.pageTemplates;
+      }) || this.noEmptyPageTemplates;
     },
     nameToDelete() {
       return this.pageTemplateToDelete && this.$te(this.pageTemplateToDelete?.name) ? this.$t(this.pageTemplateToDelete?.name) : this.pageTemplateToDelete?.name;
@@ -124,12 +127,14 @@ export default {
     this.$root.$on('page-templates-saved', this.refreshPageTemplates);
     this.$root.$on('page-templates-refresh', this.refreshPageTemplates);
     this.$root.$on('page-templates-delete', this.deletePageTemplateConfirm);
+    this.$root.$on('page-templates-create', this.createPageTemplate);
     this.refreshPageTemplates();
   },
   beforeDestroy() {
     this.$root.$off('page-templates-saved', this.refreshPageTemplates);
     this.$root.$off('page-templates-refresh', this.refreshPageTemplates);
     this.$root.$off('page-templates-delete', this.deletePageTemplateConfirm);
+    this.$root.$off('page-templates-create', this.createPageTemplate);
   },
   methods: {
     deletePageTemplateConfirm(pageTemplate) {
@@ -153,6 +158,12 @@ export default {
         })
         .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.delete.error'), 'error'))
         .finally(() => this.loading = false);
+    },
+    createPageTemplate() {
+      const columnsTemplate = this.pageTemplates.find(t => t.system && t.content.includes('FlexContainer'));
+      const columnsTemplateContent = columnsTemplate?.content || '{}';
+      this.$pageTemplateService.createPageTemplate(columnsTemplateContent, true)
+        .then(pageTemplate => window.open(`/portal/administration/layout-editor?pageTemplateId=${pageTemplate.id}`, '_blank'));
     },
   },
 };

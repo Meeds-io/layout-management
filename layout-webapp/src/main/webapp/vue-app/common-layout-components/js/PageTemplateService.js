@@ -43,7 +43,7 @@ export function getPageTemplate(id) {
   });
 }
 
-export function createPageTemplate(pageContent) {
+export function createPageTemplate(pageContent, disabled) {
   return fetch('/layout/rest/pageTemplates', {
     credentials: 'include',
     method: 'POST',
@@ -52,6 +52,7 @@ export function createPageTemplate(pageContent) {
     },
     body: JSON.stringify({
       content: pageContent,
+      disabled: disabled || false,
     }),
   }).then((resp) => {
     if (resp?.ok) {

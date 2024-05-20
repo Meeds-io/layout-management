@@ -26,8 +26,7 @@
       </h4>
       <page-templates-management-toolbar
         ref="toolbar"
-        @page-templates-filter="keyword = $event"
-        @add-page-template="addPageTemplate" />
+        @page-templates-filter="keyword = $event" />
       <page-templates-management-list
         ref="list"
         :keyword="keyword" />
@@ -40,10 +39,5 @@ export default {
   data: () => ({
     keyword: null,
   }),
-  methods: {
-    addPageTemplate() {
-      // TODO
-    },
-  },
 };
 </script>
