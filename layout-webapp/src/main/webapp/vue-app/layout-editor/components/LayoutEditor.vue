@@ -36,6 +36,8 @@
         @modified="modified = true" />
       <layout-editor-cells-selection-box />
     </div>
+    <layout-analytics
+      :application-name="pageTemplateId ? 'pageTemplateManagement' : 'pageLayoutEditor'" />
   </v-app>
 </template>
 <script>

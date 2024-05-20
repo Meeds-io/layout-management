@@ -33,6 +33,7 @@
     </v-card>
     <layout-editor-page-template-drawer />
     <page-templates-management-illustration-preview />
+    <layout-analytics application-name="pageTemplateManagement" />
   </v-app>
 </template>
 <script>
