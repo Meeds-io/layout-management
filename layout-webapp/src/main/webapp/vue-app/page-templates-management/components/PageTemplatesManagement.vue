@@ -32,6 +32,7 @@
         :keyword="keyword" />
     </v-card>
     <layout-editor-page-template-drawer />
+    <page-templates-management-illustration-preview />
   </v-app>
 </template>
 <script>
