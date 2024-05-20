@@ -36,8 +36,7 @@
         :aria-label="$t('pageTemplates.add')"
         :class="$root.isMobile && 'px-0'"
         class="btn btn-primary text-truncate"
-        disabled
-        @click="$emit('add-page-template')">
+        @click="$root.$emit('page-templates-create')">
         <v-icon
           size="18">
           fa-plus
