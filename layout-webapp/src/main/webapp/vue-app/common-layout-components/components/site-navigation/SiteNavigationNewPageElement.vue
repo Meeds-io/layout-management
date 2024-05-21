@@ -44,13 +44,18 @@
 export default {
   data: () => ({
     pageTemplateId: null,
+    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
     pageTemplates() {
       return this.$root.pageTemplates;
     },
     items() {
-      return this.pageTemplates?.map?.(t => ({
+      const items = this.pageTemplates.slice();
+      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      items.sort((a, b) =>
+        ((b.category === 'blank' && 2) || (b.category === 'default' && 1) || 0) - ((a.category === 'blank' && 2) || (a.category === 'default' && 1) || 0));
+      return items?.map?.(t => ({
         name: this.$te(t.name) ? this.$t(t.name) : t.name,
         value: t.id,
       }));
@@ -78,7 +83,7 @@ export default {
       immediate: true,
       handler() {
         if (this.items?.length) {
-          this.pageTemplateId = this.items[0].value;
+          this.pageTemplateId = this.pageTemplates[0].id;
         }
       },
     },
