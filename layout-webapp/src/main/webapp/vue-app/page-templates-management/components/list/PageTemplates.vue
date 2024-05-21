@@ -6,6 +6,8 @@
       :loading="loading"
       :disable-sort="$root.isMobile"
       :hide-default-header="$root.isMobile"
+      :custom-sort="applySortOnItems"
+      must-sort
       disable-pagination
       hide-default-footer
       class="pageTemplatesTable px-5">
@@ -148,6 +150,29 @@ export default {
     this.$root.$off('page-templates-create', this.createPageTemplate);
   },
   methods: {
+    applySortOnItems(pageTemplates, sortFields, sortDescendings) {
+      for (let i = 0; i < sortFields.length; i++) {
+        pageTemplates = this.applySortOnItemsUsingField(pageTemplates, sortFields[i], sortDescendings[i]);
+      }
+      return pageTemplates;
+    },
+    applySortOnItemsUsingField(pageTemplates, field, desc) {
+      if (field === 'name') {
+        pageTemplates.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      } else if (field === 'category') {
+        pageTemplates.sort((a, b) => {
+          const categoryA = this.$te(`layout.pageTemplate.category.${a.category || 'customized'}`) ? this.$t(`layout.pageTemplate.category.${a.category || 'customized'}`) : this.pageTemplate.category;
+          const categoryB = this.$te(`layout.pageTemplate.category.${b.category || 'customized'}`) ? this.$t(`layout.pageTemplate.category.${b.category || 'customized'}`) : this.pageTemplate.category;
+          return this.collator.compare(categoryA.toLowerCase(), categoryB.toLowerCase());
+        });
+      } else if (field === 'disabled') {
+        pageTemplates.sort((a, b) => (a.disabled ? 0 : 1) - (b.disabled ? 0 : 1));
+      }
+      if (desc) {
+        pageTemplates.reverse();
+      }
+      return pageTemplates;
+    },
     deletePageTemplateConfirm(pageTemplate) {
       this.pageTemplateToDelete = pageTemplate;
       if (this.pageTemplateToDelete) {
