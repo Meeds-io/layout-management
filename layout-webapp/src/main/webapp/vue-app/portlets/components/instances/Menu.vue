@@ -1,0 +1,189 @@
+<template>
+  <component
+    v-model="menu"
+    :is="$root.isMobile && 'v-bottom-sheet' || 'v-menu'"
+    :left="!$vuetify.rtl"
+    :right="$vuetify.rtl"
+    :content-class="menuId"
+    offset-y>
+    <template #activator="{ on, attrs }">
+      <v-btn
+        :aria-label="$t('portlets.menu.open')"
+        icon
+        small
+        class="mx-auto"
+        v-bind="attrs"
+        v-on="on">
+        <v-icon size="16" class="icon-default-color">fas fa-ellipsis-v</v-icon>
+      </v-btn>
+    </template>
+    <v-hover v-if="menu" @input="hoverMenu = $event">
+      <v-list
+        class="pa-0"
+        dense
+        @mouseout="menu = false"
+        @focusout="menu = false">
+        <v-subheader v-if="$root.isMobile">
+          <div class="d-flex full-width">
+            <div class="d-flex flex-grow-1 flex-shrink-1 align-center subtitle-1 text-truncate">
+              {{ $t('portlets.label.instanceMenu', {0: name}) }}
+            </div>
+            <div class="flex-shrink-0">
+              <v-btn
+                :aria-label="$t('portlets.label.closeMenu')"
+                icon
+                @click="menu = false">
+                <v-icon>fa-times</v-icon>
+              </v-btn>
+            </div>
+          </div>
+        </v-subheader>
+        <v-list-item-group v-model="listItem">
+          <v-tooltip
+            v-if="!$root.isMobile"
+            :disabled="!portletInstance.system"
+            bottom>
+            <template #activator="{ on, attrs }">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-list-item
+                  :href="editLayoutLink"
+                  :disabled="portletInstance.system"
+                  target="_blank"
+                  dense>
+                  <v-icon
+                    :class="portletInstance.system && 'disabled--text'"
+                    size="13">
+                    fa-columns
+                  </v-icon>
+                  <v-list-item-title
+                    :class="portletInstance.system && 'disabled--text'"
+                    class="ps-2">
+                    {{ $t('portlets.label.editLayout') }}
+                  </v-list-item-title>
+                </v-list-item>
+              </div>
+            </template>
+            <span>{{ $t('portlets.label.system.noEditLayout') }}</span>
+          </v-tooltip>
+          <v-list-item
+            dense
+            @click="$root.$emit('portlets-instance-drawer-open', portletInstance)">
+            <v-icon size="13">
+              fa-edit
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('portlets.label.editProperties') }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            dense
+            @click="$root.$emit('portlets-instance-drawer-open', portletInstance, true)">
+            <v-icon size="13">
+              fa-copy
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('portlets.label.duplicate') }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-tooltip :disabled="!portletInstance.system" bottom>
+            <template #activator="{ on, attrs }">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-list-item
+                  :disabled="portletInstance.system"
+                  dense
+                  @click="$root.$emit('portlets-instance-delete', portletInstance)">
+                  <v-icon
+                    :class="!portletInstance.system && 'error--text' || 'disabled--text'"
+                    size="13">
+                    fa-trash
+                  </v-icon>
+                  <v-list-item-title
+                    :class="!portletInstance.system && 'error--text' || 'disabled--text'"
+                    class="ps-2">
+                    {{ $t('portlets.label.delete') }}
+                  </v-list-item-title>
+                </v-list-item>
+              </div>
+            </template>
+            <span>{{ $t('portlets.label.system.noDelete') }}</span>
+          </v-tooltip>
+        </v-list-item-group>
+      </v-list>
+    </v-hover>
+  </component>
+</template>
+<script>
+export default {
+  props: {
+    portletInstance: {
+      type: Object,
+      default: null,
+    },
+  },
+  data: () => ({
+    menu: false,
+    hoverMenu: false,
+    listItem: null,
+    menuId: `PortletInstanceMenu${parseInt(Math.random() * 10000)}`,
+  }),
+  computed: {
+    portletInstanceId() {
+      return this.portletInstance?.id;
+    },
+    name() {
+      return this.$te(this.portletInstance?.name) ? this.$t(this.portletInstance?.name) : this.portletInstance?.name;
+    },
+    editLayoutLink() {
+      return `/portal/administration/layout-editor?portletInstanceId=${this.portletInstanceId}`;
+    },
+  },
+  watch: {
+    listItem() {
+      if (this.menu) {
+        this.menu = false;
+        this.listItem = null;
+      }
+    },
+    menu() {
+      if (this.menu) {
+        this.$root.$emit('portlets-instance-menu-opened', this.portletInstanceId);
+      } else {
+        this.$root.$emit('portlets-instance-menu-closed', this.portletInstanceId);
+      }
+    },
+    hoverMenu() {
+      if (!this.hoverMenu) {
+        window.setTimeout(() => {
+          if (!this.hoverMenu) {
+            this.menu = false;
+          }
+        }, 200);
+      }
+    },
+  },
+  created() {
+    this.$root.$on('portlets-instance-menu-opened', this.checkMenuStatus);
+    document.addEventListener('click', this.closeMenuOnClick);
+  },
+  beforeDestroy() {
+    this.$root.$off('pportlets-instance-menu-opened', this.checkMenuStatus);
+    document.removeEventListener('click', this.closeMenuOnClick);
+  },
+  methods: {
+    closeMenuOnClick(e) {
+      if (e.target && !e.target.closest(`.${this.menuId}`)) {
+        this.menu = false;
+      }
+    },
+    checkMenuStatus(instanceId) {
+      if (this.menu && instanceId !== this.portletInstance.id) {
+        this.menu = false;
+      }
+    },
+  },
+};
+</script>
