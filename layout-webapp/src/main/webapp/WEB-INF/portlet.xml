@@ -86,6 +86,8 @@
       <name>portlet-view-dispatched-file-path</name>
       <value>/html/pageTemplatesManagement.html</value>
     </init-param>
+    <expiration-cache>-1</expiration-cache>
+    <cache-scope>PUBLIC</cache-scope>
     <supports>
       <mime-type>text/html</mime-type>
     </supports>
@@ -94,6 +96,27 @@
     <portlet-info>
       <title>site navigation</title>
       <keywords>site navigation Management</keywords>
+    </portlet-info>
+  </portlet>
+
+  <portlet>
+    <portlet-name>Portlets</portlet-name>
+    <display-name>Portlets</display-name>
+    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+    <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/html/portlets.html</value>
+    </init-param>
+    <expiration-cache>-1</expiration-cache>
+    <cache-scope>PUBLIC</cache-scope>
+    <supports>
+      <mime-type>text/html</mime-type>
+    </supports>
+    <supported-locale>en</supported-locale>
+    <resource-bundle>locale.portlet.LayoutEditor</resource-bundle>
+    <portlet-info>
+      <title>Portlets</title>
+      <keywords>Portlets</keywords>
     </portlet-info>
   </portlet>
 
