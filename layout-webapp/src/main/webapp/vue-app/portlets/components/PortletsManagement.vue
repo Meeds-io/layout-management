@@ -21,25 +21,32 @@
 <template>
   <v-app>
     <v-card class="card-border-radius overflow-hidden position-static pb-5" flat>
-      <h4 class="title font-weight-bold px-5 pt-5 ma-0">
-        {{ $t('pageTemplates.title') }}
-      </h4>
-      <page-templates-management-toolbar
+      <portlets-toolbar
         ref="toolbar"
-        @page-templates-filter="keyword = $event" />
-      <page-templates-management-list
-        ref="list"
-        :keyword="keyword" />
+        @portlets-instance-filter="keyword = $event"
+        @select-tab="tabName = $event" />
+      <v-carousel-transition leave-absolute>
+        <portlets-list
+          ref="portlets"
+          v-if="tabName === 'portlets'"
+          :keyword="keyword" />
+      </v-carousel-transition>
+      <v-carousel-transition leave-absolute>
+        <portlets-instance-list
+          ref="instances"
+          v-if="tabName === 'instances'"
+          :keyword="keyword" />
+      </v-carousel-transition>
     </v-card>
-    <layout-editor-page-template-drawer />
     <layout-image-illustration-preview />
-    <layout-analytics application-name="pageTemplateManagement" />
+    <layout-analytics application-name="portletsManagement" />
   </v-app>
 </template>
 <script>
 export default {
   data: () => ({
     keyword: null,
+    tabName: 'portlets',
   }),
 };
 </script>
