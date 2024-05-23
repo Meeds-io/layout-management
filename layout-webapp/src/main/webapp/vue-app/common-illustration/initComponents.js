@@ -17,22 +17,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import PageTemplatesManagement from './components/PageTemplatesManagement.vue';
-
-import Toolbar from './components/header/Toolbar.vue';
-import PageTemplates from './components/list/PageTemplates.vue';
-
-import PageTemplateItem from './components/list/PageTemplateItem.vue';
-import PageTemplateItemMenu from './components/list/PageTemplateItemMenu.vue';
+import Illustration from './components/Illustration.vue';
+import IllustrationPreviewDialog from './components/IllustrationPreviewDialog.vue';
 
 const components = {
-  'page-templates-management': PageTemplatesManagement,
-
-  'page-templates-management-toolbar': Toolbar,
-  'page-templates-management-list': PageTemplates,
-
-  'page-templates-management-item': PageTemplateItem,
-  'page-templates-management-item-menu': PageTemplateItemMenu,
+  'layout-image-illustration': Illustration,
+  'layout-image-illustration-preview': IllustrationPreviewDialog,
 };
 
 for (const key in components) {
