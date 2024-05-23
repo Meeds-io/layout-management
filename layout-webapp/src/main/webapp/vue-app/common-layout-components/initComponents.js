@@ -35,7 +35,6 @@ import SiteNavigationExistingPageElement from './components/site-navigation/Site
 import SiteNavigationPageSuggester from './components/site-navigation/SiteNavigationPageSuggester.vue';
 import SiteNavigationSiteSuggester from './components/site-navigation/SiteNavigationSiteSuggester.vue';
 import NodeIconPickerDrawer from './components/site-navigation/NodeIconPickerDrawer.vue';
-import SectionMobileColumnMenu from './components/layout/SectionMobileColumnMenu.vue';
 
 const components = {
   'manage-permissions-drawer': ManagePermissionsDrawer,
@@ -56,7 +55,6 @@ const components = {
   'site-navigation-page-suggester': SiteNavigationPageSuggester,
   'site-navigation-site-suggester': SiteNavigationSiteSuggester,
   'node-icon-picker-drawer': NodeIconPickerDrawer,
-  'layout-section-mobile-column-menu-drawer': SectionMobileColumnMenu,
 };
 
 for (const key in components) {

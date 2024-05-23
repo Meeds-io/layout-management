@@ -17,24 +17,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import PageTemplatesManagement from './components/PageTemplatesManagement.vue';
+export function getPortlets() {
+  return Promise.resolve();
+}
 
-import Toolbar from './components/header/Toolbar.vue';
-import PageTemplates from './components/list/PageTemplates.vue';
+export function getPortlet() {
+  return Promise.resolve();
+}
 
-import PageTemplateItem from './components/list/PageTemplateItem.vue';
-import PageTemplateItemMenu from './components/list/PageTemplateItemMenu.vue';
+export function createPortlet() {
+  return Promise.resolve();
+}
 
-const components = {
-  'page-templates-management': PageTemplatesManagement,
+export function updatePortlet() {
+  return Promise.resolve();
+}
 
-  'page-templates-management-toolbar': Toolbar,
-  'page-templates-management-list': PageTemplates,
-
-  'page-templates-management-item': PageTemplateItem,
-  'page-templates-management-item-menu': PageTemplateItemMenu,
-};
-
-for (const key in components) {
-  Vue.component(key, components[key]);
+export function deletePortlet() {
+  return Promise.resolve();
 }

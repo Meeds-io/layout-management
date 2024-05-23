@@ -19,27 +19,34 @@
 
 -->
 <template>
-  <v-app>
-    <v-card class="card-border-radius overflow-hidden position-static pb-5" flat>
-      <h4 class="title font-weight-bold px-5 pt-5 ma-0">
-        {{ $t('pageTemplates.title') }}
-      </h4>
-      <page-templates-management-toolbar
-        ref="toolbar"
-        @page-templates-filter="keyword = $event" />
-      <page-templates-management-list
-        ref="list"
-        :keyword="keyword" />
-    </v-card>
-    <layout-editor-page-template-drawer />
-    <layout-image-illustration-preview />
-    <layout-analytics application-name="pageTemplateManagement" />
-  </v-app>
+  <application-toolbar
+    id="portletsApplication"
+    :center-button-toggle="{
+      selected: 'portlets',
+      buttons: [{
+        value: 'instances',
+        text: $t('portlets.instances'),
+        icon: 'fa-braille',
+      }, {
+        value: 'portlets',
+        text: $t('portlets'),
+        icon: 'fa-grip-horizontal',
+      }]
+    }"
+    :right-text-filter="{
+      minCharacters: 1,
+      placeholder: $t('portlets.filter.placeholder'),
+      tooltip: $t('portlets.filter.placeholder'),
+    }"
+    class="px-1"
+    @toggle-select="$emit('select-tab', $event)"
+    @filter-text-input="$emit('portlets-instance-filter', $event)" />
 </template>
 <script>
 export default {
   data: () => ({
-    keyword: null,
+    portlets: null,
+    tabName: 'portlets',
   }),
 };
 </script>

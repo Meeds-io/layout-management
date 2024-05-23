@@ -21,12 +21,12 @@
 <template>
   <v-hover v-model="hover" :disabled="!illustrationId">
     <div
-      :aria-label="$t('pageTemplate.label.preview', {0: name})"
+      :aria-label="$t(`${objectType}.label.preview`, {0: name})"
       class="position-relative full-height full-width d-flex align-center justify-center">
       <v-expand-transition>
         <v-card
           v-if="hover"
-          :aria-label="$t('pageTemplate.label.openIllustrationPreview')"
+          :aria-label="$t(`${objectType}.label.openIllustrationPreview`)"
           class="d-flex absolute-full-size z-index-one align-center justify-center transition-fast-in-fast-out grey opacity-5"
           flat
           @click="openIllustration">
@@ -43,8 +43,16 @@
 <script>
 export default {
   props: {
-    pageTemplate: {
+    value: {
       type: Object,
+      default: null,
+    },
+    objectType: {
+      type: String,
+      default: null,
+    },
+    defaultSrc: {
+      type: String,
       default: null,
     },
   },
@@ -52,22 +60,22 @@ export default {
     hover: false,
   }),
   computed: {
-    pageTemplateId() {
-      return this.pageTemplate?.id;
+    id() {
+      return this.value?.id;
     },
     name() {
-      return this.$te(this.pageTemplate?.name) ? this.$t(this.pageTemplate?.name) : this.pageTemplate?.name;
+      return this.$te(this.value?.name) ? this.$t(this.value?.name) : this.value?.name;
     },
     illustrationId() {
-      return this.pageTemplate?.illustrationId;
+      return this.value?.illustrationId;
     },
     illustrationSrc() {
-      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.pageTemplateId}/${this.illustrationId}` || '/layout/images/page-templates/DefaultPreview.webp';
+      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/${this.objectType}/${this.id}/${this.illustrationId}` || this.defaultSrc;
     },
   },
   methods: {
     openIllustration() {
-      this.$root.$emit('page-templates-illustration-preview', this.illustrationSrc);
+      this.$root.$emit('layout-illustration-preview', this.illustrationSrc);
     },
   },
 };
