@@ -73,7 +73,7 @@ export function updatePageTemplate(pageTemplate) {
     body: JSON.stringify(pageTemplate),
   }).then((resp) => {
     if (!resp?.ok) {
-      throw new Error('Error when creating page template');
+      throw new Error('Error when updating page template');
     }
   });
 }
@@ -84,7 +84,7 @@ export function deletePageTemplate(id) {
     method: 'DELETE',
   }).then((resp) => {
     if (!resp?.ok) {
-      throw new Error('Error when creating page template');
+      throw new Error('Error when deleting page template');
     }
   });
 }

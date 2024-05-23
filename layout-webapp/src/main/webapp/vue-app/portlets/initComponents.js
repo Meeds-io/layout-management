@@ -17,22 +17,30 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import PageTemplatesManagement from './components/PageTemplatesManagement.vue';
+import PortletsManagement from './components/PortletsManagement.vue';
 
 import Toolbar from './components/header/Toolbar.vue';
-import PageTemplates from './components/list/PageTemplates.vue';
 
-import PageTemplateItem from './components/list/PageTemplateItem.vue';
-import PageTemplateItemMenu from './components/list/PageTemplateItemMenu.vue';
+import InstanceList from './components/instances/List.vue';
+import InstanceItem from './components/instances/Item.vue';
+import InstanceMenu from './components/instances/Menu.vue';
+
+import PortletList from './components/portlets/List.vue';
+import PortletItem from './components/portlets/Item.vue';
+import PortletMenu from './components/portlets/Menu.vue';
 
 const components = {
-  'page-templates-management': PageTemplatesManagement,
+  'portlets-management': PortletsManagement,
 
-  'page-templates-management-toolbar': Toolbar,
-  'page-templates-management-list': PageTemplates,
+  'portlets-toolbar': Toolbar,
 
-  'page-templates-management-item': PageTemplateItem,
-  'page-templates-management-item-menu': PageTemplateItemMenu,
+  'portlets-instance-list': InstanceList,
+  'portlets-instance-item': InstanceItem,
+  'portlets-instance-item-menu': InstanceMenu,
+
+  'portlets-list': PortletList,
+  'portlets-item': PortletItem,
+  'portlets-item-menu': PortletMenu,
 };
 
 for (const key in components) {
