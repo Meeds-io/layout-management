@@ -19,6 +19,8 @@
 
 import './initComponents.js';
 import '../common/initComponents.js';
+import '../common-page-template/initComponents.js';
+
 import './extensions.js';
 import './services.js';
 

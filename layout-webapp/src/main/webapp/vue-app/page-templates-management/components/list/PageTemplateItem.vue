@@ -5,8 +5,10 @@
       v-if="!$root.isMobile"
       align="center"
       width="70px">
-      <page-templates-management-item-illustration
-        :page-template="pageTemplate" />
+      <layout-image-illustration
+        :value="pageTemplate"
+        object-type="pageTemplates"
+        default-src="/layout/images/page-templates/DefaultPreview.webp" />
     </td>
     <!-- name -->
     <td
@@ -16,7 +18,7 @@
         v-sanitized-html="name"
         class="text-truncate transparent"
         flat
-        @click="$root.$emit('page-templates-illustration-preview', illustrationSrc)" />
+        @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
     <!-- description -->
     <td
