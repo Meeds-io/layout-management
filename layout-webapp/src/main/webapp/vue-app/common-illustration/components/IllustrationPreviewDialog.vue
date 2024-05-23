@@ -68,7 +68,7 @@ export default {
     }
   },
   created() {
-    this.$root.$on('page-templates-illustration-preview', this.open);
+    this.$root.$on('layout-illustration-preview', this.open);
   },
   methods: {
     open(illustrationSrc) {

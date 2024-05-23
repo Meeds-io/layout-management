@@ -19,11 +19,11 @@
 
 import './initComponents.js';
 import '../common/initComponents.js';
-import '../common-layout-components/initComponents.js';
+import '../common-illustration/initComponents.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('siteManagement');
+  const components = extensionRegistry.loadComponents('PortletsManagement');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -31,28 +31,22 @@ if (extensionRegistry) {
   }
 }
 
-const appId = 'siteManagement';
-
-//getting language of the PLF
 const lang = eXo?.env.portal.language || 'en';
+const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.LayoutEditor-${lang}.json`;
 
-//should expose the locale ressources as REST API
-const urls = [
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteManagement-${lang}.json`,
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigation-${lang}.json`
-];
-
+const appId = 'portletsManagement';
 export function init() {
-  exoi18n.loadLanguageAsync(lang, urls)
-    .then(i18n => {
-      // init Vue app when locale ressources are ready
+  exoi18n.loadLanguageAsync(lang, url)
+    .then(i18n =>
       Vue.createApp({
-        template: `<site-management id="${appId}"/>`,
+        template: `<portlets-management id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
         i18n,
-        data: () => ({
-          pageTemplates: null,
-        }),
-      }, `#${appId}`, 'site-management');
-    });
+        computed: {
+          isMobile() {
+            return this.$vuetify.breakpoint.smAndDown;
+          },
+        },
+      }, `#${appId}`, 'Page Layout')
+    );
 }

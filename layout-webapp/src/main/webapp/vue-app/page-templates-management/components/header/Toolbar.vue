@@ -22,9 +22,7 @@
   <application-toolbar
     id="pageTemplatesApplication"
     :right-text-filter="{
-      hide: false,
       minCharacters: 1,
-      text: $t('pageTemplates.add'),
       placeholder: $t('pageTemplates.filter.placeholder'),
       tooltip: $t('pageTemplates.filter.placeholder'),
     }"
