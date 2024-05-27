@@ -138,9 +138,9 @@ export function init() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
           document.addEventListener('drawerClosed', this.setDrawerClosed);
-          this.$applicationRegistryService.getCategories('supportedModes')
+          this.$applicationRegistryService.getCategories()
             .then(categories => this.applicationCategories = categories);
-          this.$applicationRegistryService.getApplications('supportedModes')
+          this.$applicationRegistryService.getApplications()
             .then(applications => this.allApplications = applications);
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);

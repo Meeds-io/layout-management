@@ -16,12 +16,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.plugin;
+package io.meeds.layout.plugin.translation;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,28 +34,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+
+import io.meeds.layout.model.PortletInstanceCategory;
 import io.meeds.layout.service.LayoutAclService;
+import io.meeds.layout.service.PortletInstanceService;
+import io.meeds.social.translation.service.TranslationService;
 
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-                            PageTemplateTranslationPlugin.class,
+  PortletInstanceCategoryTranslationPlugin.class,
 })
 @ExtendWith(MockitoExtension.class)
-public class PageTemplateTranslationPluginTest {
+public class PortletInstanceCategoryTranslationPluginTest {
 
   @MockBean
-  private LayoutAclService              layoutAclService;
+  private LayoutAclService                         layoutAclService;
+
+  @MockBean
+  private TranslationService                       translationService;
+
+  @MockBean
+  private PortletInstanceService                   portletInstanceCategoryService;
 
   @Autowired
-  private PageTemplateTranslationPlugin translationPlugin;
+  private PortletInstanceCategoryTranslationPlugin translationPlugin;
 
-  String                                username = "test";
+  private String                                   username = "test";
 
   @Test
   public void getObjectType() {
-    assertEquals("pageTemplate", translationPlugin.getObjectType());
-    assertEquals(PageTemplateTranslationPlugin.OBJECT_TYPE, translationPlugin.getObjectType());
+    assertEquals("portletInstanceCategory", translationPlugin.getObjectType());
+    assertEquals(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE, translationPlugin.getObjectType());
   }
 
   @Test
@@ -66,7 +81,18 @@ public class PageTemplateTranslationPluginTest {
   @Test
   @SneakyThrows
   public void hasAccessPermission() {
-    assertTrue(translationPlugin.hasAccessPermission(0l, null));
+    assertThrows(ObjectNotFoundException.class, () -> translationPlugin.hasAccessPermission(1, null));
+    PortletInstanceCategory portletInstanceCategory = mock(PortletInstanceCategory.class);
+    when(portletInstanceCategoryService.getPortletInstanceCategory(1)).thenReturn(portletInstanceCategory);
+    assertTrue(translationPlugin.hasAccessPermission(1, null));
+    assertTrue(translationPlugin.hasAccessPermission(1, username));
+
+    String permissionExpression = "A Permission Expression";
+    when(portletInstanceCategory.getPermissions()).thenReturn(Collections.singletonList(permissionExpression));
+    assertFalse(translationPlugin.hasAccessPermission(1, username));
+
+    when(layoutAclService.isMemberOf(username, permissionExpression)).thenReturn(true);
+    assertTrue(translationPlugin.hasAccessPermission(1, username));
   }
 
   @Test

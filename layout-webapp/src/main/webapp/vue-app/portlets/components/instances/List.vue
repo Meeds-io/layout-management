@@ -38,6 +38,7 @@ export default {
   data: () => ({
     portletInstances: [],
     portletInstanceToDelete: null,
+    categoryId: 0,
     loading: false,
     collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
@@ -128,6 +129,7 @@ export default {
     this.$root.$on('portlets-instance-disabled', this.refreshPortletInstances);
     this.$root.$on('portlets-instance-saved', this.refreshPortletInstances);
     this.$root.$on('portlets-instance-delete', this.deletePortletInstanceConfirm);
+    this.$root.$on('portlets-instance-category-selected', this.selectCategoryId);
     this.refreshPortletInstances();
   },
   beforeDestroy() {
@@ -163,9 +165,15 @@ export default {
         this.$refs.deleteConfirmDialog.open();
       }
     },
+    selectCategoryId(id) {
+      if (this.categoryId !== id) {
+        this.categoryId = id;
+        this.refreshPortletInstances();
+      }
+    },
     refreshPortletInstances() {
       this.loading = true;
-      return this.$portletInstanceService.getPortletInstances()
+      return this.$portletInstanceService.getPortletInstances(this.categoryId)
         .then(portletInstances => this.portletInstances = portletInstances || [])
         .finally(() => this.loading = false);
     },

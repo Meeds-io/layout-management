@@ -34,6 +34,7 @@ import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
 import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.social.core.manager.IdentityManager;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
@@ -50,6 +51,9 @@ public class LayoutAclService {
 
   @Autowired
   private Authenticator    authenticator;
+
+  @Autowired
+  private IdentityManager  identityManager;
 
   @Setter
   private IdentityRegistry identityRegistry;
@@ -169,12 +173,29 @@ public class LayoutAclService {
     }
   }
 
+  public boolean isMemberOf(String username, String expression) {
+    ConversationState currentConversationState = ConversationState.getCurrent();
+    ConversationState.setCurrent(getConversationState(username));
+    try {
+      return userAcl.hasPermission(expression);
+    } finally {
+      ConversationState.setCurrent(currentConversationState);
+    }
+  }
+
   public String getAdministratorsGroup() {
     return userAcl.getAdminGroups();
   }
 
   public ConversationState getSuperUserConversationState() {
     return new ConversationState(getUserIdentity(userAcl.getSuperUser()));
+  }
+
+  public long getSuperUserIdentityId() {
+    org.exoplatform.social.core.identity.model.Identity userIdentity =
+                                                                     identityManager.getOrCreateUserIdentity(userAcl.getSuperUser());
+    String id = userIdentity == null ? null : userIdentity.getId();
+    return id == null ? 0 : Long.parseLong(id);
   }
 
   private ConversationState getConversationState(String username) {

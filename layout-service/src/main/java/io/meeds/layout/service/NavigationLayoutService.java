@@ -362,7 +362,7 @@ public class NavigationLayoutService {
   private void saveNodeLabels(String nodeId, Map<String, String> labels) {
     if (labels != null) {
       Map<Locale, State> nodeLabels = new HashMap<>();
-      labels.entrySet().forEach(label -> nodeLabels.put(new Locale(label.getKey()), new State(label.getValue(), null)));
+      labels.entrySet().forEach(label -> nodeLabels.put(Locale.forLanguageTag(label.getKey()), new State(label.getValue(), null)));
       descriptionService.setDescriptions(nodeId, nodeLabels);
     } else {
       descriptionService.setDescriptions(nodeId, Collections.emptyMap());

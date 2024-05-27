@@ -7,8 +7,8 @@
       width="70px">
       <layout-image-illustration
         :value="portletInstance"
-        object-type="portlets"
-        default-src="/layout/images/portlets/DefaultPreview.webp" />
+        object-type="portletInstance"
+        default-src="/layout/images/portlets/DefaultPortlet.png" />
     </td>
     <!-- name -->
     <td
@@ -73,7 +73,7 @@ export default {
       return this.portletInstance?.illustrationId;
     },
     illustrationSrc() {
-      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/portletInstance/${this.portletInstanceId}/${this.illustrationId}` || '/layout/images/portlets/DefaultPreview.webp';
+      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/portletInstance/${this.portletInstanceId}/${this.illustrationId}` || '/layout/images/portlets/DefaultPortlet.png';
     },
   },
   watch: {

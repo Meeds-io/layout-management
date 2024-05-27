@@ -120,7 +120,7 @@ export default {
     },
     loadMore() {
       this.$refs.drawer.startLoading();
-      this.$applicationRegistryService.getApplications('supportedModes')
+      this.$applicationRegistryService.getApplications()
         .then(applications => this.allApplications = applications)
         .finally(() => {
           this.canLoadMore = false;
