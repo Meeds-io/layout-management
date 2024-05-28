@@ -85,6 +85,7 @@ export function init() {
           diffScrollX: 0,
           diffScrollY: 0,
           gap: 20,
+          nodeUri: null,
         }),
         computed: {
           parentAppX() {
@@ -124,6 +125,11 @@ export function init() {
               this.$root.$emit('layout-editor-moving-start', this.movingParentId);
             } else {
               this.$root.$emit('layout-editor-moving-end', this.movingParentId);
+            }
+          },
+          nodeUri() {
+            if (this.nodeUri) {
+              eXo.env.portal.webPageUrl = `/portal${this.nodeUri}`;
             }
           },
           layout(newVal, oldVal) {
