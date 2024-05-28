@@ -1,12 +1,12 @@
 <template>
   <v-hover @input="hover = $event">
     <v-list-item>
-      <v-list-item-icon class="my-auto">
+      <v-list-item-icon class="my-auto me-4">
         <v-card
           width="30"
           class="transparent d-flex align-center justify-center"
           flat>
-          <v-icon v-text="category.icon" />
+          <v-icon v-text="category.icon" class="icon-default-color" />
         </v-card>
       </v-list-item-icon>
       <v-list-item-content>
