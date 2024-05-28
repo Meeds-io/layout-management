@@ -16,27 +16,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.plugin;
+package io.meeds.layout.plugin.attachment;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.social.attachment.AttachmentPlugin;
+import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.service.LayoutAclService;
-import io.meeds.social.translation.plugin.TranslationPlugin;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
-public class PageTemplateTranslationPlugin extends TranslationPlugin {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class PageTemplateAttachmentPlugin extends AttachmentPlugin {
 
-  public static final String OBJECT_TYPE            = "pageTemplate";
-
-  public static final String DESCRIPTION_FIELD_NAME = "description";
-
-  public static final String TITLE_FIELD_NAME       = "title";
+  public static final String OBJECT_TYPE = "pageTemplate";
 
   @Autowired
   private LayoutAclService   layoutAclService;
+
+  @Autowired
+  private AttachmentService              attachmentService;
+
+  @PostConstruct
+  public void init() {
+    attachmentService.addPlugin(this);
+  }
 
   @Override
   public String getObjectType() {
@@ -44,22 +55,22 @@ public class PageTemplateTranslationPlugin extends TranslationPlugin {
   }
 
   @Override
-  public boolean hasEditPermission(long templateId, String username) throws ObjectNotFoundException {
-    return layoutAclService.isAdministrator(username);
+  public boolean hasEditPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
+    return userIdentity != null && layoutAclService.isAdministrator(userIdentity.getUserId());
   }
 
   @Override
-  public boolean hasAccessPermission(long templateId, String username) throws ObjectNotFoundException {
+  public boolean hasAccessPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
     return true;
   }
 
   @Override
-  public long getAudienceId(long templateId) throws ObjectNotFoundException {
+  public long getAudienceId(String objectId) throws ObjectNotFoundException {
     return 0;
   }
 
   @Override
-  public long getSpaceId(long templateId) throws ObjectNotFoundException {
+  public long getSpaceId(String objectId) throws ObjectNotFoundException {
     return 0;
   }
 

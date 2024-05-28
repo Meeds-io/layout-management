@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.service;
+package io.meeds.layout.service.injection;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -29,56 +29,46 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.configuration.ConfigurationManager;
-import org.exoplatform.services.resources.LocaleConfigService;
-import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.social.attachment.AttachmentService;
 
-import io.meeds.layout.plugin.PageTemplateAttachmentPlugin;
-import io.meeds.layout.plugin.PageTemplateTranslationPlugin;
-import io.meeds.social.translation.service.TranslationService;
+import io.meeds.layout.service.LayoutAclService;
+import io.meeds.layout.service.PortletInstanceService;
+import io.meeds.layout.service.PortletService;
 
-@SpringBootTest(classes = { PageTemplateImportService.class })
+@SpringBootTest(classes = { PortletInstanceImportService.class })
 @ExtendWith(MockitoExtension.class)
-public class PageTemplateImportServiceTest {
+public class PortletInstanceImportServiceTest {
 
   @MockBean
-  private LayoutAclService              layoutAclService;
+  private LayoutAclService               layoutAclService;
 
   @MockBean
-  private TranslationService            translationService;
+  private LayoutTranslationImportService layoutTranslationService;
 
   @MockBean
-  private AttachmentService             attachmentService;
+  private AttachmentService              attachmentService;
 
   @MockBean
-  private LocaleConfigService           localeConfigService;
+  private PortletInstanceService         portletInstanceService;
 
   @MockBean
-  private PageTemplateService           pageTemplateService;
+  private PortletService                 portletService;
 
   @MockBean
-  private SettingService                settingService;
+  private SettingService                 settingService;
 
   @MockBean
-  private ResourceBundleService         resourceBundleService;
-
-  @MockBean
-  private ConfigurationManager          configurationManager;
-
-  @MockBean
-  private PageTemplateAttachmentPlugin  pageTemplateAttachmentPlugin;
-
-  @MockBean
-  private PageTemplateTranslationPlugin pageTemplateTranslationPlugin;
+  private ConfigurationManager           configurationManager;
 
   @Autowired
-  private PageTemplateImportService     pageTemplateImportService;
+  private PortletInstanceImportService   portletInstanceImportService;
 
   @Test
   public void init() {
-    assertDoesNotThrow(() -> pageTemplateImportService.init(),
-                       "Shouldn't stop the container initialization if page templates fails");
-    assertDoesNotThrow(() -> pageTemplateImportService.importPageTemplates(),
-                       "Shouldn't stop the container initialization if page templates fails");
+    assertDoesNotThrow(() -> portletInstanceImportService.init(),
+                       "Shouldn't stop the container initialization if portlet instances import fails");
+    assertDoesNotThrow(() -> portletInstanceImportService.importPortletInstances(),
+                       "Shouldn't stop the container initialization if portlet instances import fails");
   }
+
 }

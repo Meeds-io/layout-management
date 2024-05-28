@@ -74,7 +74,7 @@ import lombok.SneakyThrows;
 @ExtendWith(MockitoExtension.class)
 public class PageTemplateRestTest {
 
-  private static final String REST_PATH     = "/pageTemplates"; // NOSONAR
+  private static final String REST_PATH     = "/page/templates"; // NOSONAR
 
   private static final String SIMPLE_USER   = "simple";
 

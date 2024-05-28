@@ -16,11 +16,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.plugin;
+package io.meeds.layout.plugin.attachment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -32,19 +32,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.service.LayoutAclService;
 
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-                            PageTemplateAttachmentPlugin.class,
+  PageTemplateAttachmentPlugin.class,
 })
 @ExtendWith(MockitoExtension.class)
 public class PageTemplateAttachmentPluginTest {
 
   @Mock
   private Identity                     userIdentity;
+
+  @MockBean
+  private AttachmentService            attachmentService;
 
   @MockBean
   private LayoutAclService             layoutAclService;

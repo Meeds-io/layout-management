@@ -18,8 +18,8 @@
  */
 package io.meeds.layout.service;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +39,7 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.social.core.manager.IdentityManager;
 
 @SpringBootTest(classes = { LayoutAclService.class })
 @ExtendWith(MockitoExtension.class)
@@ -58,6 +59,9 @@ public class LayoutAclServiceTest {
 
   @MockBean
   private Authenticator        authenticator;
+
+  @MockBean
+  private IdentityManager      identityManager;
 
   @Mock
   private IdentityRegistry     identityRegistry;

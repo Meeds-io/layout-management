@@ -36,7 +36,8 @@
       <v-img
         :src="illustrationSrc"
         max-height="30"
-        max-width="60" />
+        max-width="60"
+        contain />
     </div>
   </v-hover>
 </template>
