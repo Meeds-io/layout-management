@@ -1,20 +1,6 @@
 {
   "descriptors":[
     {
-      "nameId":"spaces",
-      "names":{
-        "en":"layout.portletInstance.category.spaces.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.category.spaces.description"
-      },
-      "icon":"fa-braille",
-      "permissions":[
-        "*:/platform/users"
-      ],
-      "system":true
-    },
-    {
       "nameId":"content",
       "names":{
         "en":"layout.portletInstance.category.content.name"
@@ -43,6 +29,62 @@
       "system":true
     },
     {
+      "nameId":"spaceTools",
+      "names":{
+        "en":"layout.portletInstance.category.spaceTools.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.category.spaceTools.description"
+      },
+      "icon":"fa-users-cog",
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"profile",
+      "names":{
+        "en":"layout.portletInstance.category.profile.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.category.profile.description"
+      },
+      "icon":"fa-user",
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"spaces",
+      "names":{
+        "en":"layout.portletInstance.category.spaces.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.category.spaces.description"
+      },
+      "icon":"fa-tools",
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"userSettings",
+      "names":{
+        "en":"layout.portletInstance.category.userSettings.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.category.userSettings.description"
+      },
+      "icon":"fa-user-cog",
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
       "nameId":"navigation",
       "names":{
         "en":"layout.portletInstance.category.navigation.name"
@@ -50,7 +92,21 @@
       "descriptions":{
         "en":"layout.portletInstance.category.navigation.description"
       },
-      "icon":"fa-columns",
+      "icon":"fa-project-diagram",
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"others",
+      "names":{
+        "en":"layout.portletInstance.category.others.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.category.others.description"
+      },
+      "icon":"fa-ellipsis-h",
       "permissions":[
         "*:/platform/users"
       ],
