@@ -36,13 +36,14 @@ export default {
     },
   },
   data: () => ({
-    portletInstances: [],
     portletInstanceToDelete: null,
     categoryId: 0,
-    loading: false,
     collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
+    loading() {
+      return !!this.$root.loading;
+    },
     headers() {
       return this.$root.isMobile && [
         {
@@ -76,7 +77,7 @@ export default {
           align: 'left',
           sortable: true,
           class: 'portlet-instance-name-header',
-          width: '20%'
+          width: '100px'
         },
         {
           text: this.$t('portlets.label.description'),
@@ -85,6 +86,22 @@ export default {
           sortable: false,
           class: 'portlet-instance-description-header',
           width: '70%'
+        },
+        {
+          text: this.$t('portlets.label.category'),
+          value: 'categoryId',
+          align: 'center',
+          sortable: true,
+          class: 'portlet-instance-category-header',
+          width: '100px'
+        },
+        {
+          text: this.$t('portlets.label.portlet'),
+          value: 'contentId',
+          align: 'center',
+          sortable: true,
+          class: 'portlet-instance-portlet-header',
+          width: '100px'
         },
         {
           text: this.$t('portlets.label.status'),
@@ -104,6 +121,9 @@ export default {
         },
       ];
     },
+    portletInstances() {
+      return this.categoryId && this.$root.portletInstances.filter(a => a.categoryId === this.categoryId) || this.$root.portletInstances;
+    },
     noEmptyPortletInstances() {
       const portletInstances = this.portletInstances?.filter?.(t => t.name) || [];
       portletInstances.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
@@ -122,24 +142,12 @@ export default {
     },
   },
   created() {
-    this.$root.$on('portlets-instance-deleted', this.refreshPortletInstances);
-    this.$root.$on('portlets-instance-created', this.refreshPortletInstances);
-    this.$root.$on('portlets-instance-updated', this.refreshPortletInstances);
-    this.$root.$on('portlets-instance-enabled', this.refreshPortletInstances);
-    this.$root.$on('portlets-instance-disabled', this.refreshPortletInstances);
-    this.$root.$on('portlets-instance-saved', this.refreshPortletInstances);
     this.$root.$on('portlets-instance-delete', this.deletePortletInstanceConfirm);
     this.$root.$on('portlets-instance-category-selected', this.selectCategoryId);
-    this.refreshPortletInstances();
   },
   beforeDestroy() {
-    this.$root.$off('portlets-instance-deleted', this.refreshPortletInstances);
-    this.$root.$off('portlets-instance-created', this.refreshPortletInstances);
-    this.$root.$off('portlets-instance-updated', this.refreshPortletInstances);
-    this.$root.$off('portlets-instance-enabled', this.refreshPortletInstances);
-    this.$root.$off('portlets-instance-disabled', this.refreshPortletInstances);
-    this.$root.$off('portlets-instance-saved', this.refreshPortletInstances);
     this.$root.$off('portlets-instance-delete', this.deletePortletInstanceConfirm);
+    this.$root.$off('portlets-instance-category-selected', this.selectCategoryId);
   },
   methods: {
     applySortOnItems(portletInstances, sortFields, sortDescendings) {
@@ -153,6 +161,10 @@ export default {
         portletInstances.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       } else if (field === 'disabled') {
         portletInstances.sort((a, b) => (a.disabled ? 0 : 1) - (b.disabled ? 0 : 1));
+      } else if (field === 'categoryId') {
+        portletInstances.sort((a, b) => this.collator.compare(this.$root.categoriesById[a.categoryId]?.name?.toLowerCase?.(), this.$root.categoriesById[b.categoryId]?.name?.toLowerCase?.()));
+      } else if (field === 'contentId') {
+        portletInstances.sort((a, b) => this.collator.compare(this.$root.portletsById[a.contentId]?.name?.toLowerCase?.(), this.$root.portletsById[b.contentId]?.name?.toLowerCase?.()));
       }
       if (desc) {
         portletInstances.reverse();
@@ -168,14 +180,7 @@ export default {
     selectCategoryId(id) {
       if (this.categoryId !== id) {
         this.categoryId = id;
-        this.refreshPortletInstances();
       }
-    },
-    refreshPortletInstances() {
-      this.loading = true;
-      return this.$portletInstanceService.getPortletInstances(this.categoryId)
-        .then(portletInstances => this.portletInstances = portletInstances || [])
-        .finally(() => this.loading = false);
     },
     deletePortletInstance(portletInstance) {
       this.loading = true;

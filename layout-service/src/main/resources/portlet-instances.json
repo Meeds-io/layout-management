@@ -101,8 +101,24 @@
       "spaceApplication":false
     },
     {
-      "nameId":"SpaceBannerPortlet",
+      "nameId":"GettingStarted",
       "categoryNameId":"tools",
+      "portletName":"GettingStarted",
+      "names":{
+        "en":"layout.portletInstance.GettingStarted.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.GettingStarted.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
+      "spaceApplication":false
+    },
+    {
+      "nameId":"SpaceBannerPortlet",
+      "categoryNameId":"spaceTools",
       "portletName":"SpaceBannerPortlet",
       "names":{
         "en":"layout.portletInstance.SpaceBannerPortlet.name"
@@ -162,7 +178,7 @@
     },
     {
       "nameId":"SpaceActivityStreamPortlet",
-      "categoryNameId":"tools",
+      "categoryNameId":"spaceTools",
       "portletName":"SpaceActivityStreamPortlet",
       "names":{
         "en":"layout.portletInstance.SpaceActivityStreamPortlet.name"
@@ -178,7 +194,7 @@
         "*:/platform/users"
       ],
       "system":true,
-      "spaceApplication":false
+      "spaceApplication":true
     },
     {
       "nameId":"SpacesOverview",
@@ -221,8 +237,28 @@
       "spaceApplication":false
     },
     {
-      "nameId":"SpaceInfos",
+      "nameId":"UserActivityStreamPortlet",
       "categoryNameId":"tools",
+      "portletName":"UserActivityStreamPortlet",
+      "names":{
+        "en":"layout.portletInstance.UserActivityStreamPortlet.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.UserActivityStreamPortlet.description"
+      },
+      "illustrationPath":"war:/../skin/DefaultSkin/portletIcons/SpaceActivityStreamPortlet.png",
+      "preferences":[
+        
+      ],
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
+      "spaceApplication":false
+    },
+    {
+      "nameId":"SpaceInfos",
+      "categoryNameId":"spaceTools",
       "portletName":"SpaceInfos",
       "names":{
         "en":"layout.portletInstance.SpaceInfos.name"
@@ -299,6 +335,81 @@
       ],
       "system":true,
       "spaceApplication":false
+    },
+    {
+      "nameId":"GeneralSettings",
+      "categoryNameId":"userSettings",
+      "portletName":"GeneralSettings",
+      "names":{
+        "en":"layout.portletInstance.GeneralSettings.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.GeneralSettings.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
+    },
+    {
+      "nameId":"ProfileAboutMe",
+      "categoryNameId":"profile",
+      "portletName":"ProfileAboutMe",
+      "names":{
+        "en":"layout.portletInstance.ProfileAboutMe.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.ProfileAboutMe.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
+    },
+    {
+      "nameId":"ProfileContactInformation",
+      "categoryNameId":"profile",
+      "portletName":"ProfileContactInformation",
+      "names":{
+        "en":"layout.portletInstance.ProfileContactInformation.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.ProfileContactInformation.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
+    },
+    {
+      "nameId":"ProfileHeader",
+      "categoryNameId":"profile",
+      "portletName":"ProfileHeader",
+      "names":{
+        "en":"layout.portletInstance.ProfileHeader.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.ProfileHeader.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
+    },
+    {
+      "nameId":"ProfileWorkExperience",
+      "categoryNameId":"profile",
+      "portletName":"ProfileWorkExperience",
+      "names":{
+        "en":"layout.portletInstance.ProfileWorkExperience.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.ProfileWorkExperience.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true,
     }
   ]
 }
