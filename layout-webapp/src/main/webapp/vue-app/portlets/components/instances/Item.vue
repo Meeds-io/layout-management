@@ -16,7 +16,7 @@
       align="left">
       <v-card
         v-sanitized-html="name"
-        class="text-truncate transparent"
+        class="transparent"
         flat
         @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
@@ -24,8 +24,19 @@
     <td
       v-if="!$root.isMobile"
       align="left"
-      class="text-truncate"
       v-sanitized-html="description"></td>
+    <td
+      v-if="!$root.isMobile"
+      align="center"
+      width="100px">
+      {{ categoryName }}
+    </td>
+    <td
+      v-if="!$root.isMobile"
+      align="center"
+      width="100px">
+      {{ portletName }}
+    </td>
     <td
       v-if="!$root.isMobile"
       align="center"
@@ -62,6 +73,18 @@ export default {
     },
     enabled() {
       return !this.portletInstance?.disabled;
+    },
+    category() {
+      return this.$root.portletInstanceCategories?.find?.(c => c.id === this.portletInstance.categoryId);
+    },
+    categoryName() {
+      return this.category?.name;
+    },
+    portlet() {
+      return this.$root.portlets?.find?.(p => p.contentId === this.portletInstance.contentId);
+    },
+    portletName() {
+      return this.portlet?.name;
     },
     name() {
       return this.$te(this.portletInstance?.name) ? this.$t(this.portletInstance?.name) : this.portletInstance?.name;
