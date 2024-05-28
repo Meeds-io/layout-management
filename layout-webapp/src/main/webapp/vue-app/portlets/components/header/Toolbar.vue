@@ -22,7 +22,7 @@
   <application-toolbar
     id="portletsApplication"
     :center-button-toggle="{
-      selected: 'portlets',
+      selected: 'instances',
       buttons: [{
         value: 'instances',
         text: $t('portlets.instances'),
@@ -38,7 +38,7 @@
       placeholder: $t('portlets.filter.placeholder'),
       tooltip: $t('portlets.filter.placeholder'),
     }"
-    class="px-1"
+    class="border-box-sizing px-1"
     @toggle-select="$emit('select-tab', $event)"
     @filter-text-input="$emit('portlets-instance-filter', $event)" />
 </template>
@@ -46,7 +46,7 @@
 export default {
   data: () => ({
     portlets: null,
-    tabName: 'portlets',
+    tabName: 'instances',
   }),
 };
 </script>

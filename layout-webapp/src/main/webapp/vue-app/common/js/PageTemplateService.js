@@ -18,7 +18,7 @@
  */
 
 export function getPageTemplates() {
-  return fetch('/layout/rest/pageTemplates', {
+  return fetch('/layout/rest/page/templates', {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
@@ -31,7 +31,7 @@ export function getPageTemplates() {
 }
 
 export function getPageTemplate(id) {
-  return fetch(`/layout/rest/pageTemplates/${id}`, {
+  return fetch(`/layout/rest/page/templates/${id}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
@@ -44,7 +44,7 @@ export function getPageTemplate(id) {
 }
 
 export function createPageTemplate(pageContent, disabled) {
-  return fetch('/layout/rest/pageTemplates', {
+  return fetch('/layout/rest/page/templates', {
     credentials: 'include',
     method: 'POST',
     headers: {
@@ -64,7 +64,7 @@ export function createPageTemplate(pageContent, disabled) {
 }
 
 export function updatePageTemplate(pageTemplate) {
-  return fetch(`/layout/rest/pageTemplates/${pageTemplate.id}`, {
+  return fetch(`/layout/rest/page/templates/${pageTemplate.id}`, {
     credentials: 'include',
     method: 'PUT',
     headers: {
@@ -79,7 +79,7 @@ export function updatePageTemplate(pageTemplate) {
 }
 
 export function deletePageTemplate(id) {
-  return fetch(`/layout/rest/pageTemplates/${id}`, {
+  return fetch(`/layout/rest/page/templates/${id}`, {
     credentials: 'include',
     method: 'DELETE',
   }).then((resp) => {

@@ -17,14 +17,6 @@
           :portlet="props.item" />
       </template>
     </v-data-table>
-    <exo-confirm-dialog
-      ref="deleteConfirmDialog"
-      :title="$t('portlets.label.confirmDeleteTitle')"
-      :message="$t('portlets.label.confirmDeleteMessage', {0: `<br><strong>${nameToDelete}</strong>`})"
-      :ok-label="$t('portlets.label.confirm')"
-      :cancel-label="$t('portlets.label.cancel')"
-      @ok="deletePortlet(portletToDelete)"
-      @closed="portletToDelete = null" />
   </div>
 </template>
 <script>
@@ -116,28 +108,9 @@ export default {
           || this.$utils.htmlToText(description)?.toLowerCase?.()?.includes(this.keyword.toLowerCase());
       }) || this.noEmptyPortlets;
     },
-    nameToDelete() {
-      return this.portletToDelete && this.$te(this.portletToDelete?.name) ? this.$t(this.portletToDelete?.name) : this.portletToDelete?.name;
-    },
   },
   created() {
-    this.$root.$on('portlets-deleted', this.refreshPortlets);
-    this.$root.$on('portlets-created', this.refreshPortlets);
-    this.$root.$on('portlets-updated', this.refreshPortlets);
-    this.$root.$on('portlets-enabled', this.refreshPortlets);
-    this.$root.$on('portlets-disabled', this.refreshPortlets);
-    this.$root.$on('portlets-saved', this.refreshPortlets);
-    this.$root.$on('portlets-delete', this.deletePortletConfirm);
     this.refreshPortlets();
-  },
-  beforeDestroy() {
-    this.$root.$off('portlets-deleted', this.refreshPortlets);
-    this.$root.$off('portlets-created', this.refreshPortlets);
-    this.$root.$off('portlets-updated', this.refreshPortlets);
-    this.$root.$off('portlets-enabled', this.refreshPortlets);
-    this.$root.$off('portlets-disabled', this.refreshPortlets);
-    this.$root.$off('portlets-saved', this.refreshPortlets);
-    this.$root.$off('portlets-delete', this.deletePortletConfirm);
   },
   methods: {
     applySortOnItems(portlets, sortFields, sortDescendings) {
@@ -155,26 +128,10 @@ export default {
       }
       return portlets;
     },
-    deletePortletConfirm(portlet) {
-      this.portletToDelete = portlet;
-      if (this.portletToDelete) {
-        this.$refs.deleteConfirmDialog.open();
-      }
-    },
     refreshPortlets() {
       this.loading = true;
       return this.$portletService.getPortlets()
         .then(portlets => this.portlets = portlets || [])
-        .finally(() => this.loading = false);
-    },
-    deletePortlet(portlet) {
-      this.loading = true;
-      this.$portletService.deletePortlet(portlet.id)
-        .then(() => {
-          this.$root.$emit('portlets-deleted', portlet);
-          this.$root.$emit('alert-message', this.$t('portlets.delete.success'), 'success');
-        })
-        .catch(() => this.$root.$emit('alert-message', this.$t('portlets.delete.error'), 'error'))
         .finally(() => this.loading = false);
     },
   },
