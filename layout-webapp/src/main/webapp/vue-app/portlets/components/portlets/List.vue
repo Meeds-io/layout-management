@@ -28,12 +28,15 @@ export default {
     },
   },
   data: () => ({
-    portlets: [],
-    portletToDelete: null,
-    loading: false,
     collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
+    portlets() {
+      return this.$root.portlets;
+    },
+    loading() {
+      return !!this.$root.loading;
+    },
     headers() {
       return this.$root.isMobile && [
         {
@@ -109,9 +112,6 @@ export default {
       }) || this.noEmptyPortlets;
     },
   },
-  created() {
-    this.refreshPortlets();
-  },
   methods: {
     applySortOnItems(portlets, sortFields, sortDescendings) {
       for (let i = 0; i < sortFields.length; i++) {
@@ -127,12 +127,6 @@ export default {
         portlets.reverse();
       }
       return portlets;
-    },
-    refreshPortlets() {
-      this.loading = true;
-      return this.$portletService.getPortlets()
-        .then(portlets => this.portlets = portlets || [])
-        .finally(() => this.loading = false);
     },
   },
 };
