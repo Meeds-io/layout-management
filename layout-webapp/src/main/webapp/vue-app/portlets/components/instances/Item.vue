@@ -123,7 +123,7 @@ export default {
             });
         })
         .then(() => {
-          this.$root.$emit('alert-message', this.$t('portlets.status.update.success'), 'success');
+          this.$root.$emit('alert-message', this.enabled && this.$t('portlets.status.disabled.success') || this.$t('portlets.status.enabled.success'), 'success');
         })
         .catch(() => this.$root.$emit('alert-message', this.$t('portlets.status.update.error'), 'error'))
         .finally(() => this.loading = false);
