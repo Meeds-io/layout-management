@@ -27,9 +27,6 @@ export default {
       default: null,
     },
   },
-  data: () => ({
-    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
-  }),
   computed: {
     portlets() {
       return this.$root.portlets;
@@ -100,7 +97,7 @@ export default {
     },
     noEmptyPortlets() {
       const portlets = this.portlets?.filter?.(t => t.name) || [];
-      portlets.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      portlets.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       return portlets;
     },
     filteredPortlets() {
@@ -121,7 +118,7 @@ export default {
     },
     applySortOnItemsUsingField(portlets, field, desc) {
       if (field === 'name') {
-        portlets.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+        portlets.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       }
       if (desc) {
         portlets.reverse();

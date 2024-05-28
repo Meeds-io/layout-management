@@ -38,7 +38,6 @@ export default {
   data: () => ({
     portletInstanceToDelete: null,
     categoryId: 0,
-    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
     loading() {
@@ -126,7 +125,7 @@ export default {
     },
     noEmptyPortletInstances() {
       const portletInstances = this.portletInstances?.filter?.(t => t.name) || [];
-      portletInstances.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      portletInstances.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       return portletInstances;
     },
     filteredPortletInstances() {
@@ -158,13 +157,13 @@ export default {
     },
     applySortOnItemsUsingField(portletInstances, field, desc) {
       if (field === 'name') {
-        portletInstances.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+        portletInstances.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       } else if (field === 'disabled') {
         portletInstances.sort((a, b) => (a.disabled ? 0 : 1) - (b.disabled ? 0 : 1));
       } else if (field === 'categoryId') {
-        portletInstances.sort((a, b) => this.collator.compare(this.$root.categoriesById[a.categoryId]?.name?.toLowerCase?.(), this.$root.categoriesById[b.categoryId]?.name?.toLowerCase?.()));
+        portletInstances.sort((a, b) => this.$root.collator.compare(this.$root.categoriesById[a.categoryId]?.name?.toLowerCase?.(), this.$root.categoriesById[b.categoryId]?.name?.toLowerCase?.()));
       } else if (field === 'contentId') {
-        portletInstances.sort((a, b) => this.collator.compare(this.$root.portletsById[a.contentId]?.name?.toLowerCase?.(), this.$root.portletsById[b.contentId]?.name?.toLowerCase?.()));
+        portletInstances.sort((a, b) => this.$root.collator.compare(this.$root.portletsById[a.contentId]?.name?.toLowerCase?.(), this.$root.portletsById[b.contentId]?.name?.toLowerCase?.()));
       }
       if (desc) {
         portletInstances.reverse();
