@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.io.IOUtils;
@@ -49,6 +50,7 @@ import org.exoplatform.portal.config.model.UnmarshalledObject;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.social.attachment.AttachmentService;
 import org.exoplatform.social.attachment.model.UploadedAttachmentDetail;
@@ -71,13 +73,17 @@ import lombok.SneakyThrows;
 @Component
 public class PageTemplateImportService {
 
-  private static final Scope            PAGE_TEMPLATE_IMPORT_SCOPE = Scope.APPLICATION.id("PAGE_TEMPLATE_IMPORT");
+  private static final Scope            PAGE_TEMPLATE_IMPORT_SCOPE   = Scope.APPLICATION.id("PAGE_TEMPLATE_IMPORT");
 
-  private static final Context          PAGE_TEMPLATE_CONTEXT      = Context.GLOBAL.id("PAGE_TEMPLATE");
+  private static final Context          PAGE_TEMPLATE_CONTEXT        = Context.GLOBAL.id("PAGE_TEMPLATE");
 
-  private static final Log              LOG                        = ExoLogger.getLogger(PageTemplateImportService.class);
+  private static final String           PAGE_TEMPLATE_VERSION        = "version";
 
-  private static final Random           RANDOM                     = new Random();
+  private static final long             PAGE_TEMPLATE_IMPORT_VERSION = 1;
+
+  private static final Log              LOG                          = ExoLogger.getLogger(PageTemplateImportService.class);
+
+  private static final Random           RANDOM                       = new Random();
 
   @Autowired
   private LayoutAclService              layoutAclService;
@@ -96,6 +102,9 @@ public class PageTemplateImportService {
 
   @Autowired
   private SettingService                settingService;
+
+  @Autowired
+  private ResourceBundleService         resourceBundleService;
 
   @Autowired
   private ConfigurationManager          configurationManager;
@@ -121,6 +130,13 @@ public class PageTemplateImportService {
   @ContainerTransactional
   public void importPageTemplates() {
     LOG.info("Importing Page Templates");
+    if (!forceReimportTemplates
+        && getSettingValue(PAGE_TEMPLATE_VERSION) != PAGE_TEMPLATE_IMPORT_VERSION) {
+      forceReimportTemplates = true;
+    }
+
+    ConversationState currentConversationState = ConversationState.getCurrent();
+    ConversationState.setCurrent(layoutAclService.getSuperUserConversationState());
     try {
       Enumeration<URL> templateFiles = PortalContainer.getInstance()
                                                       .getPortalClassLoader()
@@ -139,7 +155,11 @@ public class PageTemplateImportService {
                  .forEach(this::importDescriptor);
     } catch (Exception e) {
       LOG.warn("An error occurred while importing page templates", e);
+    } finally {
+      ConversationState.setCurrent(currentConversationState);
     }
+    setSettingValue(PAGE_TEMPLATE_VERSION, PAGE_TEMPLATE_IMPORT_VERSION);
+    LOG.info("Importing Page Templates finished successfully");
   }
 
   protected List<PageTemplateDescriptor> parseDescriptors(URL url) {
@@ -155,21 +175,19 @@ public class PageTemplateImportService {
 
   protected void importDescriptor(PageTemplateDescriptor descriptor) {
     String descriptorId = descriptor.getId();
-    long oldTemplateId = getAlreadyImportedTemplateId(descriptorId);
-    if (forceReimportTemplates || oldTemplateId == 0) {
-      importPageTemplate(descriptor, oldTemplateId);
+    long existingTemplateId = getSettingValue(descriptorId);
+    if (forceReimportTemplates || existingTemplateId == 0) {
+      importPageTemplate(descriptor, existingTemplateId);
     } else {
       LOG.info("Ignore re-importing Page Template {}", descriptorId);
     }
   }
 
   protected void importPageTemplate(PageTemplateDescriptor d, long oldTemplateId) {
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(layoutAclService.getSuperUserConversationState());
+    LOG.info("Importing Page Template {}", d.getId());
     try {
-      LOG.info("Importing Page Template {}", d.getId());
       PageTemplate pageTemplate = createPageTemplate(d, oldTemplateId);
-      if (oldTemplateId == 0 || pageTemplate.getId() != oldTemplateId) {
+      if (forceReimportTemplates || oldTemplateId == 0 || pageTemplate.getId() != oldTemplateId) {
         LOG.info("Importing Page Template {} title translations", d.getId());
         saveTemplateNames(d, pageTemplate);
         LOG.info("Importing Page Template {} description translations", d.getId());
@@ -177,20 +195,22 @@ public class PageTemplateImportService {
         LOG.info("Importing Page Template {} illustration", d.getId());
         saveTemplateIllustration(pageTemplate.getId(), d.getIllustrationPath());
         // Mark as imported
-        settingService.set(PAGE_TEMPLATE_CONTEXT,
-                           PAGE_TEMPLATE_IMPORT_SCOPE,
-                           d.getId(),
-                           SettingValue.create(String.valueOf(pageTemplate.getId())));
+        setSettingValue(d.getId(), pageTemplate.getId());
       }
       LOG.info("Importing Page Template {} finished successfully", d.getId());
     } catch (Exception e) {
       LOG.warn("An error occurred while importing page template {}", d.getId(), e);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
     }
   }
 
   protected void saveTemplateNames(PageTemplateDescriptor d, PageTemplate pageTemplate) {
+    try {
+      translationService.deleteTranslationLabels(PageTemplateTranslationPlugin.OBJECT_TYPE,
+                                                 pageTemplate.getId(),
+                                                 PageTemplateTranslationPlugin.TITLE_FIELD_NAME);
+    } catch (Exception e) { // NOSONAR
+      // Normal, when not exists
+    }
     d.getNames()
      .forEach((k, v) -> saveTranslationLabel(PageTemplateTranslationPlugin.OBJECT_TYPE,
                                              pageTemplate.getId(),
@@ -209,6 +229,13 @@ public class PageTemplateImportService {
   }
 
   protected void saveTemplateDescriptions(PageTemplateDescriptor d, PageTemplate pageTemplate) {
+    try {
+      translationService.deleteTranslationLabels(PageTemplateTranslationPlugin.OBJECT_TYPE,
+                                                 pageTemplate.getId(),
+                                                 PageTemplateTranslationPlugin.DESCRIPTION_FIELD_NAME);
+    } catch (Exception e) { // NOSONAR
+      // Normal, when not exists
+    }
     d.getDescriptions()
      .forEach((k, v) -> saveTranslationLabel(PageTemplateTranslationPlugin.OBJECT_TYPE,
                                              pageTemplate.getId(),
@@ -232,11 +259,12 @@ public class PageTemplateImportService {
     if (oldTemplateId > 0) {
       pageTemplate = pageTemplateService.getPageTemplate(oldTemplateId);
     }
-    boolean isNew = false;
-    if (pageTemplate == null) {
+    boolean isNew = pageTemplate == null;
+    if (isNew) {
       pageTemplate = new PageTemplate();
-      isNew = true;
     }
+    pageTemplate.setCategory(d.getCategory());
+    pageTemplate.setSystem(d.isSystem());
     try (InputStream is = configurationManager.getInputStream(d.getLayoutPath())) {
       String xml = IOUtil.getStreamContentAsString(is);
       Container layout = fromXML(xml);
@@ -251,6 +279,12 @@ public class PageTemplateImportService {
 
   @SneakyThrows
   protected void saveTranslationLabel(String objectType, long id, String fieldName, Locale locale, String label) {
+    if (PortalContainer.getInstanceIfPresent() != null) {
+      String i18nLabel = getI18NLabel(label, locale);
+      if (i18nLabel != null) {
+        label = i18nLabel;
+      }
+    }
     translationService.saveTranslationLabel(objectType,
                                             id,
                                             fieldName,
@@ -287,9 +321,32 @@ public class PageTemplateImportService {
     return obj.getObject();
   }
 
-  protected long getAlreadyImportedTemplateId(String descriptorId) {
+  protected String getI18NLabel(String label, Locale locale) {
     try {
-      SettingValue<?> settingValue = settingService.get(PAGE_TEMPLATE_CONTEXT, PAGE_TEMPLATE_IMPORT_SCOPE, descriptorId);
+      ResourceBundle resourceBundle =
+                                    resourceBundleService.getResourceBundle("locale.portlet.Portlets",
+                                                                            locale,
+                                                                            PortalContainer.getInstance()
+                                                                                           .getPortalClassLoader());
+      if (resourceBundle != null && resourceBundle.containsKey(label)) {
+        return resourceBundle.getString(label);
+      }
+    } catch (Exception e) {
+      LOG.debug("Resource Bundle not found with locale {}", locale, e);
+    }
+    return null;
+  }
+
+  protected void setSettingValue(String name, long value) {
+    settingService.set(PAGE_TEMPLATE_CONTEXT,
+                       PAGE_TEMPLATE_IMPORT_SCOPE,
+                       name,
+                       SettingValue.create(String.valueOf(value)));
+  }
+
+  protected long getSettingValue(String name) {
+    try {
+      SettingValue<?> settingValue = settingService.get(PAGE_TEMPLATE_CONTEXT, PAGE_TEMPLATE_IMPORT_SCOPE, name);
       return settingValue == null || settingValue.getValue() == null ? 0l : Long.parseLong(settingValue.getValue().toString());
     } catch (NumberFormatException e) {
       return 0l;

@@ -30,6 +30,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.configuration.ConfigurationManager;
 import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.ResourceBundleService;
 import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.plugin.PageTemplateAttachmentPlugin;
@@ -59,6 +60,9 @@ public class PageTemplateImportServiceTest {
   private SettingService                settingService;
 
   @MockBean
+  private ResourceBundleService         resourceBundleService;
+
+  @MockBean
   private ConfigurationManager          configurationManager;
 
   @MockBean
@@ -72,7 +76,9 @@ public class PageTemplateImportServiceTest {
 
   @Test
   public void init() {
-    assertDoesNotThrow(() -> pageTemplateImportService.init(), "Shouldn't stop the container initialization if page templates fails");
-    assertDoesNotThrow(() -> pageTemplateImportService.importPageTemplates(), "Shouldn't stop the container initialization if page templates fails");
+    assertDoesNotThrow(() -> pageTemplateImportService.init(),
+                       "Shouldn't stop the container initialization if page templates fails");
+    assertDoesNotThrow(() -> pageTemplateImportService.importPageTemplates(),
+                       "Shouldn't stop the container initialization if page templates fails");
   }
 }

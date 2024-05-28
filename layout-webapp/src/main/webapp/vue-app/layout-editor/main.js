@@ -18,6 +18,7 @@
  */
 
 import './initComponents.js';
+import '../common/initComponents.js';
 import './extensions.js';
 import './services.js';
 
@@ -59,6 +60,8 @@ export function init() {
           displayMode: 'desktop',
           layout: null,
           pageRef: null,
+          pageTemplate: null,
+          pageTemplateId: null,
           draftPageRef: null,
           draftNode: null,
           draftNodeId: null,

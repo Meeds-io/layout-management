@@ -19,7 +19,7 @@
 
 -->
 <template>
-  <div class="position-relative layout-section">
+  <div class="layout-section">
     <layout-section-mobile-column-menu-drawer
       v-if="isMobileColumns"
       v-model="mobileSectionColumnClass"

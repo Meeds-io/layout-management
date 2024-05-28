@@ -27,19 +27,32 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PageTemplate {
 
-  private long   id;
+  private long    id;
 
-  private String content;
+  private boolean disabled;
 
-  private String name;
+  private boolean system;
 
-  private String description;
+  private String  category;
 
-  private long   illustrationId;
+  private String  content;
 
-  public PageTemplate(long id, String content) {
+  private String  name;
+
+  private String  description;
+
+  private long    illustrationId;
+
+  public PageTemplate(long id,
+                      boolean disabled,
+                      boolean system,
+                      String category,
+                      String content) {
     this.id = id;
     this.content = content;
+    this.disabled = disabled;
+    this.system = system;
+    this.category = category;
   }
 
 }

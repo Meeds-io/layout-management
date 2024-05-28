@@ -36,6 +36,8 @@
         @modified="modified = true" />
       <layout-editor-cells-selection-box />
     </div>
+    <layout-analytics
+      :application-name="pageTemplateId ? 'pageTemplateManagement' : 'pageLayoutEditor'" />
   </v-app>
 </template>
 <script>
@@ -51,6 +53,9 @@ export default {
   computed: {
     pageKey() {
       return this.node?.state?.pageRef;
+    },
+    pageTemplateId() {
+      return this.getQueryParam('pageTemplateId');
     },
     pageRef() {
       return this.getQueryParam('pageId') || this.pageKey?.ref || (this.pageKey && `${this.pageKey.site.typeName}::${this.pageKey.site.name}::${this.pageKey.name}`);
@@ -69,6 +74,14 @@ export default {
     },
   },
   watch: {
+    pageTemplateId: {
+      immediate: true,
+      handler() {
+        if (this.pageTemplateId) {
+          this.$root.pageTemplateId = this.pageTemplateId;
+        }
+      },
+    },
     pageRef: {
       immediate: true,
       handler() {
@@ -84,8 +97,18 @@ export default {
       handler() {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
-          this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
-            .then(draftLayout => this.setDraftLayout(draftLayout));
+          if (this.pageTemplateId) {
+            this.$pageTemplateService.getPageTemplate(this.pageTemplateId)
+              .then(pageTemplate => this.$root.pageTemplate = pageTemplate)
+              .then(() => this.$pageLayoutService.updatePageLayout(
+                this.draftPageRef,
+                JSON.parse(this.$root.pageTemplate.content),
+                'contentId'))
+              .then(draftLayout => this.setDraftLayout(draftLayout));
+          } else {
+            this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
+              .then(draftLayout => this.setDraftLayout(draftLayout));
+          }
         }
       },
     },

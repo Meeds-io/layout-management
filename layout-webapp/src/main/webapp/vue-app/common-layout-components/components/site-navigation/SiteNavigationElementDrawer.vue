@@ -247,7 +247,8 @@ export default {
           this.navigationNode.siteKey.name,
           this.navigationNode.siteKey.type,
           this.elementType, this.elementType === 'LINK' && this.link || null,
-          this.elementType === 'PAGE' && this.pageTemplate?.id || null)
+          this.elementType === 'PAGE' && this.pageTemplate?.id || null
+        )
           .then((createdPage) => {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             this.$root.$emit('save-node-with-page', {
@@ -257,6 +258,9 @@ export default {
               'createdPage': createdPage,
               'openEditLayout': this.elementType === 'PAGE',
             });
+            return createdPage;
+          }).then(page => {
+            this.$root.$emit('page-layout-created', page, this.pageTemplate);
           }).catch(() => {
             this.$root.$emit('alert-message', this.$t('siteNavigation.label.pageCreation.error'), 'error');
           }).finally(() => this.loading = false);

@@ -27,7 +27,7 @@
     right
     disable-pull-to-refresh>
     <template #title>
-      {{ $t('layout.saveAsTemplateTitle') }}
+      {{ duplicate && $t('layout.duplicateTemplateTitle') || templateId && $t('layout.editTemplateTitle') || $t('layout.saveAsTemplateTitle') }}
     </template>
     <template v-if="drawer" #content>
       <div class="pa-4" flat>
@@ -84,6 +84,7 @@
         <layout-editor-page-template-preview
           ref="pagePreview"
           v-model="illustrationUploadId"
+          :duplicate="duplicate"
           :template-id="templateId" />
       </div>
     </template>
@@ -119,13 +120,10 @@ export default {
     maxTitleLength: 250,
     maxDescriptionLength: 1000,
     illustrationUploadId: null,
+    duplicate: null,
     templateId: null,
+    pageLayoutContent: null,
   }),
-  computed: {
-    pageRef() {
-      return this.$root.layout.pageRef;
-    },
-  },
   watch: {
     description() {
       if (this.$refs.descriptionTranslation) {
@@ -143,17 +141,38 @@ export default {
     this.$root.$off('layout-page-template-drawer-open', this.open);
   },
   methods: {
-    open() {
+    open(pageTemplate, duplicate) {
+      this.templateId = pageTemplate.id || this.$root.pageTemplate?.id || null;
+      this.pageLayoutContent = pageTemplate.content;
+      this.duplicate = duplicate;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     close() {
       this.$refs.drawer.close();
     },
     save() {
-      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
+      this.saving = true;
       const savePageRequest =
-        this.templateId ? this.$pageTemplateService.updatePageTemplate(pageLayout, this.templateId)
-          : this.$pageTemplateService.createPageTemplate(pageLayout);
+        (!this.duplicate && this.templateId) ?
+          this.$pageTemplateService.getPageTemplate(this.templateId)
+            .then(pageTemplate => {
+              const newTemplate = (this.$root.pageTemplate && !this.$root.pageTemplate.name);
+              pageTemplate.disabled = newTemplate ? false : pageTemplate.disabled;
+              pageTemplate.content = this.pageLayoutContent;
+              return this.$pageTemplateService.updatePageTemplate(pageTemplate)
+                .then(() => {
+                  if (newTemplate) {
+                    this.$root.$emit('page-templates-created', pageTemplate);
+                  } else {
+                    this.$root.$emit('page-templates-updated', pageTemplate);
+                  }
+                });
+            })
+          : this.$pageTemplateService.createPageTemplate(this.pageLayoutContent)
+            .then(pageTemplate => {
+              this.$root.$emit('page-templates-created', pageTemplate, this.$root.pageRef);
+              return pageTemplate;
+            });
       return savePageRequest
         .then(pageTemplate => {
           if (pageTemplate) {
@@ -165,9 +184,17 @@ export default {
         .then(() => this.$translationService.saveTranslations('pageTemplate', this.templateId, 'description', this.descriptionTranslations))
         .then(() => this.$refs?.pagePreview?.save())
         .then(() => {
+          if (this.$root.pageTemplate) {
+            return this.$pageTemplateService.getPageTemplate(this.templateId)
+              .then(pageTemplate => this.$root.pageTemplate = pageTemplate);
+          }
+        })
+        .then(() => {
+          this.$root.$emit('page-templates-saved');
           this.close();
           this.$root.$emit('alert-message', this.$t('layout.pageTemplateCreatedSuccessfully'), 'success');
-        });
+        })
+        .finally(() => this.saving = false);
     },
   },
 };

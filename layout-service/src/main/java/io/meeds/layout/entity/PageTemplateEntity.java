@@ -40,9 +40,18 @@ public class PageTemplateEntity {
   @SequenceGenerator(name = "SEQ_PAGE_TEMPLATE_ID", sequenceName = "SEQ_PAGE_TEMPLATE_ID", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.AUTO, generator = "SEQ_PAGE_TEMPLATE_ID")
   @Column(name = "ID")
-  protected Long id;
+  protected Long  id;
+
+  @Column(name = "DISABLED")
+  private boolean disabled;
+
+  @Column(name = "SYSTEM_PAGE_TEMPLATE")
+  private boolean system;
+
+  @Column(name = "CATEGORY")
+  private String  category;
 
   @Column(name = "CONTENT")
-  private String content;
+  private String  content;
 
 }

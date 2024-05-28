@@ -30,7 +30,20 @@ export function getPageTemplates() {
   });
 }
 
-export function createPageTemplate(pageContent) {
+export function getPageTemplate(id) {
+  return fetch(`/layout/rest/pageTemplates/${id}`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp?.ok) {
+      throw new Error('Error when retrieving page template');
+    } else {
+      return resp.json();
+    }
+  });
+}
+
+export function createPageTemplate(pageContent, disabled) {
   return fetch('/layout/rest/pageTemplates', {
     credentials: 'include',
     method: 'POST',
@@ -38,7 +51,8 @@ export function createPageTemplate(pageContent) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      content: JSON.stringify(pageContent),
+      content: pageContent,
+      disabled: disabled || false,
     }),
   }).then((resp) => {
     if (resp?.ok) {
@@ -49,16 +63,25 @@ export function createPageTemplate(pageContent) {
   });
 }
 
-export function updatePageTemplate(pageContent, id) {
-  return fetch(`/layout/rest/pageTemplates/${id}`, {
+export function updatePageTemplate(pageTemplate) {
+  return fetch(`/layout/rest/pageTemplates/${pageTemplate.id}`, {
     credentials: 'include',
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      content: JSON.stringify(pageContent),
-    }),
+    body: JSON.stringify(pageTemplate),
+  }).then((resp) => {
+    if (!resp?.ok) {
+      throw new Error('Error when creating page template');
+    }
+  });
+}
+
+export function deletePageTemplate(id) {
+  return fetch(`/layout/rest/pageTemplates/${id}`, {
+    credentials: 'include',
+    method: 'DELETE',
   }).then((resp) => {
     if (!resp?.ok) {
       throw new Error('Error when creating page template');

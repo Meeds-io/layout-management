@@ -37,28 +37,54 @@ public class PageTemplateStorage {
 
   public List<PageTemplate> getPageTemplates() {
     List<PageTemplateEntity> entities = pageTemplateDAO.findAll();
-    return entities.stream().map(entity -> new PageTemplate(entity.getId(), entity.getContent())).toList();
+    return entities.stream()
+                   .map(e -> new PageTemplate(e.getId(),
+                                              e.isDisabled(),
+                                              e.isSystem(),
+                                              e.getCategory(),
+                                              e.getContent()))
+                   .toList();
   }
 
   public PageTemplate getPageTemplate(long id) {
     return pageTemplateDAO.findById(id)
-                          .map(e -> new PageTemplate(e.getId(), e.getContent()))
+                          .map(e -> new PageTemplate(e.getId(),
+                                                     e.isDisabled(),
+                                                     e.isSystem(),
+                                                     e.getCategory(),
+                                                     e.getContent()))
                           .orElse(null);
   }
 
   public PageTemplate createPageTemplate(PageTemplate pageTemplate) {
-    PageTemplateEntity entity = new PageTemplateEntity(null, pageTemplate.getContent());
+    PageTemplateEntity entity = new PageTemplateEntity(null,
+                                                       pageTemplate.isDisabled(),
+                                                       pageTemplate.isSystem(),
+                                                       pageTemplate.getCategory(),
+                                                       pageTemplate.getContent());
     entity = pageTemplateDAO.save(entity);
-    return new PageTemplate(entity.getId(), entity.getContent());
+    return new PageTemplate(entity.getId(),
+                            entity.isDisabled(),
+                            entity.isSystem(),
+                            entity.getCategory(),
+                            entity.getContent());
   }
 
   public PageTemplate updatePageTemplate(PageTemplate pageTemplate) throws ObjectNotFoundException {
     if (!pageTemplateDAO.existsById(pageTemplate.getId())) {
       throw new ObjectNotFoundException("Page template doesn't exist");
     }
-    PageTemplateEntity entity = new PageTemplateEntity(pageTemplate.getId(), pageTemplate.getContent());
+    PageTemplateEntity entity = new PageTemplateEntity(pageTemplate.getId(),
+                                                       pageTemplate.isDisabled(),
+                                                       pageTemplate.isSystem(),
+                                                       pageTemplate.getCategory(),
+                                                       pageTemplate.getContent());
     entity = pageTemplateDAO.save(entity);
-    return new PageTemplate(entity.getId(), entity.getContent());
+    return new PageTemplate(entity.getId(),
+                            entity.isDisabled(),
+                            entity.isSystem(),
+                            entity.getCategory(),
+                            entity.getContent());
   }
 
   public void deletePageTemplate(long templateId) throws ObjectNotFoundException {

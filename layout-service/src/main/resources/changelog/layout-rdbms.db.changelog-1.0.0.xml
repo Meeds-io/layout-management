@@ -46,4 +46,48 @@
     </modifySql>
   </changeSet>
 
+  <changeSet
+    author="layout"
+    id="1.0.0-2">
+    <addColumn tableName="LAYOUT_PAGE_TEMPLATES">
+      <column
+        name="DISABLED"
+        type="BOOLEAN"
+        defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-3">
+    <addColumn tableName="LAYOUT_PAGE_TEMPLATES">
+      <column
+        name="CATEGORY"
+        type="NVARCHAR(200)" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="layout" id="1.0.0-4" dbms="mysql">
+    <sql>
+        ALTER TABLE LAYOUT_PAGE_TEMPLATES MODIFY COLUMN CONTENT LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet author="layout" id="1.0.0-5" dbms="mysql">
+    <sql>
+        ALTER TABLE LAYOUT_PAGE_TEMPLATES MODIFY COLUMN CATEGORY VARCHAR(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-6">
+    <addColumn tableName="LAYOUT_PAGE_TEMPLATES">
+      <column
+        name="SYSTEM_PAGE_TEMPLATE"
+        type="BOOLEAN"
+        defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

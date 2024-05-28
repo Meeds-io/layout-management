@@ -70,17 +70,17 @@ public class PageTemplateService {
   public List<PageTemplate> getPageTemplates(Locale locale, boolean expand) {
     List<PageTemplate> pageTemplates = pageTemplateStorage.getPageTemplates();
     if (expand) {
-      pageTemplates.forEach(pageTemplate -> {
-        pageTemplate.setName(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.TITLE_FIELD_NAME, locale));
-        pageTemplate.setDescription(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.DESCRIPTION_FIELD_NAME, locale));
-        List<String> attachmentFileIds = attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE,
-                                                                                String.valueOf(pageTemplate.getId()));
-        if (CollectionUtils.isNotEmpty(attachmentFileIds)) {
-          pageTemplate.setIllustrationId(Long.parseLong(attachmentFileIds.get(0)));
-        }
-      });
+      pageTemplates.forEach(pageTemplate -> computePageTemplateAttributes(locale, pageTemplate));
     }
     return pageTemplates;
+  }
+
+  public PageTemplate getPageTemplate(long id, Locale locale, boolean expand) {
+    PageTemplate pageTemplate = pageTemplateStorage.getPageTemplate(id);
+    if (expand) {
+      computePageTemplateAttributes(locale, pageTemplate);
+    }
+    return pageTemplate;
   }
 
   public PageTemplate getPageTemplate(long id) {
@@ -101,6 +101,13 @@ public class PageTemplateService {
   public void deletePageTemplate(long templateId, String username) throws IllegalAccessException, ObjectNotFoundException {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to create a page template");
+    }
+    PageTemplate pageTemplate = getPageTemplate(templateId);
+    if (pageTemplate == null) {
+      throw new ObjectNotFoundException("Page template doesn't exist");
+    }
+    if (pageTemplate.isSystem()) {
+      throw new IllegalAccessException("Can't delete a system page template");
     }
     deletePageTemplate(templateId);
   }
@@ -154,6 +161,16 @@ public class PageTemplateService {
       }
     } catch (ObjectNotFoundException e) {
       return null;
+    }
+  }
+
+  private void computePageTemplateAttributes(Locale locale, PageTemplate pageTemplate) {
+    pageTemplate.setName(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.TITLE_FIELD_NAME, locale));
+    pageTemplate.setDescription(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.DESCRIPTION_FIELD_NAME, locale));
+    List<String> attachmentFileIds = attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE,
+                                                                            String.valueOf(pageTemplate.getId()));
+    if (CollectionUtils.isNotEmpty(attachmentFileIds)) {
+      pageTemplate.setIllustrationId(Long.parseLong(attachmentFileIds.get(0)));
     }
   }
 

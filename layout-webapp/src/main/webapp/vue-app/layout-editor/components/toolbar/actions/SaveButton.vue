@@ -20,6 +20,7 @@
 -->
 <template>
   <v-btn
+    v-if="canSave"
     :disabled="disabled"
     :loading="loading"
     :aria-label="$t('layout.publish')"
@@ -40,8 +41,16 @@ export default {
   data: () => ({
     loading: false,
   }),
+  computed: {
+    canSave() {
+      return eXo.env.portal.selectedNodeId !== this.$root.nodeId;
+    },
+  },
   methods: {
     savePage() {
+      if (!this.canSave) {
+        return;
+      }
       this.loading = true;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, 'contentId', true)
