@@ -44,12 +44,14 @@
             v-for="(category, index) in applicationCategories"
             :key="category.id"
             :category="category"
+            :applications="applications"
             :expanded="expanded === index"
             @addApplication="addApplication" />
           <layout-editor-application-category-card
             v-for="(category, index) in otherCategories"
-            :key="category.id"
+            :key="category.name"
             :category="category"
+            :applications="otherApplications"
             :expanded="expanded === index"
             @addApplication="addApplication" />
         </v-expansion-panels>
@@ -85,20 +87,20 @@ export default {
       return applicationCategories;
     },
     applications() {
-      return this.applicationCategories.flatMap(c => c.applications);
+      return this.$root.allApplications;
     },
     otherApplications() {
       return this.allApplications.filter(a => !this.applications.find(app => app.contentId === a.contentId));
     },
     otherCategories() {
       return this.otherApplications.reduce((otherCategories, application) => {
-        const category = otherCategories.find(c => c.name === application.categoryName);
+        const category = otherCategories.find(c => c.name === application.applicationName);
         if (category) {
           category.applications.push(application);
         } else {
           otherCategories.push({
-            name: application.categoryName,
-            label: `<strong>${this.$t('layout.otherApplications')}:</strong> ${this.$te(`layout.${application.categoryName}`) ? this.$t(`layout.${application.categoryName}`) : application.categoryName}`,
+            name: application.applicationName,
+            label: `<strong>${this.$t('layout.otherApplications')}:</strong> ${this.$te(`layout.${application.applicationName}`) ? this.$t(`layout.${application.applicationName}`) : application.applicationName}`,
             applications: [application],
           });
         }
@@ -120,7 +122,7 @@ export default {
     },
     loadMore() {
       this.$refs.drawer.startLoading();
-      this.$applicationRegistryService.getApplications('supportedModes')
+      this.$portletService.getPortlets()
         .then(applications => this.allApplications = applications)
         .finally(() => {
           this.canLoadMore = false;

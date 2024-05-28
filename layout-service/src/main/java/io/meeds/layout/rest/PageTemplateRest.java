@@ -46,8 +46,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("pageTemplates")
-@Tag(name = "pageTemplates", description = "Managing page templates")
+@RequestMapping("/page/templates")
+@Tag(name = "/layout/rest/page/templates", description = "Managing page templates")
 public class PageTemplateRest {
 
   @Autowired

@@ -20,21 +20,26 @@
 -->
 <template>
   <v-app>
-    <v-card class="card-border-radius overflow-hidden position-static pb-5" flat>
+    <v-card
+      :class="tabName === 'portlets' && 'card-border-radius overflow-hidden' || 'transparent'"
+      class="position-static pb-5"
+      flat>
       <portlets-toolbar
         ref="toolbar"
+        class="card-border-radius overflow-hidden"
         @portlets-instance-filter="keyword = $event"
         @select-tab="tabName = $event" />
       <v-carousel-transition leave-absolute>
         <portlets-list
-          ref="portlets"
           v-if="tabName === 'portlets'"
+          ref="portlets"
+          class="card-border-radius overflow-hidden"
           :keyword="keyword" />
       </v-carousel-transition>
       <v-carousel-transition leave-absolute>
-        <portlets-instance-list
-          ref="instances"
+        <portlets-instance-main
           v-if="tabName === 'instances'"
+          ref="instances"
           :keyword="keyword" />
       </v-carousel-transition>
     </v-card>
@@ -46,7 +51,7 @@
 export default {
   data: () => ({
     keyword: null,
-    tabName: 'portlets',
+    tabName: 'instances',
   }),
 };
 </script>

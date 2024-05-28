@@ -18,11 +18,13 @@
  */
 package io.meeds.layout.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -48,14 +50,14 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.model.PageTemplate;
-import io.meeds.layout.plugin.PageTemplateAttachmentPlugin;
-import io.meeds.layout.plugin.PageTemplateTranslationPlugin;
+import io.meeds.layout.plugin.attachment.PageTemplateAttachmentPlugin;
+import io.meeds.layout.plugin.translation.PageTemplateTranslationPlugin;
 import io.meeds.layout.storage.PageTemplateStorage;
 import io.meeds.social.translation.model.TranslationField;
 import io.meeds.social.translation.service.TranslationService;
 
 @SpringBootTest(classes = {
-                            PageTemplateService.class,
+  PageTemplateService.class,
 })
 @ExtendWith(MockitoExtension.class)
 public class PageTemplateServiceTest {
