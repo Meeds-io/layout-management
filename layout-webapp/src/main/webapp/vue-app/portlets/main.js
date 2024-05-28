@@ -48,6 +48,7 @@ export function init() {
           portletInstances: [],
           portletInstanceCategories: [],
           loading: 0,
+          collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
         },
         computed: {
           isMobile() {
