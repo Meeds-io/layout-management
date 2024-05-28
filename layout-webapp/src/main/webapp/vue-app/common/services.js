@@ -21,8 +21,6 @@ import * as siteLayoutService from './js/SiteLayoutService.js';
 import * as navigationLayoutService from './js/NavigationLayoutService.js';
 import * as pageLayoutService from './js/PageLayoutService.js';
 import * as pageTemplateService from './js/PageTemplateService.js';
-import * as portletInstanceService from './js/PortletInstanceService.js';
-import * as portletService from './js/PortletService.js';
 import * as applicationUtils from './js/ApplicationUtils.js';
 
 if (!Vue.prototype.$navigationLayoutService) {
@@ -46,17 +44,6 @@ if (!Vue.prototype.$pageLayoutService) {
 if (!Vue.prototype.$pageTemplateService) {
   window.Object.defineProperty(Vue.prototype, '$pageTemplateService', {
     value: pageTemplateService,
-  });
-}
-
-if (!Vue.prototype.$portletInstanceService) {
-  window.Object.defineProperty(Vue.prototype, '$portletInstanceService', {
-    value: portletInstanceService,
-  });
-}
-if (!Vue.prototype.$portletService) {
-  window.Object.defineProperty(Vue.prototype, '$portletService', {
-    value: portletService,
   });
 }
 

@@ -73,8 +73,8 @@
     <supported-locale>en</supported-locale>
     <resource-bundle>locale.portlet.LayoutEditor</resource-bundle>
     <portlet-info>
-      <title>site navigation</title>
-      <keywords>site navigation Management</keywords>
+      <title>Layout Editor</title>
+      <keywords>Layout Editor Management</keywords>
     </portlet-info>
   </portlet>
 
