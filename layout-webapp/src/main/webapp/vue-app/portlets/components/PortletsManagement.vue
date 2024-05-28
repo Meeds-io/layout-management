@@ -43,6 +43,7 @@
           :keyword="keyword" />
       </v-carousel-transition>
     </v-card>
+    <portlets-item-instances-drawer />
     <layout-image-illustration-preview />
     <layout-analytics application-name="portletsManagement" />
   </v-app>

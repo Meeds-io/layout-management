@@ -34,6 +34,8 @@ import PortletList from './components/portlets/List.vue';
 import PortletItem from './components/portlets/Item.vue';
 import PortletMenu from './components/portlets/Menu.vue';
 
+import PortletInstancesDrawer from './components/portlets/drawer/InstancesDrawer.vue';
+
 const components = {
   'portlets-management': PortletsManagement,
 
@@ -52,6 +54,7 @@ const components = {
   'portlets-list': PortletList,
   'portlets-item': PortletItem,
   'portlets-item-menu': PortletMenu,
+  'portlets-item-instances-drawer': PortletInstancesDrawer,
 };
 
 for (const key in components) {
