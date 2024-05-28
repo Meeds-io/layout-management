@@ -148,7 +148,7 @@ export function init() {
           this.$portletInstanceCategoryService.getPortletInstanceCategories()
             .then(categories => this.applicationCategories = categories);
           this.$portletInstanceService.getPortletInstances()
-            .then(applications => this.allApplications = applications);
+            .then(applications => this.allApplications = applications.filter(a => !a.disabled));
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);
         },
