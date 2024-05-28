@@ -175,7 +175,7 @@ public class LayoutModel {
       } else if (state instanceof TransientApplicationState<Portlet> transientState) {
         this.contentId = transientState.getContentId();
       } else {
-        throw new IllegalStateException("Application should either has a persistent or transient state");
+        throw new IllegalStateException("PortletInstance should either has a persistent or transient state");
       }
     }
   }
@@ -242,7 +242,7 @@ public class LayoutModel {
         transientState.setOwnerType(layoutModel.getOwnerType());
         state = transientState;
       } else {
-        throw new IllegalStateException("Application should either has a storageId or a contentId");
+        throw new IllegalStateException("PortletInstance should either has a storageId or a contentId");
       }
       application.setState(state);
       return application;

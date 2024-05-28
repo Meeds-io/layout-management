@@ -17,22 +17,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function getPortletInstances() {
-  return Promise.resolve();
-}
-
-export function getPortletInstance() {
-  return Promise.resolve();
-}
-
-export function createPortletInstance() {
-  return Promise.resolve();
-}
-
-export function updatePortletInstance() {
-  return Promise.resolve();
-}
-
-export function deletePortletInstance() {
-  return Promise.resolve();
+export function getPortlets() {
+  return fetch('/layout/rest/portlets', {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp?.ok) {
+      throw new Error('Error when retrieving portlets');
+    } else {
+      return resp.json();
+    }
+  });
 }
