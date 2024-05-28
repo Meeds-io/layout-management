@@ -43,9 +43,59 @@ export function init() {
         template: `<portlets-management id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
         i18n,
+        data: {
+          portlets: [],
+          portletInstances: [],
+          portletInstanceCategories: [],
+          loading: 0,
+        },
         computed: {
           isMobile() {
             return this.$vuetify.breakpoint.smAndDown;
+          },
+          categoriesById() {
+            return this.portletInstanceCategories.reduce((a, v) => {
+              a[v.id] = v;
+              return a;
+            }, {});
+          },
+          portletsById() {
+            return this.portlets.reduce((a, v) => {
+              a[v.contentId] = v;
+              return a;
+            }, {});
+          },
+        },
+        created() {
+          this.$root.$on('portlets-instance-deleted', this.refreshPortletInstances);
+          this.$root.$on('portlets-instance-created', this.refreshPortletInstances);
+          this.$root.$on('portlets-instance-updated', this.refreshPortletInstances);
+          this.$root.$on('portlets-instance-enabled', this.refreshPortletInstances);
+          this.$root.$on('portlets-instance-disabled', this.refreshPortletInstances);
+          this.$root.$on('portlets-instance-saved', this.refreshPortletInstances);
+
+          this.refreshPortlets();
+          this.refreshPortletInstances();
+          this.refreshPortletInstanceCategories();
+        },
+        methods: {
+          refreshPortlets() {
+            this.loading++;
+            return this.$portletService.getPortlets()
+              .then(data => this.portlets = data || [])
+              .finally(() => this.loading--);
+          },
+          refreshPortletInstances() {
+            this.loading++;
+            return this.$portletInstanceService.getPortletInstances()
+              .then(data => this.portletInstances = data || [])
+              .finally(() => this.loading--);
+          },
+          refreshPortletInstanceCategories() {
+            this.loading++;
+            return this.$portletInstanceCategoryService.getPortletInstanceCategories()
+              .then(data => this.portletInstanceCategories = data || [])
+              .finally(() => this.loading--);
           },
         },
       }, `#${appId}`, 'Page Layout')
