@@ -26,7 +26,11 @@
     <td
       align="center"
       width="50px">
-      {{ portlet.instances }}
+      <v-btn
+        text
+        @click="$root.$emit('portlets-instances-drawer', portlet.contentId)">
+        {{ instancesCount }}
+      </v-btn>
     </td>
     <td
       align="center"
@@ -58,6 +62,9 @@ export default {
     },
     description() {
       return this.$te(this.portlet?.description) ? this.$t(this.portlet?.description) : this.portlet?.description;
+    },
+    instancesCount() {
+      return this.$root.portletInstances.filter(a => a.contentId === this.portlet.contentId).length || 0;
     },
   },
   watch: {
