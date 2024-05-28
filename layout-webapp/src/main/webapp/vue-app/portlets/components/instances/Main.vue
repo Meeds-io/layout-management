@@ -6,8 +6,7 @@
       class="card-border-radius hidden-sm-and-down me-5" />
     <portlets-instance-list
       ref="list"
-      :keyword="keyword"
-      class="card-border-radius overflow-hidden" />
+      :keyword="keyword" />
   </div>
 </template>
 <script>
