@@ -32,7 +32,6 @@ export default {
   data: () => ({
     loading: false,
     selectedCategory: null,
-    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
     categories() {
@@ -40,7 +39,7 @@ export default {
     },
     filteredCategories() {
       const categories = this.categories?.filter?.(c => c.name)?.slice() || [];
-      categories.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      categories.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       return categories;
     },
   },
