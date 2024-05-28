@@ -20,6 +20,7 @@
 import './initComponents.js';
 import '../common/initComponents.js';
 import '../common-illustration/initComponents.js';
+import '../common-portlets/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {

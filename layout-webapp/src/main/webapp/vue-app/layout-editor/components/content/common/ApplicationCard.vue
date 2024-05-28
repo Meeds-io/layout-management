@@ -32,16 +32,16 @@
           max-width="45"
           @error="displayDefault = true" />
       </v-avatar>
-      <div class="flex-grow-1 ApplicationCardBody text-truncate">
+      <div class="d-flex flex-column flex-grow-1 ApplicationCardBody text-truncate ms-1 my-auto">
         <div
-          :title="applicationName"
-          class="text-truncate subtitle-1 px-1 pt-4 text-color ApplicationCardTitle">
-          {{ applicationName }}
+          :title="name"
+          class="text-truncate subtitle-1 px-1 pt-2 text-color ApplicationCardTitle">
+          {{ name }}
         </div>
         <v-card-subtitle
-          :title="applicationDescription"
-          class="text-truncate subtitle-2 px-1 pt-0 text-sub-title ApplicationCardDescription">
-          {{ applicationDescription || applicationName }}
+          :title="description"
+          class="text-truncate subtitle-2 px-1 pt-0 pb-2 text-sub-title ApplicationCardDescription">
+          {{ description || name }}
         </v-card-subtitle>
       </div>
       <div class="ApplicationCardAction">
@@ -72,18 +72,18 @@ export default {
   }),
   computed: {
     imgSrc() {
-      return this.displayDefault && this.defaultImageSrc || `/${this.webApplicationName}/skin/DefaultSkin/portletIcons/${this.portletName}.png`;
-    },
-    webApplicationName() {
-      return this.application?.contentId?.split?.('/')?.[0];
-    },
-    portletName() {
-      return this.application?.contentId?.split?.('/')?.[1];
+      return this.displayDefault && this.defaultImageSrc || `/${this.applicationName}/skin/DefaultSkin/portletIcons/${this.portletName}.png`;
     },
     applicationName() {
-      return this.application?.displayName || this.application?.applicationName;
+      return this.application?.applicationName || this.application?.contentId?.split?.('/')?.[0];
     },
-    applicationDescription() {
+    portletName() {
+      return this.application?.portletName || this.application?.contentId?.split?.('/')?.[1];
+    },
+    name() {
+      return this.application?.name;
+    },
+    description() {
       return this.application?.description;
     },
   },

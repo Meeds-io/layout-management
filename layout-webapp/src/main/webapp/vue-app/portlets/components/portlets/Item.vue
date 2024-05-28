@@ -5,26 +5,23 @@
       v-if="!$root.isMobile"
       align="center"
       width="70px">
-      <layout-image-illustration
-        :value="portlet"
-        object-type="portlets"
-        default-src="/layout/images/portlets/DefaultPreview.webp" />
+      <v-img
+        :src="illustrationSrc"
+        max-height="30"
+        max-width="60"
+        contain
+        @error="illustrationSrc = defaultIllustrationSrc" />
     </td>
     <!-- name -->
     <td
+      v-sanitized-html="name"
       :width="$root.isMobile && '100%' || 'auto'"
       align="left">
-      <v-card
-        v-sanitized-html="name"
-        class="text-truncate transparent"
-        flat
-        @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
     <!-- description -->
     <td
       v-if="!$root.isMobile"
       align="left"
-      class="text-truncate"
       v-sanitized-html="description"></td>
     <td
       align="center"
@@ -49,6 +46,8 @@ export default {
   data: () => ({
     menu: false,
     hoverMenu: false,
+    defaultIllustrationSrc: '/layout/images/portlets/DefaultPortlet.png',
+    illustrationSrc: null,
   }),
   computed: {
     portletId() {
@@ -59,12 +58,6 @@ export default {
     },
     description() {
       return this.$te(this.portlet?.description) ? this.$t(this.portlet?.description) : this.portlet?.description;
-    },
-    illustrationId() {
-      return this.portlet?.illustrationId;
-    },
-    illustrationSrc() {
-      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/portlets/${this.portletId}/${this.illustrationId}` || '/layout/images/portlets/DefaultPreview.webp';
     },
   },
   watch: {
@@ -77,6 +70,9 @@ export default {
         }, 200);
       }
     },
+  },
+  created() {
+    this.illustrationSrc = `/${this.portlet.applicationName}/skin/DefaultSkin/portletIcons/${this.portlet.portletName}.png`;
   },
 };
 </script>
