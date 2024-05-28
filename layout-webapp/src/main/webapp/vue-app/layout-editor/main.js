@@ -20,6 +20,7 @@
 import './initComponents.js';
 import '../common/initComponents.js';
 import '../common-page-template/initComponents.js';
+import '../common-portlets/main.js';
 
 import './extensions.js';
 import './services.js';
@@ -144,9 +145,9 @@ export function init() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
           document.addEventListener('drawerClosed', this.setDrawerClosed);
-          this.$applicationRegistryService.getCategories('supportedModes')
+          this.$portletInstanceCategoryService.getPortletInstanceCategories()
             .then(categories => this.applicationCategories = categories);
-          this.$applicationRegistryService.getApplications('supportedModes')
+          this.$portletInstanceService.getPortletInstances()
             .then(applications => this.allApplications = applications);
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);

@@ -18,9 +18,9 @@
  */
 package io.meeds.layout.service;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -70,11 +70,15 @@ import lombok.SneakyThrows;
 @ExtendWith(MockitoExtension.class)
 public class PageLayoutServiceTest {
 
-  private static final String     TEST_USER = "testuser";
+  private static final String     ADDON_CONTAINER      = "addonContainer";
 
-  private static final SiteKey    SITE_KEY  = SiteKey.portal("test");
+  private static final String     TEST_ADDON_CONTAINER = "testAddonContainer";
 
-  private static final PageKey    PAGE_KEY  = PageKey.parse("portal::test::test");
+  private static final String     TEST_USER            = "testuser";
+
+  private static final SiteKey    SITE_KEY             = SiteKey.portal("test");
+
+  private static final PageKey    PAGE_KEY             = PageKey.parse("portal::test::test");
 
   @MockBean
   private LayoutService           layoutService;
@@ -163,11 +167,11 @@ public class PageLayoutServiceTest {
   public void getPageLayoutWithDynamicContainer() {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     Container dynamicContainer = mock(Container.class);
-    when(dynamicContainer.getFactoryId()).thenReturn("addonContainer");
-    when(dynamicContainer.getName()).thenReturn("testAddonContainer");
+    when(dynamicContainer.getFactoryId()).thenReturn(ADDON_CONTAINER);
+    when(dynamicContainer.getName()).thenReturn(TEST_ADDON_CONTAINER);
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
     Application<Portlet> application = mock(Application.class);
-    when(addOnService.getApplications("testAddonContainer")).thenReturn(Collections.singletonList(application));
+    when(addOnService.getApplications(TEST_ADDON_CONTAINER)).thenReturn(Collections.singletonList(application));
     pageLayoutService.getPageLayout(PAGE_KEY);
     verify(dynamicContainer).setChildren(argThat(children -> children != null && children.size() == 1
                                                              && children.get(0) == application));
@@ -237,11 +241,11 @@ public class PageLayoutServiceTest {
   public void clonePageWithDynamicContainer() throws IllegalAccessException, ObjectNotFoundException {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     Container dynamicContainer = mock(Container.class);
-    when(dynamicContainer.getFactoryId()).thenReturn("addonContainer");
-    when(dynamicContainer.getName()).thenReturn("testAddonContainer");
+    when(dynamicContainer.getFactoryId()).thenReturn(ADDON_CONTAINER);
+    when(dynamicContainer.getName()).thenReturn(TEST_ADDON_CONTAINER);
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
     Application<Portlet> application = mock(Application.class);
-    when(addOnService.getApplications("testAddonContainer")).thenReturn(Collections.singletonList(application));
+    when(addOnService.getApplications(TEST_ADDON_CONTAINER)).thenReturn(Collections.singletonList(application));
     when(aclService.canEditPage(PAGE_KEY, TEST_USER)).thenReturn(true);
     when(page.getName()).thenReturn(PAGE_KEY.getName());
 

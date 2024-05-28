@@ -54,7 +54,7 @@ import io.meeds.layout.model.SiteUpdateModel;
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-                            SiteLayoutService.class,
+  SiteLayoutService.class,
 })
 @ExtendWith(MockitoExtension.class)
 public class SiteLayoutServiceTest {

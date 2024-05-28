@@ -170,7 +170,7 @@ export default {
     document.addEventListener('click', this.closeMenuOnClick);
   },
   beforeDestroy() {
-    this.$root.$off('pportlets-instance-menu-opened', this.checkMenuStatus);
+    this.$root.$off('portlets-instance-menu-opened', this.checkMenuStatus);
     document.removeEventListener('click', this.closeMenuOnClick);
   },
   methods: {

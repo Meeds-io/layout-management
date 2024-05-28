@@ -21,6 +21,11 @@ import PortletsManagement from './components/PortletsManagement.vue';
 
 import Toolbar from './components/header/Toolbar.vue';
 
+import InstanceMain from './components/instances/Main.vue';
+import InstanceCategories from './components/instances/Categories.vue';
+import InstanceCategoryMenu from './components/instances/CategoryMenu.vue';
+import InstanceCategoryItem from './components/instances/CategoryItem.vue';
+
 import InstanceList from './components/instances/List.vue';
 import InstanceItem from './components/instances/Item.vue';
 import InstanceMenu from './components/instances/Menu.vue';
@@ -33,6 +38,12 @@ const components = {
   'portlets-management': PortletsManagement,
 
   'portlets-toolbar': Toolbar,
+
+  'portlets-instance-main': InstanceMain,
+
+  'portlets-instance-categories': InstanceCategories,
+  'portlets-instance-category': InstanceCategoryItem,
+  'portlets-instance-category-menu': InstanceCategoryMenu,
 
   'portlets-instance-list': InstanceList,
   'portlets-instance-item': InstanceItem,

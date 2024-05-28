@@ -22,16 +22,16 @@
   <v-expansion-panel
     v-if="hasApplications"
     class="border-color border-radius mt-4">
-    <v-expansion-panel-header v-sanitized-html="categoryName" />
+    <v-expansion-panel-header v-sanitized-html="categoryLabel" />
     <v-divider v-if="expanded" />
     <v-expansion-panel-content>
       <div
-        v-for="application in applications"
+        v-for="application in categoryApplications"
         :key="application.id"
         class="d-flex flex-no-wrap justify-space-between border-radius border-color ApplicationCard ApplicationCardEmbedded">
         <layout-editor-application-card
           :application="application"
-          class="flex-grow-1"
+          class="d-flex flex-grow-1"
           @add="$emit('addApplication', application)" />
       </div>
     </v-expansion-panel-content>
@@ -49,16 +49,26 @@ export default {
       type: Object,
       default: null,
     },
+    applications: {
+      type: Array,
+      default: null,
+    },
   },
   computed: {
     categoryName() {
-      return this.category.label;
+      return this.category?.name;
     },
-    applications() {
-      return this.category?.applications || [];
+    categoryLabel() {
+      return this.category?.label || this.category?.name;
+    },
+    categoryId() {
+      return this.category?.id;
+    },
+    categoryApplications() {
+      return this.applications?.filter?.(a => (a.categoryId && a.categoryId === this.categoryId) || (!a.categoryId && a.applicationName === this.categoryName)) || [];
     },
     hasApplications() {
-      return this.applications.length > 0;
+      return this.categoryApplications.length > 0;
     },
   },
 };
