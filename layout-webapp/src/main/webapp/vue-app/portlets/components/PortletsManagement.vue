@@ -26,22 +26,19 @@
       flat>
       <portlets-toolbar
         ref="toolbar"
+        :tab-name="tabName"
         class="card-border-radius overflow-hidden"
         @portlet-instance-filter="keyword = $event"
-        @select-tab="tabName = $event" />
-      <v-carousel-transition leave-absolute>
-        <portlets-list
-          v-if="tabName === 'portlets'"
-          ref="portlets"
-          class="card-border-radius overflow-hidden"
-          :keyword="keyword" />
-      </v-carousel-transition>
-      <v-carousel-transition leave-absolute>
-        <portlets-instance-main
-          v-if="tabName === 'instances'"
-          ref="instances"
-          :keyword="keyword" />
-      </v-carousel-transition>
+        @select-tab="selectTab" />
+      <portlets-list
+        v-if="tabName === 'portlets'"
+        ref="portlets"
+        class="card-border-radius overflow-hidden"
+        :keyword="keyword" />
+      <portlets-instance-main
+        v-if="tabName === 'instances'"
+        ref="instances"
+        :keyword="keyword" />
     </v-card>
     <portlets-item-instances-drawer />
     <portlets-instance-category-drawer />
@@ -56,5 +53,11 @@ export default {
     keyword: null,
     tabName: 'instances',
   }),
+  methods: {
+    selectTab(tabName) {
+      this.tabName = null;
+      this.$nextTick(() => window.setTimeout(() => this.tabName = tabName, 10));
+    },
+  },
 };
 </script>
