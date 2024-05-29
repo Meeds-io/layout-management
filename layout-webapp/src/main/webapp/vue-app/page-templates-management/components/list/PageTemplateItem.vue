@@ -16,7 +16,7 @@
       align="left">
       <v-card
         v-sanitized-html="name"
-        class="text-truncate transparent"
+        class="transparent"
         flat
         @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
@@ -24,7 +24,6 @@
     <td
       v-if="!$root.isMobile"
       align="left"
-      class="text-truncate"
       v-sanitized-html="description"></td>
     <td
       v-if="!$root.isMobile"

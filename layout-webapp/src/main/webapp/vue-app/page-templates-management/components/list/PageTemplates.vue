@@ -75,7 +75,7 @@ export default {
           align: 'left',
           sortable: true,
           class: 'page-template-name-header',
-          width: '20%'
+          width: 'auto'
         },
         {
           text: this.$t('pageTemplates.label.description'),
@@ -83,7 +83,7 @@ export default {
           align: 'center',
           sortable: false,
           class: 'page-template-description-header',
-          width: '70%'
+          width: 'auto'
         },
         {
           text: this.$t('pageTemplates.label.category'),
