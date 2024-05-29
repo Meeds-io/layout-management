@@ -43,21 +43,21 @@
         @mouseout="menu = false"
         @focusout="menu = false">
         <v-list-item-group v-model="listItem">
+          <v-list-item
+            dense
+            @click="$root.$emit('portlet-instance-category-edit', category)">
+            <v-icon size="13">
+              fa-edit
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('portlets.label.edit') }}
+            </v-list-item-title>
+          </v-list-item>
           <v-tooltip :disabled="!category.system" bottom>
             <template #activator="{ on, attrs }">
               <div
                 v-on="on"
                 v-bind="attrs">
-                <v-list-item
-                  dense
-                  @click="$root.$emit('portlet-instance-category-edit', category)">
-                  <v-icon size="13">
-                    fa-edit
-                  </v-icon>
-                  <v-list-item-title class="ps-2">
-                    {{ $t('portlets.label.edit') }}
-                  </v-list-item-title>
-                </v-list-item>
                 <v-list-item
                   :disabled="category.system"
                   dense
