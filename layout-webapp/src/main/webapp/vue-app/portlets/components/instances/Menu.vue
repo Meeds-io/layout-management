@@ -1,3 +1,23 @@
+<!--
+
+  This file is part of the Meeds project (https://meeds.io/).
+
+  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
 <template>
   <component
     v-model="menu"
@@ -69,7 +89,7 @@
           </v-tooltip>
           <v-list-item
             dense
-            @click="$root.$emit('portlets-instance-drawer-open', portletInstance)">
+            @click="$root.$emit('portlet-instance-drawer-open', portletInstance)">
             <v-icon size="13">
               fa-edit
             </v-icon>
@@ -79,7 +99,7 @@
           </v-list-item>
           <v-list-item
             dense
-            @click="$root.$emit('portlets-instance-drawer-open', portletInstance, true)">
+            @click="$root.$emit('portlet-instance-drawer-open', portletInstance, true)">
             <v-icon size="13">
               fa-copy
             </v-icon>
@@ -95,7 +115,7 @@
                 <v-list-item
                   :disabled="portletInstance.system"
                   dense
-                  @click="$root.$emit('portlets-instance-delete', portletInstance)">
+                  @click="$root.$emit('portlet-instance-delete', portletInstance)">
                   <v-icon
                     :class="!portletInstance.system && 'error--text' || 'disabled--text'"
                     size="13">
@@ -150,9 +170,9 @@ export default {
     },
     menu() {
       if (this.menu) {
-        this.$root.$emit('portlets-instance-menu-opened', this.portletInstanceId);
+        this.$root.$emit('portlet-instance-menu-opened', this.portletInstanceId);
       } else {
-        this.$root.$emit('portlets-instance-menu-closed', this.portletInstanceId);
+        this.$root.$emit('portlet-instance-menu-closed', this.portletInstanceId);
       }
     },
     hoverMenu() {
@@ -166,11 +186,11 @@ export default {
     },
   },
   created() {
-    this.$root.$on('portlets-instance-menu-opened', this.checkMenuStatus);
+    this.$root.$on('portlet-instance-menu-opened', this.checkMenuStatus);
     document.addEventListener('click', this.closeMenuOnClick);
   },
   beforeDestroy() {
-    this.$root.$off('portlets-instance-menu-opened', this.checkMenuStatus);
+    this.$root.$off('portlet-instance-menu-opened', this.checkMenuStatus);
     document.removeEventListener('click', this.closeMenuOnClick);
   },
   methods: {

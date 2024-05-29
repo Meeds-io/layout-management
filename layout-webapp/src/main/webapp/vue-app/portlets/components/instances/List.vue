@@ -1,3 +1,23 @@
+<!--
+
+  This file is part of the Meeds project (https://meeds.io/).
+
+  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
 <template>
   <div>
     <v-data-table
@@ -141,12 +161,12 @@ export default {
     },
   },
   created() {
-    this.$root.$on('portlets-instance-delete', this.deletePortletInstanceConfirm);
-    this.$root.$on('portlets-instance-category-selected', this.selectCategoryId);
+    this.$root.$on('portlet-instance-delete', this.deletePortletInstanceConfirm);
+    this.$root.$on('portlet-instance-category-selected', this.selectCategoryId);
   },
   beforeDestroy() {
-    this.$root.$off('portlets-instance-delete', this.deletePortletInstanceConfirm);
-    this.$root.$off('portlets-instance-category-selected', this.selectCategoryId);
+    this.$root.$off('portlet-instance-delete', this.deletePortletInstanceConfirm);
+    this.$root.$off('portlet-instance-category-selected', this.selectCategoryId);
   },
   methods: {
     applySortOnItems(portletInstances, sortFields, sortDescendings) {
@@ -185,7 +205,7 @@ export default {
       this.loading = true;
       this.$portletInstanceService.deletePortletInstance(portletInstance.id)
         .then(() => {
-          this.$root.$emit('portlets-instance-deleted', portletInstance);
+          this.$root.$emit('portlet-instance-deleted', portletInstance);
           this.$root.$emit('alert-message', this.$t('portlets.delete.success'), 'success');
         })
         .catch(() => this.$root.$emit('alert-message', this.$t('portlets.delete.error'), 'error'))

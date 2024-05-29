@@ -5,9 +5,6 @@
       "names":{
         "en":"layout.portletInstance.category.content.name"
       },
-      "descriptions":{
-        "en":"layout.portletInstance.category.content.description"
-      },
       "icon":"fa-newspaper",
       "permissions":[
         "*:/platform/users"
@@ -18,9 +15,6 @@
       "nameId":"tools",
       "names":{
         "en":"layout.portletInstance.category.tools.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.category.tools.description"
       },
       "icon":"fa-tools",
       "permissions":[
@@ -33,9 +27,6 @@
       "names":{
         "en":"layout.portletInstance.category.spaceTools.name"
       },
-      "descriptions":{
-        "en":"layout.portletInstance.category.spaceTools.description"
-      },
       "icon":"fa-users-cog",
       "permissions":[
         "*:/platform/users"
@@ -46,9 +37,6 @@
       "nameId":"profile",
       "names":{
         "en":"layout.portletInstance.category.profile.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.category.profile.description"
       },
       "icon":"fa-user",
       "permissions":[
@@ -61,10 +49,7 @@
       "names":{
         "en":"layout.portletInstance.category.spaces.name"
       },
-      "descriptions":{
-        "en":"layout.portletInstance.category.spaces.description"
-      },
-      "icon":"fa-tools",
+      "icon":"fa-people-arrows",
       "permissions":[
         "*:/platform/users"
       ],
@@ -74,9 +59,6 @@
       "nameId":"userSettings",
       "names":{
         "en":"layout.portletInstance.category.userSettings.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.category.userSettings.description"
       },
       "icon":"fa-user-cog",
       "permissions":[
@@ -89,9 +71,6 @@
       "names":{
         "en":"layout.portletInstance.category.navigation.name"
       },
-      "descriptions":{
-        "en":"layout.portletInstance.category.navigation.description"
-      },
       "icon":"fa-project-diagram",
       "permissions":[
         "*:/platform/users"
@@ -102,9 +81,6 @@
       "nameId":"others",
       "names":{
         "en":"layout.portletInstance.category.others.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.category.others.description"
       },
       "icon":"fa-ellipsis-h",
       "permissions":[

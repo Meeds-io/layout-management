@@ -34,8 +34,6 @@ public class PortletInstanceCategory {
 
   private String       name;
 
-  private String       description;
-
   private String       icon;
 
   private boolean      system;

@@ -352,6 +352,51 @@
       "system":true
     },
     {
+      "nameId":"UserSettingLanguage",
+      "categoryNameId":"userSettings",
+      "portletName":"UserSettingLanguage",
+      "names":{
+        "en":"layout.portletInstance.UserSettingLanguage.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.UserSettingLanguage.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"UserSettingNotifications",
+      "categoryNameId":"userSettings",
+      "portletName":"UserSettingNotifications",
+      "names":{
+        "en":"layout.portletInstance.UserSettingNotifications.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.UserSettingNotifications.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
+      "nameId":"UserSettingSecurity",
+      "categoryNameId":"userSettings",
+      "portletName":"UserSettingSecurity",
+      "names":{
+        "en":"layout.portletInstance.UserSettingSecurity.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.UserSettingSecurity.description"
+      },
+      "permissions":[
+        "*:/platform/users"
+      ],
+      "system":true
+    },
+    {
       "nameId":"ProfileAboutMe",
       "categoryNameId":"profile",
       "portletName":"ProfileAboutMe",
