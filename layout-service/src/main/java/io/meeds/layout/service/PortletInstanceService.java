@@ -245,10 +245,6 @@ public class PortletInstanceService {
                                              portletInstanceCategory.getId(),
                                              PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME,
                                              locale));
-    portletInstanceCategory.setDescription(getLabel(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
-                                                    portletInstanceCategory.getId(),
-                                                    PortletInstanceCategoryTranslationPlugin.DESCRIPTION_FIELD_NAME,
-                                                    locale));
   }
 
   private String getLabel(String objectType, long objectId, String fieldName, Locale locale) {
