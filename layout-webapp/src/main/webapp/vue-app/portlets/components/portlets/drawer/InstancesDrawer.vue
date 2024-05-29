@@ -30,6 +30,13 @@
     </template>
     <template v-if="drawer" #content>
       <div v-if="applications.length" class="my-4">
+        <v-btn
+          :aria-label="$t('layout.portletInstance.add')"
+          :class="$root.isMobile && 'px-0'"
+          class="btn btn-primary text-truncate mb-6 mx-4"
+          @click="$root.$emit('portlet-instance-add', null, true, contentId)">
+          {{ $t('layout.portletInstance.add') }}
+        </v-btn>
         <v-list-item
           v-for="application in applications"
           :key="application.id"
@@ -63,8 +70,16 @@
           </v-list-item-action>
         </v-list-item>
       </div>
-      <div v-else class="d-flex align-center justify-center pa-4 subtitle-1">
-        {{ $t('portlets.noPortletInstancesYet') }}
+      <div v-else class="d-flex flex-column align-center justify-center pa-4 subtitle-1">
+        <v-icon size="40" class="icon-default-color">fa-braille</v-icon>
+        <span class="text-sub-title my-4">{{ $t('portlets.noPortletInstancesYet') }}</span>
+        <v-btn
+          :aria-label="$t('layout.portletInstance.add')"
+          :class="$root.isMobile && 'px-0'"
+          class="btn btn-primary text-truncate"
+          @click="$root.$emit('portlet-instance-add', null, true, contentId)">
+          {{ $t('layout.portletInstance.add') }}
+        </v-btn>
       </div>
     </template>
   </exo-drawer>

@@ -24,6 +24,7 @@
     id="portletInstanceDrawer"
     v-model="drawer"
     :loading="saving"
+    :go-back-button="goBackButton"
     allow-expand
     right>
     <template #title>
@@ -83,7 +84,7 @@
           class="mt-4" />
         <portlets-instance-portlet-input
           v-model="contentId"
-          :disabled="!isNew"
+          :disabled="!isNew || disableSelectedPortlet"
           class="mt-4" />
         <div class="d-flex align-center mt-4">
           <v-switch
@@ -134,6 +135,8 @@ export default {
     illustrationUploadId: null,
     lang: eXo.env.portal.language,
     spaceApplication: false,
+    goBackButton: false,
+    disableSelectedPortlet: false,
     saving: false,
     isNew: false,
   }),
@@ -159,13 +162,19 @@ export default {
     this.$root.$off('portlet-instance-edit', this.open);
   },
   methods: {
-    open(instance) {
+    open(instance, goBackButton, contentId) {
       this.$root.$emit('close-alert-message');
       this.isNew = !instance;
+      this.goBackButton = goBackButton;
+      this.disableSelectedPortlet = !!contentId;
       this.instance = instance || {};
       this.instanceId = instance?.id || null;
-      this.categoryId = instance?.categoryId || null;
-      this.contentId = instance?.contentId || null;
+      if (instance) {
+        this.categoryId = instance.categoryId || null;
+      } else {
+        this.categoryId = this.$root?.selectedCategoryId;
+      }
+      this.contentId = instance?.contentId || contentId;
       this.spaceApplication = instance?.spaceApplication || false;
       this.title = instance?.name || null;
       this.titleTranslations = {};
