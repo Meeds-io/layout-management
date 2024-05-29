@@ -26,15 +26,21 @@ import InstanceMain from './components/instances/Main.vue';
 import InstanceCategories from './components/instances/Categories.vue';
 import InstanceCategoryMenu from './components/instances/CategoryMenu.vue';
 import InstanceCategoryItem from './components/instances/CategoryItem.vue';
+
 import InstanceCategoryDrawer from './components/instances/drawer/CategoryDrawer.vue';
 
 import InstanceList from './components/instances/List.vue';
 import InstanceItem from './components/instances/Item.vue';
 import InstanceMenu from './components/instances/Menu.vue';
 
+import InstanceDrawer from './components/instances/drawer/InstanceDrawer.vue';
+
+import InstancePreview from './components/instances/form/InstancePreview.vue';
+import CategoryInput from './components/instances/form/CategoryInput.vue';
+import PortletInput from './components/instances/form/PortletInput.vue';
+
 import PortletList from './components/portlets/List.vue';
 import PortletItem from './components/portlets/Item.vue';
-import PortletMenu from './components/portlets/Menu.vue';
 
 import PortletInstancesDrawer from './components/portlets/drawer/InstancesDrawer.vue';
 
@@ -52,11 +58,14 @@ const components = {
 
   'portlets-instance-list': InstanceList,
   'portlets-instance-item': InstanceItem,
-  'portlets-instance-item-menu': InstanceMenu,
+  'portlets-instance-menu': InstanceMenu,
+  'portlets-instance-drawer': InstanceDrawer,
+  'portlets-instance-preview': InstancePreview,
+  'portlets-instance-category-input': CategoryInput,
+  'portlets-instance-portlet-input': PortletInput,
 
   'portlets-list': PortletList,
   'portlets-item': PortletItem,
-  'portlets-item-menu': PortletMenu,
   'portlets-item-instances-drawer': PortletInstancesDrawer,
 };
 

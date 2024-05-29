@@ -59,7 +59,7 @@ public class PortletInstanceCategoryRest {
              description = "This retrieves portlet instance categorys")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
   public List<PortletInstanceCategory> getPortletInstanceCategorys(HttpServletRequest request) {
-    return portletInstanceService.getPortletInstanceCategories(request.getLocale(), true);
+    return portletInstanceService.getPortletInstanceCategories(request.getRemoteUser(), request.getLocale(), true);
   }
 
   @GetMapping("{id}")
@@ -72,7 +72,13 @@ public class PortletInstanceCategoryRest {
                                                             @Parameter(description = "Portlet instance category identifier")
                                                             @PathVariable("id")
                                                             long id) {
-    return portletInstanceService.getPortletInstanceCategory(id, request.getLocale(), true);
+    try {
+      return portletInstanceService.getPortletInstanceCategory(id, request.getRemoteUser(), request.getLocale(), true);
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
   }
 
   @PostMapping
