@@ -20,7 +20,7 @@
 -->
 <template>
   <v-hover @input="hover = $event">
-    <v-list-item>
+    <v-list-item :value="category.id">
       <v-list-item-icon class="my-auto me-4">
         <v-card
           width="30"

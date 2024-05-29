@@ -26,10 +26,11 @@
     dense>
     <v-list-item class="pe-0">
       <v-list-item-content>
-        <v-list-item-title>{{ $t('layout.portletInstance.category') }}</v-list-item-title>
+        <v-list-item-title class="text-header-title font-weight-regular pb-2">{{ $t('layout.portletInstance.category') }}</v-list-item-title>
       </v-list-item-content>
       <v-list-item-action class="my-auto ms-4">
         <v-btn
+          class="mb-2"
           icon
           small
           @click="$root.$emit('portlet-instance-category-add')">
@@ -41,7 +42,7 @@
       v-model="selectedCategory"
       color="primary"
       mandatory>
-      <v-list-item>
+      <v-list-item :value="0">
         <v-list-item-icon class="my-auto me-4">
           <v-card
             width="30"
@@ -81,10 +82,10 @@ export default {
       return this.portletInstanceCategoryToDelete?.name;
     },
     categories() {
-      return this.$root.portletInstanceCategories || [];
+      return this.$root.portletInstanceCategories;
     },
     filteredCategories() {
-      const categories = this.categories?.filter?.(c => c.name)?.slice() || [];
+      const categories = this.categories?.filter?.(c => c.name) || [];
       categories.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       return categories;
     },
@@ -97,7 +98,7 @@ export default {
   },
   watch: {
     selectedCategory() {
-      this.$root.$emit('portlet-instance-category-selected', this.filteredCategories[this.selectedCategory - 1]?.id || 0);
+      this.$root.$emit('portlet-instance-category-selected', this.selectedCategory);
     },
   },
   methods: {

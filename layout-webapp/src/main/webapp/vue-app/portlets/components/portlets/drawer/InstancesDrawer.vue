@@ -91,6 +91,7 @@ export default {
   },
   methods: {
     open(contentId, name) {
+      this.$root.$emit('close-alert-message');
       this.contentId = contentId;
       this.name = name;
       this.$nextTick().then(() => this.$refs.drawer.open());
