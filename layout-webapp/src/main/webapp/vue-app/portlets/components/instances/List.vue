@@ -64,31 +64,23 @@ export default {
       return !!this.$root.loading;
     },
     headers() {
-      return this.$root.isMobile && [
+      return (this.$root.isMobile && [
         {
           text: this.$t('portlets.label.name'),
           value: 'name',
           align: 'left',
           sortable: true,
           class: 'portlet-instance-name-header',
-          width: '20%'
+          width: '100%'
         },
-        {
-          text: this.$t('portlets.label.actions'),
-          value: 'actions',
-          align: 'center',
-          sortable: false,
-          class: 'portlet-instance-actions-header',
-          width: '50px'
-        },
-      ] || [
+      ]) || (this.$vuetify.breakpoint.lgAndDown && [
         {
           text: '',
           value: 'illustrationId',
           align: 'center',
           sortable: false,
           class: 'portlet-instance-illustration-header',
-          width: '60px'
+          width: '75px'
         },
         {
           text: this.$t('portlets.label.name'),
@@ -96,31 +88,7 @@ export default {
           align: 'left',
           sortable: true,
           class: 'portlet-instance-name-header',
-          width: '100px'
-        },
-        {
-          text: this.$t('portlets.label.description'),
-          value: 'description',
-          align: 'center',
-          sortable: false,
-          class: 'portlet-instance-description-header',
-          width: '70%'
-        },
-        {
-          text: this.$t('portlets.label.category'),
-          value: 'categoryId',
-          align: 'center',
-          sortable: true,
-          class: 'portlet-instance-category-header',
-          width: '100px'
-        },
-        {
-          text: this.$t('portlets.label.portlet'),
-          value: 'contentId',
-          align: 'center',
-          sortable: true,
-          class: 'portlet-instance-portlet-header',
-          width: '100px'
+          width: 'auto'
         },
         {
           text: this.$t('portlets.label.status'),
@@ -128,7 +96,7 @@ export default {
           align: 'center',
           sortable: true,
           class: 'portlet-instance-status-header',
-          width: '60px'
+          width: '75px'
         },
         {
           text: this.$t('portlets.label.actions'),
@@ -136,7 +104,48 @@ export default {
           align: 'center',
           sortable: false,
           class: 'portlet-instance-actions-header',
-          width: '50px'
+          width: '75px'
+        },
+      ]) || [
+        {
+          text: '',
+          value: 'illustrationId',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-instance-illustration-header',
+          width: '75px'
+        },
+        {
+          text: this.$t('portlets.label.name'),
+          value: 'name',
+          align: 'left',
+          sortable: true,
+          class: 'portlet-instance-name-header',
+          width: 'auto'
+        },
+        {
+          text: this.$t('portlets.label.description'),
+          value: 'description',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-instance-description-header',
+          width: 'auto'
+        },
+        {
+          text: this.$t('portlets.label.status'),
+          value: 'disabled',
+          align: 'center',
+          sortable: true,
+          class: 'portlet-instance-status-header',
+          width: '75px'
+        },
+        {
+          text: this.$t('portlets.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-instance-actions-header',
+          width: '75px'
         },
       ];
     },
@@ -180,10 +189,6 @@ export default {
         portletInstances.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       } else if (field === 'disabled') {
         portletInstances.sort((a, b) => (a.disabled ? 0 : 1) - (b.disabled ? 0 : 1));
-      } else if (field === 'categoryId') {
-        portletInstances.sort((a, b) => this.$root.collator.compare(this.$root.categoriesById[a.categoryId]?.name?.toLowerCase?.(), this.$root.categoriesById[b.categoryId]?.name?.toLowerCase?.()));
-      } else if (field === 'contentId') {
-        portletInstances.sort((a, b) => this.$root.collator.compare(this.$root.portletsById[a.contentId]?.name?.toLowerCase?.(), this.$root.portletsById[b.contentId]?.name?.toLowerCase?.()));
       }
       if (desc) {
         portletInstances.reverse();
