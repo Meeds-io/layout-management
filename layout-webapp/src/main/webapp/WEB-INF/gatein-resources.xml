@@ -101,6 +101,9 @@
     <depends>
       <module>translationField</module>
     </depends>
+    <depends>
+      <module>fontIcons</module>
+    </depends>
   </module>
 
   <portlet>
@@ -121,6 +124,9 @@
       </depends>
       <depends>
         <module>translationField</module>
+      </depends>
+      <depends>
+        <module>fontIcons</module>
       </depends>
       <depends>
         <module>vue</module>
@@ -224,6 +230,9 @@
         <module>translationField</module>
       </depends>
       <depends>
+        <module>fontIcons</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>
@@ -284,6 +293,9 @@
       </depends>
       <depends>
         <module>translationField</module>
+      </depends>
+      <depends>
+        <module>fontIcons</module>
       </depends>
       <depends>
         <module>applicationToolbarComponent</module>

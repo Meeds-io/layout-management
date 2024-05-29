@@ -68,12 +68,14 @@ export function init() {
           },
         },
         created() {
-          this.$root.$on('portlets-instance-deleted', this.refreshPortletInstances);
-          this.$root.$on('portlets-instance-created', this.refreshPortletInstances);
-          this.$root.$on('portlets-instance-updated', this.refreshPortletInstances);
-          this.$root.$on('portlets-instance-enabled', this.refreshPortletInstances);
-          this.$root.$on('portlets-instance-disabled', this.refreshPortletInstances);
-          this.$root.$on('portlets-instance-saved', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-deleted', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-created', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-updated', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-enabled', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-disabled', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-saved', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-category-saved', this.refreshPortletInstanceCategories);
+          this.$root.$on('portlet-instance-category-deleted', this.refreshPortletInstanceCategories);
 
           this.refreshPortlets();
           this.refreshPortletInstances();

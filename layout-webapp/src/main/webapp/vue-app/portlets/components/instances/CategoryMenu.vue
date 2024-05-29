@@ -1,3 +1,23 @@
+<!--
+
+  This file is part of the Meeds project (https://meeds.io/).
+
+  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or (at your option) any later version.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License
+  along with this program; if not, write to the Free Software Foundation,
+  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
 <template>
   <v-menu
     v-model="menu"
@@ -29,9 +49,19 @@
                 v-on="on"
                 v-bind="attrs">
                 <v-list-item
+                  dense
+                  @click="$root.$emit('portlet-instance-category-edit', category)">
+                  <v-icon size="13">
+                    fa-edit
+                  </v-icon>
+                  <v-list-item-title class="ps-2">
+                    {{ $t('portlets.label.edit') }}
+                  </v-list-item-title>
+                </v-list-item>
+                <v-list-item
                   :disabled="category.system"
                   dense
-                  @click="$root.$emit('portlets-instance-category-delete', category)">
+                  @click="$root.$emit('portlet-instance-category-delete', category)">
                   <v-icon
                     :class="!category.system && 'error--text' || 'disabled--text'"
                     size="13">
@@ -58,6 +88,10 @@ export default {
     category: {
       type: Object,
       default: null,
+    },
+    value: {
+      type: Boolean,
+      default: false,
     },
   },
   data: () => ({
@@ -86,10 +120,11 @@ export default {
     },
     menu() {
       if (this.menu) {
-        this.$root.$emit('portlets-instance-category-menu-opened', this.categoryId);
+        this.$root.$emit('portlet-instance-category-menu-opened', this.categoryId);
       } else {
-        this.$root.$emit('portlets-instance-category-menu-closed', this.categoryId);
+        this.$root.$emit('portlet-instance-category-menu-closed', this.categoryId);
       }
+      this.$emit('input', this.menu);
     },
     hoverMenu() {
       if (!this.hoverMenu) {
@@ -102,11 +137,11 @@ export default {
     },
   },
   created() {
-    this.$root.$on('portlets-instance-category-menu-opened', this.checkMenuStatus);
+    this.$root.$on('portlet-instance-category-menu-opened', this.checkMenuStatus);
     document.addEventListener('click', this.closeMenuOnClick);
   },
   beforeDestroy() {
-    this.$root.$off('portlets-instance-category-menu-opened', this.checkMenuStatus);
+    this.$root.$off('portlet-instance-category-menu-opened', this.checkMenuStatus);
     document.removeEventListener('click', this.closeMenuOnClick);
   },
   methods: {

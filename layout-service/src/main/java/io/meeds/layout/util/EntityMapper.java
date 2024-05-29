@@ -44,7 +44,6 @@ public class EntityMapper {
   public static PortletInstanceCategory fromEntity(PortletInstanceCategoryEntity entity) {
     return new PortletInstanceCategory(entity.getId(),
                                        null,
-                                       null,
                                        entity.getIcon(),
                                        entity.isSystem(),
                                        entity.getPermissions());
