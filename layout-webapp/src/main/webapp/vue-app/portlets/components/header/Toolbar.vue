@@ -22,7 +22,7 @@
   <application-toolbar
     id="portletsApplication"
     :center-button-toggle="{
-      selected: 'instances',
+      selected: tabName,
       buttons: [{
         value: 'instances',
         text: $t('portlets.instances'),
@@ -41,7 +41,7 @@
     class="border-box-sizing px-1"
     @toggle-select="$emit('select-tab', $event)"
     @filter-text-input="$emit('portlet-instance-filter', $event)">
-    <template v-if="!$root.isMobile" #left>
+    <template v-if="!$root.isMobile && tabName === 'instances'" #left>
       <v-btn
         id="applicationToolbarLeftButton"
         :aria-label="$t('layout.portletInstance.add')"
@@ -63,9 +63,11 @@
 </template>
 <script>
 export default {
-  data: () => ({
-    portlets: null,
-    tabName: 'instances',
-  }),
+  props: {
+    tabName: {
+      type: String,
+      default: null,
+    }
+  },
 };
 </script>
