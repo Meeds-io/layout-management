@@ -7,7 +7,7 @@
       width="70px">
       <layout-image-illustration
         :value="pageTemplate"
-        object-type="pageTemplates"
+        object-type="pageTemplate"
         default-src="/layout/images/page-templates/DefaultPreview.webp" />
     </td>
     <!-- name -->

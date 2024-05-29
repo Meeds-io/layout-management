@@ -59,52 +59,14 @@
           </div>
         </v-subheader>
         <v-list-item-group v-model="listItem">
-          <v-tooltip
-            v-if="!$root.isMobile"
-            :disabled="!portletInstance.system"
-            bottom>
-            <template #activator="{ on, attrs }">
-              <div
-                v-on="on"
-                v-bind="attrs">
-                <v-list-item
-                  :href="editLayoutLink"
-                  :disabled="portletInstance.system"
-                  target="_blank"
-                  dense>
-                  <v-icon
-                    :class="portletInstance.system && 'disabled--text'"
-                    size="13">
-                    fa-columns
-                  </v-icon>
-                  <v-list-item-title
-                    :class="portletInstance.system && 'disabled--text'"
-                    class="ps-2">
-                    {{ $t('portlets.label.editLayout') }}
-                  </v-list-item-title>
-                </v-list-item>
-              </div>
-            </template>
-            <span>{{ $t('portlets.label.system.noEditLayout') }}</span>
-          </v-tooltip>
           <v-list-item
             dense
-            @click="$root.$emit('portlet-instance-drawer-open', portletInstance)">
+            @click="$root.$emit('portlet-instance-edit', portletInstance)">
             <v-icon size="13">
               fa-edit
             </v-icon>
             <v-list-item-title class="ps-2">
-              {{ $t('portlets.label.editProperties') }}
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item
-            dense
-            @click="$root.$emit('portlet-instance-drawer-open', portletInstance, true)">
-            <v-icon size="13">
-              fa-copy
-            </v-icon>
-            <v-list-item-title class="ps-2">
-              {{ $t('portlets.label.duplicate') }}
+              {{ $t('portlets.label.edit') }}
             </v-list-item-title>
           </v-list-item>
           <v-tooltip :disabled="!portletInstance.system" bottom>
