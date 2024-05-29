@@ -49,6 +49,9 @@
         <span class="text-font-size text-color">{{ instancesCount }}</span>
       </v-btn>
     </td>
+    <td v-if="!$root.isMobile" align="center">
+      <portlets-item-menu :portlet="portlet" />
+    </td>
   </tr>
 </template>
 <script>

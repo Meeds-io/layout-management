@@ -47,6 +47,7 @@ export function init() {
           portlets: [],
           portletInstances: [],
           portletInstanceCategories: [],
+          selectedCategoryId: null,
           loading: 0,
           collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
         }),
@@ -74,12 +75,16 @@ export function init() {
           this.$root.$on('portlet-instance-deleted', this.refreshPortletInstances);
           this.$root.$on('portlet-instance-category-saved', this.refreshPortletInstanceCategories);
           this.$root.$on('portlet-instance-category-deleted', this.refreshPortletInstanceCategories);
+          this.$root.$on('portlet-instance-category-selected', this.selectCategory);
 
           this.refreshPortlets();
           this.refreshPortletInstances();
           this.refreshPortletInstanceCategories();
         },
         methods: {
+          selectCategory(categoryId) {
+            this.selectedCategoryId = categoryId;
+          },
           refreshPortlets() {
             this.loading++;
             return this.$portletService.getPortlets()
