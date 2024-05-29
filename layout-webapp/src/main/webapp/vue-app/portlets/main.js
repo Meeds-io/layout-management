@@ -68,12 +68,10 @@ export function init() {
           },
         },
         created() {
-          this.$root.$on('portlet-instance-deleted', this.refreshPortletInstances);
-          this.$root.$on('portlet-instance-created', this.refreshPortletInstances);
-          this.$root.$on('portlet-instance-updated', this.refreshPortletInstances);
           this.$root.$on('portlet-instance-enabled', this.refreshPortletInstances);
           this.$root.$on('portlet-instance-disabled', this.refreshPortletInstances);
           this.$root.$on('portlet-instance-saved', this.refreshPortletInstances);
+          this.$root.$on('portlet-instance-deleted', this.refreshPortletInstances);
           this.$root.$on('portlet-instance-category-saved', this.refreshPortletInstanceCategories);
           this.$root.$on('portlet-instance-category-deleted', this.refreshPortletInstanceCategories);
 
@@ -85,7 +83,10 @@ export function init() {
           refreshPortlets() {
             this.loading++;
             return this.$portletService.getPortlets()
-              .then(data => this.portlets = data || [])
+              .then(data => this.portlets = data.map(p => ({...p,
+                name: this.$te(`layout.portletInstance.${p?.portletName}.name`) ? this.$t(`layout.portletInstance.${p?.portletName}.name`) : p?.name,
+                description: this.$te(`layout.portletInstance.${p?.portletName}.description`) ? this.$t(`layout.portletInstance.${p?.portletName}.description`) : p?.description,
+              })) || [])
               .finally(() => this.loading--);
           },
           refreshPortletInstances() {
