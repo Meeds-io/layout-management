@@ -73,10 +73,10 @@ export default {
       return this.portlet?.id;
     },
     name() {
-      return this.$te(this.portlet?.name) ? this.$t(this.portlet?.name) : this.portlet?.name;
+      return this.$te(`layout.portletInstance.${this.portlet?.portletName}.name`) ? this.$t(`layout.portletInstance.${this.portlet?.portletName}.name`) : this.portlet?.name;
     },
     description() {
-      return this.$te(this.portlet?.description) ? this.$t(this.portlet?.description) : this.portlet?.description;
+      return this.$te(`layout.portletInstance.${this.portlet?.portletName}.description`) ? this.$t(`layout.portletInstance.${this.portlet?.portletName}.description`) : this.portlet?.description;
     },
     instancesCount() {
       return this.$root.portletInstances.filter(a => a.contentId === this.portlet.contentId).length || 0;
