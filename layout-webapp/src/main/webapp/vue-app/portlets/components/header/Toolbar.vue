@@ -40,7 +40,26 @@
     }"
     class="border-box-sizing px-1"
     @toggle-select="$emit('select-tab', $event)"
-    @filter-text-input="$emit('portlet-instance-filter', $event)" />
+    @filter-text-input="$emit('portlet-instance-filter', $event)">
+    <template v-if="!$root.isMobile" #left>
+      <v-btn
+        id="applicationToolbarLeftButton"
+        :aria-label="$t('layout.portletInstance.add')"
+        :class="$root.isMobile && 'px-0'"
+        class="btn btn-primary text-truncate"
+        @click="$root.$emit('portlet-instance-add')">
+        <v-icon
+          size="18">
+          fa-plus
+        </v-icon>
+        <span
+          v-if="!$root.isMobile"
+          class="text-truncate text-none ms-2">
+          {{ $t('layout.portletInstance.add') }}
+        </span>
+      </v-btn>
+    </template>
+  </application-toolbar>
 </template>
 <script>
 export default {

@@ -46,7 +46,9 @@ public class EntityMapper {
                                        null,
                                        entity.getIcon(),
                                        entity.isSystem(),
-                                       entity.getPermissions());
+                                       entity.getPermissions()
+                                           == null ? Collections.emptyList() :
+                                                   entity.getPermissions().stream().filter(StringUtils::isNotBlank).toList());
   }
 
   public static PortletInstance fromEntity(PortletInstanceEntity entity, PortletDescriptor portlet) {
@@ -57,7 +59,9 @@ public class EntityMapper {
                                entity.getContentId(),
                                getPreferences(entity),
                                0l,
-                               entity.getPermissions(),
+                               entity.getPermissions()
+                                   == null ? Collections.emptyList() :
+                                           entity.getPermissions().stream().filter(StringUtils::isNotBlank).toList(),
                                portlet == null ? null : portlet.getSupportedModes(),
                                entity.isSystem(),
                                entity.isDisabled(),

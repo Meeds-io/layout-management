@@ -121,7 +121,7 @@ public class PortletInstanceCategoryRestTest {
   void getPortletInstanceCategorysWithUser() throws Exception {
     ResultActions response = mockMvc.perform(get(REST_PATH).with(testSimpleUser()));
     response.andExpect(status().isOk());
-    verify(portletInstanceService).getPortletInstanceCategories(any(), anyBoolean());
+    verify(portletInstanceService).getPortletInstanceCategories(any(), any(), anyBoolean());
   }
 
   @Test
@@ -135,7 +135,7 @@ public class PortletInstanceCategoryRestTest {
   void getPortletInstanceCategoryWithUser() throws Exception {
     ResultActions response = mockMvc.perform(get(REST_PATH + "/1").with(testSimpleUser()));
     response.andExpect(status().isOk());
-    verify(portletInstanceService).getPortletInstanceCategory(eq(1l), any(), eq(true));
+    verify(portletInstanceService).getPortletInstanceCategory(eq(1l), any(), any(), eq(true));
   }
 
   @Test

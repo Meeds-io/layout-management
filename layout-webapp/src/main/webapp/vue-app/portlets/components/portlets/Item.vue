@@ -49,9 +49,6 @@
         <span class="text-font-size text-color">{{ instancesCount }}</span>
       </v-btn>
     </td>
-    <td v-if="!$root.isMobile" align="center">
-      <portlets-menu :portlet="portlet" />
-    </td>
   </tr>
 </template>
 <script>
@@ -73,10 +70,10 @@ export default {
       return this.portlet?.id;
     },
     name() {
-      return this.$te(`layout.portletInstance.${this.portlet?.portletName}.name`) ? this.$t(`layout.portletInstance.${this.portlet?.portletName}.name`) : this.portlet?.name;
+      return this.portlet?.name;
     },
     description() {
-      return this.$te(`layout.portletInstance.${this.portlet?.portletName}.description`) ? this.$t(`layout.portletInstance.${this.portlet?.portletName}.description`) : this.portlet?.description;
+      return this.portlet?.description;
     },
     instancesCount() {
       return this.$root.portletInstances.filter(a => a.contentId === this.portlet.contentId).length || 0;

@@ -45,6 +45,7 @@
     </v-card>
     <portlets-item-instances-drawer />
     <portlets-instance-category-drawer />
+    <portlets-instance-drawer />
     <layout-image-illustration-preview />
     <layout-analytics application-name="portletsManagement" />
   </v-app>
