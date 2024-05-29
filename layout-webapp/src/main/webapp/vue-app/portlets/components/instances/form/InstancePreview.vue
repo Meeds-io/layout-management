@@ -22,7 +22,7 @@
   <div class="pt-4">
     <div class="d-flex pb-2">
       <div class="text-subtitle-1">
-        {{ $t('layout.templatePreview') }}
+        {{ $t('portlets.instancePreview') }}
       </div>
       <v-spacer />
       <v-tooltip bottom>
@@ -42,7 +42,7 @@
               @change="uploadFile" />
           </div>
         </template>
-        <span>{{ $t('layout.uploadPreviewTitle') }}</span>
+        <span>{{ $t('portlets.uploadPreviewTitle') }}</span>
       </v-tooltip>
     </div>
     <v-img
@@ -60,13 +60,9 @@ export default {
       type: String,
       default: null,
     },
-    templateId: {
+    instanceId: {
       type: Number,
       default: null,
-    },
-    duplicate: {
-      type: Boolean,
-      default: false,
     },
   },
   data: () => ({
@@ -79,7 +75,7 @@ export default {
       return this.attachments?.[0]?.id;
     },
     illustrationSrc() {
-      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.templateId}/${this.illustrationId}` || '/layout/images/page-templates/DefaultPreview.webp';
+      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/portletInstance/${this.instanceId}/${this.illustrationId}` || '/layout/images/portlets/DefaultPreview.webp';
     },
   },
   watch: {
@@ -92,14 +88,9 @@ export default {
   },
   methods: {
     init() {
-      if (this.templateId) {
-        return this.$fileAttachmentService.getAttachments('pageTemplate', this.templateId)
-          .then(data => this.attachments = data?.attachments || [])
-          .then(() => {
-            if (this.duplicate && this.illustrationId) {
-              return this.getIllustrationFile().then(this.uploadFile);
-            }
-          });
+      if (this.instanceId) {
+        return this.$fileAttachmentService.getAttachments('portletInstance', this.instanceId)
+          .then(data => this.attachments = data?.attachments || []);
       }
     },
     uploadFile(file) {
@@ -128,8 +119,8 @@ export default {
     save() {
       if (this.value) {
         return this.$fileAttachmentService.saveAttachments({
-          objectType: 'pageTemplate',
-          objectId: this.templateId,
+          objectType: 'portletInstance',
+          objectId: this.instanceId,
           uploadedFiles: [{uploadId: this.value}],
           attachedFiles: [],
         }).then((report) => {
@@ -146,13 +137,6 @@ export default {
           }
         });
       }
-    },
-    getIllustrationFile() {
-      return fetch(this.illustrationSrc, {
-        'method': 'GET',
-        'credentials': 'include'
-      })
-        .then(resp => resp.ok && resp.blob());
     },
   },
 };
