@@ -40,11 +40,9 @@ import jakarta.annotation.PostConstruct;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class PortletInstanceCategoryTranslationPlugin extends TranslationPlugin {
 
-  public static final String     OBJECT_TYPE            = "portletInstanceCategory";
+  public static final String     OBJECT_TYPE      = "portletInstanceCategory";
 
-  public static final String     DESCRIPTION_FIELD_NAME = "description";
-
-  public static final String     TITLE_FIELD_NAME       = "title";
+  public static final String     TITLE_FIELD_NAME = "title";
 
   @Autowired
   private LayoutAclService       layoutAclService;
@@ -53,7 +51,7 @@ public class PortletInstanceCategoryTranslationPlugin extends TranslationPlugin 
   private PortletInstanceService portletInstanceService;
 
   @Autowired
-  private TranslationService translationService;
+  private TranslationService     translationService;
 
   @PostConstruct
   public void init() {
