@@ -26,7 +26,7 @@
     allow-expand
     right>
     <template #title>
-      {{ $t('portlets.portletInstancesList') }}
+      <span class="text-wrap">{{ $t('portlets.portletInstancesList', {0: name}) }}</span>
     </template>
     <template v-if="drawer" #content>
       <div v-if="applications.length" class="my-4">
@@ -46,13 +46,20 @@
             </v-list-item-title>
           </v-list-item-content>
           <v-list-item-action class="my-auto me-4">
-            <v-btn
-              :disabled="!application.illustrationId"
-              class="transparent d-flex align-center justify-center"
-              icon
-              @click="openIllustration(application)">
-              <v-icon class="icon-default-color">fa-eye</v-icon>
-            </v-btn>
+            <v-tooltip bottom>
+              <template #activator="{on, attrs}">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  :disabled="!application.illustrationId"
+                  class="transparent d-flex align-center justify-center"
+                  icon
+                  @click="openIllustration(application)">
+                  <v-icon class="icon-default-color">fa-eye</v-icon>
+                </v-btn>
+              </template>
+              <span>{{ $t('portlets.previewInstance') }}</span>
+            </v-tooltip>
           </v-list-item-action>
         </v-list-item>
       </div>
@@ -67,6 +74,7 @@ export default {
   data: () => ({
     drawer: false,
     contentId: null,
+    name: null,
   }),
   computed: {
     applications() {
@@ -76,14 +84,15 @@ export default {
     },
   },
   created() {
-    this.$root.$on('portlets-instances-drawer', this.open);
+    this.$root.$on('portlet-instance-drawer', this.open);
   },
   beforeDestroy() {
-    this.$root.$off('portlets-instances-drawer', this.open);
+    this.$root.$off('portlet-instance-drawer', this.open);
   },
   methods: {
-    open(contentId) {
+    open(contentId, name) {
       this.contentId = contentId;
+      this.name = name;
       this.$nextTick().then(() => this.$refs.drawer.open());
     },
     openIllustration(application) {

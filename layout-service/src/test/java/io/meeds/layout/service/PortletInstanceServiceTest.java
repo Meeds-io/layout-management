@@ -334,7 +334,6 @@ public class PortletInstanceServiceTest {
     assertEquals(portletInstanceCategory.getId(), portletInstanceCategories.get(0).getId());
     assertEquals(portletInstanceCategory.getIcon(), portletInstanceCategories.get(0).getIcon());
     assertNull(portletInstanceCategories.get(0).getName());
-    assertNull(portletInstanceCategories.get(0).getDescription());
   }
 
   @Test
@@ -351,7 +350,6 @@ public class PortletInstanceServiceTest {
     assertEquals(category.getId(), portletInstanceCategorys.get(0).getId());
     assertEquals(category.getIcon(), portletInstanceCategorys.get(0).getIcon());
     assertNull(portletInstanceCategorys.get(0).getName());
-    assertNull(portletInstanceCategorys.get(0).getDescription());
 
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
@@ -372,7 +370,6 @@ public class PortletInstanceServiceTest {
     assertEquals(category.getId(), portletInstanceCategorys.get(0).getId());
     assertEquals(category.getIcon(), portletInstanceCategorys.get(0).getIcon());
     assertNull(portletInstanceCategorys.get(0).getName());
-    assertNull(portletInstanceCategorys.get(0).getDescription());
 
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
@@ -382,17 +379,9 @@ public class PortletInstanceServiceTest {
     assertEquals(1, portletInstanceCategorys.size());
     assertEquals(frTitle, portletInstanceCategorys.get(0).getName());
 
-    TranslationField descriptionTranslationField = mock(TranslationField.class);
-    when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
-                                                category.getId(),
-                                                PortletInstanceCategoryTranslationPlugin.DESCRIPTION_FIELD_NAME)).thenReturn(descriptionTranslationField);
-    String enDesc = DESCRIPTION;
-    when(descriptionTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.ENGLISH, enDesc));
-
     portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(Locale.ENGLISH, true);
     assertNotNull(portletInstanceCategorys);
     assertEquals(1, portletInstanceCategorys.size());
-    assertEquals(enDesc, portletInstanceCategorys.get(0).getDescription());
   }
 
   @Test
@@ -426,7 +415,6 @@ public class PortletInstanceServiceTest {
     assertEquals(category.getId(), retrievedPortletInstanceCategory.getId());
     assertEquals(category.getIcon(), retrievedPortletInstanceCategory.getIcon());
     assertNull(retrievedPortletInstanceCategory.getName());
-    assertNull(retrievedPortletInstanceCategory.getDescription());
 
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
@@ -434,16 +422,8 @@ public class PortletInstanceServiceTest {
     retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), Locale.FRENCH, true);
     assertEquals(frTitle, retrievedPortletInstanceCategory.getName());
 
-    TranslationField descriptionTranslationField = mock(TranslationField.class);
-    when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
-                                                category.getId(),
-                                                PortletInstanceCategoryTranslationPlugin.DESCRIPTION_FIELD_NAME)).thenReturn(descriptionTranslationField);
-    String enDesc = DESCRIPTION;
-    when(descriptionTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.ENGLISH, enDesc));
-
     retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), Locale.ENGLISH, true);
     assertNotNull(retrievedPortletInstanceCategory);
-    assertEquals(enDesc, retrievedPortletInstanceCategory.getDescription());
   }
 
   @Test
@@ -508,7 +488,6 @@ public class PortletInstanceServiceTest {
 
   private PortletInstanceCategory newPortletInstanceCategory() {
     return new PortletInstanceCategory(3l,
-                                       null,
                                        null,
                                        "icon",
                                        true,

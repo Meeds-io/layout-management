@@ -40,7 +40,7 @@
     }"
     class="border-box-sizing px-1"
     @toggle-select="$emit('select-tab', $event)"
-    @filter-text-input="$emit('portlets-instance-filter', $event)" />
+    @filter-text-input="$emit('portlet-instance-filter', $event)" />
 </template>
 <script>
 export default {

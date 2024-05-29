@@ -130,7 +130,6 @@
 
 
 <script>
-import fontLibrary from '../../../../js/icons.js';
 export default {
   props: {
     expanded: {
@@ -140,7 +139,6 @@ export default {
   },
   data() {
     return {
-      fontLibrary,
       allIcons: {},
       iconsNumber: 16,
       showMore: false,
@@ -165,7 +163,7 @@ export default {
   },
   methods: {
     open() {
-      this.allIcons = this.fontLibrary.icons.map(icon => ({
+      this.allIcons = this.$root.$fontLibrary.icons.map(icon => ({
         'iconName': icon.split('fa-')[1],
         'iconValue': icon,
       })).sort((icon1, icon2) => icon1.iconName.localeCompare(icon2.iconName));

@@ -101,6 +101,9 @@
     <depends>
       <module>translationField</module>
     </depends>
+    <depends>
+      <module>fontIcons</module>
+    </depends>
   </module>
 
   <portlet>
@@ -284,6 +287,9 @@
       </depends>
       <depends>
         <module>translationField</module>
+      </depends>
+      <depends>
+        <module>fontIcons</module>
       </depends>
       <depends>
         <module>applicationToolbarComponent</module>
