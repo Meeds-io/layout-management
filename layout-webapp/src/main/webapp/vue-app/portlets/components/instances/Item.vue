@@ -23,17 +23,14 @@
     <!-- Illustration -->
     <td
       v-if="!$root.isMobile"
-      align="center"
-      width="70px">
+      align="center">
       <layout-image-illustration
         :value="portletInstance"
         object-type="portletInstance"
         default-src="/layout/images/portlets/DefaultPortlet.png" />
     </td>
     <!-- name -->
-    <td
-      :width="$root.isMobile && '100%' || 'auto'"
-      align="left">
+    <td align="left">
       <v-card
         v-sanitized-html="name"
         class="transparent"
@@ -42,35 +39,22 @@
     </td>
     <!-- description -->
     <td
-      v-if="!$root.isMobile"
+      v-if="!$vuetify.breakpoint.lgAndDown"
       align="left"
       v-sanitized-html="description"></td>
     <td
       v-if="!$root.isMobile"
-      align="center"
-      width="100px">
-      {{ categoryName }}
-    </td>
-    <td
-      v-if="!$root.isMobile"
-      align="center"
-      width="100px">
-      {{ portletName }}
-    </td>
-    <td
-      v-if="!$root.isMobile"
-      align="center"
-      width="50px">
+      align="center">
       <v-switch
         v-model="enabled"
         :loading="loading"
         :aria-label="enabled && $t('portlets.label.disableInstance') || $t('portlets.label.enableInstance')"
-        class="mt-0 mx-auto"
+        class="mt-0 mx-auto width-fit-content"
         @click="changeStatus" />
     </td>
     <td
-      align="center"
-      width="50px">
+      v-if="!$root.isMobile"
+      align="center">
       <portlets-instance-menu :portlet-instance="portletInstance" />
     </td>
   </tr>
@@ -93,18 +77,6 @@ export default {
     },
     enabled() {
       return !this.portletInstance?.disabled;
-    },
-    category() {
-      return this.$root.portletInstanceCategories?.find?.(c => c.id === this.portletInstance.categoryId);
-    },
-    categoryName() {
-      return this.category?.name;
-    },
-    portlet() {
-      return this.$root.portlets?.find?.(p => p.contentId === this.portletInstance.contentId);
-    },
-    portletName() {
-      return this.portlet?.name;
     },
     name() {
       return this.$te(this.portletInstance?.name) ? this.$t(this.portletInstance?.name) : this.portletInstance?.name;

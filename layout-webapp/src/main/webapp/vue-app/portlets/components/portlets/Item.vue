@@ -23,8 +23,7 @@
     <!-- Illustration -->
     <td
       v-if="!$root.isMobile"
-      align="center"
-      width="70px">
+      align="center">
       <v-img
         :src="illustrationSrc"
         max-height="30"
@@ -35,17 +34,14 @@
     <!-- name -->
     <td
       v-sanitized-html="name"
-      :width="$root.isMobile && '100%' || 'auto'"
       align="left">
     </td>
     <!-- description -->
     <td
-      v-if="!$root.isMobile"
+      v-if="!$vuetify.breakpoint.lgAndDown"
       align="left"
       v-sanitized-html="description"></td>
-    <td
-      align="center"
-      width="50px">
+    <td align="center">
       <v-btn
         icon
         x-small
@@ -53,9 +49,7 @@
         <span class="text-font-size text-color">{{ instancesCount }}</span>
       </v-btn>
     </td>
-    <td
-      align="center"
-      width="50px">
+    <td v-if="!$root.isMobile" align="center">
       <portlets-menu :portlet="portlet" />
     </td>
   </tr>
