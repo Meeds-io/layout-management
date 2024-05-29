@@ -97,6 +97,14 @@ export default {
           class: 'portlet-instances-header',
           width: '75px'
         },
+        {
+          text: this.$t('portlets.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-actions-header',
+          width: '75px'
+        },
       ]) || [
         {
           text: '',
@@ -128,6 +136,14 @@ export default {
           align: 'center',
           sortable: false,
           class: 'portlet-instances-header',
+          width: '75px'
+        },
+        {
+          text: this.$t('portlets.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-actions-header',
           width: '75px'
         },
       ];
