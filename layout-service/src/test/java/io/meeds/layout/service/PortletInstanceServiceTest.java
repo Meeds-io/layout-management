@@ -127,7 +127,7 @@ public class PortletInstanceServiceTest {
     when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
 
     when(portletInstanceStorage.getPortletInstances(3l)).thenReturn(Collections.singletonList(portletInstance));
-    List<PortletInstance> portletInstances = portletInstanceService.getPortletInstances(3l, null, false);
+    List<PortletInstance> portletInstances = portletInstanceService.getPortletInstances(3l, null, null, false);
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
     assertEquals(portletInstance.getId(), portletInstances.get(0).getId());
@@ -145,19 +145,17 @@ public class PortletInstanceServiceTest {
 
     when(portletInstanceStorage.getPortletInstances()).thenReturn(Collections.singletonList(template));
 
-    List<PortletInstance> portletInstances = portletInstanceService.getPortletInstances(true);
+    List<PortletInstance> portletInstances = portletInstanceService.getPortletInstances();
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
     assertEquals(template.getId(), portletInstances.get(0).getId());
     assertEquals(template.getContentId(), portletInstances.get(0).getContentId());
-    assertNull(portletInstances.get(0).getName());
-    assertNull(portletInstances.get(0).getDescription());
     assertEquals(template.getIllustrationId(), portletInstances.get(0).getIllustrationId());
 
     when(translationService.getTranslationField(PortletInstanceTranslationPlugin.OBJECT_TYPE,
                                                 template.getId(),
                                                 PortletInstanceTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
-    portletInstances = portletInstanceService.getPortletInstances(true);
+    portletInstances = portletInstanceService.getPortletInstances();
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
 
@@ -167,7 +165,10 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceTranslationPlugin.OBJECT_TYPE,
                                                 template.getId(),
                                                 PortletInstanceTranslationPlugin.TITLE_FIELD_NAME)).thenReturn(titleTranslationField);
-    portletInstances = portletInstanceService.getPortletInstances(true);
+    portletInstances = portletInstanceService.getPortletInstances(0,
+                                                                  null,
+                                                                  Locale.ENGLISH,
+                                                                  true);
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
     assertEquals(template.getId(), portletInstances.get(0).getId());
@@ -179,7 +180,10 @@ public class PortletInstanceServiceTest {
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
 
-    portletInstances = portletInstanceService.getPortletInstances(true);
+    portletInstances = portletInstanceService.getPortletInstances(0,
+                                                                  null,
+                                                                  Locale.FRENCH,
+                                                                  true);
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
     assertEquals(frTitle, portletInstances.get(0).getName());
@@ -191,21 +195,27 @@ public class PortletInstanceServiceTest {
     String enDesc = DESCRIPTION;
     when(descriptionTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.ENGLISH, enDesc));
 
-    portletInstances = portletInstanceService.getPortletInstances(true);
+    portletInstances = portletInstanceService.getPortletInstances(0,
+                                                                  null,
+                                                                  Locale.ENGLISH,
+                                                                  true);
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
     assertEquals(enDesc, portletInstances.get(0).getDescription());
 
     when(attachmentService.getAttachmentFileIds(PortletInstanceAttachmentPlugin.OBJECT_TYPE,
                                                 "2")).thenReturn(Collections.singletonList("32"));
-    portletInstances = portletInstanceService.getPortletInstances(Locale.GERMAN, true);
+    portletInstances = portletInstanceService.getPortletInstances(0,
+                                                                  null,
+                                                                  Locale.ENGLISH,
+                                                                  true);
     assertNotNull(portletInstances);
     assertEquals(1, portletInstances.size());
     assertEquals(32l, portletInstances.get(0).getIllustrationId());
   }
 
   @Test
-  public void getPortletInstanceWithExpand() throws ObjectNotFoundException {
+  public void getPortletInstanceWithExpand() throws ObjectNotFoundException, IllegalAccessException {
     PortletInstance template = newPortletInstance();
     when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
     when(defaultLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
@@ -221,7 +231,7 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceTranslationPlugin.OBJECT_TYPE,
                                                 template.getId(),
                                                 PortletInstanceTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
-    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, Locale.FRENCH, true);
+    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, null, Locale.FRENCH, true);
     assertNotNull(retrievedPortletInstance);
 
     reset(translationService);
@@ -230,7 +240,7 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceTranslationPlugin.OBJECT_TYPE,
                                                 template.getId(),
                                                 PortletInstanceTranslationPlugin.TITLE_FIELD_NAME)).thenReturn(titleTranslationField);
-    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, Locale.FRENCH, true);
+    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, null, Locale.FRENCH, true);
     assertNotNull(retrievedPortletInstance);
     assertEquals(template.getId(), retrievedPortletInstance.getId());
     assertEquals(template.getContentId(), retrievedPortletInstance.getContentId());
@@ -241,7 +251,7 @@ public class PortletInstanceServiceTest {
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
 
-    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, Locale.FRENCH, true);
+    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, null, Locale.FRENCH, true);
     assertEquals(frTitle, retrievedPortletInstance.getName());
 
     TranslationField descriptionTranslationField = mock(TranslationField.class);
@@ -251,13 +261,13 @@ public class PortletInstanceServiceTest {
     String enDesc = DESCRIPTION;
     when(descriptionTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.ENGLISH, enDesc));
 
-    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, Locale.ENGLISH, true);
+    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, null, Locale.ENGLISH, true);
     assertNotNull(retrievedPortletInstance);
     assertEquals(enDesc, retrievedPortletInstance.getDescription());
 
     when(attachmentService.getAttachmentFileIds(PortletInstanceAttachmentPlugin.OBJECT_TYPE,
                                                 "2")).thenReturn(Collections.singletonList("32"));
-    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, Locale.GERMAN, true);
+    retrievedPortletInstance = portletInstanceService.getPortletInstance(2l, null, Locale.GERMAN, true);
     assertNotNull(retrievedPortletInstance);
     assertEquals(32l, retrievedPortletInstance.getIllustrationId());
   }
@@ -354,7 +364,7 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
                                                 PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
-    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(Locale.ENGLISH, true);
+    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(null, Locale.ENGLISH, true);
     assertNotNull(portletInstanceCategorys);
     assertEquals(1, portletInstanceCategorys.size());
 
@@ -364,7 +374,7 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
                                                 PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME)).thenReturn(titleTranslationField);
-    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(Locale.FRENCH, true);
+    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(null, Locale.FRENCH, true);
     assertNotNull(portletInstanceCategorys);
     assertEquals(1, portletInstanceCategorys.size());
     assertEquals(category.getId(), portletInstanceCategorys.get(0).getId());
@@ -374,18 +384,18 @@ public class PortletInstanceServiceTest {
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
 
-    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(Locale.FRENCH, true);
+    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(null, Locale.FRENCH, true);
     assertNotNull(portletInstanceCategorys);
     assertEquals(1, portletInstanceCategorys.size());
     assertEquals(frTitle, portletInstanceCategorys.get(0).getName());
 
-    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(Locale.ENGLISH, true);
+    portletInstanceCategorys = portletInstanceService.getPortletInstanceCategories(null, Locale.ENGLISH, true);
     assertNotNull(portletInstanceCategorys);
     assertEquals(1, portletInstanceCategorys.size());
   }
 
   @Test
-  public void getPortletInstanceCategoryWithExpand() throws ObjectNotFoundException {
+  public void getPortletInstanceCategoryWithExpand() throws ObjectNotFoundException, IllegalAccessException {
     PortletInstanceCategory category = newPortletInstanceCategory();
     when(localeConfigService.getDefaultLocaleConfig()).thenReturn(defaultLocaleConfig);
     when(defaultLocaleConfig.getLocale()).thenReturn(Locale.ENGLISH);
@@ -401,7 +411,7 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
                                                 PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), Locale.FRENCH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.FRENCH, true);
     assertNotNull(retrievedPortletInstanceCategory);
 
     reset(translationService);
@@ -410,7 +420,7 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
                                                 PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME)).thenReturn(titleTranslationField);
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), Locale.FRENCH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.FRENCH, true);
     assertNotNull(retrievedPortletInstanceCategory);
     assertEquals(category.getId(), retrievedPortletInstanceCategory.getId());
     assertEquals(category.getIcon(), retrievedPortletInstanceCategory.getIcon());
@@ -419,10 +429,10 @@ public class PortletInstanceServiceTest {
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
 
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), Locale.FRENCH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.FRENCH, true);
     assertEquals(frTitle, retrievedPortletInstanceCategory.getName());
 
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), Locale.ENGLISH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.ENGLISH, true);
     assertNotNull(retrievedPortletInstanceCategory);
   }
 
@@ -491,7 +501,7 @@ public class PortletInstanceServiceTest {
                                        null,
                                        "icon",
                                        true,
-                                       Collections.singletonList("permission"));
+                                       Collections.singletonList("Everyone"));
   }
 
   private PortletInstance newPortletInstance() {
@@ -502,7 +512,7 @@ public class PortletInstanceServiceTest {
                                CONTENT_ID,
                                Collections.singletonList(new PortletInstancePreference("prefName", "prefValue")),
                                7l,
-                               Collections.singletonList("permission"),
+                               Collections.singletonList("Everyone"),
                                Collections.singletonList("edit"),
                                true,
                                false,

@@ -18,11 +18,13 @@
  */
 package io.meeds.layout.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +47,9 @@ import io.meeds.social.translation.service.TranslationService;
 @Service
 public class PortletInstanceService {
 
-  private static final Log               LOG = ExoLogger.getLogger(PortletInstanceService.class);
+  private static final List<String>      EVERYONE_PERMISSIONS_LIST = Collections.singletonList("Everyone");
+
+  private static final Log               LOG                       = ExoLogger.getLogger(PortletInstanceService.class);
 
   @Autowired
   private LayoutAclService               layoutAclService;
@@ -66,44 +70,51 @@ public class PortletInstanceService {
   private PortletInstanceStorage         portletInstanceStorage;
 
   public List<PortletInstance> getPortletInstances() {
-    return getPortletInstances(null, false);
-  }
-
-  public List<PortletInstance> getPortletInstances(boolean expand) {
-    return getPortletInstances(null, expand);
-  }
-
-  public List<PortletInstance> getPortletInstances(Locale locale,
-                                                   boolean expand) {
-    return getPortletInstances(0, locale, expand);
+    return portletInstanceStorage.getPortletInstances();
   }
 
   public List<PortletInstance> getPortletInstances(long categoryId,
+                                                   String username,
                                                    Locale locale,
                                                    boolean expand) {
     List<PortletInstance> portletInstances = categoryId < 1 ? portletInstanceStorage.getPortletInstances() :
                                                             portletInstanceStorage.getPortletInstances(categoryId);
+    portletInstances = portletInstances.stream().filter(p -> this.hasPermission(p, username)).toList();
     if (expand) {
-      portletInstances.forEach(portletInstance -> computePortletInstanceAttributes(locale, portletInstance));
+      portletInstances.stream()
+                      .forEach(portletInstance -> computePortletInstanceAttributes(locale, portletInstance));
     }
     return portletInstances;
   }
 
   public List<PortletInstanceCategory> getPortletInstanceCategories() {
-    return getPortletInstanceCategories(null, false);
+    return portletInstanceCategoryStorage.getPortletInstanceCategories();
   }
 
-  public List<PortletInstanceCategory> getPortletInstanceCategories(Locale locale, boolean expand) {
+  public List<PortletInstanceCategory> getPortletInstanceCategories(String username,
+                                                                    Locale locale,
+                                                                    boolean expand) {
     List<PortletInstanceCategory> portletInstanceCategories = portletInstanceCategoryStorage.getPortletInstanceCategories();
+    portletInstanceCategories = portletInstanceCategories.stream().filter(c -> this.hasPermission(c, username)).toList();
     if (expand && locale != null) {
-      portletInstanceCategories.forEach(portletInstance -> computePortletInstanceCategoryAttributes(locale, portletInstance));
+      portletInstanceCategories.stream()
+                               .forEach(c -> computePortletInstanceCategoryAttributes(locale, c));
     }
     return portletInstanceCategories;
   }
 
-  public PortletInstance getPortletInstance(long id, Locale locale, boolean expand) {
+  public PortletInstance getPortletInstance(long id,
+                                            String username,
+                                            Locale locale,
+                                            boolean expand) throws IllegalAccessException, ObjectNotFoundException {
     PortletInstance portletInstance = portletInstanceStorage.getPortletInstance(id);
-    if (expand && portletInstance != null) {
+    if (portletInstance == null) {
+      throw new ObjectNotFoundException("Portlet instance not found");
+    }
+    if (!this.hasPermission(portletInstance, username)) {
+      throw new IllegalAccessException();
+    }
+    if (expand) {
       computePortletInstanceAttributes(locale, portletInstance);
     }
     return portletInstance;
@@ -113,9 +124,19 @@ public class PortletInstanceService {
     return portletInstanceCategoryStorage.getPortletInstanceCategory(id);
   }
 
-  public PortletInstanceCategory getPortletInstanceCategory(long id, Locale locale, boolean expand) {
+  public PortletInstanceCategory getPortletInstanceCategory(long id,
+                                                            String username,
+                                                            Locale locale,
+                                                            boolean expand) throws ObjectNotFoundException,
+                                                                            IllegalAccessException {
     PortletInstanceCategory portletInstanceCategory = portletInstanceCategoryStorage.getPortletInstanceCategory(id);
-    if (expand && portletInstanceCategory != null) {
+    if (portletInstanceCategory == null) {
+      throw new ObjectNotFoundException("Portlet instance category not found");
+    }
+    if (!this.hasPermission(portletInstanceCategory, username)) {
+      throw new IllegalAccessException();
+    }
+    if (expand) {
       computePortletInstanceCategoryAttributes(locale, portletInstanceCategory);
     }
     return portletInstanceCategory;
@@ -271,6 +292,20 @@ public class PortletInstanceService {
     } catch (ObjectNotFoundException e) {
       return null;
     }
+  }
+
+  private boolean hasPermission(PortletInstance portletInstance, String username) {
+    List<String> permissions = portletInstance.getPermissions();
+    return CollectionUtils.isEmpty(permissions)
+           || permissions.equals(EVERYONE_PERMISSIONS_LIST)
+           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(username, p)));
+  }
+
+  private boolean hasPermission(PortletInstanceCategory category, String username) {
+    List<String> permissions = category.getPermissions();
+    return CollectionUtils.isEmpty(permissions)
+           || permissions.equals(EVERYONE_PERMISSIONS_LIST)
+           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(username, p)));
   }
 
 }
