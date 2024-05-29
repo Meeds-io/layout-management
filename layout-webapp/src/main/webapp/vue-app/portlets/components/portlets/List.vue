@@ -55,47 +55,14 @@ export default {
       return !!this.$root.loading;
     },
     headers() {
-      return this.$root.isMobile && [
+      return (this.$root.isMobile && [
         {
           text: this.$t('portlets.label.name'),
           value: 'name',
           align: 'left',
           sortable: true,
           class: 'portlet-name-header',
-          width: '20%'
-        },
-        {
-          text: this.$t('portlets.label.actions'),
-          value: 'actions',
-          align: 'center',
-          sortable: false,
-          class: 'portlet-actions-header',
-          width: '50px'
-        },
-      ] || [
-        {
-          text: '',
-          value: 'illustrationId',
-          align: 'center',
-          sortable: false,
-          class: 'portlet-illustration-header',
-          width: '60px'
-        },
-        {
-          text: this.$t('portlets.label.name'),
-          value: 'name',
-          align: 'left',
-          sortable: true,
-          class: 'portlet-name-header',
-          width: '20%'
-        },
-        {
-          text: this.$t('portlets.label.description'),
-          value: 'description',
-          align: 'center',
-          sortable: false,
-          class: 'portlet-description-header',
-          width: '70%'
+          width: '100%'
         },
         {
           text: this.$t('portlets.label.instances'),
@@ -103,7 +70,32 @@ export default {
           align: 'center',
           sortable: false,
           class: 'portlet-instances-header',
-          width: '60px'
+          width: '75px'
+        },
+      ]) || (this.$vuetify.breakpoint.lgAndDown && [
+        {
+          text: '',
+          value: 'illustrationId',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-illustration-header',
+          width: '75px'
+        },
+        {
+          text: this.$t('portlets.label.name'),
+          value: 'name',
+          align: 'left',
+          sortable: true,
+          class: 'portlet-name-header',
+          width: 'auto'
+        },
+        {
+          text: this.$t('portlets.label.instances'),
+          value: 'instances',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-instances-header',
+          width: '75px'
         },
         {
           text: this.$t('portlets.label.actions'),
@@ -111,7 +103,48 @@ export default {
           align: 'center',
           sortable: false,
           class: 'portlet-actions-header',
-          width: '50px'
+          width: '75px'
+        },
+      ]) || [
+        {
+          text: '',
+          value: 'illustrationId',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-illustration-header',
+          width: '75px'
+        },
+        {
+          text: this.$t('portlets.label.name'),
+          value: 'name',
+          align: 'left',
+          sortable: true,
+          class: 'portlet-name-header',
+          width: 'auto'
+        },
+        {
+          text: this.$t('portlets.label.description'),
+          value: 'description',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-description-header',
+          width: 'auto'
+        },
+        {
+          text: this.$t('portlets.label.instances'),
+          value: 'instances',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-instances-header',
+          width: '75px'
+        },
+        {
+          text: this.$t('portlets.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'portlet-actions-header',
+          width: '75px'
         },
       ];
     },

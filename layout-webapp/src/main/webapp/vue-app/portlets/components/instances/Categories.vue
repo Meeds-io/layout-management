@@ -21,6 +21,7 @@
 <template>
   <v-list
     :loading="loading"
+    min-width="225"
     nav
     dense>
     <v-list-item class="pe-0">
