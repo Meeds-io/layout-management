@@ -22,9 +22,11 @@ import PortletsManagement from './components/PortletsManagement.vue';
 import Toolbar from './components/header/Toolbar.vue';
 
 import InstanceMain from './components/instances/Main.vue';
+
 import InstanceCategories from './components/instances/Categories.vue';
 import InstanceCategoryMenu from './components/instances/CategoryMenu.vue';
 import InstanceCategoryItem from './components/instances/CategoryItem.vue';
+import InstanceCategoryDrawer from './components/instances/drawer/CategoryDrawer.vue';
 
 import InstanceList from './components/instances/List.vue';
 import InstanceItem from './components/instances/Item.vue';
@@ -46,6 +48,7 @@ const components = {
   'portlets-instance-categories': InstanceCategories,
   'portlets-instance-category': InstanceCategoryItem,
   'portlets-instance-category-menu': InstanceCategoryMenu,
+  'portlets-instance-category-drawer': InstanceCategoryDrawer,
 
   'portlets-instance-list': InstanceList,
   'portlets-instance-item': InstanceItem,

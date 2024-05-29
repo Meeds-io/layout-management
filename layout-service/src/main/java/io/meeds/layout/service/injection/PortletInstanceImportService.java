@@ -204,8 +204,6 @@ public class PortletInstanceImportService {
       if (forceReimport || oldId == 0 || category.getId() != oldId) {
         LOG.info("Importing Portlet instance category {} title translations", descriptorId);
         saveCategoryNames(d, category);
-        LOG.info("Importing Portlet instance category {} description translations", descriptorId);
-        saveCategoryDescriptions(d, category);
         // Mark as imported
         setCategorySettingValue(descriptorId, category.getId());
       }
@@ -257,13 +255,6 @@ public class PortletInstanceImportService {
                                                    category.getId(),
                                                    PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME,
                                                    d.getNames());
-  }
-
-  protected void saveCategoryDescriptions(PortletInstanceCategoryDescriptor d, PortletInstanceCategory category) {
-    layoutTranslationService.saveTranslationLabels(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
-                                                   category.getId(),
-                                                   PortletInstanceCategoryTranslationPlugin.DESCRIPTION_FIELD_NAME,
-                                                   d.getDescriptions());
   }
 
   @SneakyThrows

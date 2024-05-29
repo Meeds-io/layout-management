@@ -27,7 +27,7 @@
       <portlets-toolbar
         ref="toolbar"
         class="card-border-radius overflow-hidden"
-        @portlets-instance-filter="keyword = $event"
+        @portlet-instance-filter="keyword = $event"
         @select-tab="tabName = $event" />
       <v-carousel-transition leave-absolute>
         <portlets-list
@@ -44,6 +44,7 @@
       </v-carousel-transition>
     </v-card>
     <portlets-item-instances-drawer />
+    <portlets-instance-category-drawer />
     <layout-image-illustration-preview />
     <layout-analytics application-name="portletsManagement" />
   </v-app>
