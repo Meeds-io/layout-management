@@ -63,7 +63,7 @@ public class PortletInstanceRest {
                                                    @Parameter(description = "Portlet instance category identifier")
                                                    @RequestParam(name = "categoryId", required = false, defaultValue = "0")
                                                    long categoryId) {
-    return portletInstanceService.getPortletInstances(categoryId, request.getLocale(), true);
+    return portletInstanceService.getPortletInstances(categoryId, request.getRemoteUser(), request.getLocale(), true);
   }
 
   @GetMapping("{id}")
@@ -76,7 +76,13 @@ public class PortletInstanceRest {
                                             @Parameter(description = "Portlet instance identifier")
                                             @PathVariable("id")
                                             long id) {
-    return portletInstanceService.getPortletInstance(id, request.getLocale(), true);
+    try {
+      return portletInstanceService.getPortletInstance(id, request.getRemoteUser(), request.getLocale(), true);
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
   }
 
   @PostMapping

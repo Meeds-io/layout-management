@@ -23,6 +23,7 @@
     ref="drawer"
     id="portletInstanceCategoryDrawer"
     v-model="drawer"
+    :loading="saving"
     allow-expand
     right>
     <template #title>
@@ -82,6 +83,7 @@ export default {
     title: null,
     titleTranslations: {},
     maxTitleLength: 100,
+    saving: false,
     isNew: false,
   }),
   created() {
@@ -94,6 +96,7 @@ export default {
   },
   methods: {
     open(category) {
+      this.$root.$emit('close-alert-message');
       this.isNew = !category;
       this.categoryId = category?.id || null;
       this.title = null;

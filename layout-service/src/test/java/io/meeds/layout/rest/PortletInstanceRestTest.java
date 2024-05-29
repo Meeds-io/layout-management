@@ -122,7 +122,7 @@ public class PortletInstanceRestTest {
   void getPortletInstancesWithUser() throws Exception {
     ResultActions response = mockMvc.perform(get(REST_PATH).with(testSimpleUser()));
     response.andExpect(status().isOk());
-    verify(portletInstanceService).getPortletInstances(anyLong(), any(), anyBoolean());
+    verify(portletInstanceService).getPortletInstances(anyLong(), any(), any(), anyBoolean());
   }
 
   @Test
@@ -136,7 +136,7 @@ public class PortletInstanceRestTest {
   void getPortletInstanceWithUser() throws Exception {
     ResultActions response = mockMvc.perform(get(REST_PATH + "/1").with(testSimpleUser()));
     response.andExpect(status().isOk());
-    verify(portletInstanceService).getPortletInstance(eq(1l), any(), eq(true));
+    verify(portletInstanceService).getPortletInstance(eq(1l), any(), any(), eq(true));
   }
 
   @Test

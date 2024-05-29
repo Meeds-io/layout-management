@@ -126,7 +126,7 @@ export default {
         {
           text: this.$t('portlets.label.description'),
           value: 'description',
-          align: 'center',
+          align: 'left',
           sortable: false,
           class: 'portlet-instance-description-header',
           width: 'auto'
