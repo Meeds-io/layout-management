@@ -55,17 +55,19 @@
           <v-list-item-action class="my-auto me-4">
             <v-tooltip bottom>
               <template #activator="{on, attrs}">
-                <v-btn
+                <div
                   v-on="on"
-                  v-bind="attrs"
-                  :disabled="!application.illustrationId"
-                  class="transparent d-flex align-center justify-center"
-                  icon
-                  @click="openIllustration(application)">
-                  <v-icon class="icon-default-color">fa-eye</v-icon>
-                </v-btn>
+                  v-bind="attrs">
+                  <v-btn
+                    :disabled="!application.illustrationId"
+                    class="transparent d-flex align-center justify-center"
+                    icon
+                    @click="openIllustration(application)">
+                    <v-icon class="icon-default-color">fa-eye</v-icon>
+                  </v-btn>
+                </div>
               </template>
-              <span>{{ $t('portlets.previewInstance') }}</span>
+              <span>{{ application.illustrationId && $t('portlets.previewInstance') || $t('portlets.noPreviewAvailable') }}</span>
             </v-tooltip>
           </v-list-item-action>
         </v-list-item>
