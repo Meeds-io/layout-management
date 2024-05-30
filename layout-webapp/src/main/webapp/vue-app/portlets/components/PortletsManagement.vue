@@ -30,14 +30,11 @@
         class="card-border-radius overflow-hidden"
         @portlet-instance-filter="keyword = $event"
         @select-tab="selectTab" />
-      <portlets-list
-        v-if="tabName === 'portlets'"
-        ref="portlets"
-        class="card-border-radius overflow-hidden"
-        :keyword="keyword" />
       <portlets-instance-main
         v-if="tabName === 'instances'"
-        ref="instances"
+        :keyword="keyword" />
+      <portlets-list
+        v-else-if="tabName === 'portlets'"
         :keyword="keyword" />
     </v-card>
     <portlets-item-instances-drawer />
