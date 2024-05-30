@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -47,7 +48,7 @@ import io.meeds.social.translation.service.TranslationService;
 @Service
 public class PortletInstanceService {
 
-  private static final List<String>      EVERYONE_PERMISSIONS_LIST = Collections.singletonList("Everyone");
+  private static final List<String>      EVERYONE_PERMISSIONS_LIST = Collections.singletonList(UserACL.EVERYONE);
 
   private static final Log               LOG                       = ExoLogger.getLogger(PortletInstanceService.class);
 

@@ -198,16 +198,16 @@ public class PortletInstanceImportService {
 
   protected void importPortletInstanceCategory(PortletInstanceCategoryDescriptor d, long oldId) {
     String descriptorId = d.getNameId();
-    LOG.info("Importing Portlet category instance {}", descriptorId);
+    LOG.debug("Importing Portlet category instance {}", descriptorId);
     try {
       PortletInstanceCategory category = savePortletInstanceCategory(d, oldId);
       if (forceReimport || oldId == 0 || category.getId() != oldId) {
-        LOG.info("Importing Portlet instance category {} title translations", descriptorId);
+        LOG.debug("Importing Portlet instance category {} title translations", descriptorId);
         saveCategoryNames(d, category);
         // Mark as imported
         setCategorySettingValue(descriptorId, category.getId());
       }
-      LOG.info("Importing Portlet instance category {} finished successfully", descriptorId);
+      LOG.debug("Importing Portlet instance category {} finished successfully", descriptorId);
     } catch (Exception e) {
       LOG.warn("An error occurred while importing portlet instance category {}", descriptorId, e);
     }
@@ -215,16 +215,16 @@ public class PortletInstanceImportService {
 
   protected void importPortletInstance(PortletInstanceDescriptor d, long oldId) {
     String descriptorId = d.getNameId();
-    LOG.info("Importing Portlet instance {}", descriptorId);
+    LOG.debug("Importing Portlet instance {}", descriptorId);
     try {
       PortletInstance portletInstance = savePortletInstance(d, oldId);
       if (forceReimport || oldId == 0 || portletInstance.getId() != oldId) {
-        LOG.info("Importing Portlet instance {} title translations", descriptorId);
+        LOG.debug("Importing Portlet instance {} title translations", descriptorId);
         saveNames(d, portletInstance);
-        LOG.info("Importing Portlet instance {} description translations", descriptorId);
+        LOG.debug("Importing Portlet instance {} description translations", descriptorId);
         saveDescriptions(d, portletInstance);
         if (StringUtils.isNotBlank(d.getIllustrationPath())) {
-          LOG.info("Importing Portlet instance {} illustration", descriptorId);
+          LOG.debug("Importing Portlet instance {} illustration", descriptorId);
           saveIllustration(portletInstance.getId(), d.getIllustrationPath());
         }
         // Mark as imported

@@ -309,5 +309,34 @@
     </module>
   </portlet>
 
+  <portlet>
+    <name>PortletEditor</name>
+    <module>
+      <load-group>portlet-editor-group</load-group>
+      <script>
+        <minify>false</minify>
+        <path>/js/portletEditor.bundle.js</path>
+      </script>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>attachImage</module>
+      </depends>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+    </module>
+  </portlet>
+
 </gatein-resources>
 
