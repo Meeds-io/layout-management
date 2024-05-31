@@ -57,7 +57,9 @@ public class PortletInstanceCategoryRest {
   @Secured("users")
   @Operation(summary = "Retrieve portlet instance categorys", method = "GET",
              description = "This retrieves portlet instance categorys")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+  })
   public List<PortletInstanceCategory> getPortletInstanceCategorys(HttpServletRequest request) {
     return portletInstanceService.getPortletInstanceCategories(request.getRemoteUser(), request.getLocale(), true);
   }
@@ -66,7 +68,11 @@ public class PortletInstanceCategoryRest {
   @Secured("users")
   @Operation(summary = "Retrieve a portlet instance category designated by its id", method = "GET",
              description = "This will retrieve a portlet instance category designated by its id")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public PortletInstanceCategory getPortletInstanceCategory(
                                                             HttpServletRequest request,
                                                             @Parameter(description = "Portlet instance category identifier")
@@ -85,8 +91,10 @@ public class PortletInstanceCategoryRest {
   @Secured("users")
   @Operation(summary = "Create a portlet instance category", method = "POST",
              description = "This creates a new portlet instance category")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "portlet instance category created"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+  })
   public PortletInstanceCategory createPortletInstanceCategory(
                                                                HttpServletRequest request,
                                                                @RequestBody
@@ -102,9 +110,11 @@ public class PortletInstanceCategoryRest {
   @Secured("users")
   @Operation(summary = "Update a portlet instance category", method = "PUT",
              description = "This updates an existing portlet instance category")
-  @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "portlet instance category updated"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "404", description = "Object Not found") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void updatePortletInstanceCategory(
                                             HttpServletRequest request,
                                             @Parameter(description = "Portlet instance category identifier")
@@ -126,9 +136,11 @@ public class PortletInstanceCategoryRest {
   @Secured("users")
   @Operation(summary = "Deletes a portlet instance category", method = "DELETE",
              description = "This deletes an existing portlet instance category")
-  @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "portlet instance category deleted"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "404", description = "Object Not found") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void deletePortletInstanceCategory(
                                             HttpServletRequest request,
                                             @Parameter(description = "Portlet instance category identifier")

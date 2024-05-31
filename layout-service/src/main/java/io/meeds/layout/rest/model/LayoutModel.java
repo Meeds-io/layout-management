@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -41,6 +42,8 @@ import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
+import io.meeds.layout.model.PortletInstancePreference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -51,69 +54,71 @@ import lombok.NoArgsConstructor;
 @JsonInclude(value = Include.NON_EMPTY)
 public class LayoutModel {
 
-  protected String            id;
+  protected String                          id;
 
-  protected String            storageId;
+  protected String                          storageId;
 
-  protected String            storageName;
+  protected String                          storageName;
 
-  protected String            name;
+  protected String                          name;
 
-  protected String            icon;
+  protected String                          icon;
 
-  protected String            template;
+  protected String                          template;
 
-  protected String            factoryId;
+  protected String                          factoryId;
 
-  protected String            title;
+  protected String                          title;
 
-  protected String            description;
+  protected String                          description;
 
-  protected String            width;
+  protected String                          width;
 
-  protected String            height;
+  protected String                          height;
 
-  protected String            cssClass;
+  protected String                          cssClass;
 
-  protected String            borderColor;
+  protected String                          borderColor;
 
-  protected String[]          accessPermissions;
+  protected String[]                        accessPermissions;
 
   // Specific to container
-  protected String            profiles;
+  protected String                          profiles;
 
-  protected String[]          moveAppsPermissions;
+  protected String[]                        moveAppsPermissions;
 
-  protected String[]          moveContainersPermissions;
+  protected String[]                        moveContainersPermissions;
 
-  protected List<LayoutModel> children;
+  protected List<PortletInstancePreference> preferences;
+
+  protected List<LayoutModel>               children;
 
   // Specific to applications
-  private String              contentId;
+  private String                            contentId;
 
-  private boolean             showInfoBar;
+  private boolean                           showInfoBar;
 
-  private boolean             showApplicationState = true;
+  private boolean                           showApplicationState = true;
 
-  private boolean             showApplicationMode  = true;
+  private boolean                           showApplicationMode  = true;
 
   // Specific to page
-  private String              editPermission;
+  private String                            editPermission;
 
   @JsonProperty(access = Access.READ_ONLY)
-  private PageKey             pageKey;
+  private PageKey                           pageKey;
 
-  private String              ownerType;
+  private String                            ownerType;
 
-  private String              ownerId;
+  private String                            ownerId;
 
-  private boolean             showMaxWindow;
+  private boolean                           showMaxWindow;
 
-  private boolean             hideSharedLayout;
+  private boolean                           hideSharedLayout;
 
-  private String              type;
+  private String                            type;
 
-  private String              link;
+  private String                            link;
 
   public LayoutModel(ModelObject model) {
     init(model);
@@ -240,6 +245,12 @@ public class LayoutModel {
         TransientApplicationState<Portlet> transientState = new TransientApplicationState<>(layoutModel.getContentId());
         transientState.setOwnerId(layoutModel.getOwnerId());
         transientState.setOwnerType(layoutModel.getOwnerType());
+        if (CollectionUtils.isNotEmpty(layoutModel.getPreferences())) {
+          Portlet portlet = new Portlet();
+          layoutModel.getPreferences()
+                     .forEach(p -> portlet.setValue(p.getName(), p.getValue()));
+          transientState.setContentState(portlet);
+        }
         state = transientState;
       } else {
         throw new IllegalStateException("PortletInstance should either has a storageId or a contentId");

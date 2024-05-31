@@ -68,7 +68,9 @@ public class PageLayoutRest {
 
   @GetMapping
   @Operation(summary = "Retrieve pages", method = "GET", description = "This retrieves pages")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+  })
   public List<PageContext> getPages(
                                     HttpServletRequest request,
                                     @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER",
@@ -92,8 +94,11 @@ public class PageLayoutRest {
 
   @GetMapping("layout")
   @Operation(summary = "Retrieve page layout by reference", method = "GET", description = "This retrieves page by reference")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public LayoutModel getPageLayout(
                                    HttpServletRequest request,
                                    @Parameter(description = "page reference", required = true)
@@ -114,8 +119,11 @@ public class PageLayoutRest {
 
   @GetMapping("byRef")
   @Operation(summary = "Retrieve page by reference", method = "GET", description = "This retrieves page by reference")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public PageContext getPage(
                              HttpServletRequest request,
                              @Parameter(description = "page reference", required = true)
@@ -133,9 +141,11 @@ public class PageLayoutRest {
   @PostMapping
   @Secured("users")
   @Operation(summary = "Create a page", method = "POST", description = "This creates the page")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "page created"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public PageContext createPage(
                                 HttpServletRequest request,
                                 @RequestBody
@@ -152,9 +162,12 @@ public class PageLayoutRest {
   @PutMapping("layout")
   @Secured("users")
   @Operation(summary = "Updates an existing page layout", method = "PUT", description = "This updates the designated page layout")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "page created"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "400", description = "Invalid request input"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public LayoutModel updatePageLayout(
                                       HttpServletRequest request,
                                       @Parameter(description = "page display name", required = true)
@@ -187,8 +200,11 @@ public class PageLayoutRest {
   @PatchMapping(name = "link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   @Secured("users")
   @Operation(summary = "Update page link", method = "GET", description = "This updates page link")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void updatePageLink(
                              HttpServletRequest request,
                              @Parameter(description = "page display name", required = true)
@@ -210,11 +226,11 @@ public class PageLayoutRest {
   @Secured("users")
   @Operation(summary = "Update a page access and edit permission", method = "PATCH",
              description = "This updates the given page access and edit permission")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Page permissions updated"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "404", description = "Page not found"),
-                          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void updatePagePermissions(
                                     HttpServletRequest request,
                                     @Parameter(description = "Page reference", required = true)
