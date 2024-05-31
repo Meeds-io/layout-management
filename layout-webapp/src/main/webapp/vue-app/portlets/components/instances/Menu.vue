@@ -19,9 +19,8 @@
 
 -->
 <template>
-  <component
+  <v-menu
     v-model="menu"
-    :is="$root.isMobile && 'v-bottom-sheet' || 'v-menu'"
     :left="!$vuetify.rtl"
     :right="$vuetify.rtl"
     :content-class="menuId"
@@ -43,22 +42,18 @@
         dense
         @mouseout="menu = false"
         @focusout="menu = false">
-        <v-subheader v-if="$root.isMobile">
-          <div class="d-flex full-width">
-            <div class="d-flex flex-grow-1 flex-shrink-1 align-center subtitle-1 text-truncate">
-              {{ $t('portlets.label.instanceMenu', {0: name}) }}
-            </div>
-            <div class="flex-shrink-0">
-              <v-btn
-                :aria-label="$t('portlets.label.closeMenu')"
-                icon
-                @click="menu = false">
-                <v-icon>fa-times</v-icon>
-              </v-btn>
-            </div>
-          </div>
-        </v-subheader>
         <v-list-item-group v-model="listItem">
+          <v-list-item
+            :href="editLayoutLink"
+            target="_blank"
+            dense>
+            <v-icon size="13">
+              fa-edit
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('portlets.label.editInstance') }}
+            </v-list-item-title>
+          </v-list-item>
           <v-list-item
             dense
             @click="$root.$emit('portlet-instance-edit', portletInstance)">
@@ -66,7 +61,7 @@
               fa-edit
             </v-icon>
             <v-list-item-title class="ps-2">
-              {{ $t('portlets.label.edit') }}
+              {{ $t('portlets.label.editProperties') }}
             </v-list-item-title>
           </v-list-item>
           <v-tooltip :disabled="!portletInstance.system" bottom>
@@ -96,7 +91,7 @@
         </v-list-item-group>
       </v-list>
     </v-hover>
-  </component>
+  </v-menu>
 </template>
 <script>
 export default {
@@ -120,7 +115,7 @@ export default {
       return this.$te(this.portletInstance?.name) ? this.$t(this.portletInstance?.name) : this.portletInstance?.name;
     },
     editLayoutLink() {
-      return `/portal/administration/layout-editor?portletInstanceId=${this.portletInstanceId}`;
+      return `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${this.portletInstanceId}`;
     },
   },
   watch: {

@@ -11,6 +11,7 @@ const config = {
     pageLayout: './src/main/webapp/vue-app/page-layout/main.js',
     pageTemplatesManagement: './src/main/webapp/vue-app/page-templates-management/main.js',
     portlets: './src/main/webapp/vue-app/portlets/main.js',
+    portletEditor: './src/main/webapp/vue-app/portlet-editor/main.js',
   },
   mode: 'production',
   context: path.resolve(__dirname, '.'),

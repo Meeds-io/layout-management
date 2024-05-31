@@ -44,15 +44,15 @@ public class PortletRest {
 
   @GetMapping
   @Secured({
-    "administrators",
-    "web-contributors",
+             "administrators",
+             "web-contributors",
   })
   @Operation(
              summary = "Retrieve portlets",
              method = "GET",
              description = "This retrieves the list of available portlets in the platform")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
   })
   public List<PortletDescriptor> getPortlets() {
     return portletService.getPortlets();
