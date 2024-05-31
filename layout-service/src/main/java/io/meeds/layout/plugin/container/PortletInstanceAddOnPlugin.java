@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.plugin.renderer;
+package io.meeds.layout.plugin.container;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +33,7 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class PortletInstanceAddOnPlugin extends AddOnPlugin {
 
-  private static final String               PORTLET_EDITOR_DYNAMIC_CONTAINER = "portlet-editor";
+  private static final String               PORTLET_EDITOR_DYNAMIC_CONTAINER = "portlet-viewer";
 
   @Autowired
   private PortletInstanceApplicationAdapter portletInstanceApplicationAdapter;

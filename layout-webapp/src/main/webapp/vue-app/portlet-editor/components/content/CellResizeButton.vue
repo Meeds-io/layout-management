@@ -19,39 +19,38 @@
 
 -->
 <template>
-  <v-btn
-    :disabled="disabled"
-    :loading="loading"
-    :aria-label="$t('layout.save')"
-    class="btn btn-primary d-flex align-center"
-    elevation="0"
-    @click="save">
-    <span class="text-none">{{ $t('layout.save') }}</span>
-  </v-btn>
+  <v-card
+    ref="resizeButton"
+    :title="$t('layout.updateWidth')"
+    :class="{
+      'l-0': $vuetify.rtl,
+      'r-0': !$vuetify.rtl,
+      'layout-column-resize': hoverSeparator,
+    }"
+    height="100%"
+    width="20"
+    class="position-absolute col-resize-cursor linear-gradient-grey-background grid-gap-width me-n5 z-index-two"
+    flat
+    @mousedown.prevent.stop="resizeStart"
+    @mouseover="hoverSeparator = true"
+    @focusin="hoverSeparator = true"
+    @mouseout="hoverSeparator = false"
+    @focusout="hoverSeparator = false" />
 </template>
 <script>
 export default {
   props: {
-    disabled: {
+    moving: {
       type: Boolean,
-      default: false,
+      default: null,
     },
   },
   data: () => ({
-    loading: false,
+    hoverSeparator: false,
   }),
   methods: {
-    async save() {
-      this.loading = true;
-      try {
-        const instance = await this.$portletInstanceService.getPortletInstance(this.$root.portletInstanceId);
-        instance.preferences = await this.$portletInstanceService.getPortletInstancePreferences(this.$root.portletInstanceId);
-        this.$portletInstanceService.updatePortletInstance(instance);
-        this.$root.$emit('portlet-instance-updated', instance);
-        this.$root.$emit('alert-message', this.$t('layout.portletInstanceUpdatedSuccessfully'), 'success');
-      } finally {
-        window.setTimeout(() => this.loading = false);
-      }
+    resizeStart(event) {
+      this.$emit('move-start', event);
     },
   },
 };

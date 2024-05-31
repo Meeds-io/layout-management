@@ -17,26 +17,4 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import PortletEditor from './components/PortletEditor.vue';
-
-import Toolbar from './components/toolbar/Toolbar.vue';
-import SaveButton from './components/toolbar/actions/SaveButton.vue';
-
-import Content from './components/content/Content.vue';
-import Cell from './components/content/Cell.vue';
-import CellResizeButton from './components/content/CellResizeButton.vue';
-import Application from './components/content/Application.vue';
-
-const components = {
-  'portlet-editor': PortletEditor,
-  'portlet-editor-toolbar': Toolbar,
-  'portlet-editor-toolbar-save-button': SaveButton,
-  'portlet-editor-content': Content,
-  'portlet-editor-cell': Cell,
-  'portlet-editor-cell-resize-button': CellResizeButton,
-  'portlet-editor-application': Application,
-};
-
-for (const key in components) {
-  Vue.component(key, components[key]);
-}
+import './initComponents.js';

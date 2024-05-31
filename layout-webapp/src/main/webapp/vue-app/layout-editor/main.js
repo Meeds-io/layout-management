@@ -18,8 +18,7 @@
  */
 
 import './initComponents.js';
-import '../common/initComponents.js';
-import '../common-page-template/initComponents.js';
+import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 
 import './extensions.js';

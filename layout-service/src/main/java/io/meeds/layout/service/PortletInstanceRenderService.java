@@ -21,8 +21,10 @@ package io.meeds.layout.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +54,7 @@ import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
 
 /**
  * A plugin that is used to display a selected portlet instance in the context
@@ -64,27 +67,30 @@ import io.meeds.layout.model.PortletInstancePreference;
 @Service
 public class PortletInstanceRenderService {
 
-  private static final String    PORTLET_EDITOR_PORTLET_CONTENT_ID = "layout/PortletEditor";
+  private static final Context                         CONTEXT                        = Context.GLOBAL.id("PORTLET_INSTANCE");
 
-  private static final String    PORTLET_EDITOR_SYSTEM_PAGE        = "_portletEditor";
+  private static final Scope                           SCOPE                          =
+                                                             Scope.APPLICATION.id("PORTLET_INSTANCE_APPLICATION");
 
-  private static final PageKey   PORTLET_EDITOR_SYSTEM_PAGE_KEY    =
-                                                                new PageKey(SiteKey.portal("global"), PORTLET_EDITOR_SYSTEM_PAGE);
-
-  private static final Context   CONTEXT                           = Context.GLOBAL.id("PORTLET_INSTANCE");
-
-  private static final Scope     SCOPE                             = Scope.APPLICATION.id("PORTLET_INSTANCE_APPLICATION");
+  private static final PageKey                         PORTLET_EDITOR_SYSTEM_PAGE_KEY = new PageKey(SiteKey.portal("global"),
+                                                                                                    "_portletEditor");
 
   @Autowired
-  private SettingService         settingService;
+  private SettingService                               settingService;
 
   @Autowired
-  private PortletInstanceService portletInstanceService;
+  private LayoutService                                layoutService;
 
   @Autowired
-  private LayoutService          layoutService;
+  private PortletInstanceService                       portletInstanceService;
 
-  private Application<Portlet>   portletEditorApplication;
+  private Application<Portlet>                         placeholderApplication;
+
+  private Map<String, PortletInstancePreferencePlugin> preferencePlugins              = new HashMap<>();
+
+  public void addPortletInstancePreferencePlugin(PortletInstancePreferencePlugin plugin) {
+    preferencePlugins.put(plugin.getPortletName(), plugin);
+  }
 
   public Application<?> getPortletInstanceApplication(String username, // NOSONAR
                                                       String portletInstanceId,
@@ -97,8 +103,28 @@ public class PortletInstanceRenderService {
       // Display the app by storage id
       return layoutService.getApplicationModel(applicationStorageId);
     } else {
-      // Display the editor
-      return getPortletEditorApplication();
+      return getPlaceholderApplication();
+    }
+  }
+
+  public List<PortletInstancePreference> getPortletInstancePreferences(long portletInstanceId,
+                                                                       String username) throws IllegalAccessException,
+                                                                                        ObjectNotFoundException {
+    PortletInstance portletInstance = portletInstanceService.getPortletInstance(portletInstanceId, username, null, false);
+    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletInstance.getContentId().split("/")[1]);
+    long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
+    Application<Portlet> application = layoutService.getApplicationModel(String.valueOf(applicationId));
+    Portlet preferences = layoutService.load(application.getState(), application.getType());
+    if (plugin == null) {
+      if (preferences == null) {
+        return Collections.emptyList();
+      } else {
+        List<PortletInstancePreference> instancePreferences = new ArrayList<>();
+        preferences.forEach(p -> instancePreferences.add(new PortletInstancePreference(p.getName(), p.getValue())));
+        return instancePreferences;
+      }
+    } else {
+      return plugin.generatePreferences(application, preferences);
     }
   }
 
@@ -109,7 +135,7 @@ public class PortletInstanceRenderService {
                                                                                 userName,
                                                                                 Locale.ENGLISH,
                                                                                 false);
-    long applicationId = getPortletInstanceApplicationId(portletInstanceId);
+    long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
     if (applicationId == 0) {
       return createPortletInstanceApplication(portletInstance);
     } else {
@@ -156,13 +182,13 @@ public class PortletInstanceRenderService {
 
     container = getPortletInstanceSystemContainer();
     Application<Portlet> application = (Application<Portlet>) container.getChildren().get(index);
-    savePortletInstanceApplicationId(application.getStorageId(),
+    savePortletInstanceApplicationId(Long.parseLong(application.getStorageId()),
                                      portletInstance.getId());
     return application;
   }
 
-  private long getPortletInstanceApplicationId(String portletInstanceId) {
-    SettingValue<?> settingValue = settingService.get(CONTEXT, SCOPE, portletInstanceId);
+  private long getPortletInstanceApplicationId(long portletInstanceId) {
+    SettingValue<?> settingValue = settingService.get(CONTEXT, SCOPE, String.valueOf(portletInstanceId));
     if (settingValue != null && settingValue.getValue() != null && StringUtils.isNotBlank(settingValue.getValue().toString())) {
       return Long.parseLong(settingValue.getValue().toString());
     } else {
@@ -170,7 +196,7 @@ public class PortletInstanceRenderService {
     }
   }
 
-  private void savePortletInstanceApplicationId(String applicationStorageId, long portletInstanceId) {
+  private void savePortletInstanceApplicationId(long applicationStorageId, long portletInstanceId) {
     settingService.set(CONTEXT,
                        SCOPE,
                        String.valueOf(portletInstanceId),
@@ -207,13 +233,13 @@ public class PortletInstanceRenderService {
     return page;
   }
 
-  private Application<Portlet> getPortletEditorApplication() {
-    if (portletEditorApplication == null) {
-      portletEditorApplication = new PortletApplication();
-      portletEditorApplication.setAccessPermissions(new String[] { UserACL.EVERYONE });
-      portletEditorApplication.setState(new TransientApplicationState<>(PORTLET_EDITOR_PORTLET_CONTENT_ID));
+  private Application<Portlet> getPlaceholderApplication() {
+    if (placeholderApplication == null) {
+      placeholderApplication = new PortletApplication();
+      placeholderApplication.setAccessPermissions(new String[] { UserACL.EVERYONE });
+      placeholderApplication.setState(new TransientApplicationState<>("layout/PortletEditor"));
     }
-    return portletEditorApplication;
+    return placeholderApplication;
   }
 
 }

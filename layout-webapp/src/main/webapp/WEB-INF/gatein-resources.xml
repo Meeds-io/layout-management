@@ -218,13 +218,13 @@
         <module>extensionRegistry</module>
       </depends>
       <depends>
-        <module>imageCropper</module>
+        <module>commonVueComponents</module>
       </depends>
       <depends>
         <module>commonLayoutComponents</module>
       </depends>
       <depends>
-        <module>commonVueComponents</module>
+        <module>imageCropper</module>
       </depends>
       <depends>
         <module>translationField</module>
@@ -322,6 +322,9 @@
       </depends>
       <depends>
         <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>commonLayoutComponents</module>
       </depends>
       <depends>
         <module>attachImage</module>

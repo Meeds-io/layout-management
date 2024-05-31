@@ -71,7 +71,7 @@ public class SiteLayoutRest {
   @ApiResponses(value = {
                           @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public ResponseEntity<SiteEntity> getSiteById(
                                                 HttpServletRequest request,
@@ -107,7 +107,7 @@ public class SiteLayoutRest {
   @ApiResponses(value = {
                           @ApiResponse(responseCode = "200", description = "Request fulfilled"),
                           @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public ResponseEntity<SiteEntity> getSite(
                                             HttpServletRequest request,
@@ -144,8 +144,11 @@ public class SiteLayoutRest {
   @DeleteMapping
   @Secured("users")
   @Operation(summary = "Delete a site", method = "GET", description = "This deletes the given site")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void deleteSite(
                          HttpServletRequest request,
                          @Parameter(description = "site type")
@@ -166,8 +169,11 @@ public class SiteLayoutRest {
   @PutMapping
   @Secured("users")
   @Operation(summary = "update a site", method = "PUT", description = "This updates the given site")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void updateSite(
                          HttpServletRequest request,
                          @RequestBody
@@ -185,11 +191,11 @@ public class SiteLayoutRest {
   @Secured("users")
   @Operation(summary = "Update a page access and edit permission", method = "PATCH",
              description = "This updates the given page access and edit permission")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Page permissions updated"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "404", description = "Page not found"),
-                          @ApiResponse(responseCode = "401", description = "Unauthorized operation"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void updateSitePermissions(
                                     HttpServletRequest request,
                                     @RequestBody
@@ -206,8 +212,11 @@ public class SiteLayoutRest {
   @PostMapping
   @Secured("users")
   @Operation(summary = "create a site", method = "POST", description = "This create a new site")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "500", description = "Internal server error"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public ResponseEntity<SiteEntity> createSite(
                                                HttpServletRequest request,
                                                @Parameter(description = "site to create", required = true)

@@ -18,7 +18,6 @@
  */
 
 import './initComponents.js';
-import '../common/initComponents.js';
 import '../common-layout-components/initComponents.js';
 
 // get overridden components if exists

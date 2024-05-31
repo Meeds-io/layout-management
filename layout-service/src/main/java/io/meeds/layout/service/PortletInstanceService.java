@@ -50,7 +50,8 @@ public class PortletInstanceService {
 
   private static final List<String>      EVERYONE_PERMISSIONS_LIST = Collections.singletonList(UserACL.EVERYONE);
 
-  private static final Log               LOG                       = ExoLogger.getLogger(PortletInstanceService.class);
+  private static final Log               LOG                       =
+                                             ExoLogger.getLogger(PortletInstanceService.class);
 
   @Autowired
   private LayoutAclService               layoutAclService;
@@ -115,7 +116,7 @@ public class PortletInstanceService {
     if (!this.hasPermission(portletInstance, username)) {
       throw new IllegalAccessException();
     }
-    if (expand) {
+    if (expand && locale != null) {
       computePortletInstanceAttributes(locale, portletInstance);
     }
     return portletInstance;

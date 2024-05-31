@@ -18,8 +18,7 @@
  */
 
 import './initComponents.js';
-import '../common/initComponents.js';
-import '../common-illustration/initComponents.js';
+import '../common-illustration/main.js';
 import '../common-portlets/main.js';
 
 // get overridden components if exists

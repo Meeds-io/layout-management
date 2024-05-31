@@ -20,8 +20,8 @@
 -->
 <template>
   <v-card
-    class="transparent singlePageApplication mx-auto"
+    class="transparent singlePageApplication no-applications-spacing mx-auto d-flex justify-center"
     flat>
-    Portlet
+    <portlet-editor-cell />
   </v-card>
 </template>

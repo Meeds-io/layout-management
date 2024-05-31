@@ -1,0 +1,96 @@
+<!--
+
+ This file is part of the Meeds project (https://meeds.io/).
+
+ Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+-->
+<template>
+  <div
+    :style="cssStyle"
+    class="d-flex position-relative">
+    <portlet-editor-application ref="application" />
+    <portlet-editor-cell-resize-button
+      ref="resizeButton"
+      :moving="moving"
+      @move-start="moveStart" />
+  </div>
+</template>
+<script>
+export default {
+  data: () => ({
+    movingStartX: 0,
+    movingStartY: 0,
+    movingX: 0,
+    movingY: 0,
+    diffX: 0,
+    diffY: 0,
+    updateDisplayInterval: 0,
+    moving: false,
+  }),
+  computed: {
+    displayResizeButton() {
+      return !this.$root.isMobile;
+    },
+    width() {
+      return this.diffX && `calc(100% ${this.diffX > 0 ? '+' : '-'} ${Math.abs(this.diffX) * 2}px)` || '100%';
+    },
+    height() {
+      return this.diffY && `calc(100% ${this.diffY > 0 ? '+' : '-'} ${Math.abs(this.diffY) * 2}px)` || '100%';
+    },
+    cssStyle() {
+      return {
+        'max-width': '100%',
+        width: this.width,
+        height: this.height,
+      };
+    },
+  },
+  methods: {
+    moveEnd() {
+      this.moving = false;
+      document.removeEventListener('mouseup', this.moveEnd);
+      document.removeEventListener('mousemove', this.move);
+    },
+    move(event) {
+      this.movingX = event.x;
+      this.movingY = event.y;
+      this.updateDisplay();
+    },
+    moveStart(event) {
+      this.moving = true;
+      if (!this.movingStartX) {
+        this.movingStartX = event.x;
+        this.movingStartY = event.y;
+      }
+      this.updateDisplayInterval = 0;
+      document.addEventListener('mouseup', this.moveEnd);
+      document.addEventListener('mousemove', this.move);
+    },
+    updateDisplay() {
+      if (!this.updateInterval) {
+        if (!this.computingDisplayInterval && !this.$root.multiCellsSelect) {
+          this.updateDisplayInterval = window.setTimeout(() => {
+            this.diffX = this.movingX - this.movingStartX;
+            this.diffY = this.movingY - this.movingStartY;
+            this.updateDisplayInterval = 0;
+          }, 50);
+        }
+      }
+    },
+  },
+};
+</script>

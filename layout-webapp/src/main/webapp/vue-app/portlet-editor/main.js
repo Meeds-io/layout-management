@@ -46,11 +46,13 @@ export function init() {
         template: `<portlet-editor id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
         data: {
+          portletInstanceId: null,
           portletInstance: null,
         },
         i18n,
         created() {
-          this.$portletInstanceService.getPortletInstance(this.getQueryParam('id'))
+          this.portletInstanceId = this.getQueryParam('id');
+          this.$portletInstanceService.getPortletInstance(this.portletInstanceId)
             .then(data => this.portletInstance = data)
             .finally(() => this.$applicationLoaded());
         },
