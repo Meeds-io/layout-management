@@ -198,16 +198,16 @@ public class PortletInstanceImportService {
 
   protected void importPortletInstanceCategory(PortletInstanceCategoryDescriptor d, long oldId) {
     String descriptorId = d.getNameId();
-    LOG.info("Importing Portlet category instance {}", descriptorId);
+    LOG.debug("Importing Portlet category instance {}", descriptorId);
     try {
       PortletInstanceCategory category = savePortletInstanceCategory(d, oldId);
-      if (forceReimport || oldId == 0 || category.getId() != oldId) {
-        LOG.info("Importing Portlet instance category {} title translations", descriptorId);
+      if (category != null && (forceReimport || oldId == 0 || category.getId() != oldId)) {
+        LOG.debug("Importing Portlet instance category {} title translations", descriptorId);
         saveCategoryNames(d, category);
         // Mark as imported
         setCategorySettingValue(descriptorId, category.getId());
       }
-      LOG.info("Importing Portlet instance category {} finished successfully", descriptorId);
+      LOG.debug("Importing Portlet instance category {} finished successfully", descriptorId);
     } catch (Exception e) {
       LOG.warn("An error occurred while importing portlet instance category {}", descriptorId, e);
     }
@@ -215,16 +215,19 @@ public class PortletInstanceImportService {
 
   protected void importPortletInstance(PortletInstanceDescriptor d, long oldId) {
     String descriptorId = d.getNameId();
-    LOG.info("Importing Portlet instance {}", descriptorId);
+    LOG.debug("Importing Portlet instance {}", descriptorId);
     try {
       PortletInstance portletInstance = savePortletInstance(d, oldId);
+      if (portletInstance == null) {
+        return;
+      }
       if (forceReimport || oldId == 0 || portletInstance.getId() != oldId) {
-        LOG.info("Importing Portlet instance {} title translations", descriptorId);
+        LOG.debug("Importing Portlet instance {} title translations", descriptorId);
         saveNames(d, portletInstance);
-        LOG.info("Importing Portlet instance {} description translations", descriptorId);
+        LOG.debug("Importing Portlet instance {} description translations", descriptorId);
         saveDescriptions(d, portletInstance);
         if (StringUtils.isNotBlank(d.getIllustrationPath())) {
-          LOG.info("Importing Portlet instance {} illustration", descriptorId);
+          LOG.debug("Importing Portlet instance {} illustration", descriptorId);
           saveIllustration(portletInstance.getId(), d.getIllustrationPath());
         }
         // Mark as imported
@@ -280,6 +283,12 @@ public class PortletInstanceImportService {
   @SneakyThrows
   protected PortletInstance savePortletInstance(PortletInstanceDescriptor d, long oldId) {
     PortletDescriptor portlet = portletService.getPortlet(d.getPortletName());
+    if (portlet == null) {
+      LOG.debug("Saving Portlet instance descriptor {} aborted since portlet {} doesn't exist.",
+                d.getNameId(),
+                d.getPortletName());
+      return null;
+    }
     PortletInstance portletInstance = null;
     if (oldId > 0) {
       portletInstance = portletInstanceService.getPortletInstance(oldId);

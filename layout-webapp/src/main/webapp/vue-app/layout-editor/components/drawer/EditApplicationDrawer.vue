@@ -307,10 +307,10 @@ export default {
       return this.container?.children?.[0]?.contentId || this.container?.contentId;
     },
     application() {
-      return this.$root.allApplications?.find?.(a => a?.contentId === this.applicationContentId);
+      return this.$root.portletInstances?.find?.(a => a?.contentId === this.applicationContentId);
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
     },
     supportedModes() {
       return this.application?.supportedModes || [];

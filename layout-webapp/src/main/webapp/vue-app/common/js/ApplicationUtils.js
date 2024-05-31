@@ -18,6 +18,11 @@
  */
 
 export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode) {
+  return getApplicationContent(navUri, applicationStorageId, applicationMode)
+    .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
+}
+
+export function getApplicationContent(navUri, applicationStorageId, applicationMode) {
   return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}`, {
     credentials: 'include',
     method: 'GET',
@@ -29,11 +34,10 @@ export function installApplication(navUri, applicationStorageId, applicationElem
       } else {
         throw new Error('The retrieved page is not a portal page');
       }
-    })
-    .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
+    });
 }
 
-function handleApplicationContent(applicationContent, applicationElement) {
+export function handleApplicationContent(applicationContent, applicationElement) {
   const newHeadContent = applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>'));
   let newBodyContent = applicationContent.substring(applicationContent.search('<body') + applicationContent.match(/<body.*>/g)[0].length, applicationContent.lastIndexOf('</body>'));
   newBodyContent = installNewCSS(newHeadContent, newBodyContent);
