@@ -38,6 +38,10 @@ export default {
       default: null,
     },
   },
+  data: () => ({
+    applicationContent: null,
+    contentRetrieved: false,
+  }),
   computed: {
     nodeUri() {
       return this.$root.nodeUri;
@@ -86,18 +90,41 @@ export default {
       return this.container.cssClass || '';
     },
   },
+  watch: {
+    portletId() {
+      this.retrieveData();
+    },
+    nodeUri() {
+      this.retrieveData();
+    },
+    applicationContent() {
+      if (this.applicationContent) {
+        this.installApplication();
+      }
+    },
+  },
+  created() {
+    this.retrieveData();
+  },
   mounted() {
     this.installApplication();
   },
   methods: {
     installApplication() {
-      if (this.$refs.content
-          && this.nodeUri) {
-        if (this.portletId) {
-          this.$applicationUtils.installApplication(this.nodeUri, this.portletId, this.$refs.content);
-        } else {
+      if (this.$refs.content && this.nodeUri) {
+        if (!this.portletId) {
           console.warn(`Application '${this.contentId}' doesn't have a storageId neither and id`); // eslint-disable-line no-console
+        } else if (this.applicationContent) {
+          this.$applicationUtils.handleApplicationContent(this.applicationContent, this.$refs.content);
+          this.applicationContent = null;
         }
+      }
+    },
+    retrieveData() {
+      if (this.portletId && this.nodeUri && !this.contentRetrieved) {
+        this.contentRetrieved = true;
+        this.$applicationUtils.getApplicationContent(this.nodeUri, this.portletId)
+          .then(applicationContent => this.applicationContent = applicationContent);
       }
     },
     hasUnit(length) {

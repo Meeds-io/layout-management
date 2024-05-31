@@ -23,6 +23,7 @@
     ref="drawer"
     id="addApplicationDrawer"
     v-model="drawer"
+    :loading="$root.loadingPortletInstances"
     allow-expand
     right
     @closed="$root.$emit('layout-application-drawer-closed')">
@@ -41,7 +42,7 @@
           focusable
           flat>
           <layout-editor-application-category-card
-            v-for="(category, index) in applicationCategories"
+            v-for="(category, index) in portletInstanceCategories"
             :key="category.id"
             :category="category"
             :applications="applications"
@@ -78,19 +79,19 @@ export default {
     expanded: 0,
     canLoadMore: true,
     layoutAllAppsDrawer: eXo.env.portal.layoutAllAppsDrawer,
-    allApplications: [],
+    portletInstances: [],
   }),
   computed: {
-    applicationCategories() {
-      const applicationCategories = this.$root.applicationCategories.slice();
-      applicationCategories.forEach(c => c.label = this.$te(`layout.${c.name}`) ? this.$t(`layout.${c.name}`) : c.name);
-      return applicationCategories;
+    portletInstanceCategories() {
+      const portletInstanceCategories = this.$root.portletInstanceCategories.slice();
+      portletInstanceCategories.forEach(c => c.label = this.$te(`layout.${c.name}`) ? this.$t(`layout.${c.name}`) : c.name);
+      return portletInstanceCategories;
     },
     applications() {
-      return this.$root.allApplications;
+      return this.$root.portletInstances;
     },
     otherApplications() {
-      return this.allApplications.filter(a => !this.applications.find(app => app.contentId === a.contentId));
+      return this.portletInstances.filter(a => !this.applications.find(app => app.contentId === a.contentId));
     },
     otherCategories() {
       return this.otherApplications.reduce((otherCategories, application) => {
@@ -110,6 +111,7 @@ export default {
   },
   methods: {
     open() {
+      this.$root.$emit('layout-editor-portlet-instances-refresh');
       this.$refs.drawer.endLoading();
       this.$refs.drawer.open();
     },
@@ -123,7 +125,7 @@ export default {
     loadMore() {
       this.$refs.drawer.startLoading();
       this.$portletService.getPortlets()
-        .then(applications => this.allApplications = applications)
+        .then(applications => this.portletInstances = applications)
         .finally(() => {
           this.canLoadMore = false;
           this.$refs.drawer.endLoading();

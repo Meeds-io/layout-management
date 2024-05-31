@@ -79,6 +79,27 @@
   </portlet>
 
   <portlet>
+    <portlet-name>PortletEditor</portlet-name>
+    <display-name>Portlet Editor Portlet</display-name>
+    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+    <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/html/portletEditor.html</value>
+    </init-param>
+    <expiration-cache>-1</expiration-cache>
+    <cache-scope>PUBLIC</cache-scope>
+    <supports>
+      <mime-type>text/html</mime-type>
+    </supports>
+    <supported-locale>en</supported-locale>
+    <resource-bundle>locale.portlet.LayoutEditor</resource-bundle>
+    <portlet-info>
+      <title>Portlet Editor</title>
+      <keywords>Portlet Editor Management</keywords>
+    </portlet-info>
+  </portlet>
+
+  <portlet>
     <portlet-name>PageTemplatesManagement</portlet-name>
     <display-name>Page Templates Management Portlet</display-name>
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>

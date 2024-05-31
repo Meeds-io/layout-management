@@ -117,10 +117,10 @@ export default {
       return this.section?.template === this.$layoutUtils.flexTemplate;
     },
     applicationTitle() {
-      return this.$root.applicationCategories?.flatMap?.(c => c.applications)?.find?.(a => a?.contentId === this.container?.contentId)?.displayName || this.container?.title || '';
+      return this.$root.portletInstanceCategories?.flatMap?.(c => c.applications)?.find?.(a => a?.contentId === this.container?.contentId)?.displayName || this.container?.title || '';
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
     },
     applicationCategoryTitle() {
       return this.applicationCategory?.displayName || '';

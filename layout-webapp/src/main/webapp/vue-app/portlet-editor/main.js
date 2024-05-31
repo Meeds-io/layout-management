@@ -18,11 +18,11 @@
  */
 
 import './initComponents.js';
-import '../common-layout-components/initComponents.js';
+import '../common-portlets/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('siteManagement');
+  const components = extensionRegistry.loadComponents('PortletEditor');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -30,28 +30,39 @@ if (extensionRegistry) {
   }
 }
 
-const appId = 'siteManagement';
+const appId = 'portletEditor';
 
 //getting language of the PLF
 const lang = eXo?.env.portal.language || 'en';
 
 //should expose the locale ressources as REST API
-const urls = [
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteManagement-${lang}.json`,
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigation-${lang}.json`
-];
+const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.LayoutEditor-${lang}.json`;
 
 export function init() {
-  exoi18n.loadLanguageAsync(lang, urls)
+  exoi18n.loadLanguageAsync(lang, url)
     .then(i18n => {
       // init Vue app when locale ressources are ready
       Vue.createApp({
-        template: `<site-management id="${appId}"/>`,
+        template: `<portlet-editor id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
+        data: {
+          portletInstanceId: null,
+          portletInstance: null,
+        },
         i18n,
-        data: () => ({
-          pageTemplates: null,
-        }),
-      }, `#${appId}`, 'site-management');
+        created() {
+          this.portletInstanceId = this.getQueryParam('id');
+          this.$portletInstanceService.getPortletInstance(this.portletInstanceId)
+            .then(data => this.portletInstance = data)
+            .finally(() => this.$applicationLoaded());
+        },
+        methods: {
+          getQueryParam(paramName) {
+            const uri = window.location.search.substring(1);
+            const params = new URLSearchParams(uri);
+            return params.get(paramName);
+          },
+        },
+      }, `#${appId}`, 'Portlet Editor');
     });
 }

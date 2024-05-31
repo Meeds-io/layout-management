@@ -176,7 +176,7 @@ export default {
       return !this.isDynamicSection && this.container?.children?.[0]?.title || '';
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.applicationCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
     },
     applicationCategoryTitle() {
       return this.applicationCategory?.displayName || '';

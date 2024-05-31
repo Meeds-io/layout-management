@@ -18,8 +18,7 @@
  */
 
 import './initComponents.js';
-import '../common/initComponents.js';
-import '../common-page-template/initComponents.js';
+import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 
 import './extensions.js';
@@ -27,7 +26,7 @@ import './services.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('layoutEditor');
+  const components = extensionRegistry.loadComponents('LayoutEditor');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -57,8 +56,9 @@ export function init() {
           hoveredSectionId: null,
           hoveredSection: null,
           hoveredApplication: null,
-          applicationCategories: null,
-          allApplications: null,
+          portletInstanceCategories: null,
+          portletInstances: null,
+          loadingPortletInstances: false,
           branding: null,
           displayMode: 'desktop',
           layout: null,
@@ -143,12 +143,10 @@ export function init() {
         },
         created() {
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
+          this.$on('layout-editor-portlet-instances-refresh', this.refreshPortletInstances);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
           document.addEventListener('drawerClosed', this.setDrawerClosed);
-          this.$portletInstanceCategoryService.getPortletInstanceCategories()
-            .then(categories => this.applicationCategories = categories);
-          this.$portletInstanceService.getPortletInstances()
-            .then(applications => this.allApplications = applications.filter(a => !a.disabled));
+          this.refreshPortletInstances();
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);
         },
@@ -158,6 +156,14 @@ export function init() {
           },
           setDrawerClosed() {
             this.drawerOpened--;
+          },
+          refreshPortletInstances() {
+            this.loadingPortletInstances = true;
+            return this.$portletInstanceCategoryService.getPortletInstanceCategories()
+              .then(categories => this.portletInstanceCategories = categories)
+              .then(()  => this.$portletInstanceService.getPortletInstances())
+              .then(applications => this.portletInstances = applications.filter(a => !a.disabled))
+              .finally(() => this.loadingPortletInstances = false);
           },
           refreshContainerTypes() {
             this.containerTypes = extensionRegistry.loadExtensions('layout-editor', 'container');

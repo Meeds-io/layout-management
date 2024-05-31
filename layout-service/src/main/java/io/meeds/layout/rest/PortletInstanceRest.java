@@ -37,6 +37,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 
 import io.meeds.layout.model.PortletInstance;
+import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.service.PortletInstanceRenderService;
 import io.meeds.layout.service.PortletInstanceService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,12 +54,17 @@ import jakarta.servlet.http.HttpServletRequest;
 public class PortletInstanceRest {
 
   @Autowired
-  private PortletInstanceService portletInstanceService;
+  private PortletInstanceService       portletInstanceService;
+
+  @Autowired
+  private PortletInstanceRenderService portletInstanceRenderService;
 
   @GetMapping
   @Secured("users")
   @Operation(summary = "Retrieve portlet instances", method = "GET", description = "This retrieves portlet instances")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+  })
   public List<PortletInstance> getPortletInstances(
                                                    HttpServletRequest request,
                                                    @Parameter(description = "Portlet instance category identifier")
@@ -70,7 +77,11 @@ public class PortletInstanceRest {
   @Secured("users")
   @Operation(summary = "Retrieve a portlet instance designated by its id", method = "GET",
              description = "This will retrieve a portlet instance designated by its id")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public PortletInstance getPortletInstance(
                                             HttpServletRequest request,
                                             @Parameter(description = "Portlet instance identifier")
@@ -85,11 +96,37 @@ public class PortletInstanceRest {
     }
   }
 
+  @GetMapping("{id}/preferences")
+  @Secured("users")
+  @Operation(summary = "Retrieve a portlet instance preferences designated by its id",
+             method = "GET",
+             description = "This will retrieve a portlet instance preferences designated by its id")
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public List<PortletInstancePreference> getPortletInstancePreferences(
+                                                                       HttpServletRequest request,
+                                                                       @Parameter(description = "Portlet instance identifier")
+                                                                       @PathVariable("id")
+                                                                       long id) {
+    try {
+      return portletInstanceRenderService.getPortletInstancePreferences(id, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+  }
+
   @PostMapping
   @Secured("users")
   @Operation(summary = "Create a portlet instance", method = "POST", description = "This creates a new portlet instance")
-  @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "portlet instance created"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+  })
   public PortletInstance createPortletInstance(
                                                HttpServletRequest request,
                                                @RequestBody
@@ -104,9 +141,11 @@ public class PortletInstanceRest {
   @PutMapping("{id}")
   @Secured("users")
   @Operation(summary = "Update a portlet instance", method = "PUT", description = "This updates an existing portlet instance")
-  @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "portlet instance updated"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "404", description = "Object Not found") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void updatePortletInstance(
                                     HttpServletRequest request,
                                     @Parameter(description = "Portlet instance identifier")
@@ -127,9 +166,11 @@ public class PortletInstanceRest {
   @DeleteMapping("{id}")
   @Secured("users")
   @Operation(summary = "Deletes a portlet instance", method = "DELETE", description = "This deletes an existing portlet instance")
-  @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "portlet instance deleted"),
-                          @ApiResponse(responseCode = "400", description = "Invalid query input"),
-                          @ApiResponse(responseCode = "404", description = "Object Not found") })
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
   public void deletePortletInstance(
                                     HttpServletRequest request,
                                     @Parameter(description = "Portlet instance identifier")
