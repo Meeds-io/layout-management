@@ -201,7 +201,7 @@ public class PortletInstanceImportService {
     LOG.debug("Importing Portlet category instance {}", descriptorId);
     try {
       PortletInstanceCategory category = savePortletInstanceCategory(d, oldId);
-      if (forceReimport || oldId == 0 || category.getId() != oldId) {
+      if (category != null && (forceReimport || oldId == 0 || category.getId() != oldId)) {
         LOG.debug("Importing Portlet instance category {} title translations", descriptorId);
         saveCategoryNames(d, category);
         // Mark as imported
@@ -218,6 +218,9 @@ public class PortletInstanceImportService {
     LOG.debug("Importing Portlet instance {}", descriptorId);
     try {
       PortletInstance portletInstance = savePortletInstance(d, oldId);
+      if (portletInstance == null) {
+        return;
+      }
       if (forceReimport || oldId == 0 || portletInstance.getId() != oldId) {
         LOG.debug("Importing Portlet instance {} title translations", descriptorId);
         saveNames(d, portletInstance);
@@ -280,6 +283,12 @@ public class PortletInstanceImportService {
   @SneakyThrows
   protected PortletInstance savePortletInstance(PortletInstanceDescriptor d, long oldId) {
     PortletDescriptor portlet = portletService.getPortlet(d.getPortletName());
+    if (portlet == null) {
+      LOG.debug("Saving Portlet instance descriptor {} aborted since portlet {} doesn't exist.",
+                d.getNameId(),
+                d.getPortletName());
+      return null;
+    }
     PortletInstance portletInstance = null;
     if (oldId > 0) {
       portletInstance = portletInstanceService.getPortletInstance(oldId);

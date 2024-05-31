@@ -21,10 +21,10 @@ package io.meeds.layout.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -86,10 +86,14 @@ public class PortletInstanceRenderService {
 
   private Application<Portlet>                         placeholderApplication;
 
-  private Map<String, PortletInstancePreferencePlugin> preferencePlugins              = new HashMap<>();
+  private Map<String, PortletInstancePreferencePlugin> preferencePlugins              = new ConcurrentHashMap<>();
 
   public void addPortletInstancePreferencePlugin(PortletInstancePreferencePlugin plugin) {
     preferencePlugins.put(plugin.getPortletName(), plugin);
+  }
+
+  public void removePortletInstancePreferencePlugin(String portletName) {
+    preferencePlugins.remove(portletName);
   }
 
   public Application<?> getPortletInstanceApplication(String username, // NOSONAR
@@ -111,9 +115,16 @@ public class PortletInstanceRenderService {
                                                                        String username) throws IllegalAccessException,
                                                                                         ObjectNotFoundException {
     PortletInstance portletInstance = portletInstanceService.getPortletInstance(portletInstanceId, username, null, false);
+    if (portletInstance == null) {
+      throw new ObjectNotFoundException(String.format("Portlet Instance with id %s wasn't found", portletInstanceId));
+    }
     PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletInstance.getContentId().split("/")[1]);
     long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
     Application<Portlet> application = layoutService.getApplicationModel(String.valueOf(applicationId));
+    if (application == null) {
+      throw new ObjectNotFoundException(String.format("Application for Portlet Instance with id %s wasn't found",
+                                                      portletInstanceId));
+    }
     Portlet preferences = layoutService.load(application.getState(), application.getType());
     if (plugin == null) {
       if (preferences == null) {
@@ -135,6 +146,9 @@ public class PortletInstanceRenderService {
                                                                                 userName,
                                                                                 Locale.ENGLISH,
                                                                                 false);
+    if (portletInstance == null) {
+      throw new ObjectNotFoundException(String.format("Portlet instance with id %s wasn't found", portletInstanceId));
+    }
     long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
     if (applicationId == 0) {
       return createPortletInstanceApplication(portletInstance);
