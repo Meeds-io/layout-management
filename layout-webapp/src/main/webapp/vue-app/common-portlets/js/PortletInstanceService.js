@@ -43,6 +43,19 @@ export function getPortletInstance(id) {
   });
 }
 
+export function getPortletInstancePreferences(id) {
+  return fetch(`/layout/rest/portlet/instances/${id}/preferences`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp?.ok) {
+      throw new Error('Error when retrieving portlet instance preferences');
+    } else {
+      return resp.json();
+    }
+  });
+}
+
 export function createPortletInstance(portletInstance) {
   return fetch('/layout/rest/portlet/instances', {
     credentials: 'include',
