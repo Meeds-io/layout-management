@@ -19,44 +19,16 @@
 
 -->
 <template>
-  <v-menu
-    v-model="menu"
-    :left="!$vuetify.rtl"
-    :right="$vuetify.rtl"
-    :content-class="menuId"
-    offset-y>
-    <template #activator="{ on, attrs }">
-      <v-btn
-        :aria-label="$t('portlets.menu.open')"
-        icon
-        small
-        class="mx-auto"
-        v-bind="attrs"
-        v-on="on">
-        <v-icon size="16" class="icon-default-color">fas fa-ellipsis-v</v-icon>
-      </v-btn>
-    </template>
-    <v-hover v-if="menu" @input="hoverMenu = $event">
-      <v-list
-        class="pa-0"
-        dense
-        @mouseout="menu = false"
-        @focusout="menu = false">
-        <v-list-item-group v-model="listItem">
-          <v-list-item
-            dense
-            @click="$root.$emit('portlet-instance-add', null, false, portlet.contentId)">
-            <v-icon size="13">
-              fa-plus
-            </v-icon>
-            <v-list-item-title class="ps-2">
-              {{ $t('portlets.label.createInstance') }}
-            </v-list-item-title>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </v-hover>
-  </v-menu>
+  <v-btn
+    :disabled="disabled"
+    :aria-label="$t('portlets.label.createInstance')"
+    :title="$t('portlets.label.createInstance')"
+    icon
+    @click="$root.$emit('portlet-instance-add', null, false, portlet.contentId)">
+    <v-icon class="icon-default-icon" size="20">
+      fa-plus
+    </v-icon>
+  </v-btn>
 </template>
 <script>
 export default {

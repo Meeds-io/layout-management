@@ -76,12 +76,16 @@ export function init() {
           this.$root.$on('portlet-instance-category-deleted', this.refreshPortletInstanceCategories);
           this.$root.$on('portlet-instance-category-deleted', this.refreshPortletInstances);
           this.$root.$on('portlet-instance-category-selected', this.selectCategory);
+          window.addEventListener('portlet-instance-layout-updated', this.propagateEventListenerLocally);
 
           this.refreshPortlets();
           this.refreshPortletInstances();
           this.refreshPortletInstanceCategories();
         },
         methods: {
+          propagateEventListenerLocally(event) {
+            this.$root.$emit(event.type, event.detail);
+          },
           selectCategory(categoryId) {
             this.selectedCategoryId = categoryId;
           },

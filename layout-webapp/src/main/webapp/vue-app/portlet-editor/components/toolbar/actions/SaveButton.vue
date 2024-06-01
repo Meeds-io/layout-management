@@ -46,12 +46,53 @@ export default {
       try {
         const instance = await this.$portletInstanceService.getPortletInstance(this.$root.portletInstanceId);
         instance.preferences = await this.$portletInstanceService.getPortletInstancePreferences(this.$root.portletInstanceId);
-        this.$portletInstanceService.updatePortletInstance(instance);
-        this.$root.$emit('portlet-instance-updated', instance);
-        this.$root.$emit('alert-message', this.$t('layout.portletInstanceUpdatedSuccessfully'), 'success');
+        await this.$portletInstanceService.updatePortletInstance(instance);
+
+        const previewCanvas = await window.html2canvas(this.$root.portletInstanceElement);
+        const previewImage = previewCanvas.toDataURL('image/png');
+        const previewBlob = this.convertPreviewToFile(previewImage);
+        const uploadId =  await this.$uploadService.upload(previewBlob);
+        await new Promise((resolve, reject) => {
+          const interval = window.setInterval(() => {
+            this.$uploadService.getUploadProgress(uploadId)
+              .then(percent => {
+                if (Number(percent) === 100) {
+                  window.clearInterval(interval);
+                  resolve();
+                }
+              })
+              .catch(e => reject(e));
+          }, 200);
+        });
+        await this.$fileAttachmentService.saveAttachments({
+          objectType: 'portletInstance',
+          objectId: this.$root.portletInstanceId,
+          uploadedFiles: [{uploadId}],
+          attachedFiles: [],
+        });
+
+        if (window?.opener) {
+          window?.opener?.dispatchEvent?.(new CustomEvent('portlet-instance-layout-updated', {
+            detail: instance,
+          }));
+          window.close();
+        } else {
+          this.$root.$emit('alert-message', this.$t('layout.portletInstanceLayoutUpdatedSuccessfully'), 'success');
+        }
+      } catch (e) {
+        console.debug('Error saving portlet instance', e); // eslint-disable-line no-console
+        this.$root.$emit('alert-message', this.$t('layout.portletInstanceLayoutUpdatedSuccessfully'), 'success');
       } finally {
-        window.setTimeout(() => this.loading = false);
+        window.setTimeout(() => this.loading = false, 50);
       }
+    },
+    convertPreviewToFile(previewImage) {
+      const imgString = window.atob(previewImage.replace(/^data:image\/\w+;base64,/, ''));
+      const bytes = new Uint8Array(imgString.length);
+      for (let i = 0; i < imgString.length; i++) {
+        bytes[i] = imgString.charCodeAt(i);
+      }
+      return new Blob([bytes], {type: 'image/png'});
     },
   },
 };

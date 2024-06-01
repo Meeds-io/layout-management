@@ -330,6 +330,9 @@
         <module>attachImage</module>
       </depends>
       <depends>
+        <module>html2canvas</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>
