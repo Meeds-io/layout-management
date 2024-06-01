@@ -46,6 +46,7 @@
           <v-list-item
             :href="editLayoutLink"
             target="_blank"
+            rel="opener"
             dense>
             <v-icon size="13">
               fa-edit

@@ -22,19 +22,36 @@
   <div
     ref="content"
     :id="id"
+    :style="cssStyle"
+    :class="$root.portletMode !== 'view' && 'white card-border-radius border-box-sizing pa-5'"
     class="layout-application no-applications-spacing full-width"></div>
 </template>
 <script>
 export default {
   data: () => ({
     applicationContent: null,
+    contentRetrieved: 0,
   }),
   computed: {
+    id() {
+      return `UIPortlet-${this.portletInstanceId}`;
+    },
+    portletMode() {
+      return this.$root.portletMode;
+    },
     portletInstanceId() {
       return this.$root.portletInstanceId;
     },
-    id() {
-      return `UIPortlet-${this.portletInstanceId}`;
+    isEmpty() {
+      return this.contentRetrieved
+          && !this.applicationContent
+          && !this.$el?.querySelector?.('.PORTLET-FRAGMENT')?.offsetHeight;
+    },
+    cssStyle() {
+      return this.isEmpty && {
+        'min-height': '100px',
+        'display': 'block !important',
+      } || null;
     },
   },
   watch: {
@@ -43,12 +60,20 @@ export default {
         this.installApplication();
       }
     },
+    portletMode() {
+      this.retrieveData();
+    },
+    isEmpty() {
+      this.$emit('empty', this.isEmpty);
+    },
   },
   created() {
+    document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
     this.retrieveData();
   },
   mounted() {
     this.installApplication();
+    this.$root.portletInstanceElement = this.$el;
   },
   methods: {
     installApplication() {
@@ -56,10 +81,25 @@ export default {
         this.$applicationUtils.handleApplicationContent(this.applicationContent, this.$refs.content);
         // Cleanup JS memory
         this.applicationContent = null;
+        // Wait for some seconds for application to be displayed
+        this.contentRetrieved++;
+        const interval = window.setInterval(() => {
+          if (this.contentRetrieved >= 100 || !this.isEmpty) {
+            document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+            window.clearInterval(interval);
+          } else if (this.isEmpty) {
+            this.contentRetrieved++;
+            if (this.contentRetrieved === 20) {
+              document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+              this.$emit('empty-message');
+            }
+          }
+        }, 50);
       }
     },
     retrieveData() {
-      fetch(`/portal/${eXo.env.portal.portalName}/portlet-viewer?portletInstanceId=${this.portletInstanceId}&noCache=true`, {
+      this.contentRetrieved = 0;
+      fetch(`/portal/${eXo.env.portal.portalName}/portlet-viewer?portletInstanceId=${this.portletInstanceId}&noCache=true&maximizedPortletMode=${this.portletMode}`, {
         credentials: 'include',
         method: 'GET',
         redirect: 'manual'
