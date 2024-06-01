@@ -20,6 +20,7 @@
 import PortletEditor from './components/PortletEditor.vue';
 
 import Toolbar from './components/toolbar/Toolbar.vue';
+import EditButton from './components/toolbar/actions/EditButton.vue';
 import SaveButton from './components/toolbar/actions/SaveButton.vue';
 
 import Content from './components/content/Content.vue';
@@ -30,6 +31,7 @@ import Application from './components/content/Application.vue';
 const components = {
   'portlet-editor': PortletEditor,
   'portlet-editor-toolbar': Toolbar,
+  'portlet-editor-toolbar-edit-button': EditButton,
   'portlet-editor-toolbar-save-button': SaveButton,
   'portlet-editor-content': Content,
   'portlet-editor-cell': Cell,

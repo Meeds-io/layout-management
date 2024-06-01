@@ -69,8 +69,11 @@ public class PortletInstanceRenderService {
 
   private static final Context                         CONTEXT                        = Context.GLOBAL.id("PORTLET_INSTANCE");
 
-  private static final Scope                           SCOPE                          =
-                                                             Scope.APPLICATION.id("PORTLET_INSTANCE_APPLICATION");
+  private static final Scope                           PORTLET_INSTANCE_SCOPE         =
+                                                                              Scope.APPLICATION.id("PORTLET_INSTANCE_APPLICATION");
+
+  private static final Scope                           PAGE_APPLICATION_SCOPE         =
+                                                                              Scope.APPLICATION.id("APPLICATION_PORTLET_INSTANCE");
 
   private static final PageKey                         PORTLET_EDITOR_SYSTEM_PAGE_KEY = new PageKey(SiteKey.portal("global"),
                                                                                                     "_portletEditor");
@@ -139,6 +142,10 @@ public class PortletInstanceRenderService {
     }
   }
 
+  public long getApplicationPortletInstanceId(long applicationId) {
+    return getSettingValue(PAGE_APPLICATION_SCOPE, applicationId);
+  }
+
   private Application<?> getOrCreatePortletInstanceApplication(String portletInstanceId,
                                                                String userName) throws IllegalAccessException,
                                                                                 ObjectNotFoundException {
@@ -202,7 +209,11 @@ public class PortletInstanceRenderService {
   }
 
   private long getPortletInstanceApplicationId(long portletInstanceId) {
-    SettingValue<?> settingValue = settingService.get(CONTEXT, SCOPE, String.valueOf(portletInstanceId));
+    return getSettingValue(PORTLET_INSTANCE_SCOPE, portletInstanceId);
+  }
+
+  private long getSettingValue(Scope scope, long id) {
+    SettingValue<?> settingValue = settingService.get(CONTEXT, scope, String.valueOf(id));
     if (settingValue != null && settingValue.getValue() != null && StringUtils.isNotBlank(settingValue.getValue().toString())) {
       return Long.parseLong(settingValue.getValue().toString());
     } else {
@@ -212,9 +223,13 @@ public class PortletInstanceRenderService {
 
   private void savePortletInstanceApplicationId(long applicationStorageId, long portletInstanceId) {
     settingService.set(CONTEXT,
-                       SCOPE,
+                       PORTLET_INSTANCE_SCOPE,
                        String.valueOf(portletInstanceId),
                        SettingValue.create(applicationStorageId));
+    settingService.set(CONTEXT,
+                       PAGE_APPLICATION_SCOPE,
+                       String.valueOf(applicationStorageId),
+                       SettingValue.create(portletInstanceId));
   }
 
   private Container getPortletInstanceSystemContainer() {
