@@ -22,9 +22,18 @@
   <div
     :style="cssStyle"
     class="d-flex position-relative">
-    <portlet-editor-application ref="application" />
+    <v-card
+      v-if="isEmpty"
+      v-text="displayEmptyMessage && $t('portlets.emptyPortletInstanceContent') || ''"
+      class="d-flex align-center card-border-radius justify-center position-absolute full-width full-height"
+      flat />
+    <portlet-editor-application
+      ref="application"
+      @empty="isEmpty = $event"
+      @empty-message="displayEmptyMessage = true" />
     <portlet-editor-cell-resize-button
       ref="resizeButton"
+      v-if="$root.portletMode === 'view' && !isEmpty"
       :moving="moving"
       @move-start="moveStart" />
   </div>
@@ -40,6 +49,8 @@ export default {
     diffY: 0,
     updateDisplayInterval: 0,
     moving: false,
+    isEmpty: false,
+    displayEmptyMessage: false,
   }),
   computed: {
     displayResizeButton() {
