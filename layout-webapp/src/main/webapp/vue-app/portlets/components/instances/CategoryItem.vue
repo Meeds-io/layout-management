@@ -30,7 +30,9 @@
         </v-card>
       </v-list-item-icon>
       <v-list-item-content>
-        <v-list-item-title v-text="category.name" />
+        <v-list-item-title
+          :title="category.name"
+          v-text="category.name" />
       </v-list-item-content>
       <v-list-item-action class="my-auto">
         <v-card

@@ -19,34 +19,30 @@
 
 -->
 <template>
-  <v-card
-    class="d-flex align-center no-border-radius border-box-sizing absolute-vertical-center t-0 px-4"
-    height="57"
-    min-width="100vw"
-    width="100vw"
-    flat>
-    <v-icon class="icon-default-color">fa-pager</v-icon>
-    <span class="px-2" v-sanitized-html="title"></span>
-    <v-spacer />
-    <portlet-editor-toolbar-edit-button
-      v-if="canSwitchToEditMode"
-      class="mx-2" />
-    <portlet-editor-toolbar-save-button
-      :disabled="$root.portletMode !== 'view'" />
-  </v-card>
+  <v-btn
+    :loading="loading"
+    :aria-label="label"
+    class="btn d-flex align-center"
+    elevation="0"
+    outlined
+    @click="switchMode">
+    <span class="text-none">{{ label }}</span>
+  </v-btn>
 </template>
 <script>
 export default {
+  data: () => ({
+    loading: false,
+  }),
   computed: {
-    title() {
-      return this.$t('layout.editPortletInstance', {0: `<strong>${this.$root?.portletInstance?.name}</strong>`});
-    },
-    canSwitchToEditMode() {
-      return this.$root.portletInstance?.supportedModes?.find?.(mode => mode === 'edit');
+    label() {
+      return this.$root.portletMode === 'view' ? this.$t('portlets.switchToEditMode') : this.$t('portlets.switchToViewMode');
     },
   },
-  mounted() {
-    document.querySelector('#layoutTopBarContentChildren').append(this.$el);
+  methods: {
+    switchMode() {
+      this.$root.portletMode = this.$root.portletMode === 'view' ? 'edit' : 'view';
+    },
   },
 };
 </script>

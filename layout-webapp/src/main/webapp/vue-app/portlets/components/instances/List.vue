@@ -172,10 +172,12 @@ export default {
   created() {
     this.$root.$on('portlet-instance-delete', this.deletePortletInstanceConfirm);
     this.$root.$on('portlet-instance-category-selected', this.selectCategoryId);
+    this.$root.$on('portlet-instance-layout-updated', this.handleLayoutUpdated);
   },
   beforeDestroy() {
     this.$root.$off('portlet-instance-delete', this.deletePortletInstanceConfirm);
     this.$root.$off('portlet-instance-category-selected', this.selectCategoryId);
+    this.$root.$off('portlet-instance-layout-updated', this.handleLayoutUpdated);
   },
   methods: {
     applySortOnItems(portletInstances, sortFields, sortDescendings) {
@@ -215,6 +217,10 @@ export default {
         })
         .catch(() => this.$root.$emit('alert-message', this.$t('portlets.delete.error'), 'error'))
         .finally(() => this.loading = false);
+    },
+    handleLayoutUpdated(instance) {
+      this.$root.$emit('portlet-instance-saved', instance);
+      this.$root.$emit('alert-message', this.$t('layout.portletInstanceLayoutUpdatedSuccessfully'), 'success');
     },
   },
 };
