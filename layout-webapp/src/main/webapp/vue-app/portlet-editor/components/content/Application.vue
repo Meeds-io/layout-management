@@ -49,6 +49,7 @@ export default {
   },
   mounted() {
     this.installApplication();
+    this.$root.portletInstanceElement = this.$el;
   },
   methods: {
     installApplication() {

@@ -48,6 +48,7 @@ export function init() {
         data: {
           portletInstanceId: null,
           portletInstance: null,
+          portletInstanceElement: null,
         },
         i18n,
         created() {
