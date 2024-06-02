@@ -63,8 +63,11 @@ export default {
     portletMode() {
       this.retrieveData();
     },
-    isEmpty() {
-      this.$emit('empty', this.isEmpty);
+    isEmpty: {
+      immediate: true,
+      handler() {
+        this.$emit('empty', this.isEmpty);
+      },
     },
   },
   created() {
