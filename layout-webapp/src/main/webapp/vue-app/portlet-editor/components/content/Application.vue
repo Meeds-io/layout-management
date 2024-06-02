@@ -23,7 +23,7 @@
     ref="content"
     :id="id"
     :style="cssStyle"
-    :class="$root.portletMode !== 'view' && 'white card-border-radius border-box-sizing pa-5'"
+    :class="$root.portletMode === 'view' && 'light-grey-background-color pa-5 ma-n5' || 'white pa-5 border-box-sizing card-border-radius'"
     class="layout-application no-applications-spacing full-width"></div>
 </template>
 <script>
