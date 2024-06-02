@@ -31,7 +31,7 @@
     <v-spacer />
     <layout-editor-toolbar-history-buttons class="me-3" />
     <layout-editor-toolbar-save-as-template-button
-      v-if="!pageTemplateId"
+      v-if="!pageTemplateId && isAdministrator"
       class="me-3" />
     <layout-editor-toolbar-preview-button
       class="me-3" />
@@ -64,6 +64,9 @@ export default {
     },
   },
   computed: {
+    isAdministrator() {
+      return eXo.env.portal.isAdministrator;
+    },
     defaultLanguage() {
       return eXo.env.portal.defaultLanguage;
     },
