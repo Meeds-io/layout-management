@@ -19,6 +19,7 @@
     <script type="text/javascript">
       eXo.env.portal.siteKeyName = '<%=siteName%>';
       eXo.env.portal.isAdministrator = <%=isAdministrator%>;
+      eXo.env.portal.canManageSiteNavigation = <%=canManageSiteNavigation%>;
       require(['PORTLET/layout/SiteNavigation'], app => app.init(<%=canManageSiteNavigation%>));
     </script>
   </div>
