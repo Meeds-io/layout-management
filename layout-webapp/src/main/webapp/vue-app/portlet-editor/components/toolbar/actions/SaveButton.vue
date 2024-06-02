@@ -46,30 +46,11 @@ export default {
       try {
         const instance = await this.$portletInstanceService.getPortletInstance(this.$root.portletInstanceId);
         instance.preferences = await this.$portletInstanceService.getPortletInstancePreferences(this.$root.portletInstanceId);
-        await this.$portletInstanceService.updatePortletInstance(instance);
 
-        const previewCanvas = await window.html2canvas(this.$root.portletInstanceElement);
-        const previewImage = previewCanvas.toDataURL('image/png');
-        const previewBlob = this.convertPreviewToFile(previewImage);
-        const uploadId =  await this.$uploadService.upload(previewBlob);
-        await new Promise((resolve, reject) => {
-          const interval = window.setInterval(() => {
-            this.$uploadService.getUploadProgress(uploadId)
-              .then(percent => {
-                if (Number(percent) === 100) {
-                  window.clearInterval(interval);
-                  resolve();
-                }
-              })
-              .catch(e => reject(e));
-          }, 200);
-        });
-        await this.$fileAttachmentService.saveAttachments({
-          objectType: 'portletInstance',
-          objectId: this.$root.portletInstanceId,
-          uploadedFiles: [{uploadId}],
-          attachedFiles: [],
-        });
+        await this.$portletInstanceService.updatePortletInstance(instance);
+        if (!this.$root.portletInstanceEmpty) {
+          await this.savePreview();
+        }
 
         if (window?.opener) {
           window?.opener?.dispatchEvent?.(new CustomEvent('portlet-instance-layout-updated', {
@@ -85,6 +66,30 @@ export default {
       } finally {
         window.setTimeout(() => this.loading = false, 50);
       }
+    },
+    async savePreview() {
+      const previewCanvas = await window.html2canvas(this.$root.portletInstanceElement);
+      const previewImage = previewCanvas.toDataURL('image/png');
+      const previewBlob = this.convertPreviewToFile(previewImage);
+      const uploadId =  await this.$uploadService.upload(previewBlob);
+      await new Promise((resolve, reject) => {
+        const interval = window.setInterval(() => {
+          this.$uploadService.getUploadProgress(uploadId)
+            .then(percent => {
+              if (Number(percent) === 100) {
+                window.clearInterval(interval);
+                resolve();
+              }
+            })
+            .catch(e => reject(e));
+        }, 200);
+      });
+      return await this.$fileAttachmentService.saveAttachments({
+        objectType: 'portletInstance',
+        objectId: this.$root.portletInstanceId,
+        uploadedFiles: [{uploadId}],
+        attachedFiles: [],
+      });
     },
     convertPreviewToFile(previewImage) {
       const imgString = window.atob(previewImage.replace(/^data:image\/\w+;base64,/, ''));

@@ -49,7 +49,7 @@ export default {
     diffY: 0,
     updateDisplayInterval: 0,
     moving: false,
-    isEmpty: false,
+    isEmpty: null,
     displayEmptyMessage: false,
   }),
   computed: {
@@ -68,6 +68,11 @@ export default {
         width: this.width,
         height: this.height,
       };
+    },
+  },
+  watch: {
+    isEmpty() {
+      this.$root.portletInstanceEmpty = this.isEmpty;
     },
   },
   methods: {
