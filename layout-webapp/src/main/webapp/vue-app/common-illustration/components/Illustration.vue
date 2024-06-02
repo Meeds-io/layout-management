@@ -19,7 +19,7 @@
 
 -->
 <template>
-  <v-hover v-model="hover" :disabled="!illustrationId">
+  <v-hover v-model="hover" :disabled="noHover || !illustrationId">
     <div
       :aria-label="$t(`${objectType}.label.preview`, {0: name})"
       class="position-relative full-height full-width d-flex align-center justify-center">
@@ -35,8 +35,8 @@
       </v-expand-transition>
       <v-img
         :src="illustrationSrc"
-        max-height="30"
-        max-width="60"
+        :max-height="maxHeight"
+        :max-width="maxWidth"
         contain />
     </div>
   </v-hover>
@@ -55,6 +55,18 @@ export default {
     defaultSrc: {
       type: String,
       default: null,
+    },
+    noHover: {
+      type: Boolean,
+      default: false,
+    },
+    maxHeight: {
+      type: String,
+      default: () => '30',
+    },
+    maxWidth: {
+      type: String,
+      default: () => '60',
     },
   },
   data: () => ({
