@@ -54,6 +54,7 @@ import Application from './components/content/container/Application.vue';
 
 import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
 import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
+import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicationCategoryDrawer.vue';
 import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
 
@@ -84,6 +85,7 @@ const components = {
   'layout-editor-section-add-drawer': AddSectionDrawer,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-section-menu': SectionMenu,
+  'layout-editor-application-category-select-drawer': SelectApplicationCategoryDrawer,
   'layout-editor-application-add-drawer': AddApplicationDrawer,
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
