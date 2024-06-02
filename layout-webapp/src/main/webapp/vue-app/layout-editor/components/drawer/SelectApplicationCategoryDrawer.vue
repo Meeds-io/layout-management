@@ -21,25 +21,25 @@
 <template>
   <exo-drawer
     ref="drawer"
-    id="addApplicationDrawer"
+    id="selectApplicationCategoryDrawer"
     v-model="drawer"
-    go-back-button
-    right
-    @closed="$root.$emit('layout-application-drawer-closed')">
+    :loading="$root.loadingPortletInstances"
+    allow-expand
+    right>
     <template slot="title">
-      {{ $t('layout.addApplicationFromCategoryTitle', {0: categoryName}) }}
+      {{ $t('layout.selectApplicationCategoryTitle') }}
     </template>
     <template v-if="drawer" #content>
       <v-card
         max-width="100%"
-        class="d-flex flex-wrap ma-4 overflow-hidden"
+        class="d-flex flex-wrap my-4 ms-4 me-2 justify-space-between overflow-hidden"
         flat>
-        <layout-editor-application-card
-          v-for="application in portletInstances"
-          :key="application.id"
-          :application="application"
-          class="flex-grow-1 mb-4"
-          @add="addApplication(application)" />
+        <layout-editor-application-category-card
+          v-for="category in portletInstanceCategories"
+          :key="category.id"
+          :category="category"
+          :applications="applications"
+          class="me-2" />
       </v-card>
     </template>
   </exo-drawer>
@@ -49,31 +49,29 @@ export default {
   data: () => ({
     drawer: false,
     portletInstances: [],
-    category: null,
   }),
   computed: {
-    categoryName() {
-      return this.category?.name;
+    portletInstanceCategories() {
+      const portletInstanceCategories = this.$root.portletInstanceCategories.slice();
+      portletInstanceCategories.forEach(c => c.label = this.$te(`layout.${c.name}`) ? this.$t(`layout.${c.name}`) : c.name);
+      return portletInstanceCategories;
+    },
+    applications() {
+      return this.$root.portletInstances;
     },
   },
   created() {
-    this.$root.$on('layout-add-application-drawer', this.open);
+    this.$root.$on('layout-add-application', this.close);
+  },
+  beforeDestroy() {
+    this.$root.$off('layout-add-application', this.close);
   },
   methods: {
-    open(portletInstances) {
-      this.portletInstances = portletInstances;
-      this.$refs.drawer.endLoading();
+    open() {
+      this.$root.$emit('layout-editor-portlet-instances-refresh');
       this.$refs.drawer.open();
     },
-    addApplication(application) {
-      this.$refs.drawer.startLoading();
-      this.$root.$emit('layout-add-application', application);
-      window.setTimeout(() => {
-        this.close();
-      }, 200);
-    },
     close() {
-      this.$refs.drawer.endLoading();
       this.$refs.drawer.close();
     },
   },

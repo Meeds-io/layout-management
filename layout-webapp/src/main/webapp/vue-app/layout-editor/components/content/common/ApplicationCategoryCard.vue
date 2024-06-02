@@ -19,25 +19,18 @@
 
 -->
 <template>
-  <v-expansion-panel
+  <v-card
     v-if="hasApplications"
-    class="border-color border-radius mt-4">
-    <v-expansion-panel-header v-sanitized-html="categoryLabel" />
-    <v-divider v-if="expanded" />
-    <v-expansion-panel-content>
-      <div
-        v-for="application in categoryApplications"
-        :key="application.id"
-        class="d-flex flex-no-wrap justify-space-between border-radius border-color ApplicationCard ApplicationCardEmbedded">
-        <layout-editor-application-card
-          :application="application"
-          class="d-flex flex-grow-1"
-          @add="$emit('addApplication', application)" />
-      </div>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+    class="d-flex flex-column border-color border-radius mt-4 align-center justify-center aspect-ratio-1"
+    min-width="110px"
+    width="calc(33% - 8px)"
+    max-width="120px"
+    flat
+    @click="$root.$emit('layout-add-application-drawer', categoryApplications)">
+    <v-icon class="mt-auto mb-2">{{ categoryIcon }}</v-icon>
+    <div v-sanitized-html="categoryLabel" class="mb-auto subtitle-1 mt-2"></div>
+  </v-card>
 </template>
-
 <script>
 export default {
   props: {
@@ -46,6 +39,14 @@ export default {
       default: false,
     },
     category: {
+      type: Object,
+      default: null,
+    },
+    parentId: {
+      type: Object,
+      default: null,
+    },
+    container: {
       type: Object,
       default: null,
     },
@@ -60,6 +61,9 @@ export default {
     },
     categoryLabel() {
       return this.category?.label || this.category?.name;
+    },
+    categoryIcon() {
+      return this.category?.icon;
     },
     categoryId() {
       return this.category?.id;
