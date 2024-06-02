@@ -79,7 +79,7 @@
           class="full-width"
           flat
           v-on="!multiSelectEnabled && {
-            click: () => $root.$emit('layout-cell-add-application', parentId, container)
+            click: () => $root.$emit('layout-add-application-category-drawer', parentId, container)
           }">
           <v-card
             v-if="isDynamicSection"

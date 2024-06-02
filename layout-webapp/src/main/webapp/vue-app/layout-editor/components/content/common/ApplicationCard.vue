@@ -19,43 +19,56 @@
 
 -->
 <template>
-  <v-card :id="portletName" flat>
-    <div class="d-flex flex-no-wrap full-width">
-      <v-avatar
-        class="ApplicationCardImage mx-1 my-auto"
-        size="45"
-        tile>
-        <v-img
-          :src="imgSrc"
-          :alt="portletName"
-          max-height="45"
-          max-width="45"
-          @error="displayDefault = true" />
-      </v-avatar>
-      <div class="d-flex flex-column flex-grow-1 ApplicationCardBody text-truncate ms-1 my-auto">
-        <div
-          :title="name"
-          class="text-truncate subtitle-1 px-1 pt-2 text-color ApplicationCardTitle">
+  <v-hover v-model="hover">
+    <v-card
+      :id="`PortletInstance_${application.id}`"
+      class="border-color card-border-radius overflow-hidden position-relative"
+      flat>
+      <v-expand-transition>
+        <v-card
+          v-if="hover"
+          class="d-flex absolute-full-size z-index-one align-center justify-center transition-fast-in-fast-out mask-color"
+          flat>
+          <div class="ApplicationCardAction">
+            <v-btn
+              :aria-label="$t('layout.add')"
+              elevation="0"
+              class="primary mx-2"
+              @click="$emit('add')">
+              <v-icon size="13" class="me-2">fa-plus</v-icon>
+              {{ $t('layout.add') }}
+            </v-btn>
+            <v-btn
+              v-if="illustrationId"
+              :aria-label="$t('layout.preview')"
+              elevation="0"
+              class="primary mx-2 primary-border-color"
+              outlined
+              @click="preview">
+              <v-icon size="13" class="me-2">fa-search</v-icon>
+              {{ $t('layout.preview') }}
+            </v-btn>
+          </div>
+        </v-card>
+      </v-expand-transition>
+      <div class="d-flex flex-column full-width pa-5">
+        <div class="subtitle-1 text-color ApplicationCardTitle">
           {{ name }}
         </div>
-        <v-card-subtitle
-          :title="description"
-          class="text-truncate subtitle-2 px-1 pt-0 pb-2 text-sub-title ApplicationCardDescription">
-          {{ description || name }}
-        </v-card-subtitle>
+        <div
+          v-if="description"
+          v-sanitized-html="description"
+          class="subtitle-2 pt-0 pb-2 text-sub-title ApplicationCardDescription"></div>
+        <layout-image-illustration
+          ref="illustration"
+          :value="application"
+          object-type="portletInstance"
+          max-height="110"
+          max-width="100%"
+          no-hover />
       </div>
-      <div class="ApplicationCardAction">
-        <v-btn
-          text
-          height="100%"
-          width="100%px"
-          class="primary--text"
-          @click="$emit('add')">
-          <v-icon size="36">fa-plus</v-icon>
-        </v-btn>
-      </div>
-    </div>
-  </v-card>
+    </v-card>
+  </v-hover>
 </template>
 <script>
 export default {
@@ -66,25 +79,29 @@ export default {
     },
   },
   data: () => ({
-    displayActionMenu: false,
-    displayDefault: false,
     defaultImageSrc: '/sites/images/application/DefaultPortlet.png',
+    hover: false,
   }),
   computed: {
-    imgSrc() {
-      return this.displayDefault && this.defaultImageSrc || `/${this.applicationName}/skin/DefaultSkin/portletIcons/${this.portletName}.png`;
-    },
-    applicationName() {
-      return this.application?.applicationName || this.application?.contentId?.split?.('/')?.[0];
-    },
-    portletName() {
-      return this.application?.portletName || this.application?.contentId?.split?.('/')?.[1];
-    },
     name() {
       return this.application?.name;
     },
     description() {
       return this.application?.description;
+    },
+    instanceId() {
+      return this.application?.id;
+    },
+    illustrationId() {
+      return this.application?.illustrationId;
+    },
+    illustrationSrc() {
+      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/portletInstance/${this.instanceId}/${this.illustrationId}` || this.defaultImageSrc;
+    },
+  },
+  methods: {
+    preview() {
+      this.$refs.illustration.openIllustration();
     },
   },
 };
