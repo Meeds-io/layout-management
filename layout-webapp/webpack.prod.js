@@ -9,7 +9,7 @@ const config = {
     siteManagement: './src/main/webapp/vue-app/site-management/main.js',
     layoutEditor: './src/main/webapp/vue-app/layout-editor/main.js',
     pageLayout: './src/main/webapp/vue-app/page-layout/main.js',
-    pageTemplatesManagement: './src/main/webapp/vue-app/page-templates-management/main.js',
+    pageTemplate: './src/main/webapp/vue-app/page-template/main.js',
     portlets: './src/main/webapp/vue-app/portlets/main.js',
     portletEditor: './src/main/webapp/vue-app/portlet-editor/main.js',
   },
