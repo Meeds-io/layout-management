@@ -68,6 +68,10 @@ export default {
       type: String,
       default: () => '60',
     },
+    previewAction: {
+      type: String,
+      default: null,
+    },
   },
   data: () => ({
     hover: false,
@@ -88,7 +92,7 @@ export default {
   },
   methods: {
     openIllustration() {
-      this.$root.$emit('layout-illustration-preview', this.illustrationSrc);
+      this.$root.$emit('layout-illustration-preview', this.illustrationSrc, this.previewAction);
     },
   },
 };

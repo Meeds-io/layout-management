@@ -31,6 +31,14 @@
     <template v-if="dialog">
       <div class="d-flex justify-end">
         <v-btn
+          v-if="actionClick"
+          :aria-label="actionLabel"
+          class="btn btn-primary my-4"
+          @click="clickOnAction">
+          <v-icon v-if="actionIcon" color="white">{{ actionIcon }}</v-icon>
+          <span>{{ actionLabel }}</span>
+        </v-btn>
+        <v-btn
           :aria-label="$t('pageTemplate.label.close')"
           class="ma-4"
           icon
@@ -56,7 +64,11 @@
 export default {
   data: () => ({
     dialog: false,
-    illustrationSrc: null, 
+    illustrationSrc: null,
+    actionLabel: null,
+    actionIcon: null,
+    actionClick: null,
+    actionCloseOnClick: null,
   }),
   watch: {
     dialog() {
@@ -71,9 +83,21 @@ export default {
     this.$root.$on('layout-illustration-preview', this.open);
   },
   methods: {
-    open(illustrationSrc) {
+    open(illustrationSrc, action) {
       this.illustrationSrc = illustrationSrc;
+      this.actionIcon = action?.icon;
+      this.actionLabel = action?.label;
+      this.actionClick = action?.click;
+      this.actionCloseOnClick = action?.closeOnClick;
       this.dialog = true;
+    },
+    clickOnAction() {
+      if (this.actionCloseOnClick) {
+        this.dialog = false;
+      }
+      if (this.actionClick) {
+        this.actionClick();
+      }
     },
   }
 };
