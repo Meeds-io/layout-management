@@ -62,6 +62,7 @@
         <layout-image-illustration
           ref="illustration"
           :value="application"
+          :preview-action="illustrationAction"
           object-type="portletInstance"
           max-height="110"
           max-width="100%"
@@ -97,6 +98,13 @@ export default {
     },
     illustrationSrc() {
       return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/portletInstance/${this.instanceId}/${this.illustrationId}` || this.defaultImageSrc;
+    },
+    illustrationAction() {
+      return {
+        label: this.$t('layout.add'),
+        closeOnClick: true,
+        click: () => this.$emit('add'),
+      };
     },
   },
   methods: {
