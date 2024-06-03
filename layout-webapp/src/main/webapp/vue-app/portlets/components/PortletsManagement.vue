@@ -48,8 +48,21 @@
 export default {
   data: () => ({
     keyword: null,
-    tabName: 'instances',
+    tabName: null,
+    switching: false,
   }),
+  watch: {
+    tabName() {
+      if (this.tabName && this.switching) {
+        window.location.hash = `#${this.tabName}`;
+      } else if (!this.tabName) {
+        this.switching = true;
+      }
+    },
+  },
+  created() {
+    this.tabName = window.location.hash === '#portlets' && 'portlets' || 'instances';
+  },
   methods: {
     selectTab(tabName) {
       this.tabName = null;
