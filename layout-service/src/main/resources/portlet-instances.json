@@ -17,8 +17,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":true
+      "system":true
     },
     {
       "nameId":"SpaceSettingPortlet",
@@ -37,8 +36,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":true
+      "system":true
     },
     {
       "nameId":"Image",
@@ -57,8 +55,7 @@
       "permissions":[
         "Everyone"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"Links",
@@ -77,8 +74,7 @@
       "permissions":[
         "Everyone"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"ExternalSpacesList",
@@ -97,8 +93,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"GettingStarted",
@@ -111,10 +106,10 @@
         "en":"layout.portletInstance.GettingStarted.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"SpaceBannerPortlet",
@@ -133,8 +128,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"WhoIsOnLinePortlet",
@@ -153,8 +147,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"PeopleOverview",
@@ -173,8 +166,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"SpaceActivityStreamPortlet",
@@ -193,8 +185,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":true
+      "system":true
     },
     {
       "nameId":"SpacesOverview",
@@ -211,10 +202,10 @@
         
       ],
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"SuggestionsPeopleAndSpace",
@@ -231,10 +222,10 @@
         
       ],
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"UserActivityStreamPortlet",
@@ -251,10 +242,10 @@
         
       ],
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"SpaceInfos",
@@ -273,8 +264,7 @@
       "permissions":[
         "*:/platform/users"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"VerticalMenu",
@@ -291,10 +281,10 @@
         
       ],
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"VerticalMenu",
@@ -311,10 +301,10 @@
         
       ],
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"Breadcrumb",
@@ -331,10 +321,10 @@
         
       ],
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
-      "system":true,
-      "spaceApplication":false
+      "system":true
     },
     {
       "nameId":"GeneralSettings",
@@ -347,7 +337,8 @@
         "en":"layout.portletInstance.GeneralSettings.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -362,7 +353,8 @@
         "en":"layout.portletInstance.UserSettingLanguage.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -377,7 +369,8 @@
         "en":"layout.portletInstance.UserSettingNotifications.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -392,7 +385,8 @@
         "en":"layout.portletInstance.UserSettingSecurity.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -407,7 +401,8 @@
         "en":"layout.portletInstance.ProfileAboutMe.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -422,7 +417,8 @@
         "en":"layout.portletInstance.ProfileContactInformation.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -437,7 +433,8 @@
         "en":"layout.portletInstance.ProfileHeader.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     },
@@ -452,7 +449,8 @@
         "en":"layout.portletInstance.ProfileWorkExperience.description"
       },
       "permissions":[
-        "*:/platform/users"
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
       ],
       "system":true
     }
