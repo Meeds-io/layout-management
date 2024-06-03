@@ -200,9 +200,6 @@ export default {
         this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
       }
     },
-    openApplicationDrawer(applications) {
-      this.$refs.applicationDrawer.open(applications);
-    },
     openApplicationCategoryDrawer(sectionId, container) {
       this.$root.selectedSectionId = sectionId;
       this.$root.selectedCells = [container];
@@ -222,7 +219,7 @@ export default {
           this.$layoutUtils.isBetween(c.colIndex, selection.fromColIndex, selection.toColIndex)
           && this.$layoutUtils.isBetween(c.rowIndex, selection.fromRowIndex, selection.toRowIndex)
         ) || [];
-        this.$refs.applicationDrawer.open();
+        this.$refs.applicationCategoryDrawer.open();
       } else {
         console.warn(`Can't find section with id ${this.$root.selectedSectionId}`); // eslint-disable-line no-console
       }
