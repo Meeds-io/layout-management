@@ -19,20 +19,22 @@
 
 -->
 <template>
-  <v-card
-    v-if="hasApplications"
-    class="d-flex flex-column border-color border-radius mt-4 align-center justify-center aspect-ratio-1"
-    min-width="110px"
-    width="calc(33% - 8px)"
-    max-width="120px"
-    flat
-    @click="$root.$emit('layout-add-application-drawer', categoryApplications)">
-    <v-icon class="mt-auto mb-2">{{ categoryIcon }}</v-icon>
-    <div
-      v-sanitized-html="categoryLabel"
+  <v-hover v-if="hasApplications" v-model="hover">
+    <v-card
+      :aria-label="$utils.htmlToText(categoryLabel)"
       :title="$utils.htmlToText(categoryLabel)"
-      class="text-truncate-2 mb-auto subtitle-1 mt-2"></div>
-  </v-card>
+      :elevation="hover && 2 || 0"
+      class="d-flex flex-column border-color border-radius overflow-hidden mt-4 align-center justify-center aspect-ratio-1"
+      min-width="110px"
+      width="calc(33% - 8px)"
+      max-width="120px"
+      @click="$root.$emit('layout-add-application-drawer', categoryApplications, category)">
+      <v-icon class="mt-auto mb-2">{{ categoryIcon }}</v-icon>
+      <div
+        v-sanitized-html="categoryLabel"
+        class="text-truncate full-width mb-auto subtitle-2 mt-2 px-1"></div>
+    </v-card>
+  </v-hover>
 </template>
 <script>
 export default {
@@ -58,6 +60,9 @@ export default {
       default: null,
     },
   },
+  data: () => ({
+    hover: false,
+  }),
   computed: {
     categoryName() {
       return this.category?.name;

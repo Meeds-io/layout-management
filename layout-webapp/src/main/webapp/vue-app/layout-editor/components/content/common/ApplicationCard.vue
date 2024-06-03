@@ -22,37 +22,25 @@
   <v-hover v-model="hover">
     <v-card
       :id="`PortletInstance_${application.id}`"
+      :title="$t('layout.preview')"
+      :elevation="hover && 2 || 0"
+      :aria-label="$t('layout.preview')"
       class="border-color card-border-radius overflow-hidden position-relative"
-      flat>
-      <v-expand-transition>
-        <v-card
-          v-if="hover"
-          class="d-flex absolute-full-size z-index-one align-center justify-center transition-fast-in-fast-out mask-color"
-          flat>
-          <div class="ApplicationCardAction">
-            <v-btn
-              :aria-label="$t('layout.add')"
-              elevation="0"
-              class="primary mx-2"
-              @click="$emit('add')">
-              <v-icon size="13" class="me-2">fa-plus</v-icon>
-              {{ $t('layout.add') }}
-            </v-btn>
-            <v-btn
-              v-if="illustrationId"
-              :aria-label="$t('layout.preview')"
-              elevation="0"
-              class="primary mx-2 primary-border-color"
-              outlined
-              @click="preview">
-              <v-icon size="13" class="me-2">fa-search</v-icon>
-              {{ $t('layout.preview') }}
-            </v-btn>
-          </div>
-        </v-card>
-      </v-expand-transition>
+      v-on="illustrationId && {
+        click: () => preview()
+      }"
+      @click="preview">
+      <v-btn
+        v-show="hover"
+        :aria-label="$t('layout.add')"
+        :class="$vuetify.rtl && 'l-0' || 'r-0'"
+        class="position-absolute t-0 mt-4 me-4"
+        icon
+        @click.stop="$emit('add')">
+        <v-icon size="24" color="primary">fa-plus</v-icon>
+      </v-btn>
       <div class="d-flex flex-column full-width pa-5">
-        <div class="subtitle-1 text-color ApplicationCardTitle">
+        <div class="subtitle-1 text-truncate-2 text-color ApplicationCardTitle">
           {{ name }}
         </div>
         <div
