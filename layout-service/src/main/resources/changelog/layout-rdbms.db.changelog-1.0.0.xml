@@ -505,22 +505,6 @@
 
   <changeSet
     author="layout"
-    id="1.0.0-31">
-    <preConditions onFail="MARK_RAN">
-      <not>
-        <columnExists tableName="PORTAL_APPLICATIONS" columnName="IS_SPACE_APPLICATION"/>
-      </not>
-    </preConditions>
-    <addColumn tableName="PORTAL_APPLICATIONS">
-      <column
-        name="IS_SPACE_APPLICATION"
-        type="Boolean"
-        defaultValueBoolean="false" />
-    </addColumn>
-  </changeSet>
-
-  <changeSet
-    author="layout"
     id="1.0.0-32">
     <preConditions onFail="MARK_RAN">
       <not>

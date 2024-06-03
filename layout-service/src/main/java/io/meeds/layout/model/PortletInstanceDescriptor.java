@@ -46,8 +46,6 @@ public class PortletInstanceDescriptor {
 
   private boolean                         system;
 
-  private boolean                         spaceApplication;
-
   private String                          illustrationPath;
 
 }
