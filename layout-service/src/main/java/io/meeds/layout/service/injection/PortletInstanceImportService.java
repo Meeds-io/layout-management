@@ -301,7 +301,6 @@ public class PortletInstanceImportService {
     portletInstance.setCategoryId(getCategorySettingValue(d.getCategoryNameId()));
     portletInstance.setPermissions(d.getPermissions());
     portletInstance.setPreferences(d.getPreferences());
-    portletInstance.setSpaceApplication(d.isSpaceApplication());
     portletInstance.setSystem(d.isSystem());
     if (isNew) {
       return portletInstanceService.createPortletInstance(portletInstance);
