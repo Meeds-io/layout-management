@@ -86,12 +86,33 @@
           v-model="contentId"
           :disabled="!isNew || disableSelectedPortlet"
           class="mt-4" />
-        <div class="d-flex align-center mt-4">
-          <v-switch
-            v-model="spaceApplication"
-            :aria-label="$t('layout.portlet.allowUsingInSpaceContext')"
-            class="mt-1 me-2 width-fit-content" />
-          <div>{{ $t('layout.portlet.allowUsingInSpaceContext') }}</div>
+        <div class="d-flex flex-column mt-4">
+          <div class="mb-2">{{ $t('portlets.selectWhoCanAddIt') }}</div>
+          <v-tooltip bottom>
+            <template #activator="{on, attrs}">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-checkbox
+                  v-model="aclAdministrators"
+                  :label="$t('portlets.administrators')"
+                  :aria-label="$t('portlets.administrators')"
+                  class="ma-0 pa-0"
+                  disabled />
+              </div>
+            </template>
+            <span>{{ $t('portlets.administratorsMandatorySelectionTooltip') }}</span>
+          </v-tooltip>
+          <v-checkbox
+            v-model="aclContributors"
+            :label="$t('portlets.contentManagers')"
+            :aria-label="$t('portlets.contentManagers')"
+            class="ma-0 pa-0" />
+          <v-checkbox
+            v-model="aclSpaceHost"
+            :label="$t('portlets.spaceHost')"
+            :aria-label="$t('portlets.spaceHost')"
+            class="ma-0 pa-0" />
         </div>
         <portlets-instance-preview
           ref="portletInstancePreview"
@@ -134,11 +155,13 @@ export default {
     maxDescriptionLength: 1000,
     illustrationUploadId: null,
     lang: eXo.env.portal.language,
-    spaceApplication: false,
     goBackButton: false,
     disableSelectedPortlet: false,
     saving: false,
     isNew: false,
+    aclSpaceHost: false,
+    aclContributors: false,
+    aclAdministrators: true,
   }),
   computed: {
     disabled() {
@@ -146,6 +169,16 @@ export default {
     },
   },
   watch: {
+    aclContributors() {
+      if (!this.aclContributors && this.aclSpaceHost) {
+        this.aclSpaceHost = false;
+      }
+    },
+    aclSpaceHost() {
+      if (this.aclSpaceHost && !this.aclContributors) {
+        this.aclContributors = true;
+      }
+    },
     description() {
       if (this.$refs.descriptionTranslation) {
         this.$refs.descriptionTranslation.setValue(this.description);
@@ -171,11 +204,14 @@ export default {
       this.instanceId = instance?.id || null;
       if (instance) {
         this.categoryId = instance.categoryId || null;
+        this.aclSpaceHost = !!instance.permissions?.find?.(p => p.includes('/platform/users'));
+        this.aclContributors = this.aclSpaceHost || !!instance.permissions?.find?.(p => p.includes('/platform/web-contributors'));
       } else {
         this.categoryId = this.$root?.selectedCategoryId;
+        this.aclSpaceHost = true;
+        this.aclContributors = true;
       }
       this.contentId = instance?.contentId || contentId;
-      this.spaceApplication = instance?.spaceApplication || false;
       this.title = instance?.name || null;
       this.titleTranslations = {};
       this.descriptionTranslations = {};
@@ -193,7 +229,7 @@ export default {
           this.$portletInstanceService.getPortletInstance(this.instanceId)
             .then(instance => {
               instance.categoryId = this.categoryId;
-              instance.spaceApplication = this.spaceApplication;
+              instance.permissions = this.getPermissions();
               return this.$portletInstanceService.updatePortletInstance(instance)
                 .then(() => {
                   this.$root.$emit('portlet-instance-updated', instance);
@@ -204,7 +240,7 @@ export default {
           : this.$portletInstanceService.createPortletInstance({
             categoryId: this.categoryId,
             contentId: this.contentId,
-            spaceApplication: this.spaceApplication,
+            permissions: this.getPermissions(),
           })
             .then(instance => {
               this.$root.$emit('portlet-instance-created', instance);
@@ -227,6 +263,13 @@ export default {
           this.close();
         })
         .finally(() => this.saving = false);
+    },
+    getPermissions() {
+      const permissions = [this.aclSpaceHost && '*:/platform/users' || '*:/platform/administrators'];
+      if (this.aclContributors) {
+        permissions.push('*:/platform/web-contributors');
+      }
+      return permissions;
     },
     checkCKEdtiorDisplay() {
       if (this.$refs.portletInstanceDescriptionEditor?.editor

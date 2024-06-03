@@ -51,6 +51,4 @@ public class PortletInstance {
 
   private boolean                         disabled;
 
-  private boolean                         spaceApplication;
-
 }
