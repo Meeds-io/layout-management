@@ -173,11 +173,13 @@ export default {
     this.$root.$on('portlet-instance-delete', this.deletePortletInstanceConfirm);
     this.$root.$on('portlet-instance-category-selected', this.selectCategoryId);
     this.$root.$on('portlet-instance-layout-updated', this.handleLayoutUpdated);
+    this.$root.$on('portlet-instance-created', this.handleInstanceCreated);
   },
   beforeDestroy() {
     this.$root.$off('portlet-instance-delete', this.deletePortletInstanceConfirm);
     this.$root.$off('portlet-instance-category-selected', this.selectCategoryId);
     this.$root.$off('portlet-instance-layout-updated', this.handleLayoutUpdated);
+    this.$root.$off('portlet-instance-created', this.handleInstanceCreated);
   },
   methods: {
     applySortOnItems(portletInstances, sortFields, sortDescendings) {
@@ -221,6 +223,10 @@ export default {
     handleLayoutUpdated(instance) {
       this.$root.$emit('portlet-instance-saved', instance);
       this.$root.$emit('alert-message', this.$t('layout.portletInstanceLayoutUpdatedSuccessfully'), 'success');
+    },
+    handleInstanceCreated(instance) {
+      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${instance.id}`;
+      window.open(instanceEditorLink, '_blank');
     },
   },
 };
