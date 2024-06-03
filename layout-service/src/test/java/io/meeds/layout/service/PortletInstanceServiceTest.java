@@ -515,8 +515,7 @@ public class PortletInstanceServiceTest {
                                Collections.singletonList("Everyone"),
                                Collections.singletonList("edit"),
                                true,
-                               false,
-                               true);
+                               false);
   }
 
 }

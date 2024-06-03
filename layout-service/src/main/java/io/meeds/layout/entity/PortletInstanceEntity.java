@@ -66,9 +66,6 @@ public class PortletInstanceEntity implements Serializable {
   @Column(name = "IS_SYSTEM")
   private boolean           system;
 
-  @Column(name = "IS_SPACE_APPLICATION")
-  private boolean           spaceApplication;
-
   @Column(name = "IS_DISABLED")
   private boolean           disabled;
 

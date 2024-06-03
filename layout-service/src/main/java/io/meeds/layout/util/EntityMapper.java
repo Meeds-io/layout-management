@@ -64,8 +64,7 @@ public class EntityMapper {
                                            entity.getPermissions().stream().filter(StringUtils::isNotBlank).toList(),
                                portlet == null ? null : portlet.getSupportedModes(),
                                entity.isSystem(),
-                               entity.isDisabled(),
-                               entity.isSpaceApplication());
+                               entity.isDisabled());
   }
 
   public static PortletInstanceCategoryEntity toEntity(PortletInstanceCategory instance) {
@@ -82,7 +81,6 @@ public class EntityMapper {
                                      instance.getPermissions(),
                                      getPreferencesString(instance),
                                      instance.isSystem(),
-                                     instance.isSpaceApplication(),
                                      instance.isDisabled(),
                                      Objects.hash(instance.getCategoryId(),
                                                   getPreferencesString(instance),
