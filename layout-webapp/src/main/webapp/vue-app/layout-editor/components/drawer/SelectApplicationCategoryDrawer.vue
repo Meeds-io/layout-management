@@ -26,13 +26,13 @@
     :loading="$root.loadingPortletInstances"
     allow-expand
     right>
-    <template slot="title">
+    <template #title>
       {{ $t('layout.selectApplicationCategoryTitle') }}
     </template>
     <template v-if="drawer" #content>
       <v-card
         max-width="100%"
-        class="d-flex flex-wrap my-4 ms-4 me-2 justify-space-between overflow-hidden"
+        class="d-flex flex-wrap mb-4 ms-4 me-2 overflow-hidden"
         flat>
         <layout-editor-application-category-card
           v-for="category in sortedCategories"

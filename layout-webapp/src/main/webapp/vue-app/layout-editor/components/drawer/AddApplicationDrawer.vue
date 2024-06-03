@@ -35,7 +35,7 @@
         class="d-flex flex-wrap ma-4 overflow-hidden"
         flat>
         <layout-editor-application-card
-          v-for="application in portletInstances"
+          v-for="application in sortedPortletInstances"
           :key="application.id"
           :application="application"
           class="flex-grow-1 mb-4"
