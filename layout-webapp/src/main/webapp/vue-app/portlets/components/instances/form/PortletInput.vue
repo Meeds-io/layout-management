@@ -24,7 +24,7 @@
     <v-autocomplete
       ref="autocomplete"
       v-model="contentId"
-      :items="$root.portlets"
+      :items="sortedPortlets"
       :disabled="disabled"
       :placeholder="$t('layout.portlet.placeholder')"
       class="portlet-instance-category-autocomplete ma-0 pa-0"
@@ -50,6 +50,13 @@ export default {
   data: () => ({
     contentId: null,
   }),
+  computed: {
+    sortedPortlets() {
+      const portlets = this.$root.portlets?.filter?.(c => c.name) || [];
+      portlets.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return portlets;
+    },
+  },
   watch: {
     value: {
       immediate: true,
