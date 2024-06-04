@@ -136,7 +136,7 @@ export default {
     this.$root.$on('layout-add-application', this.handleAddApplication);
     this.$root.$on('layout-edit-application', this.handleEditApplication);
     this.$root.$on('layout-delete-application', this.handleDeleteApplication);
-    this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
+    this.$root.$on('layout-application-category-drawer-closed', this.resetCellsSelection);
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
