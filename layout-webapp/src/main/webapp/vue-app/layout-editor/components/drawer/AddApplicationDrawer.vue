@@ -23,21 +23,29 @@
     ref="drawer"
     id="addApplicationDrawer"
     v-model="drawer"
+    allow-expand
     go-back-button
     right
+    @expand-updated="expanded = $event"
     @closed="$root.$emit('layout-application-drawer-closed')">
     <template slot="title">
       {{ $t('layout.addApplicationFromCategoryTitle', {0: categoryName}) }}
     </template>
     <template v-if="drawer" #content>
       <v-card
+        :class="expanded && 'flex-wrap' || 'flex-column'"
         max-width="100%"
-        class="d-flex flex-wrap ma-4 overflow-hidden"
+        class="d-flex justify-center ma-4 overflow-hidden"
         flat>
         <layout-editor-application-card
           v-for="application in sortedPortletInstances"
           :key="application.id"
           :application="application"
+          :width="expanded && '388px' || '100%'"
+          :height="expanded && '210px' || 'auto'"
+          :max-image-height="expanded && '100%' || '110px'"
+          max-image-width="100%"
+          :class="expanded && 'mx-2 content-box-sizing'"
           class="flex-grow-1 mb-4"
           @add="addApplication(application)" />
       </v-card>
@@ -48,6 +56,7 @@
 export default {
   data: () => ({
     drawer: false,
+    expanded: false,
     portletInstances: [],
     category: null,
   }),
