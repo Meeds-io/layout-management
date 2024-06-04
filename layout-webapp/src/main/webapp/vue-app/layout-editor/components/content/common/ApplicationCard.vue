@@ -25,6 +25,10 @@
       :title="$t('layout.preview')"
       :elevation="hover && 2 || 0"
       :aria-label="$t('layout.preview')"
+      :height="height"
+      :max-height="height"
+      :width="width"
+      :max-width="width"
       class="border-color card-border-radius overflow-hidden position-relative"
       v-on="illustrationId && {
         click: () => preview()
@@ -39,22 +43,27 @@
         @click.stop="$emit('add')">
         <v-icon size="24" color="primary">fa-plus</v-icon>
       </v-btn>
-      <div class="d-flex flex-column full-width pa-5">
-        <div class="subtitle-1 text-truncate-2 text-color ApplicationCardTitle">
+      <div class="d-flex flex-column border-box-sizing full-height full-width pa-5">
+        <div
+          :title="name"
+          class="flex-grow-0 flex-shrink-0 subtitle-1 text-truncate-2 text-color ApplicationCardTitle">
           {{ name }}
         </div>
         <div
           v-if="description"
           v-sanitized-html="description"
-          class="subtitle-2 pt-0 pb-2 text-sub-title ApplicationCardDescription"></div>
-        <layout-image-illustration
-          ref="illustration"
-          :value="application"
-          :preview-action="illustrationAction"
-          object-type="portletInstance"
-          max-height="110"
-          max-width="100%"
-          no-hover />
+          :title="$utils.htmlToText(description)"
+          class="flex-grow-0 flex-shrink-0 subtitle-2 text-truncate-2 pt-0 text-sub-title ApplicationCardDescription"></div>
+        <div class="d-flex flex-grow-1 flex-shrink-1 justify-center mt-2 overflow-hidden">
+          <layout-image-illustration
+            ref="illustration"
+            :value="application"
+            :preview-action="illustrationAction"
+            :max-height="maxImageHeight"
+            :max-width="maxImageWidth"
+            object-type="portletInstance"
+            no-hover />
+        </div>
       </div>
     </v-card>
   </v-hover>
@@ -65,6 +74,22 @@ export default {
     application: {
       type: Object,
       default: null,
+    },
+    height: {
+      type: String,
+      default: () => 'auto',
+    },
+    maxImageHeight: {
+      type: String,
+      default: () => '100%',
+    },
+    width: {
+      type: String,
+      default: () => '100%',
+    },
+    maxImageWidth: {
+      type: String,
+      default: () => '100%',
     },
   },
   data: () => ({

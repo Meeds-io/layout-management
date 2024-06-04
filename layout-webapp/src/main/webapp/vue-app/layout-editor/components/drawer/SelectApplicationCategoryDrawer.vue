@@ -25,7 +25,8 @@
     v-model="drawer"
     :loading="$root.loadingPortletInstances"
     allow-expand
-    right>
+    right
+    @closed="$root.$emit('layout-application-category-drawer-closed')">
     <template #title>
       {{ $t('layout.selectApplicationCategoryTitle') }}
     </template>
