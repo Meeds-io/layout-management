@@ -24,7 +24,7 @@
     <v-autocomplete
       ref="autocomplete"
       v-model="categoryId"
-      :items="$root.portletInstanceCategories"
+      :items="sortedCategories"
       :placeholder="$t('layout.category.placeholder')"
       class="portlet-instance-category-autocomplete ma-0 pa-0"
       item-value="id"
@@ -45,6 +45,13 @@ export default {
   data: () => ({
     categoryId: null,
   }),
+  computed: {
+    sortedCategories() {
+      const categories = this.$root.portletInstanceCategories?.filter?.(c => c.name) || [];
+      categories.sort((a, b) => this.$root.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return categories;
+    },
+  },
   watch: {
     value: {
       immediate: true,
