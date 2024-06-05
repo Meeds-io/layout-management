@@ -18,6 +18,7 @@
  */
 package io.meeds.layout.plugin.container;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,31 +28,40 @@ import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Properties;
+import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.config.serialize.PortletApplication;
 import org.exoplatform.portal.pom.data.ApplicationData;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
-import io.meeds.layout.service.PortletInstanceRenderService;
+import io.meeds.layout.service.PortletInstanceService;
 
 import lombok.SneakyThrows;
 
 @Component
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class PortletInstanceApplicationAdapter extends PortletApplication {
 
-  @Autowired
-  private PortletInstanceRenderService portletInstanceRenderService;
+  private static final String                             PLACEHOLDER_ID    = "PortletInstanceApplicationAdapter";
 
-  private ThreadLocal<Application>     application = new ThreadLocal<>();
+  private static final TransientApplicationState<Portlet> PLACEHOLDER_STATE =
+                                                                            new TransientApplicationState<>("layout/PortletEditor");
+
+  @Autowired
+  private PortletInstanceService                          portletInstanceService;
+
+  private ThreadLocal<Application<Portlet>>               application       = new ThreadLocal<>();
 
   @Override
   public ModelStyle getCssStyle() {
-    return getApplication().getCssStyle();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getCssStyle();
   }
 
   @Override
   public void setCssStyle(ModelStyle cssStyle) {
-    getApplication().setCssStyle(cssStyle);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setCssStyle(cssStyle);
+    }
   }
 
   @Override
@@ -61,222 +71,305 @@ public class PortletInstanceApplicationAdapter extends PortletApplication {
 
   @Override
   public String getWidth() {
-    return getApplication().getWidth();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getWidth();
   }
 
   @Override
   public void setWidth(String s) {
-    getApplication().setWidth(s);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setWidth(s);
+    }
   }
 
   @Override
   public String getHeight() {
-    return getApplication().getHeight();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getHeight();
   }
 
   @Override
   public void setHeight(String s) {
-    getApplication().setHeight(s);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setHeight(s);
+    }
   }
 
   @Override
   public String getId() {
-    return getApplication().getId();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? PLACEHOLDER_ID : portletApplication.getId();
   }
 
   @Override
   public void setId(String value) {
-    getApplication().setId(value);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setId(value);
+    }
   }
 
   @Override
   public String[] getAccessPermissions() {
-    return getApplication().getAccessPermissions();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getAccessPermissions();
   }
 
   @Override
   public void setAccessPermissions(String[] accessPermissions) {
-    getApplication().setAccessPermissions(accessPermissions);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setAccessPermissions(accessPermissions);
+    }
   }
 
   @Override
   public boolean isModifiable() {
-    return getApplication().isModifiable();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication != null && portletApplication.isModifiable();
   }
 
   @Override
   public void setModifiable(boolean modifiable) {
-    getApplication().setModifiable(modifiable);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setModifiable(modifiable);
+    }
   }
 
   @Override
   public ApplicationState<Portlet> getState() {
-    return getApplication().getState();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? PLACEHOLDER_STATE : portletApplication.getState();
   }
 
   @Override
   public void setState(ApplicationState<Portlet> value) {
-    getApplication().setState(value);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setState(value);
+    }
   }
 
   @Override
   public boolean getShowInfoBar() {
-    return getApplication().getShowInfoBar();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication != null && portletApplication.getShowInfoBar();
   }
 
   @Override
   public void setShowInfoBar(boolean b) {
-    getApplication().setShowInfoBar(b);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setShowInfoBar(b);
+    }
   }
 
   @Override
   public boolean getShowApplicationState() {
-    return getApplication().getShowApplicationState();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication != null && portletApplication.getShowApplicationState();
   }
 
   @Override
   public void setShowApplicationState(boolean b) {
-    getApplication().setShowApplicationState(b);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setShowApplicationState(b);
+    }
   }
 
   @Override
   public boolean getShowApplicationMode() {
-    return getApplication().getShowApplicationMode();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication != null && portletApplication.getShowApplicationMode();
   }
 
   @Override
   public void setShowApplicationMode(boolean b) {
-    getApplication().setShowApplicationMode(b);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setShowApplicationMode(b);
+    }
   }
 
   @Override
   public String getIcon() {
-    return getApplication().getIcon();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getIcon();
   }
 
   @Override
   public void setIcon(String value) {
-    getApplication().setIcon(value);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setIcon(value);
+    }
   }
 
   @Override
   public String getDescription() {
-    return getApplication().getDescription();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getDescription();
   }
 
   @Override
   public void setDescription(String des) {
-    getApplication().setDescription(des);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setDescription(des);
+    }
   }
 
   @Override
   public String getTitle() {
-    return getApplication().getTitle();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getTitle();
   }
 
   @Override
   public void setTitle(String value) {
-    getApplication().setTitle(value);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setTitle(value);
+    }
   }
 
   @Override
   public Properties getProperties() {
-    return getApplication().getProperties();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getProperties();
   }
 
   @Override
   public void setProperties(Properties properties) {
-    getApplication().setProperties(properties);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setProperties(properties);
+    }
   }
 
   @Override
   public String getTheme() {
-    return getApplication().getTheme();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getTheme();
   }
 
   @Override
   public void setTheme(String theme) {
-    getApplication().setTheme(theme);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setTheme(theme);
+    }
   }
 
   @Override
   public String getCssClass() {
-    return getApplication().getCssClass();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getCssClass();
   }
 
   @Override
   public String getBorderColor() {
-    return getApplication().getBorderColor();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getBorderColor();
   }
 
   @Override
-  public ApplicationData build() {
-    return getApplication().build();
+  @SuppressWarnings("unchecked")
+  public ApplicationData<Portlet> build() {
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.build();
   }
 
   @Override
   public void resetStorage() {
-    getApplication().resetStorage();
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.resetStorage();
+    }
   }
 
   @Override
   public void setCssClass(String cssClass) {
-    getApplication().setCssClass(cssClass);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setCssClass(cssClass);
+    }
   }
 
   @Override
   public void setBorderColor(String borderColor) {
-    getApplication().setBorderColor(borderColor);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setBorderColor(borderColor);
+    }
   }
 
   @Override
   public String getStorageId() {
-    return getApplication().getStorageId();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getStorageId();
   }
 
   @Override
   public String getStorageName() {
-    return getApplication().getStorageName();
+    Application<Portlet> portletApplication = getApplication();
+    return portletApplication == null ? null : portletApplication.getStorageName();
   }
 
   @Override
   public void setStorageName(String storageName) {
-    getApplication().setStorageName(storageName);
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.setStorageName(storageName);
+    }
   }
 
   @SneakyThrows
-  public Application getApplication() { // NOSONAR
-    Application<?> portletApplication = application.get();
+  public Application<Portlet> getApplication() { // NOSONAR
+    Application<Portlet> portletApplication = application.get();
     if (portletApplication == null) {
-      portletApplication = portletInstanceRenderService.getPortletInstanceApplication(getCurrentUserName(),
-                                                                                      getPortletInstanceId(),
-                                                                                      getApplicationStorageId());
+      portletApplication = portletInstanceService.getPortletInstanceApplication(getPortletInstanceId(),
+                                                                                getApplicationStorageId(),
+                                                                                getCurrentUserName());
       manageRequestCache(portletApplication);
     }
     return portletApplication;
   }
 
-  private void manageRequestCache(Application<?> portletApplication) {
+  public void cleanApplication() {
+    application.remove();
+  }
+
+  private void manageRequestCache(Application<Portlet> portletApplication) {
     PortalRequestContext requestContext = PortalRequestContext.getCurrentInstance();
     if (requestContext != null) {
       application.set(portletApplication);
-      requestContext.addOnRequestEnd(() -> application.remove());
+      requestContext.addOnRequestEnd(this::cleanApplication);
     }
   }
 
-  private String getPortletInstanceId() {
+  private long getPortletInstanceId() {
     PortalRequestContext requestContext = PortalRequestContext.getCurrentInstance();
-    return requestContext == null ? null : requestContext.getRequest().getParameter("portletInstanceId");
+    return requestContext == null ? 0 : getParameterLong(requestContext, "portletInstanceId");
   }
 
-  private String getApplicationStorageId() {
+  private long getApplicationStorageId() {
     PortalRequestContext requestContext = PortalRequestContext.getCurrentInstance();
-    return requestContext == null ? null : requestContext.getRequest().getParameter("portal:componentId");
+    return requestContext == null ? 0 : getParameterLong(requestContext, "portal:componentId");
   }
 
   private String getCurrentUserName() {
     PortalRequestContext requestContext = PortalRequestContext.getCurrentInstance();
     return requestContext == null ? null : requestContext.getRequest().getRemoteUser();
+  }
+
+  private long getParameterLong(PortalRequestContext requestContext, String paramName) {
+    String value = requestContext.getRequest().getParameter(paramName);
+    return StringUtils.isBlank(value) || !StringUtils.isNumeric(value) ? 0 : Long.parseLong(value);
   }
 
 }

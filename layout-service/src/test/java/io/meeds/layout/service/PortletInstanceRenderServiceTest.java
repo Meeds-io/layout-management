@@ -18,8 +18,9 @@
  */
 package io.meeds.layout.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -27,8 +28,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
@@ -53,19 +51,18 @@ import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstancePreference;
 import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
+import io.meeds.layout.storage.PortletInstanceLayoutStorage;
 
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-                            PortletInstanceRenderService.class,
+                            PortletInstanceLayoutStorage.class,
 })
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class PortletInstanceRenderServiceTest {
 
   private static final String             CONTENT_ID = "test/content";
-
-  private static final String             USERNAME   = "test";
 
   @MockBean
   private LayoutAclService                layoutAclService;
@@ -76,11 +73,8 @@ public class PortletInstanceRenderServiceTest {
   @MockBean
   private LayoutService                   layoutService;
 
-  @MockBean
-  private PortletInstanceService          portletInstanceService;
-
   @Autowired
-  private PortletInstanceRenderService    portletInstanceRenderService;
+  private PortletInstanceLayoutStorage    portletInstanceLayoutStorage;
 
   @Mock
   private Application                     application;
@@ -100,104 +94,38 @@ public class PortletInstanceRenderServiceTest {
   @Test
   @SneakyThrows
   public void getPortletInstanceApplicationByInstanceId() {
-    assertThrows(ObjectNotFoundException.class,
-                 () -> portletInstanceRenderService.getPortletInstanceApplication(USERNAME, "2", null));
     when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
-
-    assertThrows(ObjectNotFoundException.class,
-                 () -> portletInstanceRenderService.getPortletInstanceApplication(USERNAME, "2", null));
-    when(portletInstanceService.getPortletInstance(2,
-                                                   USERNAME,
-                                                   Locale.ENGLISH,
-                                                   false)).thenReturn(portletInstance);
     when(layoutService.getApplicationModel("3")).thenReturn(application);
     when(portletInstance.getId()).thenReturn(2l);
 
-    Application<?> portletInstanceApplication = portletInstanceRenderService.getPortletInstanceApplication(USERNAME, "2", null);
+    Application<?> portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0);
     assertEquals(application, portletInstanceApplication);
   }
 
   @Test
   @SneakyThrows
   public void getPortletInstanceApplicationPlaceholder() {
-    assertNotNull(portletInstanceRenderService.getPortletInstanceApplication(null, null, null));
+    assertNull(portletInstanceLayoutStorage.getPortletInstanceApplication(null, 0));
   }
 
   @Test
   @SneakyThrows
   public void getPortletInstancePreferencesWhenNoPlugin() {
-    when(portletInstanceService.getPortletInstance(2, USERNAME, null, false)).thenReturn(portletInstance);
-    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
-    when(portletInstance.getId()).thenReturn(2l);
     when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
     when(layoutService.getApplicationModel("3")).thenReturn(application);
     Portlet portlet = new Portlet();
     when(layoutService.load(any(), any())).thenReturn(portlet);
     portlet.setValue("test", "testValue");
 
-    List<PortletInstancePreference> portletInstancePreferences =
-                                                               portletInstanceRenderService.getPortletInstancePreferences(2,
-                                                                                                                          USERNAME);
+    Portlet portletInstancePreferences = portletInstanceLayoutStorage.getPortletInstancePreferences(2);
     assertNotNull(portletInstancePreferences);
-    assertEquals(1, portletInstancePreferences.size());
-    assertEquals("test", portletInstancePreferences.get(0).getName());
-    assertEquals("testValue", portletInstancePreferences.get(0).getValue());
-  }
-
-  @Test
-  @SneakyThrows
-  public void getPortletInstancePreferencesWithPlugin() {
-    when(portletInstanceService.getPortletInstance(2, USERNAME, null, false)).thenReturn(portletInstance);
-    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
-    when(portletInstance.getId()).thenReturn(2l);
-    when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
-    when(layoutService.getApplicationModel("3")).thenReturn(application);
-    when(plugin.getPortletName()).thenReturn("content");
-    portletInstanceRenderService.addPortletInstancePreferencePlugin(plugin);
-    try {
-      when(plugin.generatePreferences(any(), any())).thenReturn(Collections.singletonList(new PortletInstancePreference("test",
-                                                                                                                        "value")));
-
-      List<PortletInstancePreference> portletInstancePreferences =
-                                                                 portletInstanceRenderService.getPortletInstancePreferences(2,
-                                                                                                                            USERNAME);
-      assertNotNull(portletInstancePreferences);
-      assertEquals(1, portletInstancePreferences.size());
-      assertEquals("test", portletInstancePreferences.get(0).getName());
-      assertEquals("value", portletInstancePreferences.get(0).getValue());
-    } finally {
-      portletInstanceRenderService.removePortletInstancePreferencePlugin(plugin.getPortletName());
-    }
-  }
-
-  @Test
-  @SneakyThrows
-  public void getPortletInstancePreferencesWhenNoPluginNoPreferences() {
-    assertThrows(ObjectNotFoundException.class, () -> portletInstanceRenderService.getPortletInstancePreferences(2, USERNAME));
-
-    when(portletInstanceService.getPortletInstance(2, USERNAME, null, false)).thenReturn(portletInstance);
-    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
-    when(portletInstance.getId()).thenReturn(2l);
-    assertThrows(ObjectNotFoundException.class, () -> portletInstanceRenderService.getPortletInstancePreferences(2, USERNAME));
-
-    when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
-    assertThrows(ObjectNotFoundException.class, () -> portletInstanceRenderService.getPortletInstancePreferences(2, USERNAME));
-
-    when(layoutService.getApplicationModel("3")).thenReturn(application);
-    assertNotNull(portletInstanceRenderService.getPortletInstancePreferences(2, USERNAME));
-    assertEquals(0, portletInstanceRenderService.getPortletInstancePreferences(2, USERNAME).size());
+    assertEquals("test", portletInstancePreferences.iterator().next().getName());
+    assertEquals("testValue", portletInstancePreferences.iterator().next().getValue());
   }
 
   @Test
   @SneakyThrows
   public void getPortletInstanceApplicationByInstanceIdAndCreateApplication() {
-    assertThrows(ObjectNotFoundException.class,
-                 () -> portletInstanceRenderService.getPortletInstanceApplication(USERNAME, "2", null));
-    when(portletInstanceService.getPortletInstance(2,
-                                                   USERNAME,
-                                                   Locale.ENGLISH,
-                                                   false)).thenReturn(portletInstance);
-
     PortletInstancePreference preference = new PortletInstancePreference();
     preference.setName("prefName");
     preference.setValue("prefValue");
@@ -224,7 +152,7 @@ public class PortletInstanceRenderServiceTest {
       return null;
     }).when(container).setChildren(any());
 
-    Application<?> portletInstanceApplication = portletInstanceRenderService.getPortletInstanceApplication(USERNAME, "2", null);
+    Application<?> portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0);
     assertEquals(application, portletInstanceApplication);
   }
 
@@ -234,7 +162,7 @@ public class PortletInstanceRenderServiceTest {
     when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
 
     when(layoutService.getApplicationModel("3")).thenReturn(application);
-    Application<?> portletInstanceApplication = portletInstanceRenderService.getPortletInstanceApplication(USERNAME, null, "3");
+    Application<?> portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(null, 3);
     assertEquals(application, portletInstanceApplication);
   }
 

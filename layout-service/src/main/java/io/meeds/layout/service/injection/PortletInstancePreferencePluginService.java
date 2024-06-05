@@ -26,7 +26,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
-import io.meeds.layout.service.PortletInstanceRenderService;
+import io.meeds.layout.service.PortletInstanceService;
 
 /**
  * A class to initialize PortletInstanceService to avoid having cyclic
@@ -37,15 +37,15 @@ import io.meeds.layout.service.PortletInstanceRenderService;
 public class PortletInstancePreferencePluginService implements ApplicationContextAware {
 
   @Autowired
-  private PortletInstanceRenderService portletInstanceRenderService;
+  private PortletInstanceService portletInstanceService;
 
-  private ApplicationContext           applicationContext;
+  private ApplicationContext     applicationContext;
 
   @PostConstruct
   public void init() {
     applicationContext.getBeansOfType(PortletInstancePreferencePlugin.class)
                       .values()
-                      .forEach(portletInstanceRenderService::addPortletInstancePreferencePlugin);
+                      .forEach(portletInstanceService::addPortletInstancePreferencePlugin);
   }
 
   @Override

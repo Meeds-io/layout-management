@@ -34,7 +34,7 @@ export default {
   }),
   computed: {
     id() {
-      return `UIPortlet-${this.portletInstanceId}`;
+      return this.$root.portletMode === 'view' ? `UIPortlet-${this.$root?.portletInstance?.applicationId}` : this.$root?.portletInstance?.applicationId;
     },
     portletMode() {
       return this.$root.portletMode;

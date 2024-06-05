@@ -41,8 +41,6 @@ export function handleApplicationContent(applicationContent, applicationElement)
   const newHeadContent = applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>'));
   let newBodyContent = applicationContent.substring(applicationContent.search('<body') + applicationContent.match(/<body.*>/g)[0].length, applicationContent.lastIndexOf('</body>'));
   newBodyContent = installNewCSS(newHeadContent, newBodyContent);
-  installNewJS(newHeadContent);
-  installNewJS(newBodyContent, 'jsManager', true);
 
   const newHtmlDocument = document.createElement('div');
   newHtmlDocument.innerHTML = newBodyContent;
@@ -52,6 +50,9 @@ export function handleApplicationContent(applicationContent, applicationElement)
     oldPortletContent.remove();
   }
   applicationElement.append(portletContent);
+
+  installNewJS(newHeadContent);
+  installNewJS(newBodyContent, 'jsManager', true);
 
   window.setTimeout(() => {
     // The innerHTML change doesn't interpret script element

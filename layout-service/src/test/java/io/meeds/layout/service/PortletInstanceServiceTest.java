@@ -45,6 +45,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.attachment.AttachmentService;
@@ -52,58 +54,73 @@ import org.exoplatform.social.attachment.AttachmentService;
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstanceCategory;
 import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
 import io.meeds.layout.plugin.attachment.PortletInstanceAttachmentPlugin;
 import io.meeds.layout.plugin.translation.PortletInstanceCategoryTranslationPlugin;
 import io.meeds.layout.plugin.translation.PortletInstanceTranslationPlugin;
 import io.meeds.layout.storage.PortletInstanceCategoryStorage;
+import io.meeds.layout.storage.PortletInstanceLayoutStorage;
 import io.meeds.layout.storage.PortletInstanceStorage;
 import io.meeds.social.translation.model.TranslationField;
 import io.meeds.social.translation.service.TranslationService;
+
+import lombok.SneakyThrows;
 
 @SpringBootTest(classes = { PortletInstanceService.class, })
 @ExtendWith(MockitoExtension.class)
 public class PortletInstanceServiceTest {
 
-  private static final String            DESCRIPTION = "testDescription";
+  private static final String             DESCRIPTION = "testDescription";
 
-  private static final String            TITLE       = "testTitle";
+  private static final String             TITLE       = "testTitle";
 
-  private static final String            CONTENT_ID  = "test/portlet";
+  private static final String             CONTENT_ID  = "test/portlet";
 
-  @MockBean
-  private LayoutAclService               layoutAclService;
-
-  @MockBean
-  private TranslationService             translationService;
+  private static final String             USERNAME    = "test";
 
   @MockBean
-  private AttachmentService              attachmentService;
+  private LayoutAclService                layoutAclService;
 
   @MockBean
-  private LocaleConfigService            localeConfigService;
+  private TranslationService              translationService;
 
   @MockBean
-  private PortletInstanceCategoryStorage portletInstanceCategoryStorage;
+  private AttachmentService               attachmentService;
 
   @MockBean
-  private PortletInstanceStorage         portletInstanceStorage;
+  private LocaleConfigService             localeConfigService;
+
+  @MockBean
+  private PortletInstanceCategoryStorage  portletInstanceCategoryStorage;
+
+  @MockBean
+  private PortletInstanceLayoutStorage    portletInstanceLayoutStorage;
+
+  @MockBean
+  private PortletInstanceStorage          portletInstanceStorage;
 
   @Mock
-  private PortletInstanceCategory        portletInstanceCategory;
+  private PortletInstanceCategory         portletInstanceCategory;
 
   @Mock
-  private PortletInstance                portletInstance;
+  private PortletInstance                 portletInstance;
 
   @Mock
-  private LocaleConfig                   defaultLocaleConfig;
+  private Application<Portlet>            application;
 
   @Mock
-  private LocaleConfig                   localeConfig;
+  private LocaleConfig                    defaultLocaleConfig;
+
+  @Mock
+  private LocaleConfig                    localeConfig;
+
+  @Mock
+  private PortletInstancePreferencePlugin plugin;
 
   @Autowired
-  private PortletInstanceService         portletInstanceService;
+  private PortletInstanceService          portletInstanceService;
 
-  private String                         testuser    = "testuser";
+  private String                          testuser    = "testuser";
 
   @Test
   public void getPortletInstances() {
@@ -411,7 +428,10 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
                                                 PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.FRENCH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(),
+                                                                                         null,
+                                                                                         Locale.FRENCH,
+                                                                                         true);
     assertNotNull(retrievedPortletInstanceCategory);
 
     reset(translationService);
@@ -420,7 +440,10 @@ public class PortletInstanceServiceTest {
     when(translationService.getTranslationField(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE,
                                                 category.getId(),
                                                 PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME)).thenReturn(titleTranslationField);
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.FRENCH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(),
+                                                                                         null,
+                                                                                         Locale.FRENCH,
+                                                                                         true);
     assertNotNull(retrievedPortletInstanceCategory);
     assertEquals(category.getId(), retrievedPortletInstanceCategory.getId());
     assertEquals(category.getIcon(), retrievedPortletInstanceCategory.getIcon());
@@ -429,10 +452,16 @@ public class PortletInstanceServiceTest {
     String frTitle = TITLE;
     when(titleTranslationField.getLabels()).thenReturn(Collections.singletonMap(Locale.FRENCH, frTitle));
 
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.FRENCH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(),
+                                                                                         null,
+                                                                                         Locale.FRENCH,
+                                                                                         true);
     assertEquals(frTitle, retrievedPortletInstanceCategory.getName());
 
-    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(), null, Locale.ENGLISH, true);
+    retrievedPortletInstanceCategory = portletInstanceService.getPortletInstanceCategory(category.getId(),
+                                                                                         null,
+                                                                                         Locale.ENGLISH,
+                                                                                         true);
     assertNotNull(retrievedPortletInstanceCategory);
   }
 
@@ -496,6 +525,103 @@ public class PortletInstanceServiceTest {
     verify(portletInstanceCategoryStorage, times(1)).updatePortletInstanceCategory(portletInstanceCategory);
   }
 
+  @Test
+  @SneakyThrows
+  public void getPortletInstanceApplication() {
+    assertThrows(ObjectNotFoundException.class,
+                 () -> portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME));
+    when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
+    when(portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0)).thenReturn(application);
+    Application<Portlet> portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME);
+    assertEquals(application, portletInstanceApplication);
+  }
+
+  @Test
+  @SneakyThrows
+  public void getPortletInstanceApplicationPlaceholder() {
+    assertNull(portletInstanceService.getPortletInstanceApplication(0, 0, USERNAME));
+  }
+
+  @Test
+  @SneakyThrows
+  public void getPortletInstancePreferencesWhenNoPlugin() {
+    when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
+    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
+    when(portletInstance.getId()).thenReturn(2l);
+
+    Portlet portlet = new Portlet();
+    portlet.setValue("test", "testValue");
+    when(portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance)).thenReturn(application);
+    when(portletInstanceLayoutStorage.getPortletInstancePreferences(portletInstance.getId())).thenReturn(portlet);
+
+    List<PortletInstancePreference> portletInstancePreferences =
+                                                               portletInstanceService.getPortletInstancePreferences(2,
+                                                                                                                    USERNAME);
+    assertNotNull(portletInstancePreferences);
+    assertEquals(1, portletInstancePreferences.size());
+    assertEquals("test", portletInstancePreferences.get(0).getName());
+    assertEquals("testValue", portletInstancePreferences.get(0).getValue());
+  }
+
+  @Test
+  @SneakyThrows
+  public void getPortletInstancePreferencesWithPlugin() {
+    when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
+    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
+    when(portletInstance.getId()).thenReturn(2l);
+    when(portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance)).thenReturn(application);
+    when(plugin.getPortletName()).thenReturn(CONTENT_ID.split("/")[1]);
+    portletInstanceService.addPortletInstancePreferencePlugin(plugin);
+    try {
+      when(plugin.generatePreferences(any(), any())).thenReturn(Collections.singletonList(new PortletInstancePreference("test",
+                                                                                                                        "value")));
+
+      List<PortletInstancePreference> portletInstancePreferences =
+                                                                 portletInstanceService.getPortletInstancePreferences(2,
+                                                                                                                      USERNAME);
+      assertNotNull(portletInstancePreferences);
+      assertEquals(1, portletInstancePreferences.size());
+      assertEquals("test", portletInstancePreferences.get(0).getName());
+      assertEquals("value", portletInstancePreferences.get(0).getValue());
+    } finally {
+      portletInstanceService.removePortletInstancePreferencePlugin(plugin.getPortletName());
+    }
+  }
+
+  @Test
+  @SneakyThrows
+  public void getPortletInstancePreferencesWhenNoPluginNoPreferences() {
+    assertThrows(ObjectNotFoundException.class, () -> portletInstanceService.getPortletInstancePreferences(2, USERNAME));
+
+    when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
+    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
+    when(portletInstance.getId()).thenReturn(2l);
+    when(portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance)).thenReturn(application);
+    assertNotNull(portletInstanceService.getPortletInstancePreferences(2, USERNAME));
+    assertEquals(0, portletInstanceService.getPortletInstancePreferences(2, USERNAME).size());
+  }
+
+  @Test
+  @SneakyThrows
+  public void getPortletInstanceApplicationByInstanceIdAndCreateApplication() {
+    assertThrows(ObjectNotFoundException.class,
+                 () -> portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME));
+    when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
+    when(portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0)).thenReturn(application);
+
+    Application<?> portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME);
+    assertEquals(application, portletInstanceApplication);
+  }
+
+  @Test
+  @SneakyThrows
+  public void getPortletInstanceApplicationByApplicationId() {
+    when(portletInstanceLayoutStorage.getPortletInstanceApplication(null, 3)).thenReturn(application);
+
+    Application<?> portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(0, 3, USERNAME);
+    assertEquals(application, portletInstanceApplication);
+  }
+
   private PortletInstanceCategory newPortletInstanceCategory() {
     return new PortletInstanceCategory(3l,
                                        null,
@@ -510,6 +636,7 @@ public class PortletInstanceServiceTest {
                                "description",
                                5l,
                                CONTENT_ID,
+                               0,
                                Collections.singletonList(new PortletInstancePreference("prefName", "prefValue")),
                                7l,
                                Collections.singletonList("Everyone"),
