@@ -17,7 +17,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import SectionMobileColumnMenu from './components/layout/SectionMobileColumnMenu.vue';
+import SectionMobileColumnMenu from './components/SectionMobileColumnMenu.vue';
 
 const components = {
   'layout-section-mobile-column-menu-drawer': SectionMobileColumnMenu,
