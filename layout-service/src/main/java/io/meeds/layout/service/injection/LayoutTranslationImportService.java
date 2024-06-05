@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,10 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.ResourceBundleService;
 
+import io.meeds.common.ContainerTransactional;
 import io.meeds.social.translation.service.TranslationService;
 
+import jakarta.annotation.PreDestroy;
 import lombok.SneakyThrows;
 
 @Component
@@ -58,37 +62,34 @@ public class LayoutTranslationImportService {
 
   private Map<Locale, ResourceBundle> bundles              = new ConcurrentHashMap<>();
 
+  private ExecutorService             executorService      = Executors.newFixedThreadPool(1);
+
+  @PreDestroy
+  protected void destroy() {
+    executorService.shutdownNow();
+  }
+
   public void saveTranslationLabels(String objectType,
                                     long objectId,
                                     String fieldName,
                                     Map<String, String> labels) {
-    try {
-      translationService.deleteTranslationLabels(objectType,
-                                                 objectId,
-                                                 fieldName);
-    } catch (Exception e) { // NOSONAR
-      // Normal, when not exists
-    }
-    String defaultLabel = saveDefaultTranslationLabel(objectType,
-                                                      objectId,
-                                                      fieldName,
-                                                      labels.get("en"));
     // Make Heavy processing made at the end or import process
     postImportProcessors.computeIfAbsent(objectType, k -> new ArrayList<>())
                         .add(() -> saveTranslationLabelsForAllLanguages(objectType,
                                                                         objectId,
                                                                         fieldName,
                                                                         labels,
-                                                                        defaultLabel));
+                                                                        getI18NLabel(labels.get("en"), Locale.ENGLISH)));
   }
 
   public void postImport(String objectType) {
-    postImportProcessors.computeIfAbsent(objectType, k -> new ArrayList<>()).forEach(Runnable::run);
+    postImportProcessors.computeIfAbsent(objectType, k -> new ArrayList<>()).forEach(executorService::execute);
     postImportProcessors.remove(objectType);
     bundles.clear();
   }
 
   @SneakyThrows
+  @ContainerTransactional
   private void saveTranslationLabelsForAllLanguages(String objectType,
                                                     long objectId,
                                                     String fieldName,
@@ -109,21 +110,11 @@ public class LayoutTranslationImportService {
                                              translations);
   }
 
-  @SneakyThrows
-  protected String saveDefaultTranslationLabel(String objectType,
-                                               long objectId,
-                                               String fieldName,
-                                               String i18nKey) {
-    String label = getI18NLabel(i18nKey, Locale.ENGLISH);
-    translationService.saveTranslationLabel(objectType, objectId, fieldName, Locale.ENGLISH, label);
-    return label;
-  }
-
-  protected String getI18NLabel(String label, Locale locale) {
+  private String getI18NLabel(String label, Locale locale) {
     return getI18NLabel(label, locale, null);
   }
 
-  protected String getI18NLabel(String label, Locale locale, String defaultLabel) {
+  private String getI18NLabel(String label, Locale locale, String defaultLabel) {
     try {
       ResourceBundle resourceBundle = getResourceBundle(locale);
       if (resourceBundle != null
