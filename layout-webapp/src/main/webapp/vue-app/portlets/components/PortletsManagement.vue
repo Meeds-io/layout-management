@@ -61,12 +61,26 @@ export default {
     },
   },
   created() {
+    this.$root.$on('portlet-instance-created', this.handleInstanceCreated);
+    this.$root.$on('portlet-instance-layout-updated', this.handleLayoutUpdated);
     this.tabName = window.location.hash === '#portlets' && 'portlets' || 'instances';
+  },
+  beforeDestroy() {
+    this.$root.$off('portlet-instance-created', this.handleInstanceCreated);
+    this.$root.$off('portlet-instance-layout-updated', this.handleLayoutUpdated);
   },
   methods: {
     selectTab(tabName) {
       this.tabName = null;
       this.$nextTick(() => window.setTimeout(() => this.tabName = tabName, 10));
+    },
+    handleInstanceCreated(instance) {
+      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${instance.id}`;
+      window.open(instanceEditorLink, '_blank');
+    },
+    handleLayoutUpdated(instance) {
+      this.$root.$emit('portlet-instance-saved', instance);
+      this.$root.$emit('alert-message', this.$t('layout.portletInstanceLayoutUpdatedSuccessfully'), 'success');
     },
   },
 };
