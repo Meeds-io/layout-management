@@ -16,27 +16,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.service;
+package io.meeds.layout.storage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gatein.pc.api.PortletInvoker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.api.settings.SettingValue;
 import org.exoplatform.commons.api.settings.data.Context;
 import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
@@ -54,7 +50,6 @@ import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstancePreference;
-import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
 
 /**
  * A plugin that is used to display a selected portlet instance in the context
@@ -64,98 +59,39 @@ import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
  * working (which doesn't implement the JSRs portlet bridge), we will use this
  * trick to allow displaying a portlet instance inside WebUI dynamic container.
  */
-@Service
-public class PortletInstanceRenderService {
+@Component
+public class PortletInstanceLayoutStorage {
 
-  private static final Context                         CONTEXT                        = Context.GLOBAL.id("PORTLET_INSTANCE");
+  private static final Context CONTEXT                        = Context.GLOBAL.id("PORTLET_INSTANCE");
 
-  private static final Scope                           PORTLET_INSTANCE_SCOPE         =
-                                                                              Scope.APPLICATION.id("PORTLET_INSTANCE_APPLICATION");
+  private static final Scope   PORTLET_INSTANCE_SCOPE         =
+                                                      Scope.APPLICATION.id("PORTLET_INSTANCE_APPLICATION");
 
-  private static final Scope                           PAGE_APPLICATION_SCOPE         =
-                                                                              Scope.APPLICATION.id("APPLICATION_PORTLET_INSTANCE");
+  private static final Scope   PAGE_APPLICATION_SCOPE         =
+                                                      Scope.APPLICATION.id("APPLICATION_PORTLET_INSTANCE");
 
-  private static final PageKey                         PORTLET_EDITOR_SYSTEM_PAGE_KEY = new PageKey(SiteKey.portal("global"),
-                                                                                                    "_portletEditor");
-
-  @Autowired
-  private SettingService                               settingService;
+  private static final PageKey PORTLET_EDITOR_SYSTEM_PAGE_KEY = new PageKey(SiteKey.portal("global"),
+                                                                            "_portletEditor");
 
   @Autowired
-  private LayoutService                                layoutService;
+  private SettingService       settingService;
 
   @Autowired
-  private PortletInstanceService                       portletInstanceService;
+  private LayoutService        layoutService;
 
-  private Application<Portlet>                         placeholderApplication;
-
-  private Map<String, PortletInstancePreferencePlugin> preferencePlugins              = new ConcurrentHashMap<>();
-
-  public void addPortletInstancePreferencePlugin(PortletInstancePreferencePlugin plugin) {
-    preferencePlugins.put(plugin.getPortletName(), plugin);
-  }
-
-  public void removePortletInstancePreferencePlugin(String portletName) {
-    preferencePlugins.remove(portletName);
-  }
-
-  public Application<?> getPortletInstanceApplication(String username, // NOSONAR
-                                                      String portletInstanceId,
-                                                      String applicationStorageId) throws IllegalAccessException,
-                                                                                   ObjectNotFoundException {
-    if (StringUtils.isNotBlank(portletInstanceId)) {
+  public Application<Portlet> getPortletInstanceApplication(PortletInstance portletInstance, long applicationStorageId) {
+    if (portletInstance != null) {
       // Display the portlet instance by id
-      return getOrCreatePortletInstanceApplication(portletInstanceId, username);
-    } else if (StringUtils.isNotBlank(applicationStorageId)) {
+      return getOrCreatePortletInstanceApplication(portletInstance);
+    } else if (applicationStorageId > 0) {
       // Display the app by storage id
-      return layoutService.getApplicationModel(applicationStorageId);
+      return layoutService.getApplicationModel(String.valueOf(applicationStorageId));
     } else {
-      return getPlaceholderApplication();
+      return null;
     }
   }
 
-  public List<PortletInstancePreference> getPortletInstancePreferences(long portletInstanceId,
-                                                                       String username) throws IllegalAccessException,
-                                                                                        ObjectNotFoundException {
-    PortletInstance portletInstance = portletInstanceService.getPortletInstance(portletInstanceId, username, null, false);
-    if (portletInstance == null) {
-      throw new ObjectNotFoundException(String.format("Portlet Instance with id %s wasn't found", portletInstanceId));
-    }
-    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletInstance.getContentId().split("/")[1]);
-    long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
-    Application<Portlet> application = layoutService.getApplicationModel(String.valueOf(applicationId));
-    if (application == null) {
-      throw new ObjectNotFoundException(String.format("Application for Portlet Instance with id %s wasn't found",
-                                                      portletInstanceId));
-    }
-    Portlet preferences = layoutService.load(application.getState(), application.getType());
-    if (plugin == null) {
-      if (preferences == null) {
-        return Collections.emptyList();
-      } else {
-        List<PortletInstancePreference> instancePreferences = new ArrayList<>();
-        preferences.forEach(p -> instancePreferences.add(new PortletInstancePreference(p.getName(), p.getValue())));
-        return instancePreferences;
-      }
-    } else {
-      return plugin.generatePreferences(application, preferences);
-    }
-  }
-
-  public long getApplicationPortletInstanceId(long applicationId) {
-    return getSettingValue(PAGE_APPLICATION_SCOPE, applicationId);
-  }
-
-  private Application<?> getOrCreatePortletInstanceApplication(String portletInstanceId,
-                                                               String userName) throws IllegalAccessException,
-                                                                                ObjectNotFoundException {
-    PortletInstance portletInstance = portletInstanceService.getPortletInstance(Long.parseLong(portletInstanceId),
-                                                                                userName,
-                                                                                Locale.ENGLISH,
-                                                                                false);
-    if (portletInstance == null) {
-      throw new ObjectNotFoundException(String.format("Portlet instance with id %s wasn't found", portletInstanceId));
-    }
+  public Application<Portlet> getOrCreatePortletInstanceApplication(PortletInstance portletInstance) { // NOSONAR
     long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
     if (applicationId == 0) {
       return createPortletInstanceApplication(portletInstance);
@@ -166,6 +102,20 @@ public class PortletInstanceRenderService {
         return createPortletInstanceApplication(portletInstance);
       }
     }
+  }
+
+  public Portlet getPortletInstancePreferences(long portletInstanceId) {
+    long applicationId = getPortletInstanceApplicationId(portletInstanceId);
+    Application<Object> applicationModel = layoutService.getApplicationModel(String.valueOf(applicationId));
+    return (Portlet) layoutService.load(applicationModel.getState(), applicationModel.getType());
+  }
+
+  public long getApplicationPortletInstanceId(long applicationId) {
+    return getSettingValue(PAGE_APPLICATION_SCOPE, applicationId);
+  }
+
+  public long getPortletInstanceApplicationId(long portletInstanceId) {
+    return getSettingValue(PORTLET_INSTANCE_SCOPE, portletInstanceId);
   }
 
   @SuppressWarnings("unchecked")
@@ -206,10 +156,6 @@ public class PortletInstanceRenderService {
     savePortletInstanceApplicationId(Long.parseLong(application.getStorageId()),
                                      portletInstance.getId());
     return application;
-  }
-
-  private long getPortletInstanceApplicationId(long portletInstanceId) {
-    return getSettingValue(PORTLET_INSTANCE_SCOPE, portletInstanceId);
   }
 
   private long getSettingValue(Scope scope, long id) {
@@ -260,15 +206,6 @@ public class PortletInstanceRenderService {
       page = layoutService.getPage(PORTLET_EDITOR_SYSTEM_PAGE_KEY);
     }
     return page;
-  }
-
-  private Application<Portlet> getPlaceholderApplication() {
-    if (placeholderApplication == null) {
-      placeholderApplication = new PortletApplication();
-      placeholderApplication.setAccessPermissions(new String[] { UserACL.EVERYONE });
-      placeholderApplication.setState(new TransientApplicationState<>("layout/PortletEditor"));
-    }
-    return placeholderApplication;
   }
 
 }

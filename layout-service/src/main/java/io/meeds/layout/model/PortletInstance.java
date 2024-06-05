@@ -39,6 +39,8 @@ public class PortletInstance {
 
   private String                          contentId;
 
+  private long                            applicationId;
+
   private List<PortletInstancePreference> preferences;
 
   private long                            illustrationId;

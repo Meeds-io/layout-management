@@ -38,7 +38,6 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstancePreference;
-import io.meeds.layout.service.PortletInstanceRenderService;
 import io.meeds.layout.service.PortletInstanceService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,10 +53,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class PortletInstanceRest {
 
   @Autowired
-  private PortletInstanceService       portletInstanceService;
-
-  @Autowired
-  private PortletInstanceRenderService portletInstanceRenderService;
+  private PortletInstanceService portletInstanceService;
 
   @GetMapping
   @Secured("users")
@@ -112,7 +108,7 @@ public class PortletInstanceRest {
                                                                        @PathVariable("id")
                                                                        long id) {
     try {
-      return portletInstanceRenderService.getPortletInstancePreferences(id, request.getRemoteUser());
+      return portletInstanceService.getPortletInstancePreferences(id, request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     } catch (IllegalAccessException e) {

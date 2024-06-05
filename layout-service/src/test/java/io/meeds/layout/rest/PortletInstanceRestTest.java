@@ -61,7 +61,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 
 import io.meeds.layout.model.PortletInstance;
-import io.meeds.layout.service.PortletInstanceRenderService;
 import io.meeds.layout.service.PortletInstanceService;
 import io.meeds.spring.web.security.PortalAuthenticationManager;
 import io.meeds.spring.web.security.WebSecurityConfiguration;
@@ -95,18 +94,15 @@ public class PortletInstanceRestTest {
   }
 
   @MockBean
-  private PortletInstanceService       portletInstanceService;
-
-  @MockBean
-  private PortletInstanceRenderService portletInstanceRenderService;
+  private PortletInstanceService portletInstanceService;
 
   @Autowired
-  private SecurityFilterChain          filterChain;
+  private SecurityFilterChain    filterChain;
 
   @Autowired
-  private WebApplicationContext        context;
+  private WebApplicationContext  context;
 
-  private MockMvc                      mockMvc;
+  private MockMvc                mockMvc;
 
   @BeforeEach
   void setup() {
