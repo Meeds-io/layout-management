@@ -45,13 +45,27 @@ export function init() {
       Vue.createApp({
         template: `<portlet-editor id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
+        i18n,
         data: {
           portletInstanceId: null,
           portletInstance: null,
           portletInstanceEmpty: true,
           portletMode: 'view',
         },
-        i18n,
+        watch: {
+          portletInstanceId: {
+            immediate: true,
+            handler() {
+              eXo.env.portal.portletInstanceId = this.portletInstanceId;
+            }
+          },
+          portletMode: {
+            immediate: true,
+            handler() {
+              eXo.env.portal.maximizedPortletMode = this.portletMode;
+            }
+          },
+        },
         created() {
           this.portletInstanceId = this.getQueryParam('id');
           this.$portletInstanceService.getPortletInstance(this.portletInstanceId)

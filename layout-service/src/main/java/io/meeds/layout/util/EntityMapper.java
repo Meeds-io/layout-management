@@ -57,6 +57,7 @@ public class EntityMapper {
                                null,
                                entity.getCategoryId(),
                                entity.getContentId(),
+                               0,
                                getPreferences(entity),
                                0l,
                                entity.getPermissions()

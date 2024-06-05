@@ -18,9 +18,12 @@
  */
 package io.meeds.layout.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -30,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -37,10 +42,13 @@ import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstanceCategory;
+import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.plugin.PortletInstancePreferencePlugin;
 import io.meeds.layout.plugin.attachment.PortletInstanceAttachmentPlugin;
 import io.meeds.layout.plugin.translation.PortletInstanceCategoryTranslationPlugin;
 import io.meeds.layout.plugin.translation.PortletInstanceTranslationPlugin;
 import io.meeds.layout.storage.PortletInstanceCategoryStorage;
+import io.meeds.layout.storage.PortletInstanceLayoutStorage;
 import io.meeds.layout.storage.PortletInstanceStorage;
 import io.meeds.social.translation.model.TranslationField;
 import io.meeds.social.translation.service.TranslationService;
@@ -48,31 +56,40 @@ import io.meeds.social.translation.service.TranslationService;
 @Service
 public class PortletInstanceService {
 
-  private static final List<String>      EVERYONE_PERMISSIONS_LIST = Collections.singletonList(UserACL.EVERYONE);
+  private static final List<String>                    EVERYONE_PERMISSIONS_LIST = Collections.singletonList(UserACL.EVERYONE);
 
-  private static final Log               LOG                       =
-                                             ExoLogger.getLogger(PortletInstanceService.class);
-
-  @Autowired
-  private LayoutAclService               layoutAclService;
+  private static final Log                             LOG                       =
+                                                           ExoLogger.getLogger(PortletInstanceService.class);
 
   @Autowired
-  private TranslationService             translationService;
+  private LayoutAclService                             layoutAclService;
 
   @Autowired
-  private AttachmentService              attachmentService;
+  private TranslationService                           translationService;
 
   @Autowired
-  private LocaleConfigService            localeConfigService;
+  private AttachmentService                            attachmentService;
 
   @Autowired
-  private PortletInstanceCategoryStorage portletInstanceCategoryStorage;
+  private LocaleConfigService                          localeConfigService;
 
   @Autowired
-  private PortletInstanceStorage         portletInstanceStorage;
+  private PortletInstanceCategoryStorage               portletInstanceCategoryStorage;
 
-  public List<PortletInstance> getPortletInstances() {
-    return portletInstanceStorage.getPortletInstances();
+  @Autowired
+  private PortletInstanceStorage                       portletInstanceStorage;
+
+  @Autowired
+  private PortletInstanceLayoutStorage                 portletInstanceLayoutStorage;
+
+  private Map<String, PortletInstancePreferencePlugin> preferencePlugins         = new ConcurrentHashMap<>();
+
+  public void addPortletInstancePreferencePlugin(PortletInstancePreferencePlugin plugin) {
+    preferencePlugins.put(plugin.getPortletName(), plugin);
+  }
+
+  public void removePortletInstancePreferencePlugin(String portletName) {
+    preferencePlugins.remove(portletName);
   }
 
   public List<PortletInstance> getPortletInstances(long categoryId,
@@ -247,6 +264,37 @@ public class PortletInstanceService {
     return portletInstanceCategoryStorage.updatePortletInstanceCategory(category);
   }
 
+  public Application<Portlet> getPortletInstanceApplication(long portletInstanceId,
+                                                            long applicationStorageId,
+                                                            String username) throws IllegalAccessException,
+                                                                             ObjectNotFoundException {
+    PortletInstance portletInstance = portletInstanceId <= 0 ? null :
+                                                             getPortletInstance(portletInstanceId,
+                                                                                username,
+                                                                                null,
+                                                                                false);
+    return portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, applicationStorageId);
+  }
+
+  public List<PortletInstancePreference> getPortletInstancePreferences(long portletInstanceId,
+                                                                       String username) throws IllegalAccessException,
+                                                                                        ObjectNotFoundException {
+    PortletInstance portletInstance = getPortletInstance(portletInstanceId, username, null, false);
+    return getPortletInstancePreferences(portletInstance);
+  }
+
+  public long getApplicationPortletInstanceId(long applicationId) {
+    return portletInstanceLayoutStorage.getApplicationPortletInstanceId(applicationId);
+  }
+
+  public long getPortletInstanceApplicationId(long portletInstanceId) {
+    return portletInstanceLayoutStorage.getPortletInstanceApplicationId(portletInstanceId);
+  }
+
+  public List<PortletInstance> getPortletInstances() {
+    return portletInstanceStorage.getPortletInstances();
+  }
+
   private void computePortletInstanceAttributes(Locale locale, PortletInstance portletInstance) {
     portletInstance.setName(getLabel(PortletInstanceTranslationPlugin.OBJECT_TYPE,
                                      portletInstance.getId(),
@@ -261,6 +309,7 @@ public class PortletInstanceService {
     if (CollectionUtils.isNotEmpty(attachmentFileIds)) {
       portletInstance.setIllustrationId(Long.parseLong(attachmentFileIds.get(0)));
     }
+    portletInstance.setApplicationId(getPortletInstanceApplicationId(portletInstance.getId()));
   }
 
   private void computePortletInstanceCategoryAttributes(Locale locale, PortletInstanceCategory portletInstanceCategory) {
@@ -268,6 +317,27 @@ public class PortletInstanceService {
                                              portletInstanceCategory.getId(),
                                              PortletInstanceCategoryTranslationPlugin.TITLE_FIELD_NAME,
                                              locale));
+  }
+
+  private List<PortletInstancePreference> getPortletInstancePreferences(PortletInstance portletInstance) throws ObjectNotFoundException {
+    Application<Portlet> application = portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance);
+    if (application == null) {
+      throw new ObjectNotFoundException(String.format("Portlet Instance with id %s wasn't found", portletInstance.getId()));
+    }
+
+    Portlet preferences = portletInstanceLayoutStorage.getPortletInstancePreferences(portletInstance.getId());
+    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletInstance.getContentId().split("/")[1]);
+    if (plugin == null) {
+      if (preferences == null) {
+        return Collections.emptyList();
+      } else {
+        List<PortletInstancePreference> instancePreferences = new ArrayList<>();
+        preferences.forEach(p -> instancePreferences.add(new PortletInstancePreference(p.getName(), p.getValue())));
+        return instancePreferences;
+      }
+    } else {
+      return plugin.generatePreferences(application, preferences);
+    }
   }
 
   private String getLabel(String objectType, long objectId, String fieldName, Locale locale) {
@@ -309,5 +379,4 @@ public class PortletInstanceService {
            || permissions.equals(EVERYONE_PERMISSIONS_LIST)
            || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(username, p)));
   }
-
 }
