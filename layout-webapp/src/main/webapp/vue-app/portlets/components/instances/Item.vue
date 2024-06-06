@@ -111,7 +111,7 @@ export default {
           portletInstance.disabled = this.enabled;
           return this.$portletInstanceService.updatePortletInstance(portletInstance)
             .then(() => {
-              this.$root.$emit(`portlets-instance-${this.enabled && 'disabled' || 'enabled'}`, portletInstance);
+              this.$root.$emit(`portlet-instance-${this.enabled && 'disabled' || 'enabled'}`, portletInstance);
             });
         })
         .then(() => {
