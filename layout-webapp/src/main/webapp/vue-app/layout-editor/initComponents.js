@@ -29,7 +29,6 @@ import PreviewButton from './components/toolbar/actions/PreviewButton.vue';
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
 import NumberInput from './components/form/NumberInput.vue';
 import ColorPicker from './components/form/ColorPicker.vue';
-import PageTemplatePreview from './components/form/PageTemplatePreview.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -55,9 +54,9 @@ import Application from './components/content/container/Application.vue';
 
 import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
 import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
+import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicationCategoryDrawer.vue';
 import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
-import PageTemplateDrawer from './components/drawer/PageTemplateDrawer.vue';
 
 import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
 
@@ -71,7 +70,6 @@ const components = {
   'layout-editor-toolbar-preview-button': PreviewButton,
   'layout-editor-content': Content,
   'layout-editor-color-picker': ColorPicker,
-  'layout-editor-page-template-preview': PageTemplatePreview,
   'layout-editor-border-radius-selector': BorderRadiusSelector,
   'layout-editor-number-input': NumberInput,
   'layout-editor-container': Container,
@@ -87,9 +85,9 @@ const components = {
   'layout-editor-section-add-drawer': AddSectionDrawer,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-section-menu': SectionMenu,
+  'layout-editor-application-category-select-drawer': SelectApplicationCategoryDrawer,
   'layout-editor-application-add-drawer': AddApplicationDrawer,
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
-  'layout-editor-page-template-drawer': PageTemplateDrawer,
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
   'layout-editor-application-card': ApplicationCard,
   'layout-editor-application-category-card': ApplicationCategoryCard,

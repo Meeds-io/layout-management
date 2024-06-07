@@ -54,9 +54,9 @@ export default {
   },
   methods: {
     getPageTemplates() {
-      if (!this.$root.pageTemplates) {
+      if (!this.$root.pageTemplates?.length) {
         return this.$pageTemplateService.getPageTemplates()
-          .then(pageTemplates => this.$root.pageTemplates = pageTemplates && pageTemplates.filter(t => !t.disabled) || []);
+          .then(pageTemplates => this.$root.pageTemplates = pageTemplates && pageTemplates.filter(t => !t.disabled && t.name) || []);
       }
     },
   },

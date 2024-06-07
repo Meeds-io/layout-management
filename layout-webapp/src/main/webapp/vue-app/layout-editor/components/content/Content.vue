@@ -31,12 +31,15 @@
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
       ref="sectionEditDrawer" />
-    <layout-editor-application-add-drawer
-      ref="applicationDrawer" />
     <layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
+    <layout-editor-application-category-select-drawer
+      ref="applicationCategoryDrawer" />
+    <layout-editor-application-add-drawer
+      ref="applicationDrawer" />
     <layout-editor-portlet-edit-dialog />
     <layout-editor-page-template-drawer />
+    <layout-image-illustration-preview />
     <changes-reminder
       ref="changesReminder"
       :reminder="reminder"
@@ -122,7 +125,7 @@ export default {
   created() {
     this.$root.$on('layout-add-section-drawer', this.addSection);
     this.$root.$on('layout-edit-section-drawer', this.editSection);
-    this.$root.$on('layout-cell-add-application', this.addApplication);
+    this.$root.$on('layout-add-application-category-drawer', this.openApplicationCategoryDrawer);
     this.$root.$on('layout-add-section', this.handleAddSection);
     this.$root.$on('layout-remove-section', this.handleRemoveSection);
     this.$root.$on('layout-replace-section', this.handleReplaceSection);
@@ -133,7 +136,7 @@ export default {
     this.$root.$on('layout-add-application', this.handleAddApplication);
     this.$root.$on('layout-edit-application', this.handleEditApplication);
     this.$root.$on('layout-delete-application', this.handleDeleteApplication);
-    this.$root.$on('layout-application-drawer-closed', this.resetCellsSelection);
+    this.$root.$on('layout-application-category-drawer-closed', this.resetCellsSelection);
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
@@ -197,10 +200,10 @@ export default {
         this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
       }
     },
-    addApplication(sectionId, container) {
+    openApplicationCategoryDrawer(sectionId, container) {
       this.$root.selectedSectionId = sectionId;
       this.$root.selectedCells = [container];
-      this.$refs.applicationDrawer.open();
+      this.$refs.applicationCategoryDrawer.open();
     },
     resetCellsSelection() {
       window.setTimeout(() => {
@@ -216,7 +219,7 @@ export default {
           this.$layoutUtils.isBetween(c.colIndex, selection.fromColIndex, selection.toColIndex)
           && this.$layoutUtils.isBetween(c.rowIndex, selection.fromRowIndex, selection.toRowIndex)
         ) || [];
-        this.$refs.applicationDrawer.open();
+        this.$refs.applicationCategoryDrawer.open();
       } else {
         console.warn(`Can't find section with id ${this.$root.selectedSectionId}`); // eslint-disable-line no-console
       }

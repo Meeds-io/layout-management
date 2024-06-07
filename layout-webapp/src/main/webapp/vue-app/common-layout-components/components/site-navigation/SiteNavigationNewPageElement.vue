@@ -48,10 +48,10 @@ export default {
   }),
   computed: {
     pageTemplates() {
-      return this.$root.pageTemplates;
+      return this.$root.pageTemplates || [];
     },
     items() {
-      const items = this.pageTemplates.slice();
+      const items = this.pageTemplates.slice()?.filter?.(t => t?.name) || [];
       items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
       items.sort((a, b) =>
         ((b.category === 'blank' && 2) || (b.category === 'default' && 1) || 0) - ((a.category === 'blank' && 2) || (a.category === 'default' && 1) || 0));

@@ -19,25 +19,23 @@
 
 -->
 <template>
-  <v-expansion-panel
-    v-if="hasApplications"
-    class="border-color border-radius mt-4">
-    <v-expansion-panel-header v-sanitized-html="categoryName" />
-    <v-divider v-if="expanded" />
-    <v-expansion-panel-content>
+  <v-hover v-if="hasApplications" v-model="hover">
+    <v-card
+      :aria-label="$utils.htmlToText(categoryLabel)"
+      :title="$utils.htmlToText(categoryLabel)"
+      :elevation="hover && 2 || 0"
+      class="d-flex flex-column border-color border-radius overflow-hidden mt-4 align-center justify-center aspect-ratio-1"
+      min-width="110px"
+      width="calc(33% - 8px)"
+      max-width="120px"
+      @click="$root.$emit('layout-add-application-drawer', categoryApplications, category)">
+      <v-icon class="mt-auto mb-2">{{ categoryIcon }}</v-icon>
       <div
-        v-for="application in applications"
-        :key="application.id"
-        class="d-flex flex-no-wrap justify-space-between border-radius border-color ApplicationCard ApplicationCardEmbedded">
-        <layout-editor-application-card
-          :application="application"
-          class="flex-grow-1"
-          @add="$emit('addApplication', application)" />
-      </div>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+        v-sanitized-html="categoryLabel"
+        class="text-truncate full-width mb-auto subtitle-2 mt-2 px-1"></div>
+    </v-card>
+  </v-hover>
 </template>
-
 <script>
 export default {
   props: {
@@ -49,16 +47,40 @@ export default {
       type: Object,
       default: null,
     },
+    parentId: {
+      type: Object,
+      default: null,
+    },
+    container: {
+      type: Object,
+      default: null,
+    },
+    applications: {
+      type: Array,
+      default: null,
+    },
   },
+  data: () => ({
+    hover: false,
+  }),
   computed: {
     categoryName() {
-      return this.category.label;
+      return this.category?.name;
     },
-    applications() {
-      return this.category?.applications || [];
+    categoryLabel() {
+      return this.category?.label || this.category?.name;
+    },
+    categoryIcon() {
+      return this.category?.icon;
+    },
+    categoryId() {
+      return this.category?.id;
+    },
+    categoryApplications() {
+      return this.applications?.filter?.(a => (a.categoryId && a.categoryId === this.categoryId) || (!a.categoryId && a.applicationName === this.categoryName)) || [];
     },
     hasApplications() {
-      return this.applications.length > 0;
+      return this.categoryApplications.length > 0;
     },
   },
 };

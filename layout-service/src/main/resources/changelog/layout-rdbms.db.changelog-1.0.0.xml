@@ -22,7 +22,7 @@
 <databaseChangeLog
   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.25.xsd">
 
   <!-- Managing both DB that use sequences and db that use auto increment -->
   <property name="autoIncrement" value="true" dbms="mysql,mssql,h2,sybase,db2,hsqldb"/>
@@ -89,5 +89,465 @@
         defaultValueBoolean="false" />
     </addColumn>
   </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-7"
+    dbms="oracle,postgresql,hsqldb">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <sequenceExists sequenceName="SEQ_GTN_APPLICATION_CAT_ID" />
+      </not>
+    </preConditions>
+    <createSequence
+      sequenceName="SEQ_GTN_APPLICATION_CAT_ID"
+      startValue="1" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-8"
+    dbms="oracle,postgresql,hsqldb">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <sequenceExists sequenceName="SEQ_GTN_APPLICATION_ID" />
+      </not>
+    </preConditions>
+    <createSequence
+      sequenceName="SEQ_GTN_APPLICATION_ID"
+      startValue="1" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-9.0">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="PORTAL_APPLICATIONS" />
+        <foreignKeyConstraintExists
+          foreignKeyName="FK_PORTAL_APP_CATEGORY"
+          foreignKeyTableName="PORTAL_APPLICATIONS" />
+      </and>
+    </preConditions>
+    <dropForeignKeyConstraint
+      constraintName="FK_PORTAL_APP_CATEGORY"
+      baseTableName="PORTAL_APPLICATIONS" />
+  </changeSet>
+  <changeSet
+    author="layout"
+    id="1.0.0-9.1">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="PORTAL_APPLICATIONS" />
+        <uniqueConstraintExists
+          tableName="PORTAL_APPLICATIONS"
+          constraintName="UK_PORTAL_APP_CONTENT_CATEGORY"
+          columnNames="CATEGORY_ID, CONTENT_ID" />
+      </and>
+    </preConditions>
+    <dropUniqueConstraint
+      tableName="PORTAL_APPLICATIONS"
+      constraintName="UK_PORTAL_APP_CONTENT_CATEGORY"
+      uniqueColumns="CATEGORY_ID, CONTENT_ID" />
+  </changeSet>
+  <!--
+    Precondition doesn't work with MySQL,
+    Thus fallback to use indexes instead
+  -->
+  <changeSet
+    author="layout"
+    id="1.0.0-9.2">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="PORTAL_APPLICATIONS" />
+        <indexExists tableName="PORTAL_APPLICATIONS" indexName="UK_PORTAL_APP_CONTENT_CATEGORY" />
+      </and>
+    </preConditions>
+    <dropIndex tableName="PORTAL_APPLICATIONS" indexName="UK_PORTAL_APP_CONTENT_CATEGORY" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-10.1">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="PORTAL_APPLICATIONS" />
+        <uniqueConstraintExists
+          tableName="PORTAL_APPLICATIONS"
+          constraintName="UK_PORTAL_APP_NAME_CATEGORY"
+          columnNames="CATEGORY_ID, APP_NAME" />
+      </and>
+    </preConditions>
+    <dropUniqueConstraint
+      tableName="PORTAL_APPLICATIONS"
+      constraintName="UK_PORTAL_APP_NAME_CATEGORY"
+      uniqueColumns="CATEGORY_ID, APP_NAME" />
+  </changeSet>
+  <!--
+    Precondition doesn't work with MySQL,
+    Thus fallback to use indexes instead
+  -->
+  <changeSet
+    author="layout"
+    id="1.0.0-10.2">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <tableExists tableName="PORTAL_APPLICATIONS" />
+        <indexExists tableName="PORTAL_APPLICATIONS" indexName="UK_PORTAL_APP_NAME_CATEGORY" />
+      </and>
+    </preConditions>
+    <dropIndex tableName="PORTAL_APPLICATIONS" indexName="UK_PORTAL_APP_NAME_CATEGORY" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-11">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="PORTAL_APP_CATEGORIES" />
+      </not>
+    </preConditions>
+    <createTable tableName="PORTAL_APP_CATEGORIES">
+      <column
+        name="ID"
+        type="BIGINT"
+        autoIncrement="${autoIncrement}"
+        startWith="1">
+        <constraints
+          nullable="false"
+          primaryKey="true"
+          primaryKeyName="PK_PORTAL_APP_CATEGORY" />
+      </column>
+      <!-- Those columns will be deleted below to make upgrade to new Data Model -->
+      <column
+        name="NAME"
+        type="NVARCHAR(200)" />
+      <column
+        name="DISPLAY_NAME"
+        type="NVARCHAR(200)" />
+      <column
+        name="DESCRIPTION"
+        type="LONGTEXT" />
+      <column
+        name="CREATED_DATE"
+        type="BIGINT" />
+      <column
+        name="MODIFIED_DATE"
+        type="BIGINT" />
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+    </modifySql>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-12">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="PORTAL_APPLICATIONS" />
+      </not>
+    </preConditions>
+    <createTable tableName="PORTAL_APPLICATIONS">
+      <column
+        name="ID"
+        type="BIGINT"
+        autoIncrement="${autoIncrement}"
+        startWith="1">
+        <constraints
+          nullable="false"
+          primaryKey="true"
+          primaryKeyName="PK_PORTAL_APPLICATION" />
+      </column>
+      <column
+        name="CATEGORY_ID"
+        type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column
+        name="CONTENT_ID"
+        type="VARCHAR(200)" />
+      <!-- Those columns will be deleted below to make upgrade to new Data Model -->
+      <column
+        name="CREATED_DATE"
+        type="BIGINT" />
+      <column
+        name="MODIFIED_DATE"
+        type="BIGINT" />
+      <column
+        name="APP_NAME"
+        type="NVARCHAR(200)" />
+      <column
+        name="TYPE"
+        type="VARCHAR(50)" />
+      <column
+        name="DESCRIPTION"
+        type="LONGTEXT" />
+      <column
+        name="DISPLAY_NAME"
+        type="NVARCHAR(200)" />
+    </createTable>
+    <modifySql dbms="mysql">
+      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+    </modifySql>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-13">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists
+          foreignKeyName="FK_PORTAL_APP_CATEGORY"
+          foreignKeyTableName="PORTAL_APPLICATIONS" />
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint
+      constraintName="FK_PORTAL_APP_CATEGORY"
+      baseTableName="PORTAL_APPLICATIONS"
+      baseColumnNames="CATEGORY_ID"
+      referencedTableName="PORTAL_APP_CATEGORIES"
+      referencedColumnNames="ID"
+      onDelete="CASCADE"
+      onUpdate="NO ACTION" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-14">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="NAME"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APP_CATEGORIES" columnName="NAME" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-15">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="DISPLAY_NAME"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APP_CATEGORIES" columnName="DISPLAY_NAME" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-16">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="DESCRIPTION"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APP_CATEGORIES" columnName="DESCRIPTION" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-17">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="MODIFIED_DATE"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APP_CATEGORIES" columnName="MODIFIED_DATE" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-18">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="CREATED_DATE"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APP_CATEGORIES" columnName="CREATED_DATE" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-19">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="ICON"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APP_CATEGORIES">
+      <column
+        name="ICON"
+        type="NVARCHAR(200)" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-20">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="PERMISSIONS"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APP_CATEGORIES">
+      <column
+        name="PERMISSIONS"
+        type="NVARCHAR(2000)" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-21">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="IS_SYSTEM"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APP_CATEGORIES">
+      <column
+        name="IS_SYSTEM"
+        type="Boolean"
+        defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-22">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APPLICATIONS" columnName="DISPLAY_NAME"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APPLICATIONS" columnName="DISPLAY_NAME" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-23">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APPLICATIONS" columnName="DESCRIPTION"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APPLICATIONS" columnName="DESCRIPTION" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-24">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APPLICATIONS" columnName="APP_NAME"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APPLICATIONS" columnName="APP_NAME" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-25">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APPLICATIONS" columnName="TYPE"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APPLICATIONS" columnName="TYPE" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-26">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APPLICATIONS" columnName="MODIFIED_DATE"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APPLICATIONS" columnName="MODIFIED_DATE" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-27">
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="PORTAL_APPLICATIONS" columnName="CREATED_DATE"/>
+    </preConditions>
+    <dropColumn tableName="PORTAL_APPLICATIONS" columnName="CREATED_DATE" />
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-28">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APPLICATIONS" columnName="PERMISSIONS"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APPLICATIONS">
+      <column
+        name="PERMISSIONS"
+        type="NVARCHAR(2000)" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-29">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APPLICATIONS" columnName="PREFERENCES"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APPLICATIONS">
+      <column
+        name="PREFERENCES"
+        type="LONGTEXT" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-30">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APPLICATIONS" columnName="IS_SYSTEM"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APPLICATIONS">
+      <column
+        name="IS_SYSTEM"
+        type="Boolean"
+        defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-32">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APPLICATIONS" columnName="IS_DISABLED"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APPLICATIONS">
+      <column
+        name="IS_DISABLED"
+        type="Boolean"
+        defaultValueBoolean="false" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet
+    author="layout"
+    id="1.0.0-33">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <columnExists tableName="PORTAL_APPLICATIONS" columnName="FOOTPRINT"/>
+      </not>
+    </preConditions>
+    <addColumn tableName="PORTAL_APPLICATIONS">
+      <column
+        name="FOOTPRINT"
+        type="BIGINT"
+        defaultValueNumeric="0" />
+    </addColumn>
+  </changeSet>
+
+  <changeSet author="layout" id="1.0.0-35" dbms="mysql">
+    <sql>
+      ALTER TABLE PORTAL_APPLICATIONS MODIFY COLUMN PREFERENCES LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    </sql>
+  </changeSet>
+
+  <!-- DELETE Old Data to use new behaviors of Portlet Instances (MIP139) -->
+  <changeSet author="layout" id="1.0.0-36">
+    <delete tableName="PORTAL_APPLICATIONS" />
+  </changeSet>
+  <changeSet author="layout" id="1.0.0-37">
+    <delete tableName="PORTAL_APP_CATEGORIES" />
+  </changeSet>
+  <!--  -->
 
 </databaseChangeLog>

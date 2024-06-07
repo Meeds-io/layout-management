@@ -3,12 +3,10 @@
     "eslint-config-meedsio"
   ],
   "globals": {
-    "jQuery": true,
-    "echarts": true
+    "html2canvas": true
   },
   "rules": {
     "vue/multi-word-component-names": "off",
-    "vue/no-mutating-props": ["warn"],
-    "no-restricted-imports": ["warn", "axios"]
+    "vue/no-mutating-props": ["warn"]
   }
 }

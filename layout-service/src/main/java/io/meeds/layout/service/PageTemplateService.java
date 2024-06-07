@@ -33,8 +33,8 @@ import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.model.PageTemplate;
-import io.meeds.layout.plugin.PageTemplateAttachmentPlugin;
-import io.meeds.layout.plugin.PageTemplateTranslationPlugin;
+import io.meeds.layout.plugin.attachment.PageTemplateAttachmentPlugin;
+import io.meeds.layout.plugin.translation.PageTemplateTranslationPlugin;
 import io.meeds.layout.storage.PageTemplateStorage;
 import io.meeds.social.translation.model.TranslationField;
 import io.meeds.social.translation.service.TranslationService;
