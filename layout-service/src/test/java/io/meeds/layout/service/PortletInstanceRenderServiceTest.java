@@ -111,13 +111,12 @@ public class PortletInstanceRenderServiceTest {
   @Test
   @SneakyThrows
   public void getPortletInstancePreferencesWhenNoPlugin() {
-    when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
     when(layoutService.getApplicationModel("3")).thenReturn(application);
     Portlet portlet = new Portlet();
     when(layoutService.load(any(), any())).thenReturn(portlet);
     portlet.setValue("test", "testValue");
 
-    Portlet portletInstancePreferences = portletInstanceLayoutStorage.getPortletInstancePreferences(2);
+    Portlet portletInstancePreferences = portletInstanceLayoutStorage.getApplicationPreferences(3);
     assertNotNull(portletInstancePreferences);
     assertEquals("test", portletInstancePreferences.iterator().next().getName());
     assertEquals("testValue", portletInstancePreferences.iterator().next().getValue());

@@ -48,6 +48,7 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.DescriptionService;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.ResourceBundleManager;
 import org.exoplatform.web.WebAppController;
@@ -362,7 +363,8 @@ public class NavigationLayoutService {
   private void saveNodeLabels(String nodeId, Map<String, String> labels) {
     if (labels != null) {
       Map<Locale, State> nodeLabels = new HashMap<>();
-      labels.entrySet().forEach(label -> nodeLabels.put(Locale.forLanguageTag(label.getKey()), new State(label.getValue(), null)));
+      labels.entrySet()
+            .forEach(label -> nodeLabels.put(Locale.forLanguageTag(label.getKey()), new State(label.getValue(), null)));
       descriptionService.setDescriptions(nodeId, nodeLabels);
     } else {
       descriptionService.setDescriptions(nodeId, Collections.emptyMap());
@@ -426,10 +428,9 @@ public class NavigationLayoutService {
                                                                                                                              .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocale()
                                                                                                                                                                                      .toLanguageTag(),
                                                                                                                                                                          "ma"))
-                                                                                                                             .collect(Collectors.toMap(c -> c.getLocale()
-                                                                                                                                                             .toLanguageTag(),
-                                                                                                                                                       localeConfig -> localeConfig.getLocale()
-                                                                                                                                                                                   .getDisplayName()));
+                                                                                                                             .map(LocaleConfig::getLocale)
+                                                                                                                             .collect(Collectors.toMap(Locale::toLanguageTag,
+                                                                                                                                                       Locale::getDisplayName));
     Map<String, String> localized = new HashMap<>();
     NodeLabel nodeLabel = new NodeLabel();
     if (MapUtils.isNotEmpty(nodeLabels)) {
@@ -449,7 +450,8 @@ public class NavigationLayoutService {
   }
 
   private String getLocaleName(Locale locale) {
-    return locale.toLanguageTag().replace("-", "_"); // Use same name as localeConfigService
+    return locale.toLanguageTag().replace("-", "_"); // Use same name as
+                                                     // localeConfigService
   }
 
 }

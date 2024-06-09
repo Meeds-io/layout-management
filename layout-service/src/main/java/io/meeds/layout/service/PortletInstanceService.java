@@ -19,6 +19,7 @@
 package io.meeds.layout.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -283,6 +284,21 @@ public class PortletInstanceService {
     return getPortletInstancePreferences(portletInstance);
   }
 
+  public List<PortletInstancePreference> getApplicationPreferences(long applicationId,
+                                                                   String username) throws IllegalAccessException,
+                                                                                    ObjectNotFoundException {
+    Application<Portlet> application = portletInstanceLayoutStorage.getApplication(applicationId);
+    if (application == null) {
+      throw new ObjectNotFoundException(String.format("Application with id %s wasn't found", applicationId));
+    }
+    if (!layoutAclService.isAdministrator(username)
+        && Arrays.stream(application.getAccessPermissions())
+                 .noneMatch(permission -> layoutAclService.isMemberOf(username, permission))) {
+      throw new IllegalAccessException(String.format("Application with id %s access denied", applicationId));
+    }
+    return getApplicationPreferences(application);
+  }
+
   public long getApplicationPortletInstanceId(long applicationId) {
     return portletInstanceLayoutStorage.getApplicationPortletInstanceId(applicationId);
   }
@@ -324,9 +340,13 @@ public class PortletInstanceService {
     if (application == null) {
       throw new ObjectNotFoundException(String.format("Portlet Instance with id %s wasn't found", portletInstance.getId()));
     }
+    return getApplicationPreferences(application);
+  }
 
-    Portlet preferences = portletInstanceLayoutStorage.getPortletInstancePreferences(portletInstance.getId());
-    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletInstance.getContentId().split("/")[1]);
+  private List<PortletInstancePreference> getApplicationPreferences(Application<Portlet> application) {
+    String portletName = portletInstanceLayoutStorage.getApplicationPortletName(application);
+    Portlet preferences = portletInstanceLayoutStorage.getApplicationPreferences(Long.parseLong(application.getStorageId()));
+    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletName);
     if (plugin == null) {
       if (preferences == null) {
         return Collections.emptyList();
