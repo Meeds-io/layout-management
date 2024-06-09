@@ -546,17 +546,16 @@ public class PortletInstanceServiceTest {
   @SneakyThrows
   public void getPortletInstancePreferencesWhenNoPlugin() {
     when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
-    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
-    when(portletInstance.getId()).thenReturn(2l);
+    when(application.getStorageId()).thenReturn("3");
+    when(portletInstanceLayoutStorage.getApplicationPortletName(application)).thenReturn(CONTENT_ID);
 
     Portlet portlet = new Portlet();
     portlet.setValue("test", "testValue");
     when(portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance)).thenReturn(application);
-    when(portletInstanceLayoutStorage.getPortletInstancePreferences(portletInstance.getId())).thenReturn(portlet);
+    when(portletInstanceLayoutStorage.getApplicationPreferences(Long.parseLong(application.getStorageId()))).thenReturn(portlet);
 
-    List<PortletInstancePreference> portletInstancePreferences =
-                                                               portletInstanceService.getPortletInstancePreferences(2,
-                                                                                                                    USERNAME);
+    List<PortletInstancePreference> portletInstancePreferences = portletInstanceService.getPortletInstancePreferences(2,
+                                                                                                                      USERNAME);
     assertNotNull(portletInstancePreferences);
     assertEquals(1, portletInstancePreferences.size());
     assertEquals("test", portletInstancePreferences.get(0).getName());
@@ -567,8 +566,8 @@ public class PortletInstanceServiceTest {
   @SneakyThrows
   public void getPortletInstancePreferencesWithPlugin() {
     when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
-    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
-    when(portletInstance.getId()).thenReturn(2l);
+    when(application.getStorageId()).thenReturn("3");
+    when(portletInstanceLayoutStorage.getApplicationPortletName(application)).thenReturn(CONTENT_ID.split("/")[1]);
     when(portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance)).thenReturn(application);
     when(plugin.getPortletName()).thenReturn(CONTENT_ID.split("/")[1]);
     portletInstanceService.addPortletInstancePreferencePlugin(plugin);
@@ -594,9 +593,9 @@ public class PortletInstanceServiceTest {
     assertThrows(ObjectNotFoundException.class, () -> portletInstanceService.getPortletInstancePreferences(2, USERNAME));
 
     when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
-    when(portletInstance.getContentId()).thenReturn(CONTENT_ID);
-    when(portletInstance.getId()).thenReturn(2l);
+    when(portletInstanceLayoutStorage.getApplicationPortletName(application)).thenReturn(CONTENT_ID.split("/")[1]);
     when(portletInstanceLayoutStorage.getOrCreatePortletInstanceApplication(portletInstance)).thenReturn(application);
+    when(application.getStorageId()).thenReturn("3");
     assertNotNull(portletInstanceService.getPortletInstancePreferences(2, USERNAME));
     assertEquals(0, portletInstanceService.getPortletInstancePreferences(2, USERNAME).size());
   }

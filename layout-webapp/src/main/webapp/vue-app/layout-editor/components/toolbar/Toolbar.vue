@@ -36,11 +36,9 @@
     <layout-editor-toolbar-preview-button
       class="me-3" />
     <layout-editor-toolbar-save-template-button
-      v-if="pageTemplateId"
-      :disabled="disableSave" />
+      v-if="pageTemplateId" />
     <layout-editor-toolbar-save-button
-      v-else
-      :disabled="disableSave" />
+      v-else />
   </v-card>
 </template>
 <script>
@@ -57,10 +55,6 @@ export default {
     nodeLabels: {
       type: Object,
       default: null,
-    },
-    disableSave: {
-      type: Boolean,
-      default: false,
     },
   },
   computed: {

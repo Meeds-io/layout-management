@@ -147,28 +147,15 @@ export function getPageLayout(pageRef, expand) {
   });
 }
 
-export function getApplicationRender(nodeId, portletName, portletStorageId) {
-  return fetch(`/layout/rest/pages/${nodeId}/${portletName}/preview${portletStorageId?.length && `?storageId=${portletStorageId}` || ''}`, {
+export function getPageApplicationLayout(pageRef, applicationId, expand) {
+  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}&applicationId=${applicationId}&expand=${expand || ''}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
     if (resp?.ok) {
       return resp.json();
     } else {
-      throw new Error('Error when retrieving application preview');
-    }
-  });
-}
-
-export function getPageTemplates() {
-  return fetch('/layout/rest/pages/templates', {
-    method: 'GET',
-    credentials: 'include',
-  }).then(resp => {
-    if (!resp?.ok) {
-      throw new Error('Error when retrieving page templates');
-    } else {
-      return resp.json();
+      throw new Error('Error when retrieving page application layout');
     }
   });
 }

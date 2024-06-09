@@ -59,11 +59,14 @@ public class RestEntityBuilder {
                                          locale);
   }
 
-  public static LayoutModel toLayoutModel(Page page, LayoutService layoutService, String expand) {
-    LayoutModel layoutModel = new LayoutModel(page);
-    if (StringUtils.contains(expand, "contentId")) {
+  public static LayoutModel toLayoutModel(ModelObject modelObject,
+                                          LayoutService layoutService,
+                                          String expand) {
+    LayoutModel layoutModel = new LayoutModel(modelObject);
+    if (StringUtils.contains(expand, "contentId")
+        && modelObject instanceof Container container) {
       Map<String, String> contentIds = new HashMap<>();
-      computeApplicationContentId(layoutService, page.getChildren(), contentIds);
+      computeApplicationContentId(layoutService, container.getChildren(), contentIds);
       applyApplicationContentId(layoutModel.getChildren(), contentIds);
     }
     return layoutModel;

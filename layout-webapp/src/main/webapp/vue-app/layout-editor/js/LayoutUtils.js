@@ -794,24 +794,7 @@ function filterChildren(section) {
   });
 }
 
-// FIXME delete 'export'
-export function displayMatrix(matrix) {
-  const result = {};
-  Object.keys(matrix).forEach(r => {
-    result[r] = {};
-    Object.keys(matrix[r]).forEach(c => {
-      if (matrix[r][c]?.storageId) {
-        result[r][c] = `${matrix[r][c].storageId}_${r}_${c}`;
-      } else {
-        result[r][c] = null;
-      }
-    });
-  });
-  console.warn(result); // eslint-disable-line no-console
-}
-
-// FIXME delete 'export'
-export function parseMatrix(section) {
+function parseMatrix(section) {
   const matrix = {};
   for (let i = 0; i < section.rowsCount; i++) {
     matrix[i] = {};
@@ -852,8 +835,7 @@ export function parseMatrix(section) {
   return matrix;
 }
 
-// FIXME delete 'export'
-export function parseSectionMatrix(section, matrix) {
+function parseSectionMatrix(section, matrix) {
   const children = [];
   for (let row = 0; row < section.rowsCount; row++) {
     if (!matrix[row]) {

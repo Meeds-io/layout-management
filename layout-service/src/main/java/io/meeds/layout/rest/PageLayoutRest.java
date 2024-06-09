@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
@@ -69,7 +69,7 @@ public class PageLayoutRest {
   @GetMapping
   @Operation(summary = "Retrieve pages", method = "GET", description = "This retrieves pages")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
   })
   public List<PageContext> getPages(
                                     HttpServletRequest request,
@@ -104,12 +104,19 @@ public class PageLayoutRest {
                                    @Parameter(description = "page reference", required = true)
                                    @RequestParam("pageRef")
                                    String pageRef,
+                                   @Parameter(description = "Application Storage Id", required = false)
+                                   @RequestParam(name = "applicationId", required = false, defaultValue = "0")
+                                   long applicationId,
                                    @Parameter(description = "expand options", required = true)
                                    @RequestParam("expand")
                                    String expand) {
     try {
-      Page page = pageLayoutService.getPageLayout(PageKey.parse(pageRef), request.getRemoteUser());
-      return RestEntityBuilder.toLayoutModel(page, layoutService, expand);
+      ModelObject modelObject = applicationId > 0 ? pageLayoutService.getPageApplicationLayout(PageKey.parse(pageRef),
+                                                                                               applicationId,
+                                                                                               request.getRemoteUser()) :
+                                                  pageLayoutService.getPageLayout(PageKey.parse(pageRef),
+                                                                                  request.getRemoteUser());
+      return RestEntityBuilder.toLayoutModel(modelObject, layoutService, expand);
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -187,7 +194,7 @@ public class PageLayoutRest {
                                          RestEntityBuilder.fromLayoutModel(layoutModel),
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
-      return getPageLayout(request, pageRef, expand);
+      return getPageLayout(request, pageRef, 0, expand);
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ObjectNotFoundException e) {

@@ -20,7 +20,6 @@
 -->
 <template>
   <v-btn
-    :disabled="disabled && !newTemplate"
     :loading="loading"
     :aria-label="$t('layout.save')"
     class="btn btn-primary d-flex align-center"
@@ -31,12 +30,6 @@
 </template>
 <script>
 export default {
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data: () => ({
     loading: false,
   }),
@@ -47,29 +40,29 @@ export default {
   },
   methods: {
     savePageTemplate() {
-      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
-      if (this.newTemplate) {
-        this.$root.$emit('layout-page-template-drawer-open', {
-          content: JSON.stringify(pageLayout),
-        });
-      } else {
-        this.$root.$emit('close-alert-message');
-        this.loading = true;
-        this.$pageTemplateService.getPageTemplate(this.$root.pageTemplateId)
-          .then(pageTemplate => {
-            pageTemplate.content = JSON.stringify(pageLayout);
-            return this.$pageTemplateService.updatePageTemplate(pageTemplate)
-              .then(() => {
-                this.$root.$emit('page-templates-updated', pageTemplate);
-                return pageTemplate;
-              });
-          })
-          .then(() => {
-            this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.success'), 'success');
-          })
-          .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.layout.update.error'), 'error'))
-          .finally(() => this.loading = false);
+      this.loading = true;
+      window.setTimeout(() => this.openPageTemplateDrawer(), 10);
+    },
+    async openPageTemplateDrawer() {
+      document.addEventListener('drawerOpened', this.endLoading);
+      let pageLayout = JSON.parse(JSON.stringify(this.$root.layout));
+      await this.attachPortletsPreferences(pageLayout);
+      pageLayout = this.$layoutUtils.cleanAttributes(pageLayout, true, true);
+      this.$root.$emit('layout-page-template-drawer-open', {
+        content: JSON.stringify(pageLayout),
+      }, false, true);
+    },
+    async attachPortletsPreferences(layoutModel) {
+      if (layoutModel.children?.length) {
+        await Promise.all(layoutModel.children.map(c => this.attachPortletsPreferences(c)));
+      } else if (layoutModel.contentId) {
+        const application = await this.$pageLayoutService.getPageApplicationLayout(this.$root.draftPageRef, layoutModel.storageId);
+        layoutModel.preferences = application?.preferences;
       }
+    },
+    endLoading() {
+      window.setTimeout(() => this.loading = false, 200);
+      document.removeEventListener('drawerOpened', this.endLoading);
     },
   },
 };

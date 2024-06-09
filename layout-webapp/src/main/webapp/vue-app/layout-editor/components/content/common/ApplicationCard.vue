@@ -46,14 +46,14 @@
       <div class="d-flex flex-column border-box-sizing full-height full-width pa-5">
         <div
           :title="name"
-          class="flex-grow-0 flex-shrink-0 subtitle-1 text-truncate-2 text-color ApplicationCardTitle">
+          class="flex-grow-0 flex-shrink-0 subtitle-1 text-truncate-2 text-color">
           {{ name }}
         </div>
         <div
           v-if="description"
           v-sanitized-html="description"
           :title="$utils.htmlToText(description)"
-          class="flex-grow-0 flex-shrink-0 subtitle-2 text-truncate-2 pt-0 text-sub-title ApplicationCardDescription"></div>
+          class="flex-grow-0 flex-shrink-0 subtitle-2 text-truncate-2 pt-0 text-sub-title"></div>
         <div class="d-flex flex-grow-1 flex-shrink-1 justify-center mt-2 overflow-hidden">
           <layout-image-illustration
             ref="illustration"

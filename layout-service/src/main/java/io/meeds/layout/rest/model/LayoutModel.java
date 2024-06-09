@@ -19,8 +19,10 @@
 package io.meeds.layout.rest.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -173,14 +175,18 @@ public class LayoutModel {
 
       @SuppressWarnings("unchecked")
       ApplicationState<Portlet> state = application.getState();
-      if (state instanceof PersistentApplicationState<Portlet> persistentState) {
-        this.storageId = persistentState.getStorageId();
-      } else if (state instanceof CloneApplicationState<Portlet> persistentState) {
-        this.storageId = persistentState.getStorageId();
-      } else if (state instanceof TransientApplicationState<Portlet> transientState) {
-        this.contentId = transientState.getContentId();
-      } else {
-        throw new IllegalStateException("PortletInstance should either has a persistent or transient state");
+      switch (state) {
+        case PersistentApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
+        case CloneApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
+        case TransientApplicationState<Portlet> transientState -> {
+          this.contentId = transientState.getContentId();
+          Portlet portlet = transientState.getContentState();
+          this.preferences = portlet == null ? Collections.emptyList() :
+                                             StreamSupport.stream(portlet.spliterator(), false)
+                                                          .map(p -> new PortletInstancePreference(p.getName(), p.getValue()))
+                                                          .toList();
+        }
+        default -> throw new IllegalStateException("PortletInstance should either has a persistent or transient state");
       }
     }
   }
