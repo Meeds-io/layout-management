@@ -65,6 +65,7 @@ export function init() {
           branding: null,
           displayMode: 'desktop',
           layout: null,
+          page: null,
           pageRef: null,
           pageTemplate: null,
           pageTemplateId: null,
@@ -123,6 +124,9 @@ export function init() {
           },
           desktopDisplayMode() {
             return this.$root.displayMode === 'desktop';
+          },
+          pageId() {
+            return this.$root.page?.state?.storageId?.replace?.('page_', '');
           },
         },
         watch: {

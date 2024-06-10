@@ -51,9 +51,8 @@
           <span v-if="applicationCategoryTitle" class="caption">({{ applicationCategoryTitle }})</span>
         </div>
       </div>
-      <div v-if="$root.desktopDisplayMode">
+      <div v-if="$root.desktopDisplayMode && displayResizeButton">
         <layout-editor-cell-resize-button
-          v-if="displayResizeButton"
           :container="container"
           :parent-id="parentId"
           :dynamic-section="isDynamicSection"
@@ -190,7 +189,7 @@ export default {
       return this.$root.movingCell && this.storageId === this.$root.nextCellStorageId || false;
     },
     displayResizeButton() {
-      return this.hasApplication || (this.isDynamicSection && this.index < (this.length - 1) && this.length < 12);
+      return (!this.isDynamicSection && this.hasApplication) || (this.isDynamicSection && this.index < (this.length - 1) && this.length < 12);
     },
     displayToMenu() {
       return this.hasApplication && !this.isDynamicSection;

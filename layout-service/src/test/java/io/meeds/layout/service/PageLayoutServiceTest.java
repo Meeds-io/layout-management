@@ -49,6 +49,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
@@ -281,7 +282,9 @@ public class PageLayoutServiceTest {
 
     when(page.getWidth()).thenReturn(width);
     when(page.getHeight()).thenReturn(height);
-    when(page.getBorderColor()).thenReturn(borderColor);
+    ModelStyle cssStyle = mock(ModelStyle.class);
+    when(page.getCssStyle()).thenReturn(cssStyle);
+    when(cssStyle.getBorderColor()).thenReturn(borderColor);
     assertDoesNotThrow(() -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
 
     when(page.getWidth()).thenReturn("eval('alert(`XSS in width CSS style`)')");
@@ -294,10 +297,10 @@ public class PageLayoutServiceTest {
                  () -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
     when(page.getHeight()).thenReturn(height);
 
-    when(page.getBorderColor()).thenReturn("eval('alert(`XSS in background CSS style`)')");
+    when(cssStyle.getBorderColor()).thenReturn("eval('alert(`XSS in background CSS style`)')");
     assertThrows(IllegalArgumentException.class,
                  () -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
-    when(page.getBorderColor()).thenReturn(borderColor);
+    when(cssStyle.getBorderColor()).thenReturn(borderColor);
 
     assertDoesNotThrow(() -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
 
@@ -314,10 +317,12 @@ public class PageLayoutServiceTest {
                  () -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
     when(application.getHeight()).thenReturn(height);
 
-    when(application.getBorderColor()).thenReturn("eval('alert(`XSS in application background CSS style`)')");
+    ModelStyle applicationCssStyle = mock(ModelStyle.class);
+    when(application.getCssStyle()).thenReturn(applicationCssStyle);
+    when(applicationCssStyle.getBorderColor()).thenReturn("eval('alert(`XSS in application background CSS style`)')");
     assertThrows(IllegalArgumentException.class,
                  () -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
-    when(application.getBorderColor()).thenReturn(borderColor);
+    when(applicationCssStyle.getBorderColor()).thenReturn(borderColor);
 
     assertDoesNotThrow(() -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
   }

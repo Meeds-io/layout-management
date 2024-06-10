@@ -38,6 +38,7 @@ import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PersistentApplicationState;
 import org.exoplatform.portal.config.model.TransientApplicationState;
@@ -81,6 +82,20 @@ public class LayoutModel {
   protected String                          cssClass;
 
   protected String                          borderColor;
+
+  private String                            borderSize;
+
+  private String                            boxShadow;
+
+  private String                            backgroundColor;
+
+  private String                            backgroundImage;
+
+  private String                            backgroundEffect;
+
+  private String                            backgroundSize;
+
+  private String                            backgroundRepeat;
 
   protected String[]                        accessPermissions;
 
@@ -127,6 +142,18 @@ public class LayoutModel {
   }
 
   private void init(ModelObject model) { // NOSONAR
+    ModelStyle cssStyle = model.getCssStyle();
+    if (cssStyle != null) {
+      this.borderColor = cssStyle.getBorderColor();
+      this.borderSize = cssStyle.getBorderSize();
+      this.boxShadow = cssStyle.getBoxShadow();
+      this.backgroundColor = cssStyle.getBackgroundColor();
+      this.backgroundImage = cssStyle.getBackgroundImage();
+      this.backgroundEffect = cssStyle.getBackgroundEffect();
+      this.backgroundSize = cssStyle.getBackgroundSize();
+      this.backgroundRepeat = cssStyle.getBackgroundRepeat();
+    }
+
     if (model instanceof Container container) {
       this.id = container.getId();
       this.storageId = container.getStorageId();
@@ -140,7 +167,6 @@ public class LayoutModel {
       this.width = container.getWidth();
       this.height = container.getHeight();
       this.cssClass = container.getCssClass();
-      this.borderColor = container.getBorderColor();
       this.profiles = container.getProfiles();
       this.accessPermissions = container.getAccessPermissions();
       this.moveAppsPermissions = container.getMoveAppsPermissions();
@@ -167,7 +193,6 @@ public class LayoutModel {
       this.width = application.getWidth();
       this.height = application.getHeight();
       this.cssClass = application.getCssClass();
-      this.borderColor = application.getBorderColor();
       this.showInfoBar = application.getShowInfoBar();
       this.showApplicationState = application.getShowApplicationState();
       this.showApplicationMode = application.getShowApplicationMode();
@@ -176,17 +201,17 @@ public class LayoutModel {
       @SuppressWarnings("unchecked")
       ApplicationState<Portlet> state = application.getState();
       switch (state) {
-        case PersistentApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
-        case CloneApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
-        case TransientApplicationState<Portlet> transientState -> {
-          this.contentId = transientState.getContentId();
-          Portlet portlet = transientState.getContentState();
-          this.preferences = portlet == null ? Collections.emptyList() :
-                                             StreamSupport.stream(portlet.spliterator(), false)
-                                                          .map(p -> new PortletInstancePreference(p.getName(), p.getValue()))
-                                                          .toList();
-        }
-        default -> throw new IllegalStateException("PortletInstance should either has a persistent or transient state");
+      case PersistentApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
+      case CloneApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
+      case TransientApplicationState<Portlet> transientState -> {
+        this.contentId = transientState.getContentId();
+        Portlet portlet = transientState.getContentState();
+        this.preferences = portlet == null ? Collections.emptyList() :
+                                           StreamSupport.stream(portlet.spliterator(), false)
+                                                        .map(p -> new PortletInstancePreference(p.getName(), p.getValue()))
+                                                        .toList();
+      }
+      default -> throw new IllegalStateException("PortletInstance should either has a persistent or transient state");
       }
     }
   }
@@ -202,6 +227,24 @@ public class LayoutModel {
   }
 
   public static ModelObject toModelObject(LayoutModel layoutModel) {
+    ModelStyle cssStyle = null;
+    boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
+                       || StringUtils.isNotBlank(layoutModel.getBoxShadow())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundEffect());
+    if (hasStyle) {
+      cssStyle = new ModelStyle();
+      cssStyle.setBorderColor(layoutModel.getBorderColor());
+      cssStyle.setBorderSize(layoutModel.getBorderSize());
+      cssStyle.setBoxShadow(layoutModel.getBoxShadow());
+      cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
+      cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
+      cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
+      cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
+      cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
+    }
+
     if (StringUtils.isNotBlank(layoutModel.template)) {
       Container container = new Container(layoutModel.getStorageId());
       container.setId(layoutModel.getId());
@@ -215,11 +258,11 @@ public class LayoutModel {
       container.setWidth(layoutModel.getWidth());
       container.setHeight(layoutModel.getHeight());
       container.setCssClass(layoutModel.getCssClass());
-      container.setBorderColor(layoutModel.getBorderColor());
       container.setProfiles(layoutModel.getProfiles());
       container.setAccessPermissions(layoutModel.getAccessPermissions());
       container.setMoveAppsPermissions(layoutModel.getMoveAppsPermissions());
       container.setMoveContainersPermissions(layoutModel.getMoveContainersPermissions());
+      container.setCssStyle(cssStyle);
       if (layoutModel.getChildren() != null) {
         container.setChildren(layoutModel.getChildren()
                                          .stream()
@@ -238,11 +281,11 @@ public class LayoutModel {
       application.setWidth(layoutModel.getWidth());
       application.setHeight(layoutModel.getHeight());
       application.setCssClass(layoutModel.getCssClass());
-      application.setBorderColor(layoutModel.getBorderColor());
       application.setShowInfoBar(layoutModel.isShowInfoBar());
       application.setShowApplicationState(layoutModel.isShowApplicationState());
       application.setShowApplicationMode(layoutModel.isShowApplicationMode());
       application.setAccessPermissions(layoutModel.getAccessPermissions());
+      application.setCssStyle(cssStyle);
 
       ApplicationState<Portlet> state;
       if (StringUtils.isNotBlank(layoutModel.getStorageId())) {

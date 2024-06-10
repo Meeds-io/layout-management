@@ -28,15 +28,19 @@
         <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center t-0 mb-auto mt-n4">
           <v-tooltip bottom>
             <template #activator="{on, attrs}">
-              <v-btn
+              <div
                 v-on="on"
-                v-bind="attrs"
-                height="32"
-                width="32"
-                icon
-                @click="$root.$emit('layout-add-section-drawer', index)">
-                <v-icon size="24">fa-plus</v-icon>
-              </v-btn>
+                v-bind="attrs">
+                <v-hover v-model="hoverButton">
+                  <v-btn
+                    height="32"
+                    width="32"
+                    icon
+                    @click="$root.$emit('layout-add-section-drawer', index)">
+                    <v-icon size="24">fa-plus</v-icon>
+                  </v-btn>
+                </v-hover>
+              </div>
             </template>
             {{ $t('layout.addSectionBefore') }}
           </v-tooltip>
@@ -84,15 +88,19 @@
         <div class="position-sticky z-index-two d-flex justify-center b-0 mb-n4 mt-auto">
           <v-tooltip top>
             <template #activator="{on, attrs}">
-              <v-btn
+              <div
                 v-on="on"
-                v-bind="attrs"
-                height="32"
-                width="32"
-                icon
-                @click="$root.$emit('layout-add-section-drawer', index + 1)">
-                <v-icon size="24">fa-plus</v-icon>
-              </v-btn>
+                v-bind="attrs">
+                <v-hover v-model="hoverButton">
+                  <v-btn
+                    height="32"
+                    width="32"
+                    icon
+                    @click="$root.$emit('layout-add-section-drawer', index + 1)">
+                    <v-icon size="24">fa-plus</v-icon>
+                  </v-btn>
+                </v-hover>
+              </div>
             </template>
             {{ $t('layout.addSectionAfter') }}
           </v-tooltip>
@@ -127,6 +135,7 @@ export default {
   },
   data: () => ({
     open: false,
+    hoverButton: false,
   }),
   computed: {
     displayMoveButton() {
@@ -146,6 +155,9 @@ export default {
           this.open = this.hover;
         }
       }, 200);
+    },
+    hoverButton() {
+      this.$emit('hover-button', this.hoverButton);
     },
     moving() {
       window.setTimeout(() => {

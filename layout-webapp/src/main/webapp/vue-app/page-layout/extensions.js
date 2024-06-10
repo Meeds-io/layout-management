@@ -32,6 +32,13 @@ extensionRegistry.registerExtension('page-layout', 'container', {
 });
 
 extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 300,
+  type: 'section',
+  isValid: container => container.template === 'GridContainer',
+  containerType: 'page-layout-fixed-section',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
   rank: 600,
   type: 'application',
   isValid: container => !container.template,
