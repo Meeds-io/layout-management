@@ -27,11 +27,12 @@
 
 .layout-section-border {
   position: absolute;
-  padding: 12px;
-  top: -22px;
-  right: -24px;
-  bottom: -2px;
-  left: -24px;
+  margin: -12px 0;
+  height: 100%;
+  top: 0;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: ~"calc(@{singlePageApplicationWidth} + 24px)";
 }
 
 .layout-mobile-view {
@@ -78,10 +79,6 @@
   width: 36px;
 }
 
-.d-md-grid {
-  padding-bottom: 20px;
-}
-
 .t-20 {
   top: 20px;
 }
@@ -103,11 +100,14 @@
 }
 
 .layout-section {
+  padding-bottom: 20px;
 
   .layout-section-hover {
     border: thin solid @greyColorOpacity2 !important;
   }
-
+  &:first-of-type .layout-section-hover {
+    margin-top: 24px;
+  }
   &.layout-moving-chosen-container {
     > div {
       border: none !important;

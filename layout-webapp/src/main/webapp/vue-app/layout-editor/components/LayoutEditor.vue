@@ -22,7 +22,7 @@
   <v-app
     class="transparent"
     flat>
-    <main role="main" class="content-box-sizing">
+    <main class="content-box-sizing">
       <layout-editor-toolbar
         :page="pageContext"
         :node="node"
@@ -84,7 +84,10 @@ export default {
         if (this.pageRef) {
           this.$root.pageRef = this.pageRef;
           this.$pageLayoutService.getPage(this.pageRef)
-            .then(page => this.pageContext = page);
+            .then(page => {
+              this.$root.page = page;
+              this.pageContext = page;
+            });
         }
       },
     },

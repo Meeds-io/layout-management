@@ -272,12 +272,6 @@ public class PortletInstanceApplicationAdapter extends PortletApplication {
   }
 
   @Override
-  public String getBorderColor() {
-    Application<Portlet> portletApplication = getApplication();
-    return portletApplication == null ? null : portletApplication.getBorderColor();
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
   public ApplicationData<Portlet> build() {
     Application<Portlet> portletApplication = getApplication();
@@ -297,14 +291,6 @@ public class PortletInstanceApplicationAdapter extends PortletApplication {
     Application<Portlet> portletApplication = getApplication();
     if (portletApplication != null) {
       portletApplication.setCssClass(cssClass);
-    }
-  }
-
-  @Override
-  public void setBorderColor(String borderColor) {
-    Application<Portlet> portletApplication = getApplication();
-    if (portletApplication != null) {
-      portletApplication.setBorderColor(borderColor);
     }
   }
 

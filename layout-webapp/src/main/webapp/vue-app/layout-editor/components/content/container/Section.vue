@@ -23,17 +23,36 @@
   <div
     ref="section"
     :data-storage-id="storageId"
+    :style="cssStyle"
     class="position-relative layout-section"
     v-on="!isDynamicSection && {
       'mousedown': startSelection,
     }">
+    <v-hover :disabled="$root.mobileDisplayMode">
+      <div
+        slot-scope="{ hover }"
+        :class="hoverSectionMenuButton && 'z-index-two'"
+        class="layout-section-border">
+        <div class="position-relative full-height full-width">
+          <layout-editor-section-menu
+            :container="container"
+            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
+            :index="index"
+            :length="length"
+            :moving="movingSection"
+            @hover-button="hoverSectionMenuButton = $event"
+            @move-start="movingSection = true"
+            @move-end="movingSection = false" />
+        </div>
+      </div>
+    </v-hover>
     <layout-editor-container-base
       ref="container"
       :container="container"
       :parent-id="parentId"
       :index="index"
-      :class="`${zIndexClass} ${mobileInColumns && mobileSectionColumnClass || ''}`"
-      class="position-relative overflow-initial"
+      :class="`${mobileInColumns && mobileSectionColumnClass || ''}`"
+      class="position-relative overflow-initial layout-section-content"
       type="section"
       @hovered="hoverSection = $event && !drawerOpened">
       <template v-if="$root.movingParentId === storageId && (!isDynamicSection || $root.moveType === 'resize')" #footer>
@@ -45,22 +64,6 @@
           @hide="$root.movingParentId = null" />
       </template>
     </layout-editor-container-base>
-    <v-hover :disabled="$root.mobileDisplayMode">
-      <div
-        slot-scope="{ hover }"
-        class="layout-section-border">
-        <div class="position-relative full-height full-width">
-          <layout-editor-section-menu
-            :container="container"
-            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
-            :index="index"
-            :length="length"
-            :moving="movingSection"
-            @move-start="movingSection = true"
-            @move-end="movingSection = false" />
-        </div>
-      </div>
-    </v-hover>
     <layout-section-mobile-column-menu-drawer
       v-if="mobileInColumns"
       v-model="mobileSectionColumnClass"
@@ -89,6 +92,7 @@ export default {
   },
   data: () => ({
     hoverSection: false,
+    hoverSectionMenuButton: false,
     movingSection: false,
     mobileSectionColumnClass: null,
     sectionWidth: 0,
@@ -105,6 +109,26 @@ export default {
     },
     isDynamicSection() {
       return this.container.template === this.$layoutUtils.flexTemplate;
+    },
+    cssStyle() {
+      const style = {};
+      if (this.container.backgroundColor) {
+        style['background-color'] = this.container.backgroundColor;
+      }
+      if (this.container.backgroundImage) {
+        if (this.container.backgroundEffect) {
+          style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
+        } else {
+          style['background-image'] = `url(${this.container.backgroundImage})`;
+        }
+        if (this.container.backgroundRepeat) {
+          style['background-repeat'] = this.container.backgroundRepeat;
+        }
+        if (this.container.backgroundSize) {
+          style['background-size'] = this.container.backgroundSize;
+        }
+      }
+      return style;
     },
     mobileInColumns() {
       return this.isDynamicSection

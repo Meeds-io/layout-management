@@ -68,6 +68,9 @@ export default {
     height: null,
     width: null,
     borderColor: null,
+    borderSize: null,
+    boxShadow: null,
+    backgroundColor: null,
     cssClass: null,
     hover: false,
     hoverMenu: false,
@@ -95,23 +98,28 @@ export default {
       return `UIPortlet-${this.container?.id || this.storageId || parseInt(Math.random() * 10000)}`;
     },
     cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-          style['--appHeightScroll'] = 'auto';
-        }
-        if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-          style['--appWidthScroll'] = 'auto';
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        return style;
+      const style = {};
+      if (this.height) {
+        style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
+        style['--appHeightScroll'] = 'auto';
       }
+      if (this.width) {
+        style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
+        style['--appWidthScroll'] = 'auto';
+      }
+      if (this.borderColor) {
+        style['--appBorderColor'] = this.borderColor;
+      }
+      if (this.borderSize) {
+        style['--appBorderSize'] = `${this.borderSize}px`;
+      }
+      if (this.boxShadow === 'true') {
+        style['--appBoxShadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
+      }
+      if (this.backgroundColor) {
+        style['background-color'] = this.backgroundColor;
+      }
+      return style;
     },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
@@ -203,6 +211,9 @@ export default {
       this.height = this.container.height;
       this.width = this.container.width;
       this.borderColor = this.container.borderColor;
+      this.borderSize = this.container.borderSize || 0;
+      this.boxShadow = this.container.boxShadow;
+      this.backgroundColor = this.container.backgroundColor;
       this.cssClass = this.container.cssClass || '';
     },
     moveEnd() {
