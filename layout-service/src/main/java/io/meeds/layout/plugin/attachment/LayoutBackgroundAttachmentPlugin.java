@@ -18,12 +18,16 @@
  */
 package io.meeds.layout.plugin.attachment;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.attachment.AttachmentPlugin;
 import org.exoplatform.social.attachment.AttachmentService;
@@ -34,12 +38,15 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class PageTemplateAttachmentPlugin extends AttachmentPlugin {
+public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
 
-  public static final String OBJECT_TYPE = "pageTemplate";
+  public static final String OBJECT_TYPE = "containerBackground";
 
   @Autowired
   private LayoutAclService   layoutAclService;
+
+  @Autowired
+  private LayoutService      layoutService;
 
   @Autowired
   private AttachmentService  attachmentService;
@@ -56,12 +63,14 @@ public class PageTemplateAttachmentPlugin extends AttachmentPlugin {
 
   @Override
   public boolean hasEditPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    return userIdentity != null && layoutAclService.isAdministrator(userIdentity.getUserId());
+    return layoutAclService.canEditPage(getPageKey(entityId.split("_")[0]),
+                                        userIdentity == null ? null : userIdentity.getUserId());
   }
 
   @Override
   public boolean hasAccessPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    return true;
+    return layoutAclService.canViewPage(getPageKey(entityId.split("_")[0]),
+                                        userIdentity == null ? null : userIdentity.getUserId());
   }
 
   @Override
@@ -72,6 +81,13 @@ public class PageTemplateAttachmentPlugin extends AttachmentPlugin {
   @Override
   public long getSpaceId(String objectId) throws ObjectNotFoundException {
     return 0;
+  }
+
+  private PageKey getPageKey(String entityId) {
+    String pageUuid = entityId.replace("page_", "");
+    long pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
+    Page page = layoutService.getPage(pageId);
+    return page.getPageKey();
   }
 
 }

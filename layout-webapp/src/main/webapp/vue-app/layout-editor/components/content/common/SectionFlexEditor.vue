@@ -60,7 +60,9 @@
         </v-slider>
       </v-card>
     </div>
-    <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pa-2">
+    <div
+      :style="cssStyle"
+      class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pa-2">
       <div
         :class="gridClass"
         class="grid-gap-1">
@@ -82,6 +84,26 @@ export default {
       type: Number,
       default: null,
     },
+    backgroundImage: {
+      type: String,
+      default: null,
+    },
+    backgroundEffect: {
+      type: String,
+      default: null,
+    },
+    backgroundSize: {
+      type: String,
+      default: null,
+    },
+    backgroundRepeat: {
+      type: String,
+      default: null,
+    },
+    backgroundColor: {
+      type: String,
+      default: null,
+    },
   },
   data: () => ({
     cols: 0,
@@ -90,6 +112,32 @@ export default {
   computed: {
     gridClass() {
       return `d-md-grid pb-0 grid-cols-md-${this.cols}`;
+    },
+    cssStyle() {
+      const style = {};
+      if (this.backgroundColor) {
+        style['background-color'] = this.backgroundColor;
+      }
+      if (this.backgroundImage) {
+        if (this.backgroundEffect) {
+          style['background-image'] = `${this.backgroundEffect},url(${this.backgroundImage})`;
+        } else {
+          style['background-image'] = `url(${this.backgroundImage})`;
+        }
+        if (this.backgroundRepeat) {
+          style['background-repeat'] = this.backgroundRepeat;
+        }
+        if (this.backgroundSize) {
+          style['background-size'] = this.backgroundSize;
+        }
+        if (this.backgroundRepeat) {
+          style['background-repeat'] = this.backgroundRepeat;
+        }
+        if (this.backgroundSize) {
+          style['background-size'] = this.backgroundSize;
+        }
+      }
+      return style;
     },
   },
   watch: {

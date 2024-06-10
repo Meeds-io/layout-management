@@ -81,7 +81,6 @@ public class PortletInstanceApplicationAdapterTest {
     assertNull(portletInstanceApplicationAdapter.getProperties());
     assertNull(portletInstanceApplicationAdapter.getTheme());
     assertNull(portletInstanceApplicationAdapter.getCssClass());
-    assertNull(portletInstanceApplicationAdapter.getBorderColor());
     assertNull(portletInstanceApplicationAdapter.build());
     assertNull(portletInstanceApplicationAdapter.getStorageName());
     assertNull(portletInstanceApplicationAdapter.getApplication());
@@ -104,7 +103,6 @@ public class PortletInstanceApplicationAdapterTest {
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setProperties(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setTheme(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setCssClass(null));
-    assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setBorderColor(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setStorageName(null));
   }
 
@@ -144,7 +142,6 @@ public class PortletInstanceApplicationAdapterTest {
       when(portletApplication.getProperties()).thenReturn(properties);
       when(portletApplication.getTheme()).thenReturn(String.valueOf(++i));
       when(portletApplication.getCssClass()).thenReturn(String.valueOf(++i));
-      when(portletApplication.getBorderColor()).thenReturn(String.valueOf(++i));
       when(portletApplication.getStorageName()).thenReturn(String.valueOf(++i));
 
       i = 0;
@@ -163,7 +160,6 @@ public class PortletInstanceApplicationAdapterTest {
       assertEquals(properties, portletInstanceApplicationAdapter.getProperties());
       assertEquals(String.valueOf(++i), portletInstanceApplicationAdapter.getTheme());
       assertEquals(String.valueOf(++i), portletInstanceApplicationAdapter.getCssClass());
-      assertEquals(String.valueOf(++i), portletInstanceApplicationAdapter.getBorderColor());
       assertEquals(String.valueOf(++i), portletInstanceApplicationAdapter.getStorageName());
     } finally {
       portletInstanceApplicationAdapter.cleanApplication();

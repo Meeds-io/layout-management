@@ -67,24 +67,38 @@ export default {
     borderColor() {
       return this.container.borderColor;
     },
+    borderSize() {
+      return this.container.borderSize;
+    },
+    boxShadow() {
+      return this.container.boxShadow;
+    },
+    backgroundColor() {
+      return this.container.backgroundColor;
+    },
     cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-          style['--appHeightScroll'] = 'auto';
-        }
-        if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-          style['--appWidthScroll'] = 'auto';
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        return style;
+      const style = {};
+      if (this.height) {
+        style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
+        style['--appHeightScroll'] = 'auto';
       }
+      if (this.width) {
+        style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
+        style['--appWidthScroll'] = 'auto';
+      }
+      if (this.borderColor) {
+        style['--appBorderColor'] = this.borderColor;
+      }
+      if (this.borderSize) {
+        style['--appBorderSize'] = `${this.borderSize}px`;
+      }
+      if (this.boxShadow === 'true') {
+        style['--appBoxShadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
+      }
+      if (this.backgroundColor) {
+        style['background-color'] = this.backgroundColor;
+      }
+      return style;
     },
     cssClass() {
       return this.container.cssClass || '';

@@ -22,11 +22,10 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="light-grey-background-color singlePageApplication mx-auto"
+    class="light-grey-background-color layout-sections-parent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="layoutToEdit"
-      class="layout-sections-parent" />
+      :container="layoutToEdit" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
