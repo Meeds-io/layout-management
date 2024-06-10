@@ -76,7 +76,7 @@
             'invisible': moving,
           }"
           :title="!isDynamicSection && $t('layout.cellHoverTooltip')"
-          class="full-width"
+          class="full-width layout-add-application-button"
           flat
           v-on="!multiSelectEnabled && {
             click: () => $root.$emit('layout-add-application-category-drawer', parentId, container)

@@ -235,8 +235,6 @@ export default {
         if (this.isCell) {
           const section = this.$layoutUtils.getSectionByContainer(this.$root.layout, event.item.getAttribute('data-storage-id'));
           this.$root.$emit('layout-section-history-add', section?.storageId);
-        } else {
-          this.$root.$emit('layout-modified');
         }
 
         const fromIndex = fromCell.children.findIndex(c => c?.storageId === application.storageId);

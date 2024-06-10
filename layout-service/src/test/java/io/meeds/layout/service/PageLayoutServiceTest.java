@@ -95,6 +95,9 @@ public class PageLayoutServiceTest {
   @MockBean
   private AddOnService            addOnService;
 
+  @MockBean
+  private PortletInstanceService  portletInstanceService;
+
   @Autowired
   private PageLayoutService       pageLayoutService;
 
