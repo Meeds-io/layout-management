@@ -21,8 +21,10 @@ package io.meeds.layout.service;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +41,7 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
@@ -49,10 +52,12 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.portal.pom.spi.portlet.Preference;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
 import io.meeds.layout.model.PermissionUpdateModel;
+import io.meeds.layout.model.PortletInstancePreference;
 import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.util.JsonUtils;
 
@@ -83,6 +88,9 @@ public class PageLayoutService {
   private PageTemplateService     pageTemplateService;
 
   @Autowired
+  private PortletInstanceService  portletInstanceService;
+
+  @Autowired
   private UserPortalConfigService userPortalConfigService;
 
   @Autowired
@@ -106,8 +114,7 @@ public class PageLayoutService {
                 .toList();
   }
 
-  public PageContext getPage(PageKey pageKey,
-                             String username) throws ObjectNotFoundException, IllegalAccessException {
+  public PageContext getPage(PageKey pageKey, String username) throws ObjectNotFoundException, IllegalAccessException {
     PageContext page = layoutService.getPageContext(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
@@ -117,8 +124,22 @@ public class PageLayoutService {
     return page;
   }
 
-  public Page getPageLayout(PageKey pageKey,
-                            String username) throws ObjectNotFoundException, IllegalAccessException {
+  public Application<Portlet> getPageApplicationLayout(PageKey pageKey,
+                                                       long applicationId,
+                                                       String username) throws ObjectNotFoundException,
+                                                                        IllegalAccessException {
+    Page page = getPageLayout(pageKey, username);
+    Application<Portlet> application = findApplication(page, applicationId);
+    if (application == null) {
+      throw new ObjectNotFoundException(String.format("Application with id %s wasn't found in page %s",
+                                                      applicationId,
+                                                      pageKey));
+    }
+    computeApplicationPreferences(application, username);
+    return application;
+  }
+
+  public Page getPageLayout(PageKey pageKey, String username) throws ObjectNotFoundException, IllegalAccessException {
     Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
@@ -152,7 +173,7 @@ public class PageLayoutService {
     String pageName = pageModel.getPageName() == null ? UUID.randomUUID().toString() :
                                                       pageModel.getPageName() + "_" + UUID.randomUUID();
 
-    Page page = createPageInstance(pageModel.getPageSiteType(), // NOSONAR
+    Page page = createPageInstance(pageModel.getPageSiteType(),
                                    pageModel.getPageSiteName(),
                                    pageName,
                                    getPageType(pageModel.getPageType()),
@@ -282,8 +303,8 @@ public class PageLayoutService {
                                   PageType pageType,
                                   Long pageTemplateId,
                                   String pageLink) throws IllegalArgumentException {
-    Page page;
-    if (pageType == PageType.PAGE) {
+    return switch (pageType) {
+    case PAGE: {
       if (pageTemplateId == null) {
         throw new IllegalArgumentException("pageTemplateId is mandatory");
       }
@@ -294,23 +315,27 @@ public class PageLayoutService {
       if (pageTemplate.isDisabled()) {
         throw new IllegalArgumentException("pageTemplate with designated Id is disabled");
       }
-      page = userPortalConfigService.createPageTemplate(EMPTY_PAGE_TEMPLATE,
-                                                        siteType,
-                                                        siteName);
+      Page page = userPortalConfigService.createPageTemplate(EMPTY_PAGE_TEMPLATE,
+                                                             siteType,
+                                                             siteName);
       Page pageLayout = JsonUtils.fromJsonString(pageTemplate.getContent(), LayoutModel.class)
                                  .toPage();
       page.setChildren(pageLayout.getChildren());
       page.resetStorage();
       page.setName(pageName);
-    } else if (pageType == PageType.LINK) {
-      page = new Page(siteType, siteName, pageName);
+      page.setType(pageType.name());
+      yield page;
+    }
+    case LINK: {
+      Page page = new Page(siteType, siteName, pageName);
       page.setLink(pageLink);
-    } else {
+      page.setType(pageType.name());
+      yield page;
+    }
+    default:
       // Unreachable but kept in case of behavior changes
       throw new IllegalArgumentException("pageType is mandatory");
-    }
-    page.setType(pageType.name());
-    return page;
+    };
   }
 
   private PageType getPageType(String pageType) {
@@ -354,49 +379,108 @@ public class PageLayoutService {
     }
     if (!addonContainerChildren.isEmpty()) {
       addonContainerChildren.forEach((index, applications) -> {
-                              subContainers.remove(index.intValue());
-                              subContainers.addAll(index, applications);
-                            });
+        subContainers.remove(index.intValue());
+        subContainers.addAll(index, applications);
+      });
       container.setChildren(subContainers);
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private void validateCSSInputs(ModelObject modelObject) {
     String width;
     String height;
     String borderColor;
-    if (modelObject instanceof Container container) {
+    switch (modelObject) {
+    case Container container -> {
       width = container.getWidth();
       height = container.getHeight();
       borderColor = container.getBorderColor();
       if (!CollectionUtils.isEmpty(container.getChildren())) {
         container.getChildren().forEach(this::validateCSSInputs);
       }
-    } else if (modelObject instanceof Application application) { // NOSONAR
+    }
+    case Application application -> { // NOSONAR
       width = application.getWidth();
       height = application.getHeight();
       borderColor = application.getBorderColor();
-    } else {
-      return;
     }
-    if (width != null
+    default -> {
+      width = null;
+      height = null;
+      borderColor = null;
+    }
+    }
+    if (StringUtils.isBlank(width)) {
+      modelObject.setWidth(null);
+    }
+    if (StringUtils.isBlank(height)) {
+      modelObject.setHeight(null);
+    }
+    if (StringUtils.isBlank(borderColor)) {
+      modelObject.setBorderColor(null);
+    }
+    if (StringUtils.isNotBlank(width)
         && !SIZE_MATCHER_VALIDATOR.matches(width)) {
       throw new IllegalArgumentException(String.format("Container with id %s has an invalid width input %s",
                                                        modelObject.getStorageId(),
                                                        width));
     }
-    if (height != null
+    if (StringUtils.isNotBlank(height)
         && !SIZE_MATCHER_VALIDATOR.matches(height)) {
       throw new IllegalArgumentException(String.format("Container with id %s has an invalid height input %s",
                                                        modelObject.getStorageId(),
                                                        height));
     }
-    if (borderColor != null
+    if (StringUtils.isNotBlank(borderColor)
         && !COLOR_MATCHER_VALIDATOR.matches(borderColor)) {
       throw new IllegalArgumentException(String.format("Container with id %s has an invalid border color input %s",
                                                        modelObject.getStorageId(),
                                                        borderColor));
     }
+  }
+
+  private void computeApplicationPreferences(Application<Portlet> application, String username) throws IllegalAccessException,
+                                                                                                ObjectNotFoundException {
+    String portletContentId = layoutService.getId(application.getState());
+    Portlet portletPreferences = getApplicationPreferences(Long.parseLong(application.getStorageId()), username);
+    TransientApplicationState<Portlet> applicationState = new TransientApplicationState<>(portletContentId, portletPreferences);
+    application.setState(applicationState);
+  }
+
+  private Portlet getApplicationPreferences(long applicationId, String username) throws IllegalAccessException,
+                                                                                 ObjectNotFoundException {
+    List<PortletInstancePreference> preferences = portletInstanceService.getApplicationPreferences(applicationId, username);
+    Map<String, Preference> preferencesMap = preferences.stream()
+                                                        .collect(Collectors.toMap(PortletInstancePreference::getName,
+                                                                                  p -> new Preference(p.getName(),
+                                                                                                      p.getValue(),
+                                                                                                      false)));
+    return new Portlet(preferencesMap);
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private Application<Portlet> findApplication(ModelObject modelObject, long applicationId) {
+    return switch (modelObject) {
+    case Container container -> {
+      if (!CollectionUtils.isEmpty(container.getChildren())) {
+        yield container.getChildren()
+                       .stream()
+                       .map(m -> findApplication(m, applicationId))
+                       .filter(Objects::nonNull)
+                       .findFirst()
+                       .orElse(null);
+      }
+      yield null;
+    }
+    case Application application -> {
+      if (StringUtils.equals(application.getStorageId(), String.valueOf(applicationId))) {
+        yield application;
+      }
+      yield null;
+    }
+    default -> null;
+    };
   }
 
 }

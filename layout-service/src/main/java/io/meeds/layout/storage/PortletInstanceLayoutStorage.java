@@ -85,7 +85,7 @@ public class PortletInstanceLayoutStorage {
       return getOrCreatePortletInstanceApplication(portletInstance);
     } else if (applicationStorageId > 0) {
       // Display the app by storage id
-      return layoutService.getApplicationModel(String.valueOf(applicationStorageId));
+      return getApplication(applicationStorageId);
     } else {
       return null;
     }
@@ -97,17 +97,25 @@ public class PortletInstanceLayoutStorage {
       return createPortletInstanceApplication(portletInstance);
     } else {
       try {
-        return layoutService.getApplicationModel(String.valueOf(applicationId));
+        return getApplication(applicationId);
       } catch (Exception e) {
         return createPortletInstanceApplication(portletInstance);
       }
     }
   }
 
-  public Portlet getPortletInstancePreferences(long portletInstanceId) {
-    long applicationId = getPortletInstanceApplicationId(portletInstanceId);
-    Application<Object> applicationModel = layoutService.getApplicationModel(String.valueOf(applicationId));
-    return (Portlet) layoutService.load(applicationModel.getState(), applicationModel.getType());
+  public Application<Portlet> getApplication(long applicationId) {
+    return layoutService.getApplicationModel(String.valueOf(applicationId));
+  }
+
+  public Portlet getApplicationPreferences(long applicationId) {
+    Application<Portlet> application = getApplication(applicationId);
+    return layoutService.load(application.getState(), application.getType());
+  }
+
+  public String getApplicationPortletName(Application<Portlet> application) {
+    String contentId = layoutService.getId(application.getState());
+    return StringUtils.isBlank(contentId) ? null : contentId.split("/")[1];
   }
 
   public long getApplicationPortletInstanceId(long applicationId) {

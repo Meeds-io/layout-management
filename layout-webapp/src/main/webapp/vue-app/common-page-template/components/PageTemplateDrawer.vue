@@ -141,11 +141,32 @@ export default {
     this.$root.$off('layout-page-template-drawer-open', this.open);
   },
   methods: {
-    open(pageTemplate, duplicate) {
+    async open(pageTemplate, duplicate, generateIllustration) {
       this.templateId = pageTemplate.id || this.$root.pageTemplate?.id || null;
       this.pageLayoutContent = pageTemplate.content;
       this.duplicate = duplicate;
-      this.$nextTick().then(() => this.$refs.drawer.open());
+      if (generateIllustration) {
+        const parentElement = document.querySelector('.layout-sections-parent').parentElement;
+        parentElement.querySelectorAll('.layout-add-application-button').forEach(el => el.style.display = 'none');
+        let previewCanvas;
+        try {
+          previewCanvas = await window.html2canvas(document.querySelector('.layout-sections-parent').parentElement);
+        } finally {
+          parentElement.querySelectorAll('.layout-add-application-button').forEach(el => el.style.display = '');
+        }
+
+        if (previewCanvas) {
+          const previewImage = previewCanvas.toDataURL('image/png');
+          const previewBlob = this.convertPreviewToFile(previewImage);
+          await this.$nextTick();
+          this.$refs.drawer.open();
+          await this.$nextTick();
+          this.$refs?.pagePreview?.uploadFile(previewBlob);
+        }
+      } else {
+        await this.$nextTick();
+        this.$refs.drawer.open();
+      }
     },
     close() {
       this.$refs.drawer.close();
@@ -195,6 +216,14 @@ export default {
           this.$root.$emit('alert-message', this.$t('layout.pageTemplateCreatedSuccessfully'), 'success');
         })
         .finally(() => this.saving = false);
+    },
+    convertPreviewToFile(previewImage) {
+      const imgString = window.atob(previewImage.replace(/^data:image\/\w+;base64,/, ''));
+      const bytes = new Uint8Array(imgString.length);
+      for (let i = 0; i < imgString.length; i++) {
+        bytes[i] = imgString.charCodeAt(i);
+      }
+      return new Blob([bytes], {type: 'image/png'});
     },
   },
 };

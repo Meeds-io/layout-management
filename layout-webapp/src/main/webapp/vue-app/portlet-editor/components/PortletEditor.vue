@@ -21,12 +21,11 @@
 <template>
   <v-app
     class="transparent"
-    role="main"
     flat>
-    <div class="content-box-sizing">
+    <main role="main" class="content-box-sizing">
       <portlet-editor-toolbar />
       <portlet-editor-content />
-    </div>
+    </main>
   </v-app>
 </template>
 <script>

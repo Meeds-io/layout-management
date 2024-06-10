@@ -21,21 +21,18 @@
 <template>
   <v-app
     class="transparent"
-    role="main"
     flat>
-    <div class="content-box-sizing">
+    <main role="main" class="content-box-sizing">
       <layout-editor-toolbar
-        :disable-save="!modified"
         :page="pageContext"
         :node="node"
         :node-labels="nodeLabels" />
       <layout-editor-content
         :page="pageContext"
         :node="draftNode"
-        :layout="draftLayout"
-        @modified="modified = true" />
+        :layout="draftLayout" />
       <layout-editor-cells-selection-box />
-    </div>
+    </main>
     <layout-analytics
       :application-name="pageTemplateId ? 'pageTemplateManagement' : 'pageLayoutEditor'" />
   </v-app>
@@ -48,7 +45,6 @@ export default {
     draftNode: null,
     draftLayout: null,
     nodeLabels: null,
-    modified: false,
   }),
   computed: {
     pageKey() {

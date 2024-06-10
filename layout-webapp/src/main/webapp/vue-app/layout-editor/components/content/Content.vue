@@ -22,7 +22,7 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="transparent singlePageApplication mx-auto"
+    class="light-grey-background-color singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
       :container="layoutToEdit"
@@ -71,7 +71,6 @@ export default {
     layoutToEdit: null,
     isCompatible: true,
     changesReminderOpened: false,
-    modified: false,
     loading: 1,
   }),
   computed: {
@@ -93,9 +92,6 @@ export default {
     },
   },
   watch: {
-    modified() {
-      this.$emit('modified');
-    },
     layoutToEdit() {
       this.$root.layout = this.layoutToEdit;
     },
@@ -140,8 +136,6 @@ export default {
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
-    this.$root.$on('layout-modified', this.setAsModified);
-    this.$root.$on('layout-editor-portlet-properties-updated', this.setAsModified);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   mounted() {
@@ -166,7 +160,6 @@ export default {
           this.$layoutUtils.newSection(parentContainer, 1, 1, 2, this.$layoutUtils.flexTemplate);
         }
         this.isCompatible = !applications?.length;
-        this.modified = true;
       }
       if (this.layoutToEdit) {
         Object.assign(this.layoutToEdit, layout);
@@ -354,10 +347,6 @@ export default {
         }
         this.$root.sectionRedo = [];
       }
-      this.modified = true;
-    },
-    setAsModified() {
-      this.modified = true;
     },
     restoreSectionVersion(event) {
       if (event.ctrlKey) {
