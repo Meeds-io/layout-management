@@ -25,6 +25,7 @@
     <page-layout-container-base
       :container="container"
       :parent-id="parentId"
+      no-background-style
       class="layout-section-content" />
   </div>
 </template>

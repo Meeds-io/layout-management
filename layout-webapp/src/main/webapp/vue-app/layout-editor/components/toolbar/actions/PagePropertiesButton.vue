@@ -24,41 +24,15 @@
       <template #activator="{on, attrs}">
         <div v-bind="attrs" v-on="on">
           <v-btn
-            :href="draftPageUrl"
-            :loading="saving"
-            :aria-label="$t('layout.previewDraftPage')"
+            :aria-label="$t('layout.editPageProperties')"
             target="_blank"
             icon
-            @click.stop.prevent="previewPage">
-            <v-icon size="20" class="icon-default-color">fa-eye</v-icon>
+            @click="$root.$emit('layout-page-properties-open')">
+            <v-icon size="20" class="icon-default-color">fa-palette</v-icon>
           </v-btn>
         </div>
       </template>
-      <span>{{ $t('layout.previewDraftPage') }}</span>
+      <span>{{ $t('layout.editPageProperties') }}</span>
     </v-tooltip>
   </div>
 </template>
-<script>
-export default {
-  data: () => ({
-    saving: false,
-  }),
-  computed: {
-    draftPageUrl() {
-      return `/portal${this.$root.draftNodeUri}`;
-    },
-  },
-  methods: {
-    previewPage() {
-      this.saving = true;
-      this.$root.$on('layout-draft-saved', this.openPreviewPage);
-      this.$root.$emit('layout-save-draft');
-    },
-    openPreviewPage() {
-      this.$root.$off('layout-save-draft', this.openPreviewPage);
-      this.saving = false;
-      window.open(this.draftPageUrl, '_blank');
-    },
-  },
-};
-</script>

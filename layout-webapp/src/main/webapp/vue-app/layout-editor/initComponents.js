@@ -26,6 +26,7 @@ import SaveTemplateButton from './components/toolbar/actions/SaveTemplateButton.
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButton.vue';
 import PagePreviewButton from './components/toolbar/actions/PagePreviewButton.vue';
+import PagePropertiesButton from './components/toolbar/actions/PagePropertiesButton.vue';
 
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
 import NumberInput from './components/form/NumberInput.vue';
@@ -59,6 +60,7 @@ import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
 import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicationCategoryDrawer.vue';
 import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
+import EditPageDrawer from './components/drawer/EditPageDrawer.vue';
 
 import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
 
@@ -70,6 +72,7 @@ const components = {
   'layout-editor-toolbar-save-template-button': SaveTemplateButton,
   'layout-editor-toolbar-history-buttons': HistoryButtons,
   'layout-editor-toolbar-page-preview-button': PagePreviewButton,
+  'layout-editor-toolbar-page-properties-button': PagePropertiesButton,
   'layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'layout-editor-content': Content,
   'layout-editor-color-picker': ColorPicker,
@@ -91,6 +94,7 @@ const components = {
   'layout-editor-application-category-select-drawer': SelectApplicationCategoryDrawer,
   'layout-editor-application-add-drawer': AddApplicationDrawer,
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
+  'layout-editor-page-edit-drawer': EditPageDrawer,
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
   'layout-editor-background-image-attachment': BackgroundImageAttachment,
   'layout-editor-application-card': ApplicationCard,

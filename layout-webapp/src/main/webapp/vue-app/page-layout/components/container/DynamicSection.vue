@@ -30,6 +30,7 @@
       :container="container"
       :parent-id="parentId"
       :class="isMobileColumns && mobileSectionColumnClass || ''"
+      no-background-style
       class="layout-section-content" />
   </div>
 </template>

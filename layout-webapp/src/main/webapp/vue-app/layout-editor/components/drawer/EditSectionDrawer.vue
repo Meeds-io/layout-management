@@ -226,7 +226,7 @@ export default {
     mobileInColumns: false,
     enableBackgroundColor: false,
     enableBackgroundImage: false,
-    backgroundColor: '#FFFFFF00',
+    backgroundColor: '#FFFFFFFF',
     backgroundImageStyle: null,
     backgroundImage: null,
     backgroundEffect: null,
