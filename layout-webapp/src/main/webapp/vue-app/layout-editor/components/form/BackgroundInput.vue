@@ -33,12 +33,39 @@
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
-        {{ $t('layout.color') }}
+        <v-radio-group
+          v-model="backgroundColorStyle"
+          class="my-auto text-no-wrap flex-grow-1 flex-shrink-0"
+          mandatory>
+          <v-radio
+            value="color"
+            class="mx-0">
+            <template #label>
+              <span class="text-font-size text-color">{{ $t('layout.color') }}</span>
+            </template>
+          </v-radio>
+          <v-radio
+            value="gradient"
+            class="mx-0">
+            <template #label>
+              <span class="text-font-size text-color">{{ $t('layout.gradient') }}</span>
+            </template>
+          </v-radio>
+        </v-radio-group>
       </v-list-item-content>
       <v-list-item-action class="my-auto me-0 ms-auto">
         <layout-editor-color-picker
+          v-if="backgroundColorStyle === 'color'"
           v-model="container.backgroundColor"
           class="my-auto" />
+        <div v-else>
+          <layout-editor-color-picker
+            v-model="backgroundGradientFrom"
+            class="my-auto" />
+          <layout-editor-color-picker
+            v-model="backgroundGradientTo"
+            class="my-auto" />
+        </div>
       </v-list-item-action>
     </v-list-item>
 
@@ -58,40 +85,74 @@
           class="my-auto" />
       </v-list-item-action>
     </v-list-item>
-    <v-radio-group
-      v-if="container.backgroundImage"
-      v-model="backgroundImageStyle"
-      class="my-auto text-no-wrap"
-      mandatory>
-      <v-radio
-        value="cover"
-        class="mx-0">
-        <template #label>
-          <span class="text-font-size text-color">{{ $t('layout.imageSizeCover') }}</span>
-        </template>
-      </v-radio>
-      <v-radio
-        value="contain"
-        class="mx-0">
-        <template #label>
-          <span class="text-font-size text-color">{{ $t('layout.imageSizeContain') }}</span>
-        </template>
-      </v-radio>
-      <v-radio
-        value="repeat"
-        class="mx-0">
-        <template #label>
-          <span class="text-font-size text-color">{{ $t('layout.imageRepeat') }}</span>
-        </template>
-      </v-radio>
-      <v-radio
-        value="no-repeat"
-        class="mx-0">
-        <template #label>
-          <span class="text-font-size text-color">{{ $t('layout.imageNoRepeat') }}</span>
-        </template>
-      </v-radio>
-    </v-radio-group>
+    <div v-if="container.backgroundImage" class="d-flex">
+      <v-radio-group
+        v-model="backgroundImageStyle"
+        class="my-auto text-no-wrap flex-grow-1 flex-shrink-0"
+        mandatory>
+        <v-radio
+          value="cover"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imageSizeCover') }}</span>
+          </template>
+        </v-radio>
+        <v-radio
+          value="contain"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imageSizeContain') }}</span>
+          </template>
+        </v-radio>
+        <v-radio
+          value="repeat"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imageRepeat') }}</span>
+          </template>
+        </v-radio>
+        <v-radio
+          value="no-repeat"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imageNoRepeat') }}</span>
+          </template>
+        </v-radio>
+      </v-radio-group>
+      <v-radio-group
+        v-model="container.backgroundPosition"
+        class="my-auto text-no-wrap flex-grow-1 flex-shrink-0"
+        mandatory>
+        <v-radio
+          value="top left"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imagePositionTopLeft') }}</span>
+          </template>
+        </v-radio>
+        <v-radio
+          value="top right"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imagePositionTopRight') }}</span>
+          </template>
+        </v-radio>
+        <v-radio
+          value="bottom left"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imagePositionBottomLeft') }}</span>
+          </template>
+        </v-radio>
+        <v-radio
+          value="bottom right"
+          class="mx-0">
+          <template #label>
+            <span class="text-font-size text-color">{{ $t('layout.imagePositionBottomRight') }}</span>
+          </template>
+        </v-radio>
+      </v-radio-group>
+    </div>
   </div>
 </template>
 <script>
@@ -100,6 +161,10 @@ export default {
     value: {
       type: Object,
       default: null,
+    },
+    defaultBackgroundColor: {
+      type: String,
+      default: () => '#FFFFFFFF',
     },
     immediateSave: {
       type: Boolean,
@@ -110,30 +175,11 @@ export default {
     container: null,
     enableBackground: false,
     backgroundImageStyle: null,
+    backgroundColorStyle: null,
+    backgroundGradientFrom: null,
+    backgroundGradientTo: null,
     initialized: false,
   }),
-  computed: {
-    cssStyle() {
-      const style = {};
-      if (this.container.backgroundColor) {
-        style['background-color'] = this.container.backgroundColor;
-      }
-      if (this.container.backgroundImage) {
-        if (this.container.backgroundEffect) {
-          style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
-        } else {
-          style['background-image'] = `url(${this.container.backgroundImage})`;
-        }
-        if (this.container.backgroundRepeat) {
-          style['background-repeat'] = this.container.backgroundRepeat;
-        }
-        if (this.container.backgroundSize) {
-          style['background-size'] = this.container.backgroundSize;
-        }
-      }
-      return style;
-    },
-  },
   watch: {
     container: {
       deep: true,
@@ -145,7 +191,7 @@ export default {
     },
     enableBackground() {
       if (this.initialized) {
-        this.container.backgroundColor = this.enableBackground && '#FFFFFFFF' || null;
+        this.container.backgroundColor = this.enableBackground && this.defaultBackgroundColor || null;
         this.container.backgroundImage = null;
         this.backgroundImageStyle = null;
       }
@@ -161,6 +207,33 @@ export default {
         }
       }
     },
+    backgroundGradientFrom() {
+      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.backgroundColorStyle === 'gradient') {
+        this.container.backgroundEffect = `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
+      } else {
+        this.container.backgroundEffect = null;
+      }
+    },
+    backgroundGradientTo() {
+      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.backgroundColorStyle === 'gradient') {
+        this.container.backgroundEffect = `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
+      } else {
+        this.container.backgroundEffect = null;
+      }
+    },
+    backgroundColorStyle() {
+      if (this.initialized) {
+        if (this.backgroundColorStyle === 'color') {
+          this.container.backgroundColor = this.backgroundColor || this.defaultBackgroundColor;
+          this.backgroundGradientFrom = null;
+          this.backgroundGradientTo = null;
+        } else if (this.backgroundColorStyle === 'gradient') {
+          this.backgroundGradientFrom = this.container.backgroundColor;
+          this.backgroundGradientTo = '#999999FF';
+          this.container.backgroundColor = '#FFFFFF00';
+        }
+      }
+    },
   },
   created() {
     this.container = this.value;
@@ -172,9 +245,17 @@ export default {
         this.backgroundImageStyle = this.container.backgroundRepeat;
       }
     }
+    if (this.container.backgroundEffect) {
+      this.backgroundColorStyle = 'gradient';
+      this.backgroundGradientFrom = this.container.backgroundEffect.replace('linear-gradient(', '').split(',')[0].trim();
+      this.backgroundGradientTo = this.container.backgroundEffect.replace('linear-gradient(', '').split(',')[1].replace(/\)$/g, '').trim();
+    } else {
+      this.backgroundColorStyle = 'color';
+    }
+
     this.enableBackground = !!this.container.backgroundColor || !!this.container.backgroundImage;
     if (this.enableBackground && !this.container.backgroundColor) {
-      this.container.backgroundColor = '#FFFFFFFF';
+      this.container.backgroundColor = this.defaultBackgroundColor;
     }
     this.$nextTick().then(() => this.initialized = true);
   },

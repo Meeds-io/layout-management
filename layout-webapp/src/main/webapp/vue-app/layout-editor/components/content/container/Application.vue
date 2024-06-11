@@ -96,13 +96,13 @@ export default {
       return this.section?.template === this.$layoutUtils.flexTemplate;
     },
     applicationTitle() {
-      return this.$root.portletInstanceCategories?.flatMap?.(c => c.applications)?.find?.(a => a?.contentId === this.container?.contentId)?.displayName || this.container?.title || '';
+      return this.$root.portletInstances?.find?.(a => a?.contentId === this.container?.contentId)?.name || this.container?.title || '';
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
     },
     applicationCategoryTitle() {
-      return this.applicationCategory?.displayName || '';
+      return this.applicationCategory?.name || '';
     },
     hoverApp() {
       return this.hoverMenu || this.hover || this.hoverGridCell;
@@ -180,41 +180,11 @@ export default {
     },
     initStyle() {
       this.cssClass = this.container.cssClass || '';
-      const style = {};
-      if (this.container.height) {
-        style['--appHeight'] = this.hasUnit(this.container.height) ? this.container.height : `${this.container.height}px`;
-        style['--appHeightScroll'] = 'auto';
-      }
-      if (this.container.width) {
-        style['--appWidth'] = this.hasUnit(this.container.width) ? this.container.width : `${this.container.width}px`;
-        style['--appWidthScroll'] = 'auto';
-      }
-      if (this.container.borderColor) {
-        style['--appBorderColor'] = this.container.borderColor;
-      }
-      if (this.container.borderSize) {
-        style['--appBorderSize'] = `${this.container.borderSize}px`;
-      }
-      if (this.container.boxShadow === 'true') {
-        style['--appBoxShadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
-      }
-      if (this.container.backgroundColor) {
-        style['background-color'] = this.container.backgroundColor;
-      }
-      if (this.container.backgroundImage) {
-        if (this.container.backgroundEffect) {
-          style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
-        } else {
-          style['background-image'] = `url(${this.container.backgroundImage})`;
-        }
-        if (this.container.backgroundRepeat) {
-          style['background-repeat'] = this.container.backgroundRepeat;
-        }
-        if (this.container.backgroundSize) {
-          style['background-size'] = this.container.backgroundSize;
-        }
-      }
-      this.cssStyle = style;
+      this.cssStyle = this.$applicationUtils.getStyle(this.container, {
+        isApplicationBackground: true,
+        isApplicationStyle: true,
+        isApplicationScroll: true,
+      });
     },
     moveEnd() {
       this.$emit('move-end');

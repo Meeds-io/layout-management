@@ -66,6 +66,7 @@ export const containerModel = {
   backgroundColor: null,
   backgroundImage: null,
   backgroundEffect: null,
+  backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
   // Used to specify whether the block should be displayed or not
@@ -106,6 +107,7 @@ export const applicationModel = {
   backgroundColor: null,
   backgroundImage: null,
   backgroundEffect: null,
+  backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
   accessPermissions: ['Everyone'],
@@ -243,6 +245,7 @@ export function applyContainerStyle(container, containerStyle) {
   Vue.set(container, 'backgroundColor', containerStyle.backgroundColor || null);
   Vue.set(container, 'backgroundImage', containerStyle.backgroundImage || null);
   Vue.set(container, 'backgroundEffect', containerStyle.backgroundEffect || null);
+  Vue.set(container, 'backgroundPosition', containerStyle.backgroundPosition || null);
   Vue.set(container, 'backgroundSize', containerStyle.backgroundSize || null);
   Vue.set(container, 'backgroundRepeat', containerStyle.backgroundRepeat || null);
 }
@@ -255,6 +258,7 @@ export function parseSections(layout) {
     }
     const compatible = parentContainer.children.every(c => c.template === gridTemplate || c.template === flexTemplate);
     if (compatible) {
+      Object.assign(parentContainer, Object.assign({...containerModel}, parentContainer));
       try {
         parentContainer.children.forEach(parseSection);
       } catch (e) {
@@ -623,6 +627,7 @@ function parseSection(section) {
     || !section.children.length) {
     return;
   }
+  Object.assign(section, Object.assign({...containerModel}, section));
   if (section.children) {
     section.children.forEach(parseCell);
   } else {

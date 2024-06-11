@@ -175,10 +175,10 @@ export default {
       return !this.isDynamicSection && this.container?.children?.[0]?.title || '';
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
     },
     applicationCategoryTitle() {
-      return this.applicationCategory?.displayName || '';
+      return this.applicationCategory?.name || '';
     },
     isSelectedCell() {
       return this.$root.isMultiSelect

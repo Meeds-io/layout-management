@@ -60,6 +60,7 @@
           v-if="parentContainer"
           ref="backgroundInput"
           v-model="parentContainer"
+          :default-background-color="defaultBackgroundColor"
           class="mt-4" />
       </v-card>
     </template>
@@ -85,6 +86,7 @@
 export default {
   data: () => ({
     pagePreview: '/layout/images/page-templates/DefaultPreview.webp',
+    defaultBackgroundColor: '#F2F2F2FF',
     parentContainer: null,
     fullWindow: false,
     drawer: false,
@@ -92,24 +94,9 @@ export default {
   }),
   computed: {
     cssStyle() {
-      const style = {};
-      if (this.parentContainer.backgroundColor) {
-        style['background-color'] = this.parentContainer.backgroundColor;
-      }
-      if (this.parentContainer.backgroundImage) {
-        if (this.parentContainer.backgroundEffect) {
-          style['background-image'] = `${this.parentContainer.backgroundEffect},url(${this.parentContainer.backgroundImage})`;
-        } else {
-          style['background-image'] = `url(${this.parentContainer.backgroundImage})`;
-        }
-        if (this.parentContainer.backgroundRepeat) {
-          style['background-repeat'] = this.parentContainer.backgroundRepeat;
-        }
-        if (this.parentContainer.backgroundSize) {
-          style['background-size'] = this.parentContainer.backgroundSize;
-        }
-      }
-      return style;
+      return this.$applicationUtils.getStyle(this.parentContainer, {
+        onlyBackgroundStyle: true,
+      });
     },
   },
   watch: {
@@ -121,15 +108,17 @@ export default {
   },
   created() {
     this.$root.$on('layout-page-properties-open', this.open);
+    if (document.body.computedStyleMap().get('--allPagesLightGrey')) {
+      this.defaultBackgroundColor = document.body.computedStyleMap().get('--allPagesLightGrey')[0] || this.defaultBackgroundColor;
+    }
   },
   beforeDestroy() {
     this.$root.$off('layout-page-properties-open', this.open);
   },
   methods: {
     open() {
-      let parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
-      parentContainer = JSON.parse(JSON.stringify(parentContainer));
-      this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, parentContainer);
+      const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
+      this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
       this.fullWindow = this.parentContainer.width === 'fullWindow';
       this.$refs.drawer.open();
     },
@@ -139,6 +128,7 @@ export default {
         this.parentContainer.width = this.fullWindow && 'fullWindow' || null;
         await this.$refs.backgroundInput.apply();
         const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
+        this.parentContainer.children = parentContainer.children;
         Object.assign(parentContainer, this.parentContainer);
         this.close();
       } finally {

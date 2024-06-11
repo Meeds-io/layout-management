@@ -125,24 +125,8 @@ export default {
       type: Number,
       default: null,
     },
-    backgroundImage: {
-      type: String,
-      default: null,
-    },
-    backgroundEffect: {
-      type: String,
-      default: null,
-    },
-    backgroundSize: {
-      type: String,
-      default: null,
-    },
-    backgroundRepeat: {
-      type: String,
-      default: null,
-    },
-    backgroundColor: {
-      type: String,
+    backgroundProperties: {
+      type: Object,
       default: null,
     },
   },
@@ -155,24 +139,9 @@ export default {
       return `d-md-grid pb-0 grid-cols-md-${this.cols} grid-rows-md-${this.rows}`;
     },
     cssStyle() {
-      const style = {};
-      if (this.backgroundColor) {
-        style['background-color'] = this.backgroundColor;
-      }
-      if (this.backgroundImage) {
-        if (this.backgroundEffect) {
-          style['background-image'] = `${this.backgroundEffect},url(${this.backgroundImage})`;
-        } else {
-          style['background-image'] = `url(${this.backgroundImage})`;
-        }
-        if (this.backgroundRepeat) {
-          style['background-repeat'] = this.backgroundRepeat;
-        }
-        if (this.backgroundSize) {
-          style['background-size'] = this.backgroundSize;
-        }
-      }
-      return style;
+      return this.backgroundProperties && this.$applicationUtils.getStyle(this.backgroundProperties, {
+        onlyBackgroundStyle: true,
+      });
     },
     length() {
       return this.rows * this.cols;

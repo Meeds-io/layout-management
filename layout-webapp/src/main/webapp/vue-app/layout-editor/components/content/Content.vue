@@ -92,8 +92,11 @@ export default {
     },
   },
   watch: {
-    layoutToEdit() {
-      this.$root.layout = this.layoutToEdit;
+    layoutToEdit: {
+      immediate: true,
+      handler() {
+        this.$root.layout = this.layoutToEdit;
+      },
     },
     loading(newVal, oldVal) {
       if (newVal - oldVal > 0) {
@@ -336,6 +339,7 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       this.addSectionVersion(section.storageId);
       parentContainer.children.splice(index, 1, section);
+      this.setLayout(this.layoutToEdit);
     },
     addSectionVersion(sectionId) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);

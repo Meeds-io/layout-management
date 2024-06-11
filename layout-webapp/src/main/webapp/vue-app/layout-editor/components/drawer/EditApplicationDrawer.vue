@@ -137,6 +137,8 @@
             <layout-editor-number-input
               v-model="borderSize"
               :step="1"
+              :min="0"
+              :max="8"
               class="me-n3" />
           </v-list-item-action>
         </v-list-item>
@@ -336,7 +338,7 @@ export default {
       return this.$root.portletInstances?.find?.(a => a?.contentId === this.applicationContentId);
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
     },
     supportedModes() {
       return this.application?.supportedModes || [];

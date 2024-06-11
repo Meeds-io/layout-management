@@ -46,7 +46,7 @@ export default {
       type: String,
       default: null,
     },
-    noBackgrounStyle: {
+    noBackgroundStyle: {
       type: Boolean,
       default: false,
     },
@@ -74,45 +74,10 @@ export default {
       return this.container.borderColor;
     },
     cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-        }
-        if (this.width === 'fullWindow') {
-          style['--allPagesSinglePageApplicationWidth'] = 'calc(100% - 40px)';
-        } else if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        if (this.container.borderSize) {
-          style['--appBorderSize'] = `${this.container.borderSize}px`;
-        }
-        if (this.container.boxShadow === 'true') {
-          style['--appBoxShadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
-        }
-        if (!this.noBackgrounStyle && (this.container.backgroundImage || this.container.backgroundColor)) {
-          if (this.container.backgroundColor) {
-            style['background-color'] = this.container.backgroundColor;
-          }
-          if (this.container.backgroundEffect) {
-            style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
-          } else {
-            style['background-image'] = `url(${this.container.backgroundImage})`;
-          }
-          if (this.container.backgroundRepeat) {
-            style['background-repeat'] = this.container.backgroundRepeat;
-          }
-          if (this.container.backgroundSize) {
-            style['background-size'] = this.container.backgroundSize;
-          }
-        }
-        return style;
-      }
+      return this.$applicationUtils.getStyle(this.container, {
+        isApplicationStyle: true,
+        noBackgroundStyle: this.noBackgroundStyle
+      });
     },
     cssClass() {
       return this.container.cssClass || '';
