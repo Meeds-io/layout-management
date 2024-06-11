@@ -33,7 +33,9 @@
     <layout-editor-toolbar-save-as-template-button
       v-if="!pageTemplateId && isAdministrator"
       class="me-3" />
-    <layout-editor-toolbar-preview-button
+    <layout-editor-toolbar-page-preview-button
+      class="me-3" />
+    <layout-editor-toolbar-mobile-preview-button
       class="me-3" />
     <layout-editor-toolbar-save-template-button
       v-if="pageTemplateId" />
