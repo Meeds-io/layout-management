@@ -31,6 +31,7 @@
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
+        :style="sectionMenuStyle"
         :class="hoverSectionMenuButton && 'z-index-two'"
         class="layout-section-border">
         <div class="position-relative full-height full-width">
@@ -97,6 +98,11 @@ export default {
     movingSection: false,
     mobileSectionColumnClass: null,
     sectionWidth: 0,
+    // FIXME can't be set using Less, YUICompressor bug
+    // which deletes spaces
+    sectionMenuStyle: {
+      width: 'calc(var(--allPagesSinglePageApplicationWidth, 1320px) + 24px)',
+    },
   }),
   computed: {
     storageId() {
@@ -112,24 +118,9 @@ export default {
       return this.container.template === this.$layoutUtils.flexTemplate;
     },
     cssStyle() {
-      const style = {};
-      if (this.container.backgroundColor) {
-        style['background-color'] = this.container.backgroundColor;
-      }
-      if (this.container.backgroundImage) {
-        if (this.container.backgroundEffect) {
-          style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
-        } else {
-          style['background-image'] = `url(${this.container.backgroundImage})`;
-        }
-        if (this.container.backgroundRepeat) {
-          style['background-repeat'] = this.container.backgroundRepeat;
-        }
-        if (this.container.backgroundSize) {
-          style['background-size'] = this.container.backgroundSize;
-        }
-      }
-      return style;
+      return this.$applicationUtils.getStyle(this.container, {
+        onlyBackgroundStyle: true,
+      });
     },
     mobileInColumns() {
       return this.isDynamicSection

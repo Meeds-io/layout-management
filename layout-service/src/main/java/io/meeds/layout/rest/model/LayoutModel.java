@@ -93,6 +93,8 @@ public class LayoutModel {
 
   private String                            backgroundEffect;
 
+  private String                            backgroundPosition;
+
   private String                            backgroundSize;
 
   private String                            backgroundRepeat;
@@ -150,6 +152,7 @@ public class LayoutModel {
       this.backgroundColor = cssStyle.getBackgroundColor();
       this.backgroundImage = cssStyle.getBackgroundImage();
       this.backgroundEffect = cssStyle.getBackgroundEffect();
+      this.backgroundPosition = cssStyle.getBackgroundPosition();
       this.backgroundSize = cssStyle.getBackgroundSize();
       this.backgroundRepeat = cssStyle.getBackgroundRepeat();
     }
@@ -231,8 +234,7 @@ public class LayoutModel {
     boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
                        || StringUtils.isNotBlank(layoutModel.getBoxShadow())
                        || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundEffect());
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage());
     if (hasStyle) {
       cssStyle = new ModelStyle();
       cssStyle.setBorderColor(layoutModel.getBorderColor());
@@ -241,6 +243,7 @@ public class LayoutModel {
       cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
       cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
       cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
+      cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
       cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
       cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
     }

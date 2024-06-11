@@ -43,24 +43,9 @@ export default {
   },
   computed: {
     cssStyle() {
-      const style = {};
-      if (this.container.backgroundColor) {
-        style['background-color'] = this.container.backgroundColor;
-      }
-      if (this.container.backgroundImage) {
-        if (this.container.backgroundEffect) {
-          style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
-        } else {
-          style['background-image'] = `url(${this.container.backgroundImage})`;
-        }
-        if (this.container.backgroundRepeat) {
-          style['background-repeat'] = this.container.backgroundRepeat;
-        }
-        if (this.container.backgroundSize) {
-          style['background-size'] = this.container.backgroundSize;
-        }
-      }
-      return style;
+      return this.$applicationUtils.getStyle(this.container, {
+        onlyBackgroundStyle: true,
+      });
     },
   },
 };

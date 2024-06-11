@@ -70,7 +70,7 @@ public class PageLayoutService {
 
   public static final String      EMPTY_PAGE_TEMPLATE             = "empty";
 
-  private static final Pattern    GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_]+");
+  private static final Pattern    GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_ ]+");
 
   private static final String     PAGE_NOT_EXISTS_MESSAGE         = "Page with key %s doesn't exist";
 
@@ -397,6 +397,7 @@ public class PageLayoutService {
                   cssStyle == null ? null : cssStyle.getBackgroundColor(),
                   cssStyle == null ? null : cssStyle.getBackgroundImage(),
                   cssStyle == null ? null : cssStyle.getBackgroundEffect(),
+                  cssStyle == null ? null : cssStyle.getBackgroundPosition(),
                   cssStyle == null ? null : cssStyle.getBackgroundSize(),
                   cssStyle == null ? null : cssStyle.getBackgroundRepeat())
           .forEach(this::validateCSSStyleValue);

@@ -34,20 +34,13 @@
           v-if="sectionType === $layoutUtils.gridTemplate"
           :rows-count="section.rowsCount"
           :cols-count="section.colsCount"
-          :background-image="section.backgroundImage"
-          :background-size="section.backgroundSize"
-          :background-repeat="section.backgroundRepeat"
-          :background-color="section.backgroundColor"
+          :background-properties="section"
           @rows-updated="rows = $event"
           @cols-updated="cols = $event" />
         <layout-editor-section-flex-editor
           v-else-if="sectionType === $layoutUtils.flexTemplate"
           :cols-count="cols"
-          :background-image="section.backgroundImage"
-          :background-size="section.backgroundSize"
-          :background-repeat="section.backgroundRepeat"
-          :background-effect="section.backgroundEffect"
-          :background-color="section.backgroundColor"
+          :background-properties="section"
           @cols-updated="cols = $event" />
         <layout-editor-background-input
           v-if="section"
@@ -212,7 +205,8 @@ export default {
   },
   methods: {
     open(section, index, length) {
-      this.section = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(section)));
+      this.section = JSON.parse(JSON.stringify(section));
+      this.section.children = section.children;
       this.stickyApplication = this.section.cssClass?.includes?.('layout-sticky-application');
       this.mobileInColumns = this.section.cssClass?.includes?.('layout-mobile-columns');
       this.optionsModified = false;
@@ -235,7 +229,7 @@ export default {
     async apply() {
       await this.$refs.backgroundInput.apply();
       const section = JSON.parse(JSON.stringify(this.section));
-      Object.assign(section, this.section);
+      section.children = this.section.children;
       if (section.template === this.$layoutUtils.flexTemplate && this.section.children.length !== this.cols) {
         this.$layoutUtils.editDynamicSection(section, this.cols);
       } else if (section.template === this.$layoutUtils.gridTemplate) {
