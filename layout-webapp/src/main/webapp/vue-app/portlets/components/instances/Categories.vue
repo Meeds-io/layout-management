@@ -22,6 +22,7 @@
   <v-list
     :loading="loading"
     :role="null"
+    class="app-background-color"
     min-width="225"
     nav
     dense>

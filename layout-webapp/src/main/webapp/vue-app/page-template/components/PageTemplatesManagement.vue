@@ -20,7 +20,7 @@
 -->
 <template>
   <v-app>
-    <v-card class="card-border-radius overflow-hidden position-static pb-5" flat>
+    <v-card class="card-border-radius app-background-color overflow-hidden position-static pb-5" flat>
       <h4 class="title font-weight-bold px-5 pt-5 ma-0">
         {{ $t('pageTemplates.title') }}
       </h4>
