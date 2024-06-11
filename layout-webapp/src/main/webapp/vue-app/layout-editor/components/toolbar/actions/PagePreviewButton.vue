@@ -55,7 +55,7 @@ export default {
       this.$root.$emit('layout-save-draft');
     },
     openPreviewPage() {
-      this.$root.$off('layout-save-draft', this.openPreviewPage);
+      this.$root.$off('layout-draft-saved', this.openPreviewPage);
       this.saving = false;
       window.open(this.draftPageUrl, '_blank');
     },

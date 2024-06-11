@@ -56,78 +56,11 @@
             v-model="fullWindow"
             class="ms-auto my-auto me-n2" />
         </div>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.background') }}
-          </div>
-          <v-switch
-            v-model="enableBackground"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <v-list-item
-          v-if="enableBackground"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.color') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-color-picker
-              v-model="backgroundColor"
-              class="my-auto" />
-          </v-list-item-action>
-        </v-list-item>
-
-        <v-list-item
-          v-if="enableBackground"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.image') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-background-image-attachment
-              v-model="backgroundImage"
-              ref="backgroundImage"
-              :storage-id="`${$root.pageId}_${parentContainer.storageId}`"
-              class="my-auto"
-              @image-data="backgroundImage = $event" />
-          </v-list-item-action>
-        </v-list-item>
-        <v-radio-group
-          v-if="backgroundImage"
-          v-model="backgroundImageStyle"
-          class="my-auto text-no-wrap"
-          mandatory>
-          <v-radio
-            value="cover"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageSizeCover') }}</span>
-            </template>
-          </v-radio>
-          <v-radio
-            value="contain"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageSizeContain') }}</span>
-            </template>
-          </v-radio>
-          <v-radio
-            value="repeat"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageRepeat') }}</span>
-            </template>
-          </v-radio>
-          <v-radio
-            value="no-repeat"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageNoRepeat') }}</span>
-            </template>
-          </v-radio>
-        </v-radio-group>
+        <layout-editor-background-input
+          v-if="parentContainer"
+          ref="backgroundInput"
+          v-model="parentContainer"
+          class="mt-4" />
       </v-card>
     </template>
     <template #footer>
@@ -154,71 +87,33 @@ export default {
     pagePreview: '/layout/images/page-templates/DefaultPreview.webp',
     parentContainer: null,
     fullWindow: false,
-    enableBackground: false,
-    backgroundColor: '#FFFFFFFF',
-    backgroundImageStyle: null,
-    backgroundImage: null,
-    backgroundEffect: null,
-    backgroundRepeat: null,
-    backgroundSize: null,
     drawer: false,
     saving: false,
   }),
   computed: {
-
     cssStyle() {
       const style = {};
-      if (this.backgroundColor) {
-        style['background-color'] = this.backgroundColor;
+      if (this.parentContainer.backgroundColor) {
+        style['background-color'] = this.parentContainer.backgroundColor;
       }
-      if (this.backgroundImage) {
-        if (this.backgroundEffect) {
-          style['background-image'] = `${this.backgroundEffect},url(${this.backgroundImage})`;
+      if (this.parentContainer.backgroundImage) {
+        if (this.parentContainer.backgroundEffect) {
+          style['background-image'] = `${this.parentContainer.backgroundEffect},url(${this.parentContainer.backgroundImage})`;
         } else {
-          style['background-image'] = `url(${this.backgroundImage})`;
+          style['background-image'] = `url(${this.parentContainer.backgroundImage})`;
         }
-        if (this.backgroundRepeat) {
-          style['background-repeat'] = this.backgroundRepeat;
+        if (this.parentContainer.backgroundRepeat) {
+          style['background-repeat'] = this.parentContainer.backgroundRepeat;
         }
-        if (this.backgroundSize) {
-          style['background-size'] = this.backgroundSize;
+        if (this.parentContainer.backgroundSize) {
+          style['background-size'] = this.parentContainer.backgroundSize;
         }
       }
       return style;
     },
   },
   watch: {
-    enableBackground() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        this.backgroundColor = this.enableBackground && '#FFFFFFFF' || null;
-        this.backgroundImageStyle = null;
-        this.backgroundImage = null;
-      }
-    },
-    backgroundColor() {
-      if (this.drawer) {
-        this.optionsModified = true;
-      }
-    },
-    backgroundImage() {
-      if (this.drawer) {
-        this.optionsModified = true;
-      }
-    },
-    backgroundImageStyle() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        if (this.backgroundImageStyle === 'cover' || this.backgroundImageStyle === 'contain') {
-          this.backgroundSize = this.backgroundImageStyle;
-          this.backgroundRepeat = null;
-        } else {
-          this.backgroundSize = null;
-          this.backgroundRepeat = this.backgroundImageStyle;
-        }
-      }
-    },
-    backgroundEffect() {
+    parentContainer() {
       if (this.drawer) {
         this.optionsModified = true;
       }
@@ -232,47 +127,19 @@ export default {
   },
   methods: {
     open() {
-      this.parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
+      let parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
+      parentContainer = JSON.parse(JSON.stringify(parentContainer));
+      this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, parentContainer);
       this.fullWindow = this.parentContainer.width === 'fullWindow';
-      this.backgroundColor = this.parentContainer.backgroundColor;
-      this.backgroundImage = this.parentContainer.backgroundImage;
-      this.backgroundEffect = this.parentContainer.backgroundEffect;
-      this.backgroundSize = null;
-      this.backgroundRepeat = null;
-      if (this.parentContainer.backgroundSize || this.parentContainer.backgroundRepeat) {
-        if (this.parentContainer.backgroundSize === 'cover'
-            || this.parentContainer.backgroundSize === 'contain') {
-          this.backgroundImageStyle = this.parentContainer.backgroundSize;
-          this.backgroundSize = this.parentContainer.backgroundSize;
-          this.backgroundRepeat = null;
-        } else {
-          this.backgroundImageStyle = this.parentContainer.backgroundRepeat;
-          this.backgroundRepeat = this.parentContainer.backgroundRepeat;
-          this.backgroundSize = null;
-        }
-      }
-      this.enableBackground = !!this.backgroundColor || !!this.backgroundImage;
-      if (this.enableBackground && !this.backgroundColor) {
-        this.backgroundColor = '#FFFFFFFF';
-      }
-      this.$nextTick().then(() => this.$refs.drawer.open());
+      this.$refs.drawer.open();
     },
     async apply() {
       this.saving = true;
       try {
-        if (this.enableBackground && this.$refs.backgroundImage) {
-          const backgroundImage = await this.$refs.backgroundImage.save();
-          if (backgroundImage) {
-            this.parentContainer.backgroundImage = backgroundImage;
-          }
-        } else {
-          this.parentContainer.backgroundImage = null;
-        }
         this.parentContainer.width = this.fullWindow && 'fullWindow' || null;
-        this.parentContainer.backgroundColor = this.enableBackground && this.backgroundColor || null;
-        this.parentContainer.backgroundEffect = this.enableBackground && this.backgroundEffect || null;
-        this.parentContainer.backgroundSize = this.enableBackground && this.backgroundSize || null;
-        this.parentContainer.backgroundRepeat = this.enableBackground && this.backgroundRepeat || null;
+        await this.$refs.backgroundInput.apply();
+        const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
+        Object.assign(parentContainer, this.parentContainer);
         this.close();
       } finally {
         this.saving = false;
