@@ -54,6 +54,7 @@
       :class="`${mobileInColumns && mobileSectionColumnClass || ''}`"
       class="position-relative overflow-initial layout-section-content"
       type="section"
+      no-background-style
       @hovered="hoverSection = $event && !drawerOpened">
       <template v-if="$root.movingParentId === storageId && (!isDynamicSection || $root.moveType === 'resize')" #footer>
         <layout-editor-section-selection-grid
