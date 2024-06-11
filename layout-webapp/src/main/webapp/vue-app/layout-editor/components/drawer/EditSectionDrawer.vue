@@ -34,101 +34,26 @@
           v-if="sectionType === $layoutUtils.gridTemplate"
           :rows-count="section.rowsCount"
           :cols-count="section.colsCount"
-          :background-image="backgroundImage"
-          :background-size="backgroundSize"
-          :background-repeat="backgroundRepeat"
-          :background-color="backgroundColor"
+          :background-image="section.backgroundImage"
+          :background-size="section.backgroundSize"
+          :background-repeat="section.backgroundRepeat"
+          :background-color="section.backgroundColor"
           @rows-updated="rows = $event"
           @cols-updated="cols = $event" />
         <layout-editor-section-flex-editor
           v-else-if="sectionType === $layoutUtils.flexTemplate"
           :cols-count="cols"
-          :background-image="backgroundImage"
-          :background-size="backgroundSize"
-          :background-repeat="backgroundRepeat"
-          :background-effect="backgroundEffect"
-          :background-color="backgroundColor"
+          :background-image="section.backgroundImage"
+          :background-size="section.backgroundSize"
+          :background-repeat="section.backgroundRepeat"
+          :background-effect="section.backgroundEffect"
+          :background-color="section.backgroundColor"
           @cols-updated="cols = $event" />
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.backgroundColor') }}
-          </div>
-          <v-switch
-            v-model="enableBackgroundColor"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <v-list-item
-          v-if="enableBackgroundColor"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.color') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-color-picker
-              v-model="backgroundColor"
-              class="my-auto" />
-          </v-list-item-action>
-        </v-list-item>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.backgroundImage') }}
-          </div>
-          <v-switch
-            v-model="enableBackgroundImage"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <v-list-item
-          v-if="enableBackgroundImage"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.image') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-background-image-attachment
-              v-if="section"
-              v-model="backgroundImage"
-              ref="backgroundImage"
-              :storage-id="`${$root.pageId}_${section.storageId}`"
-              class="my-auto"
-              @image-data="backgroundImage = $event" />
-          </v-list-item-action>
-        </v-list-item>
-        <v-radio-group
-          v-if="backgroundImage"
-          v-model="backgroundImageStyle"
-          class="my-auto text-no-wrap"
-          mandatory>
-          <v-radio
-            value="cover"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageSizeCover') }}</span>
-            </template>
-          </v-radio>
-          <v-radio
-            value="contain"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageSizeContain') }}</span>
-            </template>
-          </v-radio>
-          <v-radio
-            value="repeat"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageRepeat') }}</span>
-            </template>
-          </v-radio>
-          <v-radio
-            value="no-repeat"
-            class="mx-0">
-            <template #label>
-              <span class="text-font-size text-color">{{ $t('layout.imageNoRepeat') }}</span>
-            </template>
-          </v-radio>
-        </v-radio-group>
+        <layout-editor-background-input
+          v-if="section"
+          ref="backgroundInput"
+          v-model="section"
+          class="mt-4" />
         <template v-if="isDynamicSection">
           <div class="d-flex align-center mt-4">
             <div class="subtitle-1 font-weight-bold me-auto mb-2">
@@ -250,6 +175,14 @@ export default {
     },
   },
   watch: {
+    section: {
+      deep: true,
+      handler() {
+        if (this.drawer) {
+          this.optionsModified = true;
+        }
+      }
+    },
     stickyApplication() {
       if (this.drawer) {
         if (!this.section.cssClass) {
@@ -276,86 +209,12 @@ export default {
         this.optionsModified = true;
       }
     },
-    enableBackgroundColor(val) {
-      if (val) {
-        if (!this.backgroundColor) {
-          this.backgroundColor = '#FFFFFFFF';
-        }
-      } else {
-        this.backgroundColor = null;
-      }
-    },
-    enableBackgroundImage() {
-      if (this.drawer) {
-        this.backgroundImage = null;
-        this.backgroundImageStyle = 'cover';
-      }
-    },
-    backgroundColor() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        this.section.backgroundColor = this.backgroundColor;
-      }
-    },
-    backgroundImage() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        this.section.backgroundImage = this.backgroundImage;
-      }
-    },
-    backgroundImageStyle() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        if (this.backgroundImageStyle === 'cover' || this.backgroundImageStyle === 'contain') {
-          this.backgroundSize = this.backgroundImageStyle;
-          this.backgroundRepeat = null;
-        } else {
-          this.backgroundSize = null;
-          this.backgroundRepeat = this.backgroundImageStyle;
-        }
-      }
-    },
-    backgroundEffect() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        this.section.backgroundEffect = this.backgroundEffect;
-      }
-    },
-    backgroundRepeat() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        this.section.backgroundRepeat = this.backgroundRepeat;
-      }
-    },
-    backgroundSize() {
-      if (this.drawer) {
-        this.optionsModified = true;
-        this.section.backgroundSize = this.backgroundSize;
-      }
-    },
   },
   methods: {
     open(section, index, length) {
-      this.section = JSON.parse(JSON.stringify(section));
+      this.section = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(section)));
       this.stickyApplication = this.section.cssClass?.includes?.('layout-sticky-application');
       this.mobileInColumns = this.section.cssClass?.includes?.('layout-mobile-columns');
-      this.enableBackgroundColor = !!this.section.backgroundColor;
-      this.enableBackgroundImage = !!this.section.backgroundImage;
-      this.backgroundColor = this.section.backgroundColor || '#FFFFFFFF';
-      this.backgroundImage = this.section.backgroundImage;
-      this.backgroundEffect = this.section.backgroundEffect;
-      if (this.section.backgroundSize || this.section.backgroundRepeat) {
-        if (this.section.backgroundSize === 'cover'
-            || this.section.backgroundSize === 'contain') {
-          this.backgroundImageStyle = this.section.backgroundSize;
-          this.backgroundSize = this.section.backgroundSize;
-          this.backgroundRepeat = null;
-        } else {
-          this.backgroundImageStyle = this.section.backgroundRepeat;
-          this.backgroundRepeat = this.section.backgroundRepeat;
-          this.backgroundSize = null;
-        }
-      }
       this.optionsModified = false;
       this.originalSection = JSON.parse(JSON.stringify(section));
       this.index = index;
@@ -374,15 +233,9 @@ export default {
       this.$root.$emit('layout-remove-section', this.index);
     },
     async apply() {
-      if (this.$refs.backgroundImage) {
-        const backgroundImage = await this.$refs.backgroundImage.save();
-        if (backgroundImage) {
-          this.section.backgroundImage = backgroundImage;
-        }
-      } else {
-        this.section.backgroundImage = null;
-      }
+      await this.$refs.backgroundInput.apply();
       const section = JSON.parse(JSON.stringify(this.section));
+      Object.assign(section, this.section);
       if (section.template === this.$layoutUtils.flexTemplate && this.section.children.length !== this.cols) {
         this.$layoutUtils.editDynamicSection(section, this.cols);
       } else if (section.template === this.$layoutUtils.gridTemplate) {

@@ -151,35 +151,12 @@
             <v-checkbox v-model="boxShadow" />
           </v-list-item-action>
         </v-list-item>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.backgroundColor') }}
-          </div>
-          <v-switch
-            v-model="enableBackgroundColor"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <v-list-item
-          v-if="enableBackgroundColor"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.color') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-color-picker
-              v-model="backgroundColor"
-              class="my-auto" />
-          </v-list-item-action>
-        </v-list-item>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.borderRadius') }}
-          </div>
-          <v-switch
-            v-model="enableBorderRadius"
-            class="ms-auto my-auto me-n2" />
-        </div>
+        <layout-editor-background-input
+          v-if="backgroundProperties"
+          ref="backgroundInput"
+          v-model="backgroundProperties"
+          immediate-save
+          class="mt-4" />
         <div
           v-if="enableBorderRadius"
           :class="radiusChoice === 'same' && 'flex-row' || 'flex-column'"
@@ -329,6 +306,7 @@ export default {
     hiddenOnMobile: false,
     section: null,
     container: null,
+    backgroundProperties: null,
     marginChoice: 'same',
     marginTop: 20,
     marginRight: 20,
@@ -341,13 +319,9 @@ export default {
     radiusBottomRight: null,
     radiusBottomLeft: null,
     enableBorderColor: true,
-    enableBackgroundColor: true,
     borderColor: '#FFFFFF',
     borderSize: 1,
     boxShadow: false,
-    backgroundColor: '#FFFFFFFF',
-    backgroundImage: null,
-    backgroundEffect: null,
     applicationCategoryTitle: null,
     applicationTitle: null,
   }),
@@ -417,9 +391,7 @@ export default {
         borderColor: this.borderColor,
         borderSize: this.borderSize || 0,
         boxShadow: this.boxShadow && 'true' || null,
-        backgroundColor: this.backgroundColor,
-        backgroundImage: this.backgroundImage,
-        backgroundEffect: this.backgroundEffect,
+        ...this.backgroundProperties,
         hiddenOnMobile: this.hiddenOnMobile,
       } || null;
     },
@@ -449,15 +421,6 @@ export default {
         this.boxShadow = null;
         this.borderColor = null;
         this.borderSize = 1;
-      }
-    },
-    enableBackgroundColor(val) {
-      if (val) {
-        if (!this.backgroundColor) {
-          this.backgroundColor = '#FFFFFFFF';
-        }
-      } else {
-        this.backgroundColor = null;
       }
     },
     enableBorderRadius(val) {
@@ -544,11 +507,14 @@ export default {
       this.boxShadow = this.container.boxShadow === 'true';
       this.enableBorderColor = !!this.borderColor;
 
-      this.backgroundColor = this.container.backgroundColor;
-      this.enableBackgroundColor = !!this.backgroundColor;
-
-      this.backgroundImage = this.container.backgroundImage;
-      this.backgroundEffect = this.container.backgroundEffect;
+      this.backgroundProperties = {
+        storageId: this.container.storageId,
+        backgroundColor: this.container.backgroundColor || null,
+        backgroundImage: this.container.backgroundImage || null,
+        backgroundEffect: this.container.backgroundEffect || null,
+        backgroundRepeat: this.container.backgroundRepeat || null,
+        backgroundSize: this.container.backgroundSize || null,
+      };
 
       this.marginChoice = this.marginTop === this.marginRight
         && this.marginRight === this.marginLeft

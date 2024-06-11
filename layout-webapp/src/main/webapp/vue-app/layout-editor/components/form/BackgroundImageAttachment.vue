@@ -30,8 +30,19 @@
           <div
             v-on="on"
             v-bind="attrs">
+            <v-btn
+              v-if="value"
+              id="deleteImageFileInput"
+              :aria-label="$t('layout.deleteBackgroundImageTitle')"
+              icon
+              dense
+              @click="reset">
+              <v-icon color="error" dense>fa-trash</v-icon>
+            </v-btn>
             <v-file-input
+              v-else
               id="imageFileInput"
+              :loading="sendingImage"
               ref="uploadInput"
               accept="image/*"
               prepend-icon="fas fa-camera z-index-two rounded-circle primary-border-color white py-1 ms-3"
@@ -42,7 +53,7 @@
               @change="uploadFile" />
           </div>
         </template>
-        <span>{{ $t('layout.uploadBackgroundImageTitle') }}</span>
+        <span>{{ value && $t('layout.deleteBackgroundImageTitle') || $t('layout.uploadBackgroundImageTitle') }}</span>
       </v-tooltip>
     </div>
   </div>
@@ -50,11 +61,15 @@
 <script>
 export default {
   props: {
-    storageId: {
-      type: Number,
+    value: {
+      type: String,
       default: null,
     },
-    duplicate: {
+    storageId: {
+      type: String,
+      default: null,
+    },
+    immediateSave: {
       type: Boolean,
       default: false,
     },
@@ -63,7 +78,6 @@ export default {
     changed: false,
     sendingImage: false,
     uploadId: null,
-    imageData: null,
     attachments: null,
   }),
   computed: {
@@ -71,15 +85,12 @@ export default {
       return this.attachments?.[0]?.id;
     },
     remoteIllustrationSrc() {
-      return `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/containerBackground/${this.storageId}/${this.illustrationId}`;
+      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/containerBackground/${this.storageId}/${this.illustrationId}` || null;
     },
   },
   watch: {
     sendingImage() {
       this.$emit('sending', this.sendingImage);
-    },
-    imageData() {
-      this.$emit('image-data', this.imageData);
     },
   },
   methods: {
@@ -95,8 +106,12 @@ export default {
           .then(uploadId => {
             const reader = new FileReader();
             reader.onload = (e) => {
-              thiss.imageData = e.target.result;
-              thiss.$forceUpdate();
+              if (thiss.immediateSave) {
+                thiss.save();
+              } else {
+                thiss.$emit('input', e.target.result);
+                thiss.$forceUpdate();
+              }
             };
             reader.readAsDataURL(file);
             this.uploadId = uploadId;
@@ -107,12 +122,17 @@ export default {
           .finally(() => this.sendingImage = false);
       }
     },
+    reset() {
+      this.uploadId = null;
+      this.$emit('input', null);
+      this.changed = true;
+    },
     save() {
       if (this.changed) {
         return this.$fileAttachmentService.saveAttachments({
           objectType: 'containerBackground',
           objectId: this.storageId,
-          uploadedFiles: [{uploadId: this.uploadId}],
+          uploadedFiles: this.uploadId && [{uploadId: this.uploadId}] || [],
           attachedFiles: [],
         }).then((report) => {
           if (report?.errorByUploadId?.length) {
@@ -123,6 +143,9 @@ export default {
               .then(() => {
                 if (this.$refs.uploadInput) {
                   this.$refs.uploadInput.reset();
+                }
+                if (this.immediateSave) {
+                  this.$emit('input', this.remoteIllustrationSrc);
                 }
                 return this.remoteIllustrationSrc;
               });

@@ -65,12 +65,7 @@ export default {
     applicationInstalled: false,
     installing: false,
     section: null,
-    height: null,
-    width: null,
-    borderColor: null,
-    borderSize: null,
-    boxShadow: null,
-    backgroundColor: null,
+    cssStyle: null,
     cssClass: null,
     hover: false,
     hoverMenu: false,
@@ -96,30 +91,6 @@ export default {
     },
     id() {
       return `UIPortlet-${this.container?.id || this.storageId || parseInt(Math.random() * 10000)}`;
-    },
-    cssStyle() {
-      const style = {};
-      if (this.height) {
-        style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-        style['--appHeightScroll'] = 'auto';
-      }
-      if (this.width) {
-        style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-        style['--appWidthScroll'] = 'auto';
-      }
-      if (this.borderColor) {
-        style['--appBorderColor'] = this.borderColor;
-      }
-      if (this.borderSize) {
-        style['--appBorderSize'] = `${this.borderSize}px`;
-      }
-      if (this.boxShadow === 'true') {
-        style['--appBoxShadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
-      }
-      if (this.backgroundColor) {
-        style['background-color'] = this.backgroundColor;
-      }
-      return style;
     },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
@@ -208,13 +179,42 @@ export default {
       }
     },
     initStyle() {
-      this.height = this.container.height;
-      this.width = this.container.width;
-      this.borderColor = this.container.borderColor;
-      this.borderSize = this.container.borderSize || 0;
-      this.boxShadow = this.container.boxShadow;
-      this.backgroundColor = this.container.backgroundColor;
       this.cssClass = this.container.cssClass || '';
+      const style = {};
+      if (this.container.height) {
+        style['--appHeight'] = this.hasUnit(this.container.height) ? this.container.height : `${this.container.height}px`;
+        style['--appHeightScroll'] = 'auto';
+      }
+      if (this.container.width) {
+        style['--appWidth'] = this.hasUnit(this.container.width) ? this.container.width : `${this.container.width}px`;
+        style['--appWidthScroll'] = 'auto';
+      }
+      if (this.container.borderColor) {
+        style['--appBorderColor'] = this.container.borderColor;
+      }
+      if (this.container.borderSize) {
+        style['--appBorderSize'] = `${this.container.borderSize}px`;
+      }
+      if (this.container.boxShadow === 'true') {
+        style['--appBoxShadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
+      }
+      if (this.container.backgroundColor) {
+        style['background-color'] = this.container.backgroundColor;
+      }
+      if (this.container.backgroundImage) {
+        if (this.container.backgroundEffect) {
+          style['background-image'] = `${this.container.backgroundEffect},url(${this.container.backgroundImage})`;
+        } else {
+          style['background-image'] = `url(${this.container.backgroundImage})`;
+        }
+        if (this.container.backgroundRepeat) {
+          style['background-repeat'] = this.container.backgroundRepeat;
+        }
+        if (this.container.backgroundSize) {
+          style['background-size'] = this.container.backgroundSize;
+        }
+      }
+      this.cssStyle = style;
     },
     moveEnd() {
       this.$emit('move-end');
