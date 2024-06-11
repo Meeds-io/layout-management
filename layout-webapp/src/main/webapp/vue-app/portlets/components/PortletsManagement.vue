@@ -21,13 +21,13 @@
 <template>
   <v-app>
     <v-card
-      :class="tabName === 'portlets' && 'card-border-radius overflow-hidden' || 'transparent'"
+      :class="tabName === 'portlets' && 'card-border-radius app-background-color overflow-hidden' || 'transparent'"
       class="position-static pb-5"
       flat>
       <portlets-toolbar
         ref="toolbar"
         :tab-name="tabName"
-        class="card-border-radius overflow-hidden"
+        class="card-border-radius app-background-color overflow-hidden"
         @portlet-instance-filter="keyword = $event"
         @select-tab="selectTab" />
       <portlets-instance-main
