@@ -135,6 +135,7 @@ export default {
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
+    this.$root.$on('layout-save-draft', this.saveDraft);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   mounted() {
@@ -383,7 +384,10 @@ export default {
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
         .then(layout => this.setLayout(layout))
-        .finally(() => window.setTimeout(() => this.loading--, 200));
+        .finally(() => {
+          window.setTimeout(() => this.loading--, 200);
+          this.$root.$emit('layout-draft-saved');
+        });
     },
   },
 };

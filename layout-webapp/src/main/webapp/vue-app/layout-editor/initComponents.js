@@ -24,7 +24,8 @@ import SaveButton from './components/toolbar/actions/SaveButton.vue';
 import SaveAsTemplateButton from './components/toolbar/actions/SaveAsTemplateButton.vue';
 import SaveTemplateButton from './components/toolbar/actions/SaveTemplateButton.vue';
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
-import PreviewButton from './components/toolbar/actions/PreviewButton.vue';
+import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButton.vue';
+import PagePreviewButton from './components/toolbar/actions/PagePreviewButton.vue';
 
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
 import NumberInput from './components/form/NumberInput.vue';
@@ -68,7 +69,8 @@ const components = {
   'layout-editor-toolbar-save-as-template-button': SaveAsTemplateButton,
   'layout-editor-toolbar-save-template-button': SaveTemplateButton,
   'layout-editor-toolbar-history-buttons': HistoryButtons,
-  'layout-editor-toolbar-preview-button': PreviewButton,
+  'layout-editor-toolbar-page-preview-button': PagePreviewButton,
+  'layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'layout-editor-content': Content,
   'layout-editor-color-picker': ColorPicker,
   'layout-editor-border-radius-selector': BorderRadiusSelector,
