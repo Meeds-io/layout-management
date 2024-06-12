@@ -53,7 +53,9 @@
           </v-radio>
         </v-radio-group>
       </v-list-item-content>
-      <v-list-item-action class="my-auto me-0 ms-auto">
+      <v-list-item-action
+        :class="backgroundColorStyle === 'color' && 'mb-auto' || 'my-auto'"
+        class="me-0 ms-auto">
         <layout-editor-color-picker
           v-if="backgroundColorStyle === 'color'"
           v-model="container.backgroundColor"
@@ -61,9 +63,11 @@
         <div v-else>
           <layout-editor-color-picker
             v-model="backgroundGradientFrom"
+            :label="$t('layout.gradientFrom')"
             class="my-auto" />
           <layout-editor-color-picker
             v-model="backgroundGradientTo"
+            :label="$t('layout.gradientTo')"
             class="my-auto" />
         </div>
       </v-list-item-action>
