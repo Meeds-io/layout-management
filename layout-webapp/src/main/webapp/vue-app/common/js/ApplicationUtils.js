@@ -35,6 +35,8 @@ export function getStyle(container, options) {
   
     if (container.width === 'fullWindow') {
       style['--allPagesSinglePageApplicationWidth'] = 'calc(100% - 40px)';
+      style['--allPagesSinglePageApplicationPadding'] = '0';
+      style['--allPagesSinglePageApplicationMargin'] = '0 20px';
     } else if (container.width) {
       style[options.isApplicationStyle && '--appWidth' || 'width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
       if (options.isApplicationScroll) {

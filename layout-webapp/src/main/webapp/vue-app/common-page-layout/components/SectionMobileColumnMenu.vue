@@ -19,7 +19,7 @@
 
 -->
 <template>
-  <div class="absolute-full-size mx-n5">
+  <div class="absolute-full-size">
     <div class="position-relative full-width full-height d-flex flex-column">
       <div class="position-sticky t-0 mb-auto"></div>
       <div class="position-sticky t-quarter b-quarter z-index-floating-button d-flex align-center">
@@ -49,6 +49,10 @@
 <script>
 export default {
   props: {
+    value: {
+      type: String,
+      default: null,
+    },
     container: {
       type: Object,
       default: null,

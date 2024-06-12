@@ -69,6 +69,7 @@ export function init() {
           pageRef: null,
           pageTemplate: null,
           pageTemplateId: null,
+          pageFullWindow: false,
           draftPageRef: null,
           draftNode: null,
           draftNodeId: null,
@@ -146,6 +147,7 @@ export function init() {
             if (!oldVal) {
               window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
             }
+            this.pageFullWindow = this.$layoutUtils.getParentContainer(newVal)?.width === 'fullWindow';
           },
         },
         created() {
