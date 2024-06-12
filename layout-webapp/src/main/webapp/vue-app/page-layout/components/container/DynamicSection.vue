@@ -19,7 +19,8 @@
 
 -->
 <template>
-  <div 
+  <div
+    :class="isMobileColumns && 'layout-section-mobile-pages' || ''"
     :style="cssStyle"
     class="layout-section">
     <layout-section-mobile-column-menu-drawer

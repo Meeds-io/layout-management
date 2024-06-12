@@ -48,38 +48,49 @@
         <div class="position-sticky t-20 b-20 z-index-one d-flex align-center mx-n5">
           <div
             v-if="displayMoveButton"
-            class="position-absolute l-0">
+            :style="leftButtonStyle"
+            class="position-absolute">
             <v-tooltip :disabled="moving" bottom>
               <template #activator="{on, attrs}">
-                <v-btn
+                <div
                   v-on="on"
-                  v-bind="attrs"
-                  height="32"
-                  width="32"
-                  class="draggable"
-                  icon
-                  @mousedown="$emit('move-start')"
-                  @mouseup="$emit('move-end')"
-                  @mouseout="$emit('move-end')"
-                  @focusout="$emit('move-end')">
-                  <v-icon size="24">fa-arrows-alt</v-icon>
-                </v-btn>
+                  v-bind="attrs">
+                  <v-hover v-model="hoverButton">
+                    <v-btn
+                      height="32"
+                      width="32"
+                      class="draggable"
+                      icon
+                      @mousedown="$emit('move-start')"
+                      @mouseup="$emit('move-end')"
+                      @mouseout="$emit('move-end')"
+                      @focusout="$emit('move-end')">
+                      <v-icon size="24">fa-arrows-alt</v-icon>
+                    </v-btn>
+                  </v-hover>
+                </div>
               </template>
               {{ $t('layout.moveSection') }}
             </v-tooltip>
           </div>
-          <div class="position-absolute r-0">
+          <div
+            :style="rightButtonStyle"
+            class="position-absolute">
             <v-tooltip bottom>
               <template #activator="{on, attrs}">
-                <v-btn
+                <div
                   v-on="on"
-                  v-bind="attrs"
-                  height="32"
-                  width="32"
-                  icon
-                  @click="$root.$emit('layout-edit-section-drawer', index, length)">
-                  <v-icon size="24">fa-edit</v-icon>
-                </v-btn>
+                  v-bind="attrs">
+                  <v-hover v-model="hoverButton">
+                    <v-btn
+                      height="32"
+                      width="32"
+                      icon
+                      @click="$root.$emit('layout-edit-section-drawer', index, length)">
+                      <v-icon size="24">fa-edit</v-icon>
+                    </v-btn>
+                  </v-hover>
+                </div>
               </template>
               {{ $t('layout.editSection') }}
             </v-tooltip>
@@ -146,6 +157,16 @@ export default {
     },
     hoveredApplication() {
       return this.$root.hoveredApplication;
+    },
+    leftButtonStyle() {
+      return {
+        left: this.$root.pageFullWindow && '6px' || 0,
+      };
+    },
+    rightButtonStyle() {
+      return {
+        right: this.$root.pageFullWindow && '6px' || 0,
+      };
     },
   },
   watch: {
