@@ -25,9 +25,10 @@
       }
     }
   }
+  String cssClass = uicomponent.getCssClass() == null ? "" : " class='" + uicomponent.getCssClass() + "'";
 %>
 <div class="VuetifyApp">
-  <div id="PageLayout">
+  <div id="PageLayout"<%=cssClass%>>
     <script type="text/javascript">
       require(['PORTLET/layout/PageLayout'], app => app.init('<%=pageRef%>'));
     </script>

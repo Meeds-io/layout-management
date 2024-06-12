@@ -23,7 +23,8 @@
     class="layout-sections-parent singlePageApplication transparent"
     role="main"
     flat>
-    <page-layout-container-extension
+    <page-layout-page-container
+      v-if="pageLayout"
       :container="pageLayout" />
   </v-app>
 </template>
