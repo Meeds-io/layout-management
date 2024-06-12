@@ -126,14 +126,39 @@
               class="my-auto" />
           </v-list-item-action>
         </v-list-item>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.borderRadius') }}
-          </div>
-          <v-switch
-            v-model="enableBorderRadius"
-            class="ms-auto my-auto me-n2" />
-        </div>
+        <v-list-item
+          v-if="enableBorderColor"
+          class="pa-0"
+          dense>
+          <v-list-item-content class="my-auto">
+            {{ $t('layout.borderSize') }}
+          </v-list-item-content>
+          <v-list-item-action class="my-auto me-0 ms-auto">
+            <layout-editor-number-input
+              v-model="borderSize"
+              :step="1"
+              :min="0"
+              :max="8"
+              class="me-n3" />
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item
+          v-if="enableBorderColor"
+          class="pa-0"
+          dense>
+          <v-list-item-content class="my-auto">
+            {{ $t('layout.boxShadow') }}
+          </v-list-item-content>
+          <v-list-item-action class="my-auto me-0 ms-auto">
+            <v-checkbox v-model="boxShadow" />
+          </v-list-item-action>
+        </v-list-item>
+        <layout-editor-background-input
+          v-if="backgroundProperties"
+          ref="backgroundInput"
+          v-model="backgroundProperties"
+          immediate-save
+          class="mt-4" />
         <div
           v-if="enableBorderRadius"
           :class="radiusChoice === 'same' && 'flex-row' || 'flex-column'"
@@ -283,6 +308,7 @@ export default {
     hiddenOnMobile: false,
     section: null,
     container: null,
+    backgroundProperties: null,
     marginChoice: 'same',
     marginTop: 20,
     marginRight: 20,
@@ -296,6 +322,8 @@ export default {
     radiusBottomLeft: null,
     enableBorderColor: true,
     borderColor: '#FFFFFF',
+    borderSize: 1,
+    boxShadow: false,
     applicationCategoryTitle: null,
     applicationTitle: null,
   }),
@@ -310,7 +338,7 @@ export default {
       return this.$root.portletInstances?.find?.(a => a?.contentId === this.applicationContentId);
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
     },
     supportedModes() {
       return this.application?.supportedModes || [];
@@ -363,6 +391,9 @@ export default {
         radiusBottomRight: this.radiusBottomRight,
         radiusBottomLeft: this.radiusBottomLeft,
         borderColor: this.borderColor,
+        borderSize: this.borderSize || 0,
+        boxShadow: this.boxShadow && 'true' || null,
+        ...this.backgroundProperties,
         hiddenOnMobile: this.hiddenOnMobile,
       } || null;
     },
@@ -386,9 +417,12 @@ export default {
       if (val) {
         if (!this.borderColor) {
           this.borderColor = '#FFFFFF';
+          this.borderSize = 1;
         }
       } else {
+        this.boxShadow = null;
         this.borderColor = null;
+        this.borderSize = 1;
       }
     },
     enableBorderRadius(val) {
@@ -471,7 +505,18 @@ export default {
       this.enableBorderRadius = this.radiusBottomLeft === 0 || !!this.radiusBottomLeft;
 
       this.borderColor = this.container.borderColor;
+      this.borderSize = this.container.borderSize || 0;
+      this.boxShadow = this.container.boxShadow === 'true';
       this.enableBorderColor = !!this.borderColor;
+
+      this.backgroundProperties = {
+        storageId: this.container.storageId,
+        backgroundColor: this.container.backgroundColor || null,
+        backgroundImage: this.container.backgroundImage || null,
+        backgroundEffect: this.container.backgroundEffect || null,
+        backgroundRepeat: this.container.backgroundRepeat || null,
+        backgroundSize: this.container.backgroundSize || null,
+      };
 
       this.marginChoice = this.marginTop === this.marginRight
         && this.marginRight === this.marginLeft

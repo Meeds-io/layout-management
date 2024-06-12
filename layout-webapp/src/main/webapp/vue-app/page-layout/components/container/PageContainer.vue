@@ -19,21 +19,9 @@
 
 -->
 <template>
-  <div
-    :class="isMobileColumns && 'layout-section-mobile-pages' || ''"
-    :style="cssStyle"
-    class="layout-section">
-    <layout-section-mobile-column-menu-drawer
-      v-if="isMobileColumns"
-      v-model="mobileSectionColumnClass"
-      :container="container" />
-    <page-layout-container-base
-      :container="container"
-      :parent-id="parentId"
-      :class="isMobileColumns && mobileSectionColumnClass || ''"
-      no-background-style
-      class="layout-section-content" />
-  </div>
+  <page-layout-container-extension
+    :container="container"
+    class="layout-page-body" />
 </template>
 <script>
 export default {
@@ -45,21 +33,6 @@ export default {
     parentId: {
       type: String,
       default: null,
-    },
-  },
-  data: () => ({
-    mobileSectionColumnClass: null,
-  }),
-  computed: {
-    isMobileColumns() {
-      return this.$vuetify.breakpoint.smAndDown
-        && this.container?.template === 'FlexContainer'
-        && this.container?.cssClass?.includes?.('layout-mobile-columns');
-    },
-    cssStyle() {
-      return this.$applicationUtils.getStyle(this.container, {
-        onlyBackgroundStyle: true,
-      });
     },
   },
 };

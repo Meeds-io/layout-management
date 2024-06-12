@@ -36,7 +36,11 @@
             v-on="on" />
         </v-list-item-action>
         <v-list-item-content class="my-auto">
-          {{ value }}
+          <div v-if="label">
+            <div class="text-font-small-size text-color">{{ label }}</div>
+            <div class="text-font-small-size text-sub-title">{{ value }}</div>
+          </div>
+          <div v-else class="text-font-size text-color">{{ value }}</div>
         </v-list-item-content>
       </v-list-item>
     </template>
@@ -69,6 +73,10 @@
 export default {
   props: {
     value: {
+      type: String,
+      default: null,
+    },
+    label: {
       type: String,
       default: null,
     },

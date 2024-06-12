@@ -58,33 +58,12 @@ export default {
     id() {
       return `UIPortlet-${this.container?.id || this.storageId || `${this.parentId}-${parseInt(Math.random() * 10000)}`}`;
     },
-    height() {
-      return this.container.height;
-    },
-    width() {
-      return this.container.width;
-    },
-    borderColor() {
-      return this.container.borderColor;
-    },
     cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-          style['--appHeightScroll'] = 'auto';
-        }
-        if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-          style['--appWidthScroll'] = 'auto';
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        return style;
-      }
+      return this.$applicationUtils.getStyle(this.container, {
+        isApplicationBackground: true,
+        isApplicationStyle: true,
+        isApplicationScroll: true,
+      });
     },
     cssClass() {
       return this.container.cssClass || '';

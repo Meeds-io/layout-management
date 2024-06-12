@@ -50,6 +50,9 @@ export function init(pageRef) {
     created() {
       document.addEventListener('extension-page-layout-container-updated', this.refreshContainerTypes);
     },
+    mounted() {
+      this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
+    },
     methods: {
       refreshContainerTypes() {
         this.containerTypes = extensionRegistry.loadExtensions('page-layout', 'container');

@@ -60,7 +60,9 @@
         </v-slider>
       </v-card>
     </div>
-    <div class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pa-2">
+    <div
+      :style="cssStyle"
+      class="border-color-thin-grey-opacity2 border-radius mt-2 mb-4 pa-2">
       <div
         :class="gridClass"
         class="grid-gap-1">
@@ -82,6 +84,10 @@ export default {
       type: Number,
       default: null,
     },
+    backgroundProperties: {
+      type: Object,
+      default: null,
+    },
   },
   data: () => ({
     cols: 0,
@@ -90,6 +96,11 @@ export default {
   computed: {
     gridClass() {
       return `d-md-grid pb-0 grid-cols-md-${this.cols}`;
+    },
+    cssStyle() {
+      return this.backgroundProperties && this.$applicationUtils.getStyle(this.backgroundProperties, {
+        onlyBackgroundStyle: true,
+      });
     },
   },
   watch: {

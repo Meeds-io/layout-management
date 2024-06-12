@@ -34,12 +34,19 @@
           v-if="sectionType === $layoutUtils.gridTemplate"
           :rows-count="section.rowsCount"
           :cols-count="section.colsCount"
+          :background-properties="section"
           @rows-updated="rows = $event"
           @cols-updated="cols = $event" />
         <layout-editor-section-flex-editor
           v-else-if="sectionType === $layoutUtils.flexTemplate"
           :cols-count="cols"
+          :background-properties="section"
           @cols-updated="cols = $event" />
+        <layout-editor-background-input
+          v-if="section"
+          ref="backgroundInput"
+          v-model="section"
+          class="mt-4" />
         <template v-if="isDynamicSection">
           <div class="d-flex align-center mt-4">
             <div class="subtitle-1 font-weight-bold me-auto mb-2">
@@ -135,6 +142,14 @@ export default {
     cols: 0,
     canRemove: false,
     mobileInColumns: false,
+    enableBackgroundColor: false,
+    enableBackgroundImage: false,
+    backgroundColor: '#FFFFFFFF',
+    backgroundImageStyle: null,
+    backgroundImage: null,
+    backgroundEffect: null,
+    backgroundRepeat: null,
+    backgroundSize: null,
     stickyApplication: false,
     optionsModified: false,
   }),
@@ -153,6 +168,14 @@ export default {
     },
   },
   watch: {
+    section: {
+      deep: true,
+      handler() {
+        if (this.drawer) {
+          this.optionsModified = true;
+        }
+      }
+    },
     stickyApplication() {
       if (this.drawer) {
         if (!this.section.cssClass) {
@@ -183,6 +206,7 @@ export default {
   methods: {
     open(section, index, length) {
       this.section = JSON.parse(JSON.stringify(section));
+      this.section.children = section.children;
       this.stickyApplication = this.section.cssClass?.includes?.('layout-sticky-application');
       this.mobileInColumns = this.section.cssClass?.includes?.('layout-mobile-columns');
       this.optionsModified = false;
@@ -202,8 +226,10 @@ export default {
       this.close();
       this.$root.$emit('layout-remove-section', this.index);
     },
-    apply() {
+    async apply() {
+      await this.$refs.backgroundInput.apply();
       const section = JSON.parse(JSON.stringify(this.section));
+      section.children = this.section.children;
       if (section.template === this.$layoutUtils.flexTemplate && this.section.children.length !== this.cols) {
         this.$layoutUtils.editDynamicSection(section, this.cols);
       } else if (section.template === this.$layoutUtils.gridTemplate) {

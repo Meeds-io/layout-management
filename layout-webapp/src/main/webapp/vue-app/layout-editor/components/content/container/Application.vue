@@ -65,9 +65,7 @@ export default {
     applicationInstalled: false,
     installing: false,
     section: null,
-    height: null,
-    width: null,
-    borderColor: null,
+    cssStyle: null,
     cssClass: null,
     hover: false,
     hoverMenu: false,
@@ -94,36 +92,17 @@ export default {
     id() {
       return `UIPortlet-${this.container?.id || this.storageId || parseInt(Math.random() * 10000)}`;
     },
-    cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-          style['--appHeightScroll'] = 'auto';
-        }
-        if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-          style['--appWidthScroll'] = 'auto';
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        return style;
-      }
-    },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate;
     },
     applicationTitle() {
-      return this.$root.portletInstanceCategories?.flatMap?.(c => c.applications)?.find?.(a => a?.contentId === this.container?.contentId)?.displayName || this.container?.title || '';
+      return this.$root.portletInstances?.find?.(a => a?.contentId === this.container?.contentId)?.name || this.container?.title || '';
     },
     applicationCategory() {
-      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.displayName === this.applicationTitle));
+      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
     },
     applicationCategoryTitle() {
-      return this.applicationCategory?.displayName || '';
+      return this.applicationCategory?.name || '';
     },
     hoverApp() {
       return this.hoverMenu || this.hover || this.hoverGridCell;
@@ -200,10 +179,12 @@ export default {
       }
     },
     initStyle() {
-      this.height = this.container.height;
-      this.width = this.container.width;
-      this.borderColor = this.container.borderColor;
       this.cssClass = this.container.cssClass || '';
+      this.cssStyle = this.$applicationUtils.getStyle(this.container, {
+        isApplicationBackground: true,
+        isApplicationStyle: true,
+        isApplicationScroll: true,
+      });
     },
     moveEnd() {
       this.$emit('move-end');

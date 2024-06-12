@@ -24,11 +24,15 @@ import SaveButton from './components/toolbar/actions/SaveButton.vue';
 import SaveAsTemplateButton from './components/toolbar/actions/SaveAsTemplateButton.vue';
 import SaveTemplateButton from './components/toolbar/actions/SaveTemplateButton.vue';
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
-import PreviewButton from './components/toolbar/actions/PreviewButton.vue';
+import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButton.vue';
+import PagePreviewButton from './components/toolbar/actions/PagePreviewButton.vue';
+import PagePropertiesButton from './components/toolbar/actions/PagePropertiesButton.vue';
 
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
 import NumberInput from './components/form/NumberInput.vue';
 import ColorPicker from './components/form/ColorPicker.vue';
+import BackgroundImageAttachment from './components/form/BackgroundImageAttachment.vue';
+import BackgroundInput from './components/form/BackgroundInput.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -57,6 +61,7 @@ import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
 import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicationCategoryDrawer.vue';
 import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
+import EditPageDrawer from './components/drawer/EditPageDrawer.vue';
 
 import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
 
@@ -67,7 +72,9 @@ const components = {
   'layout-editor-toolbar-save-as-template-button': SaveAsTemplateButton,
   'layout-editor-toolbar-save-template-button': SaveTemplateButton,
   'layout-editor-toolbar-history-buttons': HistoryButtons,
-  'layout-editor-toolbar-preview-button': PreviewButton,
+  'layout-editor-toolbar-page-preview-button': PagePreviewButton,
+  'layout-editor-toolbar-page-properties-button': PagePropertiesButton,
+  'layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'layout-editor-content': Content,
   'layout-editor-color-picker': ColorPicker,
   'layout-editor-border-radius-selector': BorderRadiusSelector,
@@ -88,7 +95,10 @@ const components = {
   'layout-editor-application-category-select-drawer': SelectApplicationCategoryDrawer,
   'layout-editor-application-add-drawer': AddApplicationDrawer,
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
+  'layout-editor-page-edit-drawer': EditPageDrawer,
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
+  'layout-editor-background-image-attachment': BackgroundImageAttachment,
+  'layout-editor-background-input': BackgroundInput,
   'layout-editor-application-card': ApplicationCard,
   'layout-editor-application-category-card': ApplicationCategoryCard,
   'layout-editor-application-menu': ApplicationMenu,

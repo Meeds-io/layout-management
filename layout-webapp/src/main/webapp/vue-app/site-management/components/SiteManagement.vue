@@ -18,7 +18,7 @@
 -->
 <template>
   <v-app class="siteManagementApplication">
-    <v-main class="white pa-5 card-border-radius">
+    <v-main class="pa-5 card-border-radius app-background-color">
       <site-management-toolbar />
       <site-management-sites-list :sites="sites" />
     </v-main>

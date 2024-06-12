@@ -27,11 +27,10 @@
 
 .layout-section-border {
   position: absolute;
-  padding: 12px;
-  top: -22px;
-  right: -24px;
-  bottom: -2px;
-  left: -24px;
+  height: 100%;
+  top: 0;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
 }
 
 .layout-mobile-view {
@@ -78,10 +77,6 @@
   width: 36px;
 }
 
-.d-md-grid {
-  padding-bottom: 20px;
-}
-
 .t-20 {
   top: 20px;
 }
@@ -107,7 +102,12 @@
   .layout-section-hover {
     border: thin solid @greyColorOpacity2 !important;
   }
-
+  &:first-of-type .layout-section-hover {
+    margin-top: 12px;
+  }
+  &:last-of-type {
+    padding-bottom: 20px !important;
+  }
   &.layout-moving-chosen-container {
     > div {
       border: none !important;
@@ -130,3 +130,4 @@
     }
   }
 }
+

@@ -32,6 +32,7 @@ export const defaultMarginBottom = 20;
 export const defaultMarginLeft = 20;
 export const defaultBorderRadius = 8;
 export const defaultBorderColor = '#FFFFFF';
+export const defaultBackgroundColor = '#FFFFFF';
 
 export const containerModel = {
   storageId: null,
@@ -60,6 +61,14 @@ export const containerModel = {
   // Used to specify some special CSS Classes to be used on container parent
   cssClass: null,
   borderColor: null,
+  borderSize: null,
+  boxShadow: null,
+  backgroundColor: null,
+  backgroundImage: null,
+  backgroundEffect: null,
+  backgroundPosition: null,
+  backgroundSize: null,
+  backgroundRepeat: null,
   // Used to specify whether the block should be displayed or not
   // when an addon is present
   profiles: null,
@@ -92,6 +101,15 @@ export const applicationModel = {
   theme: null,
   width: null,
   height: null,
+  borderColor: null,
+  borderSize: null,
+  boxShadow: null,
+  backgroundColor: null,
+  backgroundImage: null,
+  backgroundEffect: null,
+  backgroundPosition: null,
+  backgroundSize: null,
+  backgroundRepeat: null,
   accessPermissions: ['Everyone'],
 };
 
@@ -221,8 +239,15 @@ export function applyContainerStyle(container, containerStyle) {
     container.cssClass += ' hidden-sm-and-down';
   }
   Vue.set(container, 'cssClass', container.cssClass);
-
   Vue.set(container, 'borderColor', containerStyle.borderColor || null);
+  Vue.set(container, 'borderSize', containerStyle.borderSize || '0');
+  Vue.set(container, 'boxShadow', containerStyle.boxShadow && 'true' || null);
+  Vue.set(container, 'backgroundColor', containerStyle.backgroundColor || null);
+  Vue.set(container, 'backgroundImage', containerStyle.backgroundImage || null);
+  Vue.set(container, 'backgroundEffect', containerStyle.backgroundEffect || null);
+  Vue.set(container, 'backgroundPosition', containerStyle.backgroundPosition || null);
+  Vue.set(container, 'backgroundSize', containerStyle.backgroundSize || null);
+  Vue.set(container, 'backgroundRepeat', containerStyle.backgroundRepeat || null);
 }
 
 export function parseSections(layout) {
@@ -233,6 +258,7 @@ export function parseSections(layout) {
     }
     const compatible = parentContainer.children.every(c => c.template === gridTemplate || c.template === flexTemplate);
     if (compatible) {
+      Object.assign(parentContainer, Object.assign({...containerModel}, parentContainer));
       try {
         parentContainer.children.forEach(parseSection);
       } catch (e) {
@@ -601,6 +627,7 @@ function parseSection(section) {
     || !section.children.length) {
     return;
   }
+  Object.assign(section, Object.assign({...containerModel}, section));
   if (section.children) {
     section.children.forEach(parseCell);
   } else {

@@ -22,7 +22,7 @@
   <v-app
     class="transparent"
     flat>
-    <main role="main" class="content-box-sizing">
+    <main class="content-box-sizing">
       <portlet-editor-toolbar />
       <portlet-editor-content />
     </main>

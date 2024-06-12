@@ -19,6 +19,7 @@
 package io.meeds.layout.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
+import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
@@ -66,17 +68,15 @@ import lombok.SneakyThrows;
 @Service
 public class PageLayoutService {
 
-  public static final String      EMPTY_PAGE_TEMPLATE         = "empty";
+  public static final String      EMPTY_PAGE_TEMPLATE             = "empty";
 
-  private static final Pattern    COLOR_MATCHER_VALIDATOR     = Pattern.compile("[#0-9a-zA-Z]+");
+  private static final Pattern    GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_ ]+");
 
-  private static final Pattern    SIZE_MATCHER_VALIDATOR      = Pattern.compile("[0-9a-zA-Z%]+");
+  private static final String     PAGE_NOT_EXISTS_MESSAGE         = "Page with key %s doesn't exist";
 
-  private static final String     PAGE_NOT_EXISTS_MESSAGE     = "Page with key %s doesn't exist";
+  private static final String     PAGE_NOT_ACCESSIBLE_MESSAGE     = "Page with ref %s isn't accessible for user %s";
 
-  private static final String     PAGE_NOT_ACCESSIBLE_MESSAGE = "Page with ref %s isn't accessible for user %s";
-
-  private static final String     PAGE_NOT_EDITABLE_MESSAGE   = "Page with ref %s isn't editable for user %s";
+  private static final String     PAGE_NOT_EDITABLE_MESSAGE       = "Page with ref %s isn't editable for user %s";
 
   @Autowired
   private LayoutService           layoutService;
@@ -190,6 +190,7 @@ public class PageLayoutService {
                                                                   portalConfig.getEditPermission() :
                                                                   pageModel.getEditPermission();
     page.setEditPermission(editPermission);
+    validateCSSInputs(page);
     layoutService.save(new PageContext(page.getPageKey(), Utils.toPageState(page)), page);
     return layoutService.getPageContext(page.getPageKey());
   }
@@ -386,57 +387,32 @@ public class PageLayoutService {
     }
   }
 
-  @SuppressWarnings("rawtypes")
   private void validateCSSInputs(ModelObject modelObject) {
-    String width;
-    String height;
-    String borderColor;
-    switch (modelObject) {
-    case Container container -> {
-      width = container.getWidth();
-      height = container.getHeight();
-      borderColor = container.getBorderColor();
-      if (!CollectionUtils.isEmpty(container.getChildren())) {
-        container.getChildren().forEach(this::validateCSSInputs);
-      }
+    ModelStyle cssStyle = modelObject.getCssStyle();
+    Arrays.asList(modelObject.getHeight(),
+                  modelObject.getWidth(),
+                  cssStyle == null ? null : cssStyle.getBorderColor(),
+                  cssStyle == null ? null : cssStyle.getBorderSize(),
+                  cssStyle == null ? null : cssStyle.getBoxShadow(),
+                  cssStyle == null ? null : cssStyle.getBackgroundColor(),
+                  cssStyle == null ? null : cssStyle.getBackgroundImage(),
+                  cssStyle == null ? null : cssStyle.getBackgroundEffect(),
+                  cssStyle == null ? null : cssStyle.getBackgroundPosition(),
+                  cssStyle == null ? null : cssStyle.getBackgroundSize(),
+                  cssStyle == null ? null : cssStyle.getBackgroundRepeat())
+          .forEach(this::validateCSSStyleValue);
+    if (modelObject instanceof Container container && !CollectionUtils.isEmpty(container.getChildren())) {
+      container.getChildren().forEach(this::validateCSSInputs);
     }
-    case Application application -> { // NOSONAR
-      width = application.getWidth();
-      height = application.getHeight();
-      borderColor = application.getBorderColor();
-    }
-    default -> {
-      width = null;
-      height = null;
-      borderColor = null;
-    }
-    }
-    if (StringUtils.isBlank(width)) {
-      modelObject.setWidth(null);
-    }
-    if (StringUtils.isBlank(height)) {
-      modelObject.setHeight(null);
-    }
-    if (StringUtils.isBlank(borderColor)) {
-      modelObject.setBorderColor(null);
-    }
-    if (StringUtils.isNotBlank(width)
-        && !SIZE_MATCHER_VALIDATOR.matches(width)) {
-      throw new IllegalArgumentException(String.format("Container with id %s has an invalid width input %s",
-                                                       modelObject.getStorageId(),
-                                                       width));
-    }
-    if (StringUtils.isNotBlank(height)
-        && !SIZE_MATCHER_VALIDATOR.matches(height)) {
-      throw new IllegalArgumentException(String.format("Container with id %s has an invalid height input %s",
-                                                       modelObject.getStorageId(),
-                                                       height));
-    }
-    if (StringUtils.isNotBlank(borderColor)
-        && !COLOR_MATCHER_VALIDATOR.matches(borderColor)) {
-      throw new IllegalArgumentException(String.format("Container with id %s has an invalid border color input %s",
-                                                       modelObject.getStorageId(),
-                                                       borderColor));
+  }
+
+  private void validateCSSStyleValue(String value) {
+    if (StringUtils.isNotBlank(value)
+        && (!GENERIC_STYLE_MATCHER_VALIDATOR.matches(value)
+            || value.contains("javascript")
+            || value.contains("eval"))) {
+      throw new IllegalArgumentException(String.format("Invalid css value input %s",
+                                                       value));
     }
   }
 

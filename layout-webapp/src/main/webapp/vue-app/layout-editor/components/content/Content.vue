@@ -22,11 +22,11 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="light-grey-background-color singlePageApplication mx-auto"
+    class="light-grey-background-color layout-sections-parent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="layoutToEdit"
-      class="layout-sections-parent" />
+      :container="pageLayout"
+      class="layout-page-body" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
@@ -39,6 +39,7 @@
       ref="applicationDrawer" />
     <layout-editor-portlet-edit-dialog />
     <layout-editor-page-template-drawer />
+    <layout-editor-page-edit-drawer />
     <layout-image-illustration-preview />
     <changes-reminder
       ref="changesReminder"
@@ -74,6 +75,13 @@ export default {
     loading: 1,
   }),
   computed: {
+    pageLayout() {
+      if (this.layoutToEdit?.children?.[0]?.children?.[0]?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl') {
+        return this.layoutToEdit?.children?.[0]?.children?.[0];
+      } else {
+        return this.layoutToEdit?.children?.[0];
+      }
+    },
     mobileDisplayMode() {
       return this.$root.mobileDisplayMode;
     },
@@ -92,8 +100,11 @@ export default {
     },
   },
   watch: {
-    layoutToEdit() {
-      this.$root.layout = this.layoutToEdit;
+    layoutToEdit: {
+      immediate: true,
+      handler() {
+        this.$root.layout = this.layoutToEdit;
+      },
     },
     loading(newVal, oldVal) {
       if (newVal - oldVal > 0) {
@@ -136,6 +147,7 @@ export default {
     this.$root.$on('layout-section-history-add', this.addSectionVersion);
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
+    this.$root.$on('layout-save-draft', this.saveDraft);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   mounted() {
@@ -335,6 +347,7 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       this.addSectionVersion(section.storageId);
       parentContainer.children.splice(index, 1, section);
+      this.setLayout(this.layoutToEdit);
     },
     addSectionVersion(sectionId) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
@@ -384,7 +397,10 @@ export default {
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
         .then(layout => this.setLayout(layout))
-        .finally(() => window.setTimeout(() => this.loading--, 200));
+        .finally(() => {
+          window.setTimeout(() => this.loading--, 200);
+          this.$root.$emit('layout-draft-saved');
+        });
     },
   },
 };

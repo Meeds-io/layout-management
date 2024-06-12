@@ -109,6 +109,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    noBackgroundStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     hover: false,
@@ -140,25 +144,11 @@ export default {
     width() {
       return this.container.width === 'unset' ? null : this.container.width;
     },
-    borderColor() {
-      return this.container.borderColor;
-    },
     cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-        }
-        if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        return style;
-      }
+      return this.$applicationUtils.getStyle(this.container, {
+        isApplicationStyle: true,
+        noBackgroundStyle: this.noBackgroundStyle
+      });
     },
     containerCssClass() {
       return this.$root.mobileDisplayMode ? this.container.cssClass?.replace?.('d-md-grid', '') : this.container.cssClass;

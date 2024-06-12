@@ -46,6 +46,10 @@ export default {
       type: String,
       default: null,
     },
+    noBackgroundStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     id() {
@@ -55,39 +59,28 @@ export default {
       return this.container?.storageId;
     },
     children() {
-      return this.container.children;
+      return this.container?.children;
     },
     hasChildren() {
       return !!this.children?.length;
     },
     height() {
-      return this.container.height;
+      return this.container?.height;
     },
     width() {
-      return this.container.width;
+      return this.container?.width;
     },
     borderColor() {
-      return this.container.borderColor;
+      return this.container?.borderColor;
     },
     cssStyle() {
-      if (!this.height && !this.width && !this.borderColor) {
-        return null;
-      } else {
-        const style = {};
-        if (this.height) {
-          style['--appHeight'] = this.hasUnit(this.height) ? this.height : `${this.height}px`;
-        }
-        if (this.width) {
-          style['--appWidth'] = this.hasUnit(this.width) ? this.width : `${this.width}px`;
-        }
-        if (this.borderColor) {
-          style['--appBorderColor'] = this.borderColor;
-        }
-        return style;
-      }
+      return this.$applicationUtils.getStyle(this.container, {
+        isApplicationStyle: true,
+        noBackgroundStyle: this.noBackgroundStyle
+      });
     },
     cssClass() {
-      return this.container.cssClass || '';
+      return this.container?.cssClass || '';
     },
   },
   methods: {

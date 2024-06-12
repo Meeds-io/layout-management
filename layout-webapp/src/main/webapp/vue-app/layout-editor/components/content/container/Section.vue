@@ -23,18 +23,40 @@
   <div
     ref="section"
     :data-storage-id="storageId"
+    :style="cssStyle"
+    :class="mobileInColumns && 'layout-section-mobile-pages' || ''"
     class="position-relative layout-section"
     v-on="!isDynamicSection && {
       'mousedown': startSelection,
     }">
+    <v-hover :disabled="$root.mobileDisplayMode">
+      <div
+        slot-scope="{ hover }"
+        :style="sectionMenuStyle"
+        :class="hoverSectionMenuButton && 'z-index-two'"
+        class="layout-section-border">
+        <div class="position-relative full-height full-width">
+          <layout-editor-section-menu
+            :container="container"
+            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
+            :index="index"
+            :length="length"
+            :moving="movingSection"
+            @hover-button="hoverSectionMenuButton = $event"
+            @move-start="movingSection = true"
+            @move-end="movingSection = false" />
+        </div>
+      </div>
+    </v-hover>
     <layout-editor-container-base
       ref="container"
       :container="container"
       :parent-id="parentId"
       :index="index"
-      :class="`${zIndexClass} ${mobileInColumns && mobileSectionColumnClass || ''}`"
-      class="position-relative overflow-initial"
+      :class="`${mobileInColumns && mobileSectionColumnClass || ''}`"
+      class="position-relative overflow-initial layout-section-content"
       type="section"
+      no-background-style
       @hovered="hoverSection = $event && !drawerOpened">
       <template v-if="$root.movingParentId === storageId && (!isDynamicSection || $root.moveType === 'resize')" #footer>
         <layout-editor-section-selection-grid
@@ -45,22 +67,6 @@
           @hide="$root.movingParentId = null" />
       </template>
     </layout-editor-container-base>
-    <v-hover :disabled="$root.mobileDisplayMode">
-      <div
-        slot-scope="{ hover }"
-        class="layout-section-border">
-        <div class="position-relative full-height full-width">
-          <layout-editor-section-menu
-            :container="container"
-            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
-            :index="index"
-            :length="length"
-            :moving="movingSection"
-            @move-start="movingSection = true"
-            @move-end="movingSection = false" />
-        </div>
-      </div>
-    </v-hover>
     <layout-section-mobile-column-menu-drawer
       v-if="mobileInColumns"
       v-model="mobileSectionColumnClass"
@@ -89,9 +95,15 @@ export default {
   },
   data: () => ({
     hoverSection: false,
+    hoverSectionMenuButton: false,
     movingSection: false,
     mobileSectionColumnClass: null,
     sectionWidth: 0,
+    // FIXME can't be set using Less, YUICompressor bug
+    // which deletes spaces
+    sectionMenuStyle: {
+      width: 'calc(var(--allPagesSinglePageApplicationWidth, 1320px) + 24px)',
+    },
   }),
   computed: {
     storageId() {
@@ -105,6 +117,11 @@ export default {
     },
     isDynamicSection() {
       return this.container.template === this.$layoutUtils.flexTemplate;
+    },
+    cssStyle() {
+      return this.$applicationUtils.getStyle(this.container, {
+        onlyBackgroundStyle: true,
+      });
     },
     mobileInColumns() {
       return this.isDynamicSection

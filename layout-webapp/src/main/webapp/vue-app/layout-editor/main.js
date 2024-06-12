@@ -65,9 +65,11 @@ export function init() {
           branding: null,
           displayMode: 'desktop',
           layout: null,
+          page: null,
           pageRef: null,
           pageTemplate: null,
           pageTemplateId: null,
+          pageFullWindow: false,
           draftPageRef: null,
           draftNode: null,
           draftNodeId: null,
@@ -124,6 +126,9 @@ export function init() {
           desktopDisplayMode() {
             return this.$root.displayMode === 'desktop';
           },
+          pageId() {
+            return this.$root.page?.state?.storageId?.replace?.('page_', '');
+          },
         },
         watch: {
           movingParentId() {
@@ -142,6 +147,7 @@ export function init() {
             if (!oldVal) {
               window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
             }
+            this.pageFullWindow = this.$layoutUtils.getParentContainer(newVal)?.width === 'fullWindow';
           },
         },
         created() {
@@ -152,6 +158,9 @@ export function init() {
           this.refreshPortletInstances();
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);
+        },
+        mounted() {
+          this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
         },
         methods: {
           setDrawerOpened() {

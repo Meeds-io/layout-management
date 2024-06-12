@@ -22,6 +22,67 @@ export function installApplication(navUri, applicationStorageId, applicationElem
     .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
 }
 
+export function getStyle(container, options) {
+
+  const style = {};
+  if (!options.onlyBackgroundStyle) {
+    if (container.height) {
+      style[options.isApplicationStyle && '--appHeight' || 'height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+      if (options.isApplicationScroll) {
+        style['--appHeightScroll'] = 'auto';
+      }
+    }
+  
+    if (container.width === 'fullWindow') {
+      style['--allPagesSinglePageApplicationWidth'] = 'calc(100% - 40px)';
+      style['--allPagesSinglePageApplicationPadding'] = '0';
+      style['--allPagesSinglePageApplicationMargin'] = '0 20px';
+    } else if (container.width) {
+      style[options.isApplicationStyle && '--appWidth' || 'width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+      if (options.isApplicationScroll) {
+        style['--appWidthScroll'] = 'auto';
+      }
+    }
+  
+    if (container.borderColor) {
+      style[options.isApplicationStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
+    }
+    if (container.borderSize) {
+      style[options.isApplicationStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
+    }
+    if (container.boxShadow === 'true') {
+      style[options.isApplicationStyle && '--appBoxShadow' || 'box-shadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
+    }
+  }
+  if (!options.noBackgroundStyle
+    && (container.backgroundImage
+      || container.backgroundColor
+      || container.backgroundEffect)) {
+    if (container.backgroundColor) {
+      style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = container.backgroundColor;
+    }
+    if (container.backgroundEffect && container.backgroundImage) {
+      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage}),${container.backgroundEffect}`;
+    } else if (container.backgroundImage) {
+      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
+    } else if (container.backgroundEffect) {
+      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
+    }
+    if (container.backgroundImage) {
+      if (container.backgroundRepeat) {
+        style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = container.backgroundRepeat;
+      }
+      if (container.backgroundSize) {
+        style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = container.backgroundSize;
+      }
+      if (container.backgroundPosition) {
+        style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
+      }
+    }
+  }
+  return style;
+}
+
 export function getApplicationContent(navUri, applicationStorageId, applicationMode) {
   return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}`, {
     credentials: 'include',
@@ -139,4 +200,8 @@ function cloneScriptElement(node) {
     scriptElement.setAttribute(scriptAttrs[i].name, scriptAttrs[i].value);
   }
   return scriptElement;
+}
+
+function hasUnit(length) {
+  return Number.isNaN(Number(length));
 }
