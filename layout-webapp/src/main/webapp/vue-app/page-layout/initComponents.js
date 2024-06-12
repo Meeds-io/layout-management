@@ -22,6 +22,7 @@ import PageLayout from './components/PageLayout.vue';
 import ContainerExtension from './components/base/ContainerExtension.vue';
 import ContainerBase from './components/base/ContainerBase.vue';
 
+import PageContainer from './components/container/PageContainer.vue';
 import DynamicSection from './components/container/DynamicSection.vue';
 import FixedSection from './components/container/FixedSection.vue';
 import Container from './components/container/Container.vue';
@@ -33,6 +34,7 @@ const components = {
   'page-layout-container-extension': ContainerExtension,
   'page-layout-container-base': ContainerBase,
 
+  'page-layout-page-container': PageContainer,
   'page-layout-dynamic-section': DynamicSection,
   'page-layout-fixed-section': FixedSection,
   'page-layout-container': Container,

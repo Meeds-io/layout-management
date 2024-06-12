@@ -25,7 +25,8 @@
     class="light-grey-background-color layout-sections-parent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="layoutToEdit" />
+      :container="pageLayout"
+      class="layout-page-body" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
@@ -74,6 +75,13 @@ export default {
     loading: 1,
   }),
   computed: {
+    pageLayout() {
+      if (this.layoutToEdit?.children?.[0]?.children?.[0]?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl') {
+        return this.layoutToEdit?.children?.[0]?.children?.[0];
+      } else {
+        return this.layoutToEdit?.children?.[0];
+      }
+    },
     mobileDisplayMode() {
       return this.$root.mobileDisplayMode;
     },

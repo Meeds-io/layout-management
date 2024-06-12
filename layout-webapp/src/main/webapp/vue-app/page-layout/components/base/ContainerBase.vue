@@ -59,19 +59,19 @@ export default {
       return this.container?.storageId;
     },
     children() {
-      return this.container.children;
+      return this.container?.children;
     },
     hasChildren() {
       return !!this.children?.length;
     },
     height() {
-      return this.container.height;
+      return this.container?.height;
     },
     width() {
-      return this.container.width;
+      return this.container?.width;
     },
     borderColor() {
-      return this.container.borderColor;
+      return this.container?.borderColor;
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
@@ -80,7 +80,7 @@ export default {
       });
     },
     cssClass() {
-      return this.container.cssClass || '';
+      return this.container?.cssClass || '';
     },
   },
   methods: {

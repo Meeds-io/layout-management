@@ -159,6 +159,9 @@ export function init() {
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);
         },
+        mounted() {
+          this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
+        },
         methods: {
           setDrawerOpened() {
             this.drawerOpened++;
