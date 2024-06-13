@@ -48,8 +48,12 @@
     <v-img
       :lazy-src="illustrationSrc"
       :src="illustrationSrc"
+      max-width="100%"
+      max-height="205"
       class="border-radius"
       transition="none"
+      position="top"
+      contain
       eager />
   </div>
 </template>
