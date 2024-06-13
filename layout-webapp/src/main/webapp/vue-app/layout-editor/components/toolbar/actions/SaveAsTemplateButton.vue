@@ -26,6 +26,7 @@
         v-on="on"
         class="me-3">
         <v-btn
+          :loading="loading"
           :disabled="disabled"
           :aria-label="$t('layout.saveAsTemplate')"
           icon
@@ -45,12 +46,24 @@ export default {
       default: false,
     },
   },
+  data: () => ({
+    loading: false,
+  }),
   methods: {
     savePageTemplate() {
+      this.loading = true;
+      window.setTimeout(() => this.openPageTemplateDrawer(), 10);
+    },
+    async openPageTemplateDrawer() {
+      document.addEventListener('drawerOpened', this.endLoading);
       const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
       this.$root.$emit('layout-page-template-drawer-open', {
         content: JSON.stringify(pageLayout),
-      });
+      }, false, true);
+    },
+    endLoading() {
+      window.setTimeout(() => this.loading = false, 200);
+      document.removeEventListener('drawerOpened', this.endLoading);
     },
   },
 };
