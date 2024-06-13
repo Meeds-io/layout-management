@@ -53,4 +53,6 @@ public class PortletInstance {
 
   private boolean                         disabled;
 
+  private boolean                         editable;
+
 }

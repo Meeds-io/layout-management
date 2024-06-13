@@ -38,6 +38,20 @@
           @move-start="moveStart"
           @move-end="moveEnd" />
       </v-hover>
+      <div
+        v-show="hover && !editablePortlet"
+        class="full-width full-height position-absolute">
+        <v-expand-transition>
+          <v-card
+            v-if="hover"
+            :class="isDynamicSection && 'mb-5'"
+            :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
+            class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
+            <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
+            <span>{{ $t('layout.readonlyPortletContent') }}</span>
+          </v-card>
+        </v-expand-transition>
+      </div>
       <div v-if="displayNoContent" class="full-width text-no-wrap border-color-grey-lighten ms-1">
         <div class="layout-no-content absolute-vertical-center d-flex full-width ms-n1">
           <div class="light-black-background white--text px-2">
@@ -109,6 +123,12 @@ export default {
     },
     displayNoContent() {
       return this.isDynamicSection && !this.hasContent && this.$root.desktopDisplayMode;
+    },
+    portletInstance() {
+      return this.$root.portletInstances?.find?.(p => p.contentId === this.container?.contentId);
+    },
+    editablePortlet() {
+      return this.portletInstance?.editable || false;
     },
   },
   watch: {
