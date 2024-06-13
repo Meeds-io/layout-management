@@ -30,6 +30,7 @@ import org.gatein.pc.api.PortletInvoker;
 import org.gatein.pc.api.info.MetaInfo;
 import org.gatein.pc.api.info.ModeInfo;
 import org.gatein.pc.api.info.PortletInfo;
+import org.gatein.pc.portlet.impl.info.ContainerPortletInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -86,8 +87,11 @@ public class PortletStorage {
     portletDescriptor.setName(getLocalizedStringOrDefault(nameLS, info.getName()));
     portletDescriptor.setDescription(getLocalizedStringOrDefault(descriptionLS, info.getName()));
     portletDescriptor.setSupportedModes(allModes.stream()
-                                                .map(m -> m.getModeName())
-                                                .toList());
+                                        .map(m -> m.getModeName())
+                                        .toList());
+    if(info instanceof ContainerPortletInfo containerPortletInfo) {
+      portletDescriptor.setEditable(StringUtils.equals("true", containerPortletInfo.getInitParameter("layout-content-editable")));
+    }
     return portletDescriptor;
   }
 
