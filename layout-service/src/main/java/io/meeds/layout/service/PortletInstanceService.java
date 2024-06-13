@@ -41,6 +41,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.attachment.AttachmentService;
 
+import io.meeds.layout.model.PortletDescriptor;
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstanceCategory;
 import io.meeds.layout.model.PortletInstancePreference;
@@ -82,6 +83,9 @@ public class PortletInstanceService {
 
   @Autowired
   private PortletInstanceLayoutStorage                 portletInstanceLayoutStorage;
+
+  @Autowired
+  private PortletService                               portletService;
 
   private Map<String, PortletInstancePreferencePlugin> preferencePlugins         = new ConcurrentHashMap<>();
 
@@ -326,6 +330,10 @@ public class PortletInstanceService {
       portletInstance.setIllustrationId(Long.parseLong(attachmentFileIds.get(0)));
     }
     portletInstance.setApplicationId(getPortletInstanceApplicationId(portletInstance.getId()));
+    PortletDescriptor portlet = portletService.getPortlet(portletInstance.getContentId());
+    if (portlet != null) {
+      portletInstance.setEditable(portlet.isEditable());
+    }
   }
 
   private void computePortletInstanceCategoryAttributes(Locale locale, PortletInstanceCategory portletInstanceCategory) {

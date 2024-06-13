@@ -39,6 +39,8 @@ public class PortletDescriptor {
 
   private List<String> supportedModes;
 
+  private boolean      editable;
+
   public String getContentId() {
     return applicationName + "/" + portletName;
   }

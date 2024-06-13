@@ -61,7 +61,7 @@
       <template v-if="$root.movingParentId === storageId && (!isDynamicSection || $root.moveType === 'resize')" #footer>
         <layout-editor-section-selection-grid
           :section="container"
-          class="position-absolute z-index-two full-width full-height" />
+          class="position-absolute z-index-two full-width full-height px-5" />
         <layout-editor-cells-drop-box
           :section="container"
           @hide="$root.movingParentId = null" />

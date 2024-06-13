@@ -52,6 +52,11 @@ export function init() {
           portletInstanceEmpty: true,
           portletMode: 'view',
         },
+        computed: {
+          editablePortlet() {
+            return this.portletInstance?.editable || false;
+          },
+        },
         watch: {
           portletInstanceId: {
             immediate: true,
