@@ -29,6 +29,7 @@
 <script>
 export default {
   data: () => ({
+    applicationInstalled: false,
     applicationContent: null,
     contentRetrieved: 0,
   }),
@@ -69,6 +70,9 @@ export default {
         this.$emit('empty', this.isEmpty);
       },
     },
+    applicationInstalled() {
+      this.$emit('initialized');
+    },
   },
   created() {
     document.dispatchEvent(new CustomEvent('displayTopBarLoading'));
@@ -89,10 +93,11 @@ export default {
         const interval = window.setInterval(() => {
           if (this.contentRetrieved >= 100 || !this.isEmpty) {
             document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+            this.applicationInstalled = true;
             window.clearInterval(interval);
           } else if (this.isEmpty) {
             this.contentRetrieved++;
-            if (this.contentRetrieved === 20) {
+            if (this.contentRetrieved === 30) {
               document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
               this.$emit('empty-message');
             }

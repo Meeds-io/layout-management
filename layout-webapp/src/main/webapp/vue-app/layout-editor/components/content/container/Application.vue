@@ -46,6 +46,21 @@
           <v-icon size="35" class="layout-no-content-caret icon-default-color my-n2">{{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}</v-icon>
         </div>
       </div>
+      <div
+        v-else-if="!editablePortlet && !hoverMenu"
+        v-show="hover"
+        class="full-width full-height position-absolute z-index-two">
+        <v-expand-transition>
+          <v-card
+            v-if="hover"
+            :class="isDynamicSection && 'mb-5'"
+            :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
+            class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
+            <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
+            <span>{{ $t('layout.readonlyPortletContent') }}</span>
+          </v-card>
+        </v-expand-transition>
+      </div>
     </div>
   </v-hover>
 </template>
@@ -110,6 +125,12 @@ export default {
     displayNoContent() {
       return this.isDynamicSection && !this.hasContent && this.$root.desktopDisplayMode;
     },
+    portletInstance() {
+      return this.$root.portletInstances?.find?.(p => p.contentId === this.container?.contentId);
+    },
+    editablePortlet() {
+      return this.portletInstance?.editable || false;
+    },
   },
   watch: {
     applicationInstalled() {
@@ -170,7 +191,7 @@ export default {
           && this.nodeUri
           && this.storageId) {
         this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs.content)
-          .then(() => this.applicationInstalled = true);
+          .then(() => window.setTimeout(() => this.applicationInstalled = true, 200));
       }
     },
     updateStyle(container) {
