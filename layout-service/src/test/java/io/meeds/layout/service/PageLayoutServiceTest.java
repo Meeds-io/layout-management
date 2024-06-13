@@ -168,6 +168,23 @@ public class PageLayoutServiceTest {
 
   @SuppressWarnings("unchecked")
   @Test
+  public void getPageApplicationLayout() throws IllegalAccessException, ObjectNotFoundException {
+    assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+
+    Container container = mock(Container.class);
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
+    Application<Portlet> application = mock(Application.class);
+    when(application.getStorageId()).thenReturn("2");
+    when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    assertNotNull(pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
   public void getPageLayoutWithDynamicContainer() {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     Container dynamicContainer = mock(Container.class);
@@ -224,6 +241,34 @@ public class PageLayoutServiceTest {
     pageLayoutService.createPage(pageModel, TEST_USER);
     verify(page).setAccessPermissions(argThat(permissions -> permissions[0].equals(pagePermission)));
     verify(page).setEditPermission(argThat(permission -> permission.equals(pageEditPermission)));
+  }
+
+  @Test
+  @SneakyThrows
+  public void createPageWithLink() {
+    PageCreateModel pageModel = mock(PageCreateModel.class);
+    when(pageModel.getPageSiteType()).thenReturn(SITE_KEY.getTypeName());
+    when(pageModel.getPageSiteName()).thenReturn(SITE_KEY.getName());
+    when(pageModel.getPageType()).thenReturn(PageType.LINK.name());
+    when(pageModel.getLink()).thenReturn("#link");
+    when(pageModel.getPageName()).thenReturn(PAGE_KEY.getName());
+
+    String pageTitle = "pageTitle";
+    when(pageModel.getPageTitle()).thenReturn(pageTitle);
+    String sitePermission = "site permission";
+    when(portalConfig.getAccessPermissions()).thenReturn(new String[] { sitePermission });
+    String siteEditPermission = "site edit permission";
+    when(portalConfig.getEditPermission()).thenReturn(siteEditPermission);
+    when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
+    when(aclService.canEditNavigation(SITE_KEY, TEST_USER)).thenReturn(true);
+
+    pageLayoutService.createPage(pageModel, TEST_USER);
+    verify(layoutService).save(any(PageContext.class),
+                               argThat(p -> p.getAccessPermissions()[0].equals(sitePermission)
+                                            && p.getEditPermission().equals(siteEditPermission)
+                                            && p.getLink().equals(pageModel.getLink())
+                                            && p.getType().equals(PageType.LINK.name())
+                                            && p.getTitle().equals(pageTitle)));
   }
 
   @Test

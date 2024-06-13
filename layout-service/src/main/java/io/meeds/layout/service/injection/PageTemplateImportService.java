@@ -237,6 +237,7 @@ public class PageTemplateImportService {
       uploadResource.setStatus(UploadResource.UPLOADED_STATUS);
       uploadResource.setStoreLocation(resource.getPath());
       UploadedAttachmentDetail uploadedAttachmentDetail = new UploadedAttachmentDetail(uploadResource);
+      attachmentService.deleteAttachments(PageTemplateAttachmentPlugin.OBJECT_TYPE, String.valueOf(pageTemplateId));
       attachmentService.saveAttachment(uploadedAttachmentDetail,
                                        PageTemplateAttachmentPlugin.OBJECT_TYPE,
                                        String.valueOf(pageTemplateId),
