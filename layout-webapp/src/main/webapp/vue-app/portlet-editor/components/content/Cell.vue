@@ -19,28 +19,50 @@
 
 -->
 <template>
-  <div
-    :style="cssStyle"
-    class="d-flex position-relative">
-    <v-card
-      v-if="isEmpty"
-      v-text="displayEmptyMessage && $t('portlets.emptyPortletInstanceContent') || ''"
-      class="d-flex align-center card-border-radius justify-center position-absolute full-width full-height"
-      flat />
-    <portlet-editor-application
-      ref="application"
-      @empty="isEmpty = $event"
-      @empty-message="displayEmptyMessage = true" />
-    <portlet-editor-cell-resize-button
-      ref="resizeButton"
-      v-if="$root.portletMode === 'view' && !isEmpty"
-      :moving="moving"
-      @move-start="moveStart" />
-  </div>
+  <v-hover v-model="hover" :disabled="!readOnly">
+    <div
+      :style="cssStyle"
+      class="d-flex position-relative">
+      <v-card
+        v-if="isEmpty"
+        v-text="displayEmptyMessage && $t('portlets.emptyPortletInstanceContent') || ''"
+        class="d-flex align-center card-border-radius justify-center position-absolute full-width full-height"
+        flat />
+      <div
+        v-else-if="readOnly"
+        v-show="hover && !hoverResizeButton"
+        class="full-width full-height position-absolute z-index-two">
+        <v-expand-transition>
+          <v-card
+            v-if="hover && !hoverResizeButton"
+            class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text"
+            height="100%">
+            <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
+            <span>{{ $t('layout.readonlyPortletContent') }}</span>
+          </v-card>
+        </v-expand-transition>
+      </div>
+      <portlet-editor-application
+        ref="application"
+        @empty="isEmpty = $event"
+        @empty-message="displayEmptyMessage = true"
+        @initialized="initialized = true" />
+      <v-hover
+        v-if="$root.portletMode === 'view' && !isEmpty"
+        v-model="hoverResizeButton"
+        :disabled="!readOnly">
+        <portlet-editor-cell-resize-button
+          ref="resizeButton"
+          :moving="moving"
+          @move-start="moveStart" />
+      </v-hover>
+    </div>
+  </v-hover>
 </template>
 <script>
 export default {
   data: () => ({
+    initialized: false,
     movingStartX: 0,
     movingStartY: 0,
     movingX: 0,
@@ -49,6 +71,8 @@ export default {
     diffY: 0,
     updateDisplayInterval: 0,
     moving: false,
+    hoverResizeButton: false,
+    hover: false,
     isEmpty: null,
     displayEmptyMessage: false,
   }),
@@ -68,6 +92,12 @@ export default {
         width: this.width,
         height: this.height,
       };
+    },
+    readOnly() {
+      return this.initialized
+        && this.$root.portletInstance
+        && this.$root.portletMode === 'view'
+        && !this.$root.editablePortlet;
     },
   },
   watch: {

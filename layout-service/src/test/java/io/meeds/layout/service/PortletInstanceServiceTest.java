@@ -99,6 +99,9 @@ public class PortletInstanceServiceTest {
   @MockBean
   private PortletInstanceStorage          portletInstanceStorage;
 
+  @MockBean
+  private PortletService                  portletService;
+
   @Mock
   private PortletInstanceCategory         portletInstanceCategory;
 
@@ -641,6 +644,7 @@ public class PortletInstanceServiceTest {
                                Collections.singletonList("Everyone"),
                                Collections.singletonList("edit"),
                                true,
+                               false,
                                false);
   }
 

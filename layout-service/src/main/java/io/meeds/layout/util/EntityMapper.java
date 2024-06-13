@@ -65,7 +65,8 @@ public class EntityMapper {
                                            entity.getPermissions().stream().filter(StringUtils::isNotBlank).toList(),
                                portlet == null ? null : portlet.getSupportedModes(),
                                entity.isSystem(),
-                               entity.isDisabled());
+                               entity.isDisabled(),
+                               false);
   }
 
   public static PortletInstanceCategoryEntity toEntity(PortletInstanceCategory instance) {

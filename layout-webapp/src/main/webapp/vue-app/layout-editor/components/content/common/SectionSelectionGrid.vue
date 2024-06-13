@@ -19,7 +19,7 @@
 
 -->
 <template>
-  <div :class="gridClass" class="border-box-sizing pb-5">
+  <div :class="gridClass" class="border-box-sizing">
     <layout-editor-section-selection-grid-cell
       v-for="i in length"
       :id="`grid-cell-${i}`"
