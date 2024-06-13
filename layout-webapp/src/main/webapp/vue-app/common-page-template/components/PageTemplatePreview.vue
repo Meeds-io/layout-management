@@ -103,7 +103,7 @@ export default {
       }
     },
     uploadFile(file) {
-      if (file && file.size) {
+      if (file?.size) {
         if (file.size > this.maxUploadSize) {
           this.$root.$emit('alert-message', this.$t(this.$uploadService.avatarExcceedsLimitError), 'error');
           return;

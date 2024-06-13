@@ -146,7 +146,7 @@ export default {
       this.pageLayoutContent = pageTemplate.content;
       this.duplicate = duplicate;
       if (generateIllustration) {
-        const parentElement = document.querySelector('.layout-sections-parent').parentElement;
+        const parentElement = document.querySelector('.layout-sections-parent .layout-page-body').parentElement;
         parentElement.querySelectorAll('.layout-add-application-button').forEach(el => el.style.display = 'none');
         let previewCanvas;
         try {
@@ -161,7 +161,7 @@ export default {
           await this.$nextTick();
           this.$refs.drawer.open();
           await this.$nextTick();
-          this.$refs?.pagePreview?.uploadFile(previewBlob);
+          window.setTimeout(() => this.$refs?.pagePreview?.uploadFile(previewBlob), 200);
         }
       } else {
         await this.$nextTick();
