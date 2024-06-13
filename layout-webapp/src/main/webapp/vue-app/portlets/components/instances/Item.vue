@@ -23,6 +23,7 @@
     <!-- Illustration -->
     <td
       v-if="!$root.isMobile"
+      class="px-0"
       align="center">
       <layout-image-illustration
         :value="portletInstance"
