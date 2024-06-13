@@ -319,6 +319,7 @@ public class PortletInstanceImportService {
       uploadResource.setStatus(UploadResource.UPLOADED_STATUS);
       uploadResource.setStoreLocation(resource.getPath());
       UploadedAttachmentDetail uploadedAttachmentDetail = new UploadedAttachmentDetail(uploadResource);
+      attachmentService.deleteAttachments(PortletInstanceAttachmentPlugin.OBJECT_TYPE, String.valueOf(portletInstanceId));
       attachmentService.saveAttachment(uploadedAttachmentDetail,
                                        PortletInstanceAttachmentPlugin.OBJECT_TYPE,
                                        String.valueOf(portletInstanceId),
