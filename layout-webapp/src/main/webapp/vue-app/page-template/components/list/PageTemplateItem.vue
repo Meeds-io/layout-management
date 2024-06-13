@@ -3,6 +3,7 @@
     <!-- Illustration -->
     <td
       v-if="!$root.isMobile"
+      class="px-0"
       align="center"
       width="70px">
       <layout-image-illustration
