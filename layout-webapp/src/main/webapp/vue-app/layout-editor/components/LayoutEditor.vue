@@ -27,10 +27,31 @@
         :page="pageContext"
         :node="node"
         :node-labels="nodeLabels" />
-      <layout-editor-content
-        :page="pageContext"
-        :node="draftNode"
-        :layout="draftLayout" />
+      <coediting
+        v-model="draftNodeId"
+        :object-id="nodeId"
+        :messages="{
+          lockConfirmTitle: 'layout.lockConfirmTitle',
+          lockConfirmMessage: 'layout.lockConfirmMessage',
+          lockConfirmQuestion: 'layout.lockConfirmQuestion',
+          lockConfirmOkLabel: 'layout.lockConfirmOkLabel',
+          lockConfirmCancelLabel: 'layout.lockConfirmCancelLabel',
+          draftConfirmTitle: 'layout.draftConfirmTitle',
+          draftConfirmMessage: 'layout.draftConfirmMessage',
+          draftConfirmQuestion: 'layout.draftConfirmQuestion',
+          draftConfirmOkLabel: 'layout.draftConfirmOkLabel',
+          draftConfirmCancelLabel: 'layout.draftConfirmCancelLabel',
+        }"
+        object-type="navigation"
+        @initialized="initDraftPage"
+        @locked="stopLoading"
+        @draft-detected="stopLoading"
+        @canceled="cancelEditPage">
+        <layout-editor-content
+          :page="pageContext"
+          :node="draftNode"
+          :layout="draftLayout" />
+      </coediting>
       <layout-editor-cells-selection-box />
     </main>
     <layout-analytics
@@ -42,6 +63,7 @@ export default {
   data: () => ({
     node: null,
     pageContext: null,
+    draftNodeId: null,
     draftNode: null,
     draftLayout: null,
     nodeLabels: null,
@@ -58,9 +80,6 @@ export default {
     },
     nodeId() {
       return this.getQueryParam('nodeId') || (this.pageTemplateId && eXo.env.portal.selectedNodeId);
-    },
-    draftNodeId() {
-      return this.draftNode?.id;
     },
     draftPageKey() {
       return this.draftNode?.state?.pageRef;
@@ -128,10 +147,6 @@ export default {
                   .finally(() => this.$root.nodeUri = uri);
               });
           }
-          this.$navigationLayoutService.getNode(this.nodeId)
-            .then(node => this.node = node)
-            .then(() => this.$navigationLayoutService.createDraftNode(this.node.id))
-            .then(draftNode => this.draftNode = draftNode);
         }
       },
     },
@@ -156,13 +171,49 @@ export default {
   },
   created() {
     this.$root.$on('layout-draft-refresh', this.setDraftLayout);
+    if (this.pageTemplateId) {
+      this.$root.$on('page-templates-saved', this.deleteDraft);
+    } else {
+      this.$root.$on('layout-page-saved', this.deleteDraft);
+    }
   },
   beforeDestroy() {
     this.$root.$off('layout-draft-refresh', this.setDraftLayout);
+    if (this.pageTemplateId) {
+      this.$root.$off('page-templates-saved', this.deleteDraft);
+    } else {
+      this.$root.$off('layout-page-saved', this.deleteDraft);
+    }
   },
   methods: {
+    initDraftPage() {
+      if (this.draftNodeId) {
+        this.$navigationLayoutService.getNode(this.nodeId)
+          .then(node => this.node = node)
+          .then(() => this.$navigationLayoutService.getNode(this.draftNodeId))
+          .then(draftNode => this.draftNode = draftNode);
+      } else {
+        this.$navigationLayoutService.getNode(this.nodeId)
+          .then(node => this.node = node)
+          .then(() => this.$navigationLayoutService.createDraftNode(this.node.id))
+          .then(draftNode => {
+            this.draftNode = draftNode;
+            this.draftNodeId = draftNode?.id;
+          });
+      }
+    },
+    cancelEditPage() {
+      this.stopLoading();
+      window.close();
+    },
+    stopLoading() {
+      document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+    },
     setDraftLayout(draftLayout) {
       this.draftLayout = draftLayout;
+    },
+    deleteDraft() {
+      this.$root.$emit('coediting-remove-revision');
     },
     getQueryParam(paramName) {
       const uri = window.location.search.substring(1);

@@ -42,8 +42,11 @@
       class="me-3" />
     <layout-editor-toolbar-save-template-button
       v-if="pageTemplateId" />
+    <layout-editor-toolbar-save-draft-button
+      v-if="!pageTemplateId"
+      class="me-3" />
     <layout-editor-toolbar-save-button
-      v-else />
+      v-if="!pageTemplateId" />
   </v-card>
 </template>
 <script>
@@ -63,6 +66,9 @@ export default {
     },
   },
   computed: {
+    disabledDraft() {
+      return !this.$root.sectionHistory?.length && !this.$root.sectionRedo?.length;
+    },
     isAdministrator() {
       return eXo.env.portal.isAdministrator;
     },
