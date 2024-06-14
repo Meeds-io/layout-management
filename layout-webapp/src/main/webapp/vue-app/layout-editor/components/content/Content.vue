@@ -230,6 +230,7 @@ export default {
       }
     },
     handlePageSaved() {
+      this.$root.$emit('coediting-remove-revision');
       document.dispatchEvent(new CustomEvent('alert-message', {detail: {
         alertLink: `/portal${this.$root.nodeUri}`,
         alertMessage: this.$t('layout.pageSavedSuccessfully'),
@@ -400,6 +401,7 @@ export default {
         .finally(() => {
           window.setTimeout(() => this.loading--, 200);
           this.$root.$emit('layout-draft-saved');
+          this.$root.$emit('coediting-set-lock');
         });
     },
   },

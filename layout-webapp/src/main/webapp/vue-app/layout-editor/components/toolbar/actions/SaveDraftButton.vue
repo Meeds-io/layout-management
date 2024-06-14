@@ -21,31 +21,21 @@
 <template>
   <v-tooltip v-if="canSave" bottom>
     <template #activator="{on, attrs}">
-      <div
+      <v-btn
         v-on="on"
-        v-bind="attrs">
-        <v-btn
-          :disabled="disabled"
-          :loading="loading"
-          :aria-label="$t('layout.publish')"
-          class="btn btn-primary d-flex align-center"
-          elevation="0"
-          @click="savePage">
-          <span class="text-none">{{ $t('layout.publish') }}</span>
-        </v-btn>
-      </div>
+        v-bind="attrs"
+        :loading="loading"
+        :aria-label="$t('layout.saveDraft')"
+        class="btn me-3"
+        @click="saveDraft">
+        {{ $t('layout.saveDraft') }}
+      </v-btn>
     </template>
-    <span>{{ $t('layout.publishTooltip') }}</span>
+    <span>{{ $t('layout.saveDraftTooltip') }}</span>
   </v-tooltip>
 </template>
 <script>
 export default {
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
   data: () => ({
     loading: false,
   }),
@@ -55,16 +45,14 @@ export default {
     },
   },
   methods: {
-    savePage() {
-      if (!this.canSave) {
-        return;
-      }
+    saveDraft() {
       this.loading = true;
-      const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout, false, true);
-      return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, 'contentId', true)
-        .then(() => this.$root.$emit('layout-page-saved'))
-        .catch(() => this.$root.$emit('alert-message', this.$t('layout.pageSavingError'), 'error'))
-        .finally(() => window.setTimeout(() => this.loading = false));
+      this.$root.$on('layout-draft-saved', this.stopLoading);
+      this.$root.$emit('layout-save-draft');
+    },
+    stopLoading() {
+      this.$root.$off('layout-draft-saved', this.stopLoading);
+      this.loading = false;
     },
   },
 };
