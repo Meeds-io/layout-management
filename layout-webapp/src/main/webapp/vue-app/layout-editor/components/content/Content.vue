@@ -400,6 +400,7 @@ export default {
         .finally(() => {
           window.setTimeout(() => this.loading--, 200);
           this.$root.$emit('layout-draft-saved');
+          this.$root.$emit('coediting-set-lock');
         });
     },
   },
