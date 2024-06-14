@@ -98,16 +98,16 @@ export default {
           value: 'disabled',
           align: 'center',
           sortable: true,
-          class: 'page-template-category-header',
-          width: '60px'
+          class: 'page-template-category-header text-no-wrap',
+          width: '90px'
         },
         {
           text: this.$t('pageTemplates.label.actions'),
           value: 'actions',
           align: 'center',
           sortable: false,
-          class: 'page-template-actions-header',
-          width: '50px'
+          class: 'page-template-actions-header text-no-wrap',
+          width: '90px'
         },
       ];
     },

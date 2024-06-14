@@ -136,16 +136,16 @@ export default {
           value: 'disabled',
           align: 'center',
           sortable: true,
-          class: 'portlet-instance-status-header',
-          width: '75px'
+          class: 'portlet-instance-status-header text-no-wrap',
+          width: '90px'
         },
         {
           text: this.$t('portlets.label.actions'),
           value: 'actions',
           align: 'center',
           sortable: false,
-          class: 'portlet-instance-actions-header',
-          width: '75px'
+          class: 'portlet-instance-actions-header text-no-wrap',
+          width: '90px'
         },
       ];
     },
