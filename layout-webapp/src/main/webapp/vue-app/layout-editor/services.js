@@ -18,10 +18,16 @@
  */
 
 import * as layoutUtils from './js/LayoutUtils.js';
+import * as coeditingService from './js/CoeditingService.js';
 
 if (!Vue.prototype.$layoutUtils) {
   window.Object.defineProperty(Vue.prototype, '$layoutUtils', {
     value: layoutUtils,
+  });
+}
+if (!Vue.prototype.$coeditingService) {
+  window.Object.defineProperty(Vue.prototype, '$coeditingService', {
+    value: coeditingService,
   });
 }
 
