@@ -1,14 +1,10 @@
 <%
   import java.util.List;
   import java.util.ArrayList;
-
-  import io.meeds.layout.service.NavigationLayoutService;
-
   import org.exoplatform.portal.application.PortalRequestContext;
   import org.exoplatform.portal.webui.application.UIPortlet;
 
   PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
-  NavigationLayoutService navigationLayoutService = uicomponent.getApplicationComponent(NavigationLayoutService.class);
 
   String pageRef = rcontext.getUiPage().getPageId();
 
@@ -21,10 +17,12 @@
     for (int i =0; i < portlets.size(); i++) {
       def portletId = portlets.get(i).getId();
       if (portletId != null) {
-        rcontext.getResponse().addHeader("Link", "<" + rcontext.getRequest().getRequestURI() + "?maximizedPortletId=" + portletId + "&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=VIEW>; rel=preload; as=fetch; crossorigin=use-credentials", false);
+        %>
+        <link rel="prefetch" as="fetch" type="text/html" href="<%=rcontext.getRequest().getRequestURI()%>?maximizedPortletId<%=portletId%>&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=VIEW" crossorigin><%
       }
     }
   }
+
   String cssClass = uicomponent.getCssClass() == null ? "" : " class='" + uicomponent.getCssClass() + "'";
 %>
 <div class="VuetifyApp">
