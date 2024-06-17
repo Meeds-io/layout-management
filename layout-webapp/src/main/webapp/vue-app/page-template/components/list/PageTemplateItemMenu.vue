@@ -51,6 +51,7 @@
                   :href="editLayoutLink"
                   :disabled="pageTemplate.system"
                   target="_blank"
+                  rel="opener"
                   dense>
                   <v-icon
                     :class="pageTemplate.system && 'disabled--text'"
