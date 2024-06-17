@@ -153,12 +153,14 @@
             <v-checkbox v-model="boxShadow" />
           </v-list-item-action>
         </v-list-item>
-        <layout-editor-background-input
-          v-if="backgroundProperties"
-          ref="backgroundInput"
-          v-model="backgroundProperties"
-          immediate-save
-          class="mt-4" />
+        <div class="d-flex align-center mt-4">
+          <div class="subtitle-1 font-weight-bold me-auto">
+            {{ $t('layout.borderRadius') }}
+          </div>
+          <v-switch
+            v-model="enableBorderRadius"
+            class="ms-auto my-auto me-n2" />
+        </div>
         <div
           v-if="enableBorderRadius"
           :class="radiusChoice === 'same' && 'flex-row' || 'flex-column'"
@@ -216,6 +218,12 @@
               class="my-auto me-n3" />
           </v-list-item>
         </div>
+        <layout-editor-background-input
+          v-if="backgroundProperties"
+          ref="backgroundInput"
+          v-model="backgroundProperties"
+          immediate-save
+          class="mt-4" />
         <div class="d-flex align-center mt-4">
           <div class="subtitle-1 font-weight-bold me-auto mb-2">
             {{ $t('layout.advancedOptions') }}
