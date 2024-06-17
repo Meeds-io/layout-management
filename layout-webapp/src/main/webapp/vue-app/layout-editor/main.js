@@ -139,7 +139,9 @@ export function init() {
             }
           },
           nodeUri() {
-            if (this.nodeUri) {
+            if (window.opener) {
+              eXo.env.portal.webPageUrl = window.opener.location.pathname;
+            } else {
               eXo.env.portal.webPageUrl = `/portal${this.nodeUri}`;
             }
           },
