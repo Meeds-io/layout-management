@@ -23,12 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -228,14 +230,15 @@ public class PageTemplateImportService {
   }
 
   protected void saveIllustration(long pageTemplateId, String imagePath) {
+    File tempFile = null;
     try {
-      URL resource = configurationManager.getResource(imagePath);
+      tempFile = getIllustrationFile(imagePath);
       String uploadId = "PageTemplateIllustration" + RANDOM.nextLong();
       UploadResource uploadResource = new UploadResource(uploadId);
-      uploadResource.setFileName(new File(resource.getPath()).getName());
+      uploadResource.setFileName(tempFile.getName());
       uploadResource.setMimeType("image/png");
       uploadResource.setStatus(UploadResource.UPLOADED_STATUS);
-      uploadResource.setStoreLocation(resource.getPath());
+      uploadResource.setStoreLocation(tempFile.getPath());
       UploadedAttachmentDetail uploadedAttachmentDetail = new UploadedAttachmentDetail(uploadResource);
       attachmentService.deleteAttachments(PageTemplateAttachmentPlugin.OBJECT_TYPE, String.valueOf(pageTemplateId));
       attachmentService.saveAttachment(uploadedAttachmentDetail,
@@ -248,6 +251,14 @@ public class PageTemplateImportService {
                                                     imagePath,
                                                     pageTemplateId),
                                       e);
+    } finally {
+      if (tempFile != null) {
+        try {
+          Files.delete(tempFile.toPath());
+        } catch (IOException e) {
+          tempFile.deleteOnExit();
+        }
+      }
     }
   }
 
@@ -270,6 +281,14 @@ public class PageTemplateImportService {
       return settingValue == null || settingValue.getValue() == null ? 0l : Long.parseLong(settingValue.getValue().toString());
     } catch (NumberFormatException e) {
       return 0l;
+    }
+  }
+
+  private File getIllustrationFile(String imagePath) throws Exception {
+    try (InputStream inputStream = configurationManager.getInputStream(imagePath)) {
+      File tempFile = File.createTempFile("temp", ".png");
+      FileUtils.copyInputStreamToFile(inputStream, tempFile);
+      return tempFile;
     }
   }
 
