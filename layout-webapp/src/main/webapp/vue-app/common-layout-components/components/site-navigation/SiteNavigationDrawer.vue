@@ -103,9 +103,6 @@ export default {
     },
     isMetaSite() {
       return this.site?.metaSite;
-    },
-    activeNode() {
-      return this.navigationNodesToDisplay.find(node => node.uri === eXo.env.portal.selectedNodeUri || this.site.rootNode);
     }
   },
   watch: {
@@ -150,7 +147,7 @@ export default {
         .finally(() => this.loading = false);
     },
     createNode() {
-      this.$root.$emit('open-site-navigation-add-node-drawer', this.activeNode);
+      this.$root.$emit('open-site-navigation-add-node-drawer', this.site.rootNode);
     },
     filterNavigationNodes(){
       this.navigationNodesToDisplay = [];
