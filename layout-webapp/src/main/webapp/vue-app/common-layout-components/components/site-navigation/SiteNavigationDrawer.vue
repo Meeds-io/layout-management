@@ -25,11 +25,7 @@
     allow-expand
     @closed="close">
     <template slot="title">
-      <span>{{ $t('siteNavigation.drawer.title') }}<v-chip
-        v-if="isMetaSite"
-        class="ms-4 primary">
-        {{ siteName }}
-      </v-chip></span> 
+      <span>{{ $t('siteNavigation.drawer.title') }}</span>
     </template>
     <template slot="content">
       <div :class="$refs.siteNavigationDrawer?.expand ? 'singlePageApplication' : ' ' ">
@@ -37,18 +33,18 @@
           color="white"
           flat
           dense>
-          <v-btn
-            v-if="isMetaSite"
-            @click="createNode"
-            class="btn btn-primary ms-2">
-            {{ $t('siteNavigation.label.btn.createNode') }}
-          </v-btn>
-          <v-chip
-            v-else
-            class="ms-4 mt-3 mb-4 primary">
-            {{ siteName }}
-          </v-chip>
-          <v-spacer />
+            <span
+              class="font-weight-bold">
+              {{ siteName }}
+            </span>
+            <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
+            <v-btn
+              v-if="isMetaSite"
+              @click="createNode"
+              class="btn btn-primary ms-2">
+              {{ $t('siteNavigation.label.btn.createNode') }}
+            </v-btn>
+          <v-spacer v-if="$refs.siteNavigationDrawer?.expand" />
           <select
             id="siteNavigationDrawerFilterSelect"
             v-model="filter"
@@ -107,6 +103,9 @@ export default {
     },
     isMetaSite() {
       return this.site?.metaSite;
+    },
+    activeNode() {
+      return this.navigationNodesToDisplay.find(node => node.uri === eXo.env.portal.selectedNodeUri || this.site.rootNode);
     }
   },
   watch: {
@@ -151,7 +150,7 @@ export default {
         .finally(() => this.loading = false);
     },
     createNode() {
-      this.$root.$emit('open-site-navigation-add-node-drawer', this.site.rootNode);
+      this.$root.$emit('open-site-navigation-add-node-drawer', this.activeNode);
     },
     filterNavigationNodes(){
       this.navigationNodesToDisplay = [];
