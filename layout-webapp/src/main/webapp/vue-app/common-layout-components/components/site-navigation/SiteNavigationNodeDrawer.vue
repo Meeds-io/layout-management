@@ -43,9 +43,8 @@
           <v-card-text class="d-flex pb-2">
             <v-label>
               <span class="text-color font-weight-bold text-start text-truncate-2">
-                {{ $t('siteNavigation.label.nodeLabel.title') }} *              
+                {{ $t('siteNavigation.label.nodeLabel.title') }}
               </span>
-              <p class="caption">{{ $t('siteNavigation.label.nodeLabel.description') }} </p>
             </v-label>
           </v-card-text>
           <v-card-text class="d-flex py-0">
@@ -55,6 +54,7 @@
               type="text"
               required="required"
               :rules="[nodeLabelRules.required]"
+              :placeholder="$t('siteNavigation.label.nodeLabel.placeholder')"
               outlined
               dense 
               @blur="blurOnNodeLabel">
@@ -68,19 +68,24 @@
               </template>
             </v-text-field>
           </v-card-text>
-          <v-card-text class="d-flex flex-grow-1 pb-2">
-            <v-label>
-              <span class="text-color font-weight-bold text-start mr-6 text-truncate-2">
-                {{ $t('siteNavigation.label.nodeId.title') }} *              
-              </span>
-              <p
-                v-if="nodeId && nodeId.length"
-                class="caption text-break mx-auto text-wrap text-left">
-                {{ nodeUrl }}
-              </p>
-            </v-label>
+          <v-card-text class="py-2">
+            <div class="d-flex align-center justify-space-between">
+              <div>
+                <span class="text-color font-weight-bold text-start mr-6 text-truncate-2 v-label">
+                  {{ $t('siteNavigation.label.nodeId.title') }}
+                </span>
+                <p
+                  v-if="nodeId && nodeId.length"
+                  class="caption text-break mx-auto text-wrap text-left mb-0">
+                  {{ nodeUrl }}
+                </p>
+              </div>
+              <v-switch
+                v-model="displayNodeName"
+                class="mt-0 me-0" />
+            </div>
           </v-card-text>
-          <v-card-text class="d-flex py-0">
+          <v-card-text v-if="displayNodeName" class="d-flex pt-0">
             <v-text-field
               v-model="nodeId"
               class="pt-0"
@@ -88,95 +93,9 @@
               required="required"
               :rules="nodeIdRules"
               :disabled="disableNodeId"
+              :placeholder="$t('siteNavigation.label.nodeId.placeholder')"
               outlined
               dense />
-          </v-card-text>
-          <v-card-text class="d-flex flex-grow-1 pb-2">
-            <v-label>
-              <span class="text-color font-weight-bold text-start mr-6 text-truncate-2">
-                {{ $t('siteNavigation.label.icon.title') }}             
-              </span>
-              <p class="caption"> {{ $t('siteNavigation.label.icon.description') }}  </p>
-            </v-label>
-          </v-card-text>
-          <v-card-text class="d-flex py-0 pb-8">
-            <div
-              class="d-flex flex-grow-1 full-width">
-              <div class="me-2 ms-auto">
-                <v-tooltip bottom>
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      v-on="on"
-                      v-bind="attrs"
-                      id="changeIconButton"
-                      class="light-black-background border-color"
-                      icon
-                      outlined
-                      dark
-                      small
-                      @click="openNodeIconPickerDrawer">
-                      <v-icon size="13">fas fa-file-image</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>{{ $t('siteNavigation.btn.changeIcon.title') }}</span>
-                </v-tooltip>
-              </div>
-            </div>
-          </v-card-text>
-          <v-card-text class="flex-grow-1 align-center pb-8">
-            <v-icon
-              size="32"
-              color="black">
-              {{ icon }}
-            </v-icon>
-          </v-card-text>
-          <v-card-text class="d-flex flex-grow-1 pb-2">
-            <v-label>
-              <span class="text-color font-weight-bold pt-2">
-                {{ $t('siteNavigation.label.visibility.title') }} 
-              </span>
-            </v-label>
-            <v-tooltip bottom>
-              <template #activator="{ on, attrs }">
-                <v-icon
-                  v-on="on"
-                  v-bind="attrs"
-                  color="black"
-                  size="24"
-                  class="pl-2">
-                  fa-info-circle
-                </v-icon>
-              </template>
-              <span>{{ $t('siteNavigation.label.visibility.info') }}</span>
-            </v-tooltip>
-          </v-card-text>
-          <v-card-text>
-            <div class="d-flex flex-row">
-              <v-switch      
-                v-model="visible"
-                class="mt-0 me-1" />
-              <span class="caption pt-1">
-                {{ $t('siteNavigation.label.visibility.visible') }}
-              </span>
-            </div>
-            <div
-              class="d-flex flex-row"
-              v-if="visible">
-              <v-switch   
-                v-model="isScheduled" 
-                class="mt-0 me-1" />
-              <span class="caption pt-1">
-                {{ $t('siteNavigation.label.visibility.scheduleVisibility') }}
-              </span>
-            </div>
-          </v-card-text>
-          <v-card-text class="pt-0" v-if="visible && isScheduled">
-            <site-navigation-schedule-date-pickers
-              :start-schedule-date="startScheduleDate"
-              :end-schedule-date="endScheduleDate"
-              :start-schedule-time="startScheduleTime"
-              :end-schedule-time="endScheduleTime"
-              @change="updateDates" />
           </v-card-text>
           <v-card-text class="d-flex flex-grow-1 text-no-wrap text-left font-weight-bold pb-2">
             <v-label>
@@ -185,7 +104,7 @@
               </span>
             </v-label>
           </v-card-text>
-          <v-card-text class="d-flex flex-row">
+          <v-card-text class="d-flex flex-row pt-0">
             <div class="d-flex flex-column">
               <v-radio-group
                 v-model="nodeType"
@@ -217,6 +136,72 @@
                 </p>
               </v-radio-group>
             </div>
+          </v-card-text>
+          <v-card-text class="d-flex flex-grow-1 pb-2 pt-0">
+            <v-label>
+              <span class="text-color font-weight-bold text-start mr-6 text-truncate-2">
+                {{ $t('siteNavigation.label.icon.title') }}
+              </span>
+            </v-label>
+          </v-card-text>
+          <v-card-text class="d-flex pt-2">
+            <div
+              class="d-flex flex-grow-1 full-width">
+              <v-icon
+                size="32"
+                class="icon-default-color">
+                {{ icon }}
+              </v-icon>
+              <v-tooltip bottom>
+                <template #activator="{ on, attrs }">
+                  <v-btn
+                    v-on="on"
+                    v-bind="attrs"
+                    id="changeIconButton"
+                    class="btn btn-primary ms-3"
+                    outlined
+                    @click="openNodeIconPickerDrawer">
+                    <span>{{ $t('siteNavigation.label.icon.upload') }}</span>
+                  </v-btn>
+                </template>
+                <span>{{ $t('siteNavigation.btn.changeIcon.title') }}</span>
+              </v-tooltip>
+            </div>
+          </v-card-text>
+          <v-card-text class="d-flex flex-grow-1 pb-0">
+            <v-label>
+              <span class="text-color font-weight-bold pt-2">
+                {{ $t('siteNavigation.label.visibility.title') }}
+              </span>
+            </v-label>
+          </v-card-text>
+          <v-card-text class="pt-2">
+            <div class="d-flex align-center justify-space-between flex-row">
+              <span class="caption">
+                {{ $t('siteNavigation.label.visibility.visible') }}
+              </span>
+              <v-switch
+                v-model="visible"
+                class="mt-0 me-0" />
+            </div>
+            <div
+              class="d-flex align-center justify-space-between flex-row"
+              v-if="visible">
+              <span class="caption pt-1">
+                {{ $t('siteNavigation.label.visibility.scheduleVisibility') }}
+              </span>
+              <v-switch
+                v-model="isScheduled"
+                class="mt-0 me-0" />
+            </div>
+          </v-card-text>
+          <v-card-text class="pt-0" v-if="visible && isScheduled">
+            <site-navigation-schedule-date-pickers
+              :start-schedule-date="startScheduleDate"
+              :end-schedule-date="endScheduleDate"
+              :start-schedule-time="startScheduleTime"
+              :end-schedule-time="endScheduleTime"
+              @change="updateDates" />
           </v-card-text>
         </v-form>
       </template>
@@ -276,6 +261,7 @@ export default {
       visible: true,
       isScheduled: false,
       disableNodeId: false,
+      displayNodeName: false,
       nodeType: 'Group',
       parentNavigationNodeUrl: '',
       editMode: false,
@@ -300,7 +286,7 @@ export default {
   },
   computed: {
     icon() {
-      return this.nodeIcon ? this.nodeIcon : 'fas fa-folder';
+      return this.nodeIcon ? this.nodeIcon : 'fas fa-project-diagram';
     },
     title() {
       return this.editMode ? this.$t('siteNavigation.drawer.editNode.title') : this.$t('siteNavigation.drawer.addNode.title');
@@ -365,6 +351,7 @@ export default {
       this.nodeLabel = null;
       this.visible = true;
       this.isScheduled = false;
+      this.displayNodeName = false;
       this.nodeType = 'Group';
       this.disableNodeId = false;
       this.editMode= false;
