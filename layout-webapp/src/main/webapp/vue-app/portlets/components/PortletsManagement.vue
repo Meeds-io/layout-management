@@ -20,23 +20,23 @@
 -->
 <template>
   <v-app>
-    <v-card
-      :class="tabName === 'portlets' && 'card-border-radius app-background-color overflow-hidden' || 'transparent'"
-      class="position-static pb-5"
-      flat>
-      <portlets-toolbar
-        ref="toolbar"
-        :tab-name="tabName"
-        class="card-border-radius app-background-color overflow-hidden"
-        @portlet-instance-filter="keyword = $event"
-        @select-tab="selectTab" />
-      <portlets-instance-main
-        v-if="tabName === 'instances'"
-        :keyword="keyword" />
-      <portlets-list
-        v-else-if="tabName === 'portlets'"
-        :keyword="keyword" />
-    </v-card>
+    <main
+      class="application-body position-static">
+      <div :class="tabName !== 'instances' && 'application-layout-style'">
+        <portlets-toolbar
+          ref="toolbar"
+          :tab-name="tabName"
+          :class="tabName === 'instances' && 'application-layout-style'"
+          @portlet-instance-filter="keyword = $event"
+          @select-tab="selectTab" />
+        <portlets-instance-main
+          v-if="tabName === 'instances'"
+          :keyword="keyword" />
+        <portlets-list
+          v-else-if="tabName === 'portlets'"
+          :keyword="keyword" />
+      </div>
+    </main>
     <portlets-item-instances-drawer />
     <portlets-instance-category-drawer />
     <portlets-instance-drawer />
