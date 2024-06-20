@@ -26,7 +26,7 @@
     flat>
     <layout-editor-container-extension
       :container="pageLayout"
-      class="layout-page-body" />
+      class="layout-page-body no-border-radius" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
