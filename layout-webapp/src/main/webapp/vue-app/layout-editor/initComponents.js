@@ -34,6 +34,7 @@ import NumberInput from './components/form/NumberInput.vue';
 import ColorPicker from './components/form/ColorPicker.vue';
 import BackgroundImageAttachment from './components/form/BackgroundImageAttachment.vue';
 import BackgroundInput from './components/form/BackgroundInput.vue';
+import TextColorInput from './components/form/TextColorInput.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -103,6 +104,7 @@ const components = {
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
   'layout-editor-background-image-attachment': BackgroundImageAttachment,
   'layout-editor-background-input': BackgroundInput,
+  'layout-editor-text-color-input': TextColorInput,
   'layout-editor-application-card': ApplicationCard,
   'layout-editor-application-category-card': ApplicationCategoryCard,
   'layout-editor-application-menu': ApplicationMenu,
