@@ -105,30 +105,17 @@
                 v-model="nodeType"
                 class="mt-0">
                 <v-radio
+                  :label="$t('siteNavigation.label.newPage')"
+                  value="PAGE" />
+                <v-radio
+                  :label="$t('siteNavigation.label.existingPage')"
+                  value="existingPage" />
+                <v-radio
+                  :label="$t('siteNavigation.label.link')"
+                  value="LINK" />
+                <v-radio
                   :label="$t('siteNavigation.label.nodeType.group')"
                   value="Group" />
-                <p class="caption text-light-color ms-8 me-2 mt-n2">
-                  {{ $t('siteNavigation.label.nodeType.group.caption') }}
-                </p>
-                <div class="d-flex">
-                  <v-radio
-                    :label="$t('siteNavigation.label.nodeType.pageOrLink')"
-                    value="pageOrLink" />
-                  <a
-                    v-if="this.navigationNode && this.navigationNode.pageKey && this.editMode"
-                    class="mx-4"
-                    @click="openAddElementDrawer">
-                    <v-icon
-                      class="pb-1"
-                      size="13">
-                      fas fa-edit
-                    </v-icon>
-                    {{ $t('siteNavigation.label.editElement') }}
-                  </a>
-                </div>
-                <p class="caption text-light-color ms-8 me-2 text-wrap text-break text-truncate-2">
-                  {{ $t('siteNavigation.label.nodeType.pageOrLink.caption') }}
-                </p>
               </v-radio-group>
             </div>
           </v-card-text>
@@ -290,7 +277,7 @@ export default {
       return !(this.isValidInputs && this.nodeId && this.nodeLabel);
     },
     displayNextBtn() {
-      return this.editMode ? this.nodeType === 'pageOrLink' && !this.navigationNode.pageKey : this.nodeType === 'pageOrLink';
+      return this.editMode ? this.nodeType === 'PAGE' && !this.navigationNode.pageKey : this.nodeType === 'PAGE';
     },
   },
   created() {
