@@ -430,7 +430,7 @@ export default {
       } else {
         this.boxShadow = null;
         this.borderColor = null;
-        this.borderSize = 1;
+        this.borderSize = 0;
       }
     },
     enableBorderRadius(val) {
