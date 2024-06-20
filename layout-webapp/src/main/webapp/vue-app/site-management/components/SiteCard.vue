@@ -24,7 +24,6 @@
     hover
     @click="openSiteNavigationDrawer">
     <v-toolbar
-      color="white"
       flat
       dense
       class="mt-2">
@@ -38,7 +37,6 @@
     </div>
     <v-footer absolute class="px-0 py-0">
       <v-toolbar
-        color="white"
         flat
         dense>
         <v-icon
