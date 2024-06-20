@@ -30,13 +30,14 @@ export function getStyle(container, options) {
       style[options.isApplicationStyle && '--appHeight' || 'height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
       if (options.isApplicationScroll) {
         style['--appHeightScroll'] = 'auto';
+        style['--appWidthScroll'] = 'hidden';
       }
     }
   
     if (container.width === 'fullWindow') {
       style['--allPagesSinglePageApplicationWidth'] = 'calc(100% - 40px)';
       style['--allPagesSinglePageApplicationPadding'] = '0';
-      style['--allPagesSinglePageApplicationMargin'] = '0 20px';
+      style['--allPagesSinglePageApplicationMargin'] = '20px';
     } else if (container.width) {
       style[options.isApplicationStyle && '--appWidth' || 'width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
       if (options.isApplicationScroll) {
