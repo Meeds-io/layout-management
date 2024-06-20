@@ -69,6 +69,9 @@ export const containerModel = {
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  textColor: null,
+  textHeaderColor: null,
+  textSubtitleColor: null,
   // Used to specify whether the block should be displayed or not
   // when an addon is present
   profiles: null,
@@ -110,6 +113,9 @@ export const applicationModel = {
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  textColor: null,
+  textHeaderColor: null,
+  textSubtitleColor: null,
   accessPermissions: ['Everyone'],
 };
 

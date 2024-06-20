@@ -57,87 +57,93 @@ import lombok.NoArgsConstructor;
 @JsonInclude(value = Include.NON_EMPTY)
 public class LayoutModel {
 
-  protected String                          id;
+  protected String                        id;
 
-  protected String                          storageId;
+  protected String                        storageId;
 
-  protected String                          storageName;
+  protected String                        storageName;
 
-  protected String                          name;
+  protected String                        name;
 
-  protected String                          icon;
+  protected String                        icon;
 
-  protected String                          template;
+  protected String                        template;
 
-  protected String                          factoryId;
+  protected String                        factoryId;
 
-  protected String                          title;
+  protected String                        title;
 
-  protected String                          description;
+  protected String                        description;
 
-  protected String                          width;
+  protected String                        width;
 
-  protected String                          height;
+  protected String                        height;
 
-  protected String                          cssClass;
+  protected String                        cssClass;
 
-  protected String                          borderColor;
+  protected String                        borderColor;
 
-  private String                            borderSize;
+  private String                          borderSize;
 
-  private String                            boxShadow;
+  private String                          boxShadow;
 
-  private String                            backgroundColor;
+  private String                          backgroundColor;
 
-  private String                            backgroundImage;
+  private String                          backgroundImage;
 
-  private String                            backgroundEffect;
+  private String                          backgroundEffect;
 
-  private String                            backgroundPosition;
+  private String                          backgroundPosition;
 
-  private String                            backgroundSize;
+  private String                          backgroundSize;
 
-  private String                            backgroundRepeat;
+  private String                          backgroundRepeat;
 
-  protected String[]                        accessPermissions;
+  private String                          textColor;
+
+  private String                          textHeaderColor;
+
+  private String                          textSubtitleColor;
+
+  private String[]                        accessPermissions;
 
   // Specific to container
-  protected String                          profiles;
+  private String                          profiles;
 
-  protected String[]                        moveAppsPermissions;
+  private String[]                        moveAppsPermissions;
 
-  protected String[]                        moveContainersPermissions;
+  private String[]                        moveContainersPermissions;
 
-  protected List<PortletInstancePreference> preferences;
+  private List<PortletInstancePreference> preferences;
 
-  protected List<LayoutModel>               children;
+  private List<LayoutModel>               children;
 
   // Specific to applications
-  private String                            contentId;
+  private String                          contentId;
 
-  private boolean                           showInfoBar;
+  private boolean                         showInfoBar;
 
-  private boolean                           showApplicationState = true;
+  private boolean                         showApplicationState = true;
 
-  private boolean                           showApplicationMode  = true;
+  private boolean                         showApplicationMode  = true;
 
   // Specific to page
-  private String                            editPermission;
+  private String                          editPermission;
 
   @JsonProperty(access = Access.READ_ONLY)
-  private PageKey                           pageKey;
+  private PageKey                         pageKey;
 
-  private String                            ownerType;
+  private String                          ownerType;
 
-  private String                            ownerId;
+  private String                          ownerId;
 
-  private boolean                           showMaxWindow;
+  private boolean                         showMaxWindow;
 
-  private boolean                           hideSharedLayout;
+  private boolean                         hideSharedLayout;
 
-  private String                            type;
+  private String                          type;
 
-  private String                            link;
+  private String                          link;
 
   public LayoutModel(ModelObject model) {
     init(model);
@@ -155,6 +161,9 @@ public class LayoutModel {
       this.backgroundPosition = cssStyle.getBackgroundPosition();
       this.backgroundSize = cssStyle.getBackgroundSize();
       this.backgroundRepeat = cssStyle.getBackgroundRepeat();
+      this.textColor = cssStyle.getTextColor();
+      this.textHeaderColor = cssStyle.getTextHeaderColor();
+      this.textSubtitleColor = cssStyle.getTextSubtitleColor();
     }
 
     if (model instanceof Container container) {
@@ -246,6 +255,9 @@ public class LayoutModel {
       cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
       cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
       cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
+      cssStyle.setTextColor(layoutModel.getTextColor());
+      cssStyle.setTextHeaderColor(layoutModel.getTextHeaderColor());
+      cssStyle.setTextSubtitleColor(layoutModel.getTextSubtitleColor());
     }
 
     if (StringUtils.isNotBlank(layoutModel.template)) {

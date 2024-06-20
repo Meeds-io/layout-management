@@ -23,7 +23,6 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 }
 
 export function getStyle(container, options) {
-
   const style = {};
   if (!options.onlyBackgroundStyle) {
     if (container.height) {
@@ -79,6 +78,15 @@ export function getStyle(container, options) {
       if (container.backgroundPosition) {
         style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
       }
+    }
+    if (container.textColor) {
+      style['--allPagesBaseTextColor'] = container.textColor;
+    }
+    if (container.textHeaderColor) {
+      style['--allPagesBaseTextHeaderColor'] = container.textHeaderColor;
+    }
+    if (container.textSubtitleColor) {
+      style['--allPagesBaseTextSubtitleColor'] = container.textSubtitleColor;
     }
   }
   return style;
