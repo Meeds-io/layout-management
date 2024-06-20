@@ -224,6 +224,10 @@
           v-model="backgroundProperties"
           immediate-save
           class="mt-4" />
+        <layout-editor-text-color-input
+          ref="tectColorInput"
+          v-model="container"
+          class="mt-4" />
         <div class="d-flex align-center mt-4">
           <div class="subtitle-1 font-weight-bold me-auto mb-2">
             {{ $t('layout.advancedOptions') }}
@@ -342,6 +346,15 @@ export default {
     applicationContentId() {
       return this.container?.children?.[0]?.contentId || this.container?.contentId;
     },
+    textColor() {
+      return this.container?.textColor;
+    },
+    textHeaderColor() {
+      return this.container?.textHeaderColor;
+    },
+    textSubtitleColor() {
+      return this.container?.textSubtitleColor;
+    },
     application() {
       return this.$root.portletInstances?.find?.(a => a?.contentId === this.applicationContentId);
     },
@@ -401,6 +414,9 @@ export default {
         borderColor: this.borderColor,
         borderSize: this.borderSize || 0,
         boxShadow: this.boxShadow && 'true' || null,
+        textColor: this.textColor || null,
+        textHeaderColor: this.textHeaderColor || null,
+        textSubtitleColor: this.textSubtitleColor || null,
         ...this.backgroundProperties,
         hiddenOnMobile: this.hiddenOnMobile,
       } || null;
@@ -466,7 +482,7 @@ export default {
     styleClasses(value, oldVal) {
       if (value && oldVal) {
         this.$root.$emit('layout-section-history-add', this.sectionId);
-        this.$layoutUtils.applyContainerStyle(this.container, value);
+        this.$layoutUtils.applyContainerStyle(this.container, this.styleClasses);
         this.$root.$emit('layout-section-application-update-style', this.container);
       } else if (value && !oldVal) {
         this.initialized = true;
