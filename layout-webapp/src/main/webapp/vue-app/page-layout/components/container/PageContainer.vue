@@ -21,7 +21,7 @@
 <template>
   <page-layout-container-extension
     :container="container"
-    class="layout-page-body" />
+    class="layout-page-body no-border-radius" />
 </template>
 <script>
 export default {

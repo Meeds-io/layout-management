@@ -33,11 +33,12 @@
                 v-bind="attrs">
                 <v-hover v-model="hoverButton">
                   <v-btn
+                    class="white text-color border-color"
                     height="32"
                     width="32"
                     icon
                     @click="$root.$emit('layout-add-section-drawer', index)">
-                    <v-icon size="24">fa-plus</v-icon>
+                    <v-icon size="20">fa-plus</v-icon>
                   </v-btn>
                 </v-hover>
               </div>
@@ -57,15 +58,15 @@
                   v-bind="attrs">
                   <v-hover v-model="hoverButton">
                     <v-btn
+                      class="white text-color border-color draggable"
                       height="32"
                       width="32"
-                      class="draggable"
                       icon
                       @mousedown="$emit('move-start')"
                       @mouseup="$emit('move-end')"
                       @mouseout="$emit('move-end')"
                       @focusout="$emit('move-end')">
-                      <v-icon size="24">fa-arrows-alt</v-icon>
+                      <v-icon size="20">fa-arrows-alt</v-icon>
                     </v-btn>
                   </v-hover>
                 </div>
@@ -83,11 +84,12 @@
                   v-bind="attrs">
                   <v-hover v-model="hoverButton">
                     <v-btn
+                      class="white text-color border-color"
                       height="32"
                       width="32"
                       icon
                       @click="$root.$emit('layout-edit-section-drawer', index, length)">
-                      <v-icon size="24">fa-edit</v-icon>
+                      <v-icon size="20">fa-edit</v-icon>
                     </v-btn>
                   </v-hover>
                 </div>
@@ -104,11 +106,12 @@
                 v-bind="attrs">
                 <v-hover v-model="hoverButton">
                   <v-btn
+                    class="white text-color border-color"
                     height="32"
                     width="32"
                     icon
                     @click="$root.$emit('layout-add-section-drawer', index + 1)">
-                    <v-icon size="24">fa-plus</v-icon>
+                    <v-icon size="20">fa-plus</v-icon>
                   </v-btn>
                 </v-hover>
               </div>
