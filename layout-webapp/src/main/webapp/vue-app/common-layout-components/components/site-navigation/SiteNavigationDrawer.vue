@@ -33,17 +33,17 @@
           color="white"
           flat
           dense>
-            <span
-              class="font-weight-bold">
-              {{ siteName }}
-            </span>
-            <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
-            <v-btn
-              v-if="isMetaSite"
-              @click="createNode"
-              class="btn btn-primary ms-2">
-              {{ $t('siteNavigation.label.btn.createNode') }}
-            </v-btn>
+          <span
+            class="font-weight-bold">
+            {{ siteName }}
+          </span>
+          <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
+          <v-btn
+            v-if="isMetaSite"
+            @click="createNode"
+            class="btn btn-primary ms-2">
+            {{ $t('siteNavigation.label.btn.createNode') }}
+          </v-btn>
           <v-spacer v-if="$refs.siteNavigationDrawer?.expand" />
           <select
             id="siteNavigationDrawerFilterSelect"
