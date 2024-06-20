@@ -411,7 +411,10 @@ public class PageLayoutService {
                   cssStyle == null ? null : cssStyle.getBackgroundEffect(),
                   cssStyle == null ? null : cssStyle.getBackgroundPosition(),
                   cssStyle == null ? null : cssStyle.getBackgroundSize(),
-                  cssStyle == null ? null : cssStyle.getBackgroundRepeat())
+                  cssStyle == null ? null : cssStyle.getBackgroundRepeat(),
+                  cssStyle == null ? null : cssStyle.getTextColor(),
+                  cssStyle == null ? null : cssStyle.getTextHeaderColor(),
+                  cssStyle == null ? null : cssStyle.getTextSubtitleColor())
           .forEach(this::validateCSSStyleValue);
     if (modelObject instanceof Container container && !CollectionUtils.isEmpty(container.getChildren())) {
       container.getChildren().forEach(this::validateCSSInputs);
