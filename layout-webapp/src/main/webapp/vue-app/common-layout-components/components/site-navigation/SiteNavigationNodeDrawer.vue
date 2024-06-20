@@ -74,11 +74,6 @@
                 <span class="text-color font-weight-bold text-start mr-6 text-truncate-2 v-label">
                   {{ $t('siteNavigation.label.nodeId.title') }}
                 </span>
-                <p
-                  v-if="nodeId && nodeId.length"
-                  class="caption text-break mx-auto text-wrap text-left mb-0">
-                  {{ nodeUrl }}
-                </p>
               </div>
               <v-switch
                 v-model="displayNodeName"
@@ -297,10 +292,6 @@ export default {
     displayNextBtn() {
       return this.editMode ? this.nodeType === 'pageOrLink' && !this.navigationNode.pageKey : this.nodeType === 'pageOrLink';
     },
-    nodeUrl() {
-      const nodeuri = `${this.$t('siteNavigation.label.nodeId.description')}${this.parentNavigationNodeUrl}`;
-      return this.editMode ? nodeuri : `${nodeuri}/${this.nodeId}` ;
-    }
   },
   created() {
     this.$root.$on('open-site-navigation-add-node-drawer', this.open);
