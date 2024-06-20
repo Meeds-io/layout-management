@@ -69,6 +69,9 @@ export const containerModel = {
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  textColor: null,
+  textHeaderColor: null,
+  textSubtitleColor: null,
   // Used to specify whether the block should be displayed or not
   // when an addon is present
   profiles: null,
@@ -110,6 +113,9 @@ export const applicationModel = {
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  textColor: null,
+  textHeaderColor: null,
+  textSubtitleColor: null,
   accessPermissions: ['Everyone'],
 };
 
@@ -248,6 +254,9 @@ export function applyContainerStyle(container, containerStyle) {
   Vue.set(container, 'backgroundPosition', containerStyle.backgroundPosition || null);
   Vue.set(container, 'backgroundSize', containerStyle.backgroundSize || null);
   Vue.set(container, 'backgroundRepeat', containerStyle.backgroundRepeat || null);
+  Vue.set(container, 'textColor', containerStyle.textColor || null);
+  Vue.set(container, 'textHeaderColor', containerStyle.textHeaderColor || null);
+  Vue.set(container, 'textSubtitleColor', containerStyle.textSubtitleColor || null);
 }
 
 export function parseSections(layout) {

@@ -23,8 +23,16 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 }
 
 export function getStyle(container, options) {
-
   const style = {};
+  if (container.textColor) {
+    style['--allPagesBaseTextColor'] = container.textColor;
+  }
+  if (container.textHeaderColor) {
+    style['--allPagesBaseTextHeaderColor'] = container.textHeaderColor;
+  }
+  if (container.textSubtitleColor) {
+    style['--allPagesBaseTextSubtitleColor'] = container.textSubtitleColor;
+  }
   if (!options.onlyBackgroundStyle) {
     if (container.height) {
       style[options.isApplicationStyle && '--appHeight' || 'height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
