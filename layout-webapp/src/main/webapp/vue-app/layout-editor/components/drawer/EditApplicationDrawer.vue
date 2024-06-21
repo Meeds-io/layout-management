@@ -42,10 +42,16 @@
         max-width="100%"
         class="ma-4"
         flat>
-        <div class="subtitle-1 font-weight-bold mb-2">
-          {{ $t('layout.margins') }}
+        <div class="d-flex align-center mb-2">
+          <div class="subtitle-1 font-weight-bold me-auto">
+            {{ $t('layout.margins') }}
+          </div>
+          <v-switch
+            v-model="enableMargin"
+            class="ms-auto my-auto me-n2" />
         </div>
         <div
+          v-if="enableMargin"
           :class="marginChoice === 'same' && 'flex-row' || 'flex-column'"
           class="d-flex">
           <v-radio-group v-model="marginChoice" class="my-auto text-no-wrap ms-n1">
@@ -321,6 +327,7 @@ export default {
     section: null,
     container: null,
     backgroundProperties: null,
+    enableMargin: true,
     marginChoice: 'same',
     marginTop: 20,
     marginRight: 20,
@@ -465,6 +472,15 @@ export default {
         this.radiusBottomLeft = null;
       }
     },
+    enableMargin() {
+      if (this.drawer) {
+        this.marginChoice = 'same';
+        this.marginTop = 0;
+        this.marginRight = 0;
+        this.marginBottom = 0;
+        this.marginLeft = 0;
+      }
+    },
     radiusChoice() {
       if (this.radiusChoice === 'same') {
         this.radiusTopLeft = this.radiusTopRight;
@@ -549,6 +565,7 @@ export default {
         && this.radiusBottomRight === this.radiusTopLeft
         && this.radiusTopLeft === this.radiusBottomLeft
         && this.radiusBottomLeft === this.radiusTopRight ? 'same' : 'different';
+      this.enableMargin = this.marginChoice !== 'same' || this.marginRight !== 0;
 
       this.$nextTick(() => this.$refs.drawer.open());
     },
