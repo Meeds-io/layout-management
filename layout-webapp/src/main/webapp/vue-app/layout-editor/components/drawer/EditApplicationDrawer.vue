@@ -230,7 +230,7 @@
           v-model="backgroundProperties"
           immediate-save
           class="mt-4" />
-        <layout-editor-text-color-input
+        <layout-editor-text-input
           ref="tectColorInput"
           v-model="container"
           class="mt-4" />
@@ -353,15 +353,6 @@ export default {
     applicationContentId() {
       return this.container?.children?.[0]?.contentId || this.container?.contentId;
     },
-    textColor() {
-      return this.container?.textColor;
-    },
-    textHeaderColor() {
-      return this.container?.textHeaderColor;
-    },
-    textSubtitleColor() {
-      return this.container?.textSubtitleColor;
-    },
     application() {
       return this.$root.portletInstances?.find?.(a => a?.contentId === this.applicationContentId);
     },
@@ -421,9 +412,22 @@ export default {
         borderColor: this.borderColor,
         borderSize: this.borderSize || 0,
         boxShadow: this.boxShadow && 'true' || null,
-        textColor: this.textColor || null,
-        textHeaderColor: this.textHeaderColor || null,
-        textSubtitleColor: this.textSubtitleColor || null,
+        textTitleColor: this.container?.textTitleColor || null,
+        textTitleFontSize: this.container?.textTitleFontSize || null,
+        textTitleFontWeight: this.container?.textTitleFontWeight || null,
+        textTitleFontStyle: this.container?.textTitleFontStyle || null,
+        textHeaderColor: this.container?.textHeaderColor || null,
+        textHeaderFontSize: this.container?.textHeaderFontSize || null,
+        textHeaderFontWeight: this.container?.textHeaderFontWeight || null,
+        textHeaderFontStyle: this.container?.textHeaderFontStyle || null,
+        textColor: this.container?.textColor || null,
+        textFontSize: this.container?.textFontSize || null,
+        textFontWeight: this.container?.textFontWeight || null,
+        textFontStyle: this.container?.textFontStyle || null,
+        textSubtitleColor: this.container?.textSubtitleColor || null,
+        textSubtitleFontSize: this.container?.textSubtitleFontSize || null,
+        textSubtitleFontWeight: this.container?.textSubtitleFontWeight || null,
+        textSubtitleFontStyle: this.container?.textSubtitleFontStyle || null,
         ...this.backgroundProperties,
         hiddenOnMobile: this.hiddenOnMobile,
       } || null;
