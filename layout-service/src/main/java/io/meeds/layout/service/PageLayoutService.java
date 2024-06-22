@@ -387,7 +387,7 @@ public class PageLayoutService {
     }
   }
 
-  private void validateCSSInputs(ModelObject modelObject) {
+  private void validateCSSInputs(ModelObject modelObject) { // NOSONAR
     ModelStyle cssStyle = modelObject.getCssStyle();
     Arrays.asList(modelObject.getHeight(),
                   modelObject.getWidth(),
@@ -400,9 +400,22 @@ public class PageLayoutService {
                   cssStyle == null ? null : cssStyle.getBackgroundPosition(),
                   cssStyle == null ? null : cssStyle.getBackgroundSize(),
                   cssStyle == null ? null : cssStyle.getBackgroundRepeat(),
+                  cssStyle == null ? null : cssStyle.getTextTitleColor(),
+                  cssStyle == null ? null : cssStyle.getTextTitleFontSize(),
+                  cssStyle == null ? null : cssStyle.getTextTitleFontWeight(),
+                  cssStyle == null ? null : cssStyle.getTextTitleFontStyle(),
                   cssStyle == null ? null : cssStyle.getTextColor(),
+                  cssStyle == null ? null : cssStyle.getTextFontSize(),
+                  cssStyle == null ? null : cssStyle.getTextFontWeight(),
+                  cssStyle == null ? null : cssStyle.getTextFontStyle(),
                   cssStyle == null ? null : cssStyle.getTextHeaderColor(),
-                  cssStyle == null ? null : cssStyle.getTextSubtitleColor())
+                  cssStyle == null ? null : cssStyle.getTextHeaderFontSize(),
+                  cssStyle == null ? null : cssStyle.getTextHeaderFontWeight(),
+                  cssStyle == null ? null : cssStyle.getTextHeaderFontStyle(),
+                  cssStyle == null ? null : cssStyle.getTextSubtitleColor(),
+                  cssStyle == null ? null : cssStyle.getTextSubtitleFontSize(),
+                  cssStyle == null ? null : cssStyle.getTextSubtitleFontWeight(),
+                  cssStyle == null ? null : cssStyle.getTextSubtitleFontStyle())
           .forEach(this::validateCSSStyleValue);
     if (modelObject instanceof Container container && !CollectionUtils.isEmpty(container.getChildren())) {
       container.getChildren().forEach(this::validateCSSInputs);

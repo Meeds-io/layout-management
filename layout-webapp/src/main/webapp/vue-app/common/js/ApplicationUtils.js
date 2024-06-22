@@ -24,14 +24,53 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 
 export function getStyle(container, options) {
   const style = {};
+  if (container.textTitleColor) {
+    style['--appTextTitleColor'] = container.textTitleColor;
+  }
+  if (container.textTitleFontSize) {
+    style['--appTextTitleFontSize'] = container.textTitleFontSize;
+  }
+  if (container.textTitleFontWeight) {
+    style['--appTextTitleFontWeight'] = container.textTitleFontWeight;
+  }
+  if (container.textTitleFontStyle) {
+    style['--appTextTitleFontStyle'] = container.textTitleFontStyle;
+  }
   if (container.textColor) {
     style['--appTextColor'] = container.textColor;
+  }
+  if (container.textFontSize) {
+    style['--appTextFontSize'] = container.textFontSize;
+  }
+  if (container.textFontWeight) {
+    style['--appTextFontWeight'] = container.textFontWeight;
+  }
+  if (container.textFontStyle) {
+    style['--appTextFontStyle'] = container.textFontStyle;
   }
   if (container.textHeaderColor) {
     style['--appTextHeaderColor'] = container.textHeaderColor;
   }
+  if (container.textHeaderFontSize) {
+    style['--appTextHeaderFontSize'] = container.textHeaderFontSize;
+  }
+  if (container.textHeaderFontWeight) {
+    style['--appTextHeaderFontWeight'] = container.textHeaderFontWeight;
+  }
+  if (container.textHeaderFontStyle) {
+    style['--appTextHeaderFontStyle'] = container.textHeaderFontStyle;
+  }
   if (container.textSubtitleColor) {
     style['--appTextSubtitleColor'] = container.textSubtitleColor;
+  }
+  if (container.textSubtitleFontSize) {
+    style['--appTextSubtitleFontSize'] = container.textSubtitleFontSize;
+  }
+  if (container.textSubtitleFontWeight) {
+    style['--appTextSubtitleFontWeight'] = container.textSubtitleFontWeight;
+  }
+  if (container.textSubtitleFontStyle) {
+    style['--appTextSubtitleFontStyle'] = container.textSubtitleFontStyle;
   }
   if (!options.onlyBackgroundStyle) {
     if (container.height) {

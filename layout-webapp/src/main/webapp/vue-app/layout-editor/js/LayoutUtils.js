@@ -69,9 +69,22 @@ export const containerModel = {
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
-  textColor: null,
+  textTitleColor: null,
+  textTitleFontSize: null,
+  textTitleFontWeight: null,
+  textTitleFontStyle: null,
   textHeaderColor: null,
+  textHeaderFontSize: null,
+  textHeaderFontWeight: null,
+  textHeaderFontStyle: null,
+  textColor: null,
+  textFontSize: null,
+  textFontWeight: null,
+  textFontStyle: null,
   textSubtitleColor: null,
+  textSubtitleFontSize: null,
+  textSubtitleFontWeight: null,
+  textSubtitleFontStyle: null,
   // Used to specify whether the block should be displayed or not
   // when an addon is present
   profiles: null,
@@ -113,9 +126,22 @@ export const applicationModel = {
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
-  textColor: null,
+  textTitleColor: null,
+  textTitleFontSize: null,
+  textTitleFontWeight: null,
+  textTitleFontStyle: null,
   textHeaderColor: null,
+  textHeaderFontSize: null,
+  textHeaderFontWeight: null,
+  textHeaderFontStyle: null,
+  textColor: null,
+  textFontSize: null,
+  textFontWeight: null,
+  textFontStyle: null,
   textSubtitleColor: null,
+  textSubtitleFontSize: null,
+  textSubtitleFontWeight: null,
+  textSubtitleFontStyle: null,
   accessPermissions: ['Everyone'],
 };
 
@@ -254,9 +280,22 @@ export function applyContainerStyle(container, containerStyle) {
   Vue.set(container, 'backgroundPosition', containerStyle.backgroundPosition || null);
   Vue.set(container, 'backgroundSize', containerStyle.backgroundSize || null);
   Vue.set(container, 'backgroundRepeat', containerStyle.backgroundRepeat || null);
-  Vue.set(container, 'textColor', containerStyle.textColor || null);
+  Vue.set(container, 'textTitleColor', containerStyle.textTitleColor || null);
+  Vue.set(container, 'textTitleFontSize', containerStyle.textTitleFontSize || null);
+  Vue.set(container, 'textTitleFontWeight', containerStyle.textTitleFontWeight || null);
+  Vue.set(container, 'textTitleFontStyle', containerStyle.textTitleFontStyle || null);
   Vue.set(container, 'textHeaderColor', containerStyle.textHeaderColor || null);
+  Vue.set(container, 'textHeaderFontSize', containerStyle.textHeaderFontSize || null);
+  Vue.set(container, 'textHeaderFontWeight', containerStyle.textHeaderFontWeight || null);
+  Vue.set(container, 'textHeaderFontStyle', containerStyle.textHeaderFontStyle || null);
+  Vue.set(container, 'textColor', containerStyle.textColor || null);
+  Vue.set(container, 'textFontSize', containerStyle.textFontSize || null);
+  Vue.set(container, 'textFontWeight', containerStyle.textFontWeight || null);
+  Vue.set(container, 'textFontStyle', containerStyle.textFontStyle || null);
   Vue.set(container, 'textSubtitleColor', containerStyle.textSubtitleColor || null);
+  Vue.set(container, 'textSubtitleFontSize', containerStyle.textSubtitleFontSize || null);
+  Vue.set(container, 'textSubtitleFontWeight', containerStyle.textSubtitleFontWeight || null);
+  Vue.set(container, 'textSubtitleFontStyle', containerStyle.textSubtitleFontStyle || null);
 }
 
 export function parseSections(layout) {
