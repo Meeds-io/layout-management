@@ -99,11 +99,37 @@ public class LayoutModel {
 
   private String                          backgroundRepeat;
 
-  private String                          textColor;
+  private String                          textTitleColor;
+
+  private String                          textTitleFontSize;
+
+  private String                          textTitleFontWeight;
+
+  private String                          textTitleFontStyle;
 
   private String                          textHeaderColor;
 
+  private String                          textHeaderFontSize;
+
+  private String                          textHeaderFontWeight;
+
+  private String                          textHeaderFontStyle;
+
+  private String                          textColor;
+
+  private String                          textFontSize;
+
+  private String                          textFontWeight;
+
+  private String                          textFontStyle;
+
   private String                          textSubtitleColor;
+
+  private String                          textSubtitleFontSize;
+
+  private String                          textSubtitleFontWeight;
+
+  private String                          textSubtitleFontStyle;
 
   private String[]                        accessPermissions;
 
@@ -161,9 +187,22 @@ public class LayoutModel {
       this.backgroundPosition = cssStyle.getBackgroundPosition();
       this.backgroundSize = cssStyle.getBackgroundSize();
       this.backgroundRepeat = cssStyle.getBackgroundRepeat();
-      this.textColor = cssStyle.getTextColor();
+      this.textTitleColor = cssStyle.getTextTitleColor();
+      this.textTitleFontSize = cssStyle.getTextTitleFontSize();
+      this.textTitleFontWeight = cssStyle.getTextTitleFontWeight();
+      this.textTitleFontStyle = cssStyle.getTextTitleFontStyle();
       this.textHeaderColor = cssStyle.getTextHeaderColor();
+      this.textHeaderFontSize = cssStyle.getTextHeaderFontSize();
+      this.textHeaderFontWeight = cssStyle.getTextHeaderFontWeight();
+      this.textHeaderFontStyle = cssStyle.getTextHeaderFontStyle();
+      this.textColor = cssStyle.getTextColor();
+      this.textFontSize = cssStyle.getTextFontSize();
+      this.textFontWeight = cssStyle.getTextFontWeight();
+      this.textFontStyle = cssStyle.getTextFontStyle();
       this.textSubtitleColor = cssStyle.getTextSubtitleColor();
+      this.textSubtitleFontSize = cssStyle.getTextSubtitleFontSize();
+      this.textSubtitleFontWeight = cssStyle.getTextSubtitleFontWeight();
+      this.textSubtitleFontStyle = cssStyle.getTextSubtitleFontStyle();
     }
 
     if (model instanceof Container container) {
@@ -238,13 +277,14 @@ public class LayoutModel {
     return page;
   }
 
-  public static ModelObject toModelObject(LayoutModel layoutModel) {
+  public static ModelObject toModelObject(LayoutModel layoutModel) { // NOSONAR
     ModelStyle cssStyle = null;
     boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
                        || StringUtils.isNotBlank(layoutModel.getBorderSize())
                        || StringUtils.isNotBlank(layoutModel.getBoxShadow())
                        || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
                        || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
+                       || StringUtils.isNotBlank(layoutModel.getTextTitleColor())
                        || StringUtils.isNotBlank(layoutModel.getTextColor())
                        || StringUtils.isNotBlank(layoutModel.getTextHeaderColor())
                        || StringUtils.isNotBlank(layoutModel.getTextSubtitleColor());
@@ -259,9 +299,22 @@ public class LayoutModel {
       cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
       cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
       cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
-      cssStyle.setTextColor(layoutModel.getTextColor());
+      cssStyle.setTextTitleColor(layoutModel.getTextTitleColor());
+      cssStyle.setTextTitleFontSize(layoutModel.getTextTitleFontSize());
+      cssStyle.setTextTitleFontWeight(layoutModel.getTextTitleFontWeight());
+      cssStyle.setTextTitleFontStyle(layoutModel.getTextTitleFontStyle());
       cssStyle.setTextHeaderColor(layoutModel.getTextHeaderColor());
+      cssStyle.setTextHeaderFontSize(layoutModel.getTextHeaderFontSize());
+      cssStyle.setTextHeaderFontWeight(layoutModel.getTextHeaderFontWeight());
+      cssStyle.setTextHeaderFontStyle(layoutModel.getTextHeaderFontStyle());
+      cssStyle.setTextColor(layoutModel.getTextColor());
+      cssStyle.setTextFontSize(layoutModel.getTextFontSize());
+      cssStyle.setTextFontWeight(layoutModel.getTextFontWeight());
+      cssStyle.setTextFontStyle(layoutModel.getTextFontStyle());
       cssStyle.setTextSubtitleColor(layoutModel.getTextSubtitleColor());
+      cssStyle.setTextSubtitleFontSize(layoutModel.getTextSubtitleFontSize());
+      cssStyle.setTextSubtitleFontWeight(layoutModel.getTextSubtitleFontWeight());
+      cssStyle.setTextSubtitleFontStyle(layoutModel.getTextSubtitleFontStyle());
     }
 
     if (StringUtils.isNotBlank(layoutModel.template)) {
