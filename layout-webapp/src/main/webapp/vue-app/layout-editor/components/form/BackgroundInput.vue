@@ -198,6 +198,8 @@ export default {
         this.container.backgroundColor = this.enableBackground && this.defaultBackgroundColor || null;
         this.container.backgroundImage = null;
         this.backgroundImageStyle = null;
+        this.backgroundGradientFrom = null;
+        this.backgroundGradientTo = null;
       }
     },
     backgroundImageStyle() {
