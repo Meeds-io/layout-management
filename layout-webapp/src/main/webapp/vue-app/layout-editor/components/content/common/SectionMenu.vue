@@ -25,13 +25,13 @@
     class="absolute-full-size layout-no-multi-select border-radius">
     <v-slide-y-transition>
       <div v-if="open" class="position-relative full-width full-height d-flex flex-column">
-        <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center mb-auto mt-n4">
-          <v-tooltip bottom>
-            <template #activator="{on, attrs}">
-              <div
-                v-on="on"
-                v-bind="attrs">
-                <v-hover v-model="hoverButton">
+        <v-hover v-model="hoverButton">
+          <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center mb-auto mt-n4">
+            <v-tooltip bottom>
+              <template #activator="{on, attrs}">
+                <div
+                  v-on="on"
+                  v-bind="attrs">
                   <v-btn
                     class="white text-color border-color"
                     height="32"
@@ -40,12 +40,12 @@
                     @click="$root.$emit('layout-add-section-drawer', index)">
                     <v-icon size="20">fa-plus</v-icon>
                   </v-btn>
-                </v-hover>
-              </div>
-            </template>
-            {{ $t('layout.addSectionBefore') }}
-          </v-tooltip>
-        </div>
+                </div>
+              </template>
+              {{ $t('layout.addSectionBefore') }}
+            </v-tooltip>
+          </div>
+        </v-hover>
         <div class="position-sticky t-20 b-20 z-index-one d-flex align-center mx-n5">
           <div
             v-if="displayMoveButton"
@@ -98,13 +98,13 @@
             </v-tooltip>
           </div>
         </div>
-        <div class="position-sticky z-index-two d-flex justify-center mb-n4 mt-auto">
-          <v-tooltip top>
-            <template #activator="{on, attrs}">
-              <div
-                v-on="on"
-                v-bind="attrs">
-                <v-hover v-model="hoverButton">
+        <v-hover v-model="hoverButton">
+          <div class="position-sticky z-index-two d-flex justify-center mb-n4 mt-auto">
+            <v-tooltip top>
+              <template #activator="{on, attrs}">
+                <div
+                  v-on="on"
+                  v-bind="attrs">
                   <v-btn
                     class="white text-color border-color"
                     height="32"
@@ -113,12 +113,12 @@
                     @click="$root.$emit('layout-add-section-drawer', index + 1)">
                     <v-icon size="20">fa-plus</v-icon>
                   </v-btn>
-                </v-hover>
-              </div>
-            </template>
-            {{ $t('layout.addSectionAfter') }}
-          </v-tooltip>
-        </div>
+                </div>
+              </template>
+              {{ $t('layout.addSectionAfter') }}
+            </v-tooltip>
+          </div>
+        </v-hover>
       </div>
     </v-slide-y-transition>
   </div>
