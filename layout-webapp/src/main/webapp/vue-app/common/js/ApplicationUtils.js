@@ -80,7 +80,6 @@ export function getStyle(container, options) {
         style['--appWidthScroll'] = 'hidden';
       }
     }
-  
     if (container.width === 'fullWindow') {
       style['--allPagesSinglePageApplicationWidth'] = 'calc(100% - 40px)';
       style['--allPagesSinglePageApplicationPadding'] = '0';
@@ -91,7 +90,6 @@ export function getStyle(container, options) {
         style['--appWidthScroll'] = 'auto';
       }
     }
-  
     if (container.borderColor) {
       style[options.isApplicationStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
     }
