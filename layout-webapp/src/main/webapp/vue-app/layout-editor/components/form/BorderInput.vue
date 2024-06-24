@@ -20,16 +20,17 @@
 -->
 <template>
   <div>
-    <div class="d-flex align-center mt-4">
-      <div class="subtitle-1 font-weight-bold me-auto">
+    <div class="d-flex align-center">
+      <div
+        class="text-header me-auto">
         {{ $t('layout.border') }}
       </div>
       <v-switch
-        v-model="enableBorder"
+        v-model="enabled"
         class="ms-auto my-auto me-n2" />
     </div>
     <v-list-item
-      v-if="enableBorder"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -42,7 +43,7 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enableBorder"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -58,7 +59,7 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enableBorder"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -77,11 +78,15 @@ export default {
       type: Object,
       default: null,
     },
+    pageStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     container: null,
     initialized: false,
-    enableBorder: true,
+    enabled: true,
     borderColor: '#FFFFFF',
     borderSize: 1,
     boxShadow: false,
@@ -105,7 +110,7 @@ export default {
         this.$emit('refresh');
       }
     },
-    enableBorder(val) {
+    enabled(val) {
       if (val) {
         if (!this.borderColor) {
           this.borderColor = '#FFFFFF';
@@ -123,7 +128,7 @@ export default {
     this.borderColor = this.container.borderColor;
     this.borderSize = this.container.borderSize || 0;
     this.boxShadow = this.container.boxShadow === 'true';
-    this.enableBorder = !!this.borderColor;
+    this.enabled = !!this.borderColor;
     this.$nextTick().then(() => this.initialized = true);
   },
 };

@@ -21,7 +21,8 @@
 <template>
   <div>
     <div class="d-flex align-center mb-2">
-      <div class="subtitle-1 font-weight-bold me-auto">
+      <div
+        class="text-header me-auto">
         {{ $t('layout.margins') }}
       </div>
       <v-switch

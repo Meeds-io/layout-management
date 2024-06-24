@@ -22,7 +22,7 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="light-grey-background-color layout-sections-parent singlePageApplication mx-auto"
+    class="transparent layout-sections-parent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
       :container="pageLayout"

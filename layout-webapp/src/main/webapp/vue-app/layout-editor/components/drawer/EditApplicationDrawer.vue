@@ -42,6 +42,11 @@
         max-width="100%"
         class="ma-4"
         flat>
+        <div class="d-flex align-center">
+          <div class="text-title mb-2">
+            {{ $t('layout.applicationStyling') }}
+          </div>
+        </div>
         <layout-editor-margin-input
           v-if="initialized"
           ref="marginInput"
@@ -56,7 +61,7 @@
           @refresh="refresh++" />
         <layout-editor-border-radius-input
           v-if="initialized"
-          ref="borderInput"
+          ref="borderRadiusInput"
           v-model="container"
           class="mt-4"
           @refresh="refresh++" />
@@ -69,12 +74,12 @@
           @refresh="refresh++" />
         <layout-editor-text-input
           v-if="initialized"
-          ref="tectColorInput"
+          ref="textInput"
           v-model="container"
           class="mt-4"
           @refresh="refresh++" />
         <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto mb-2">
+          <div class="text-title mb-2">
             {{ $t('layout.advancedOptions') }}
           </div>
         </div>
@@ -234,7 +239,7 @@ export default {
         radiusBottomRight: this.container?.radiusBottomRight,
         radiusBottomLeft: this.container?.radiusBottomLeft,
         borderColor: this.container?.borderColor,
-        borderSize: this.container?.borderSize || 0,
+        borderSize: this.container?.borderColor && this.container?.borderSize || null,
         boxShadow: this.container?.boxShadow && 'true' || null,
         textTitleColor: this.container?.textTitleColor || null,
         textTitleFontSize: this.container?.textTitleFontSize || null,
