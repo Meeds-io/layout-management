@@ -40,13 +40,13 @@
             v-if="label"
             :min-width="minTextWidth"
             flat>
-            <div class="text-font-small-size text-color">{{ label }}</div>
-            <div class="text-font-small-size text-sub-title">{{ value }}</div>
+            <div class="text-body">{{ label }}</div>
+            <div class="text-subtitle">{{ value }}</div>
           </v-card>
           <v-card
             v-else
             :min-width="minTextWidth"
-            class="text-font-size text-color text-end"
+            class="text-body text-end"
             flat>
             {{ value }}
           </v-card>

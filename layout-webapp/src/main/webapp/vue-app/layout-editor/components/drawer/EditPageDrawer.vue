@@ -49,7 +49,12 @@
         </v-card>
 
         <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
+          <div class="text-title me-auto mb-2">
+            {{ $t('layout.globalPageDesign') }}
+          </div>
+        </div>
+        <div class="d-flex align-center mt-4">
+          <div class="text-header me-auto mb-2">
             {{ $t('layout.fullWindow') }}
           </div>
           <v-switch
@@ -61,7 +66,41 @@
           ref="backgroundInput"
           v-model="parentContainer"
           :default-background-color="defaultBackgroundColor"
-          class="mt-4" />
+          class="mt-2"
+          page-style>
+          <template #title>
+            <div class="text-header me-auto mb-2">
+              {{ $t('layout.globalPageBackground') }}
+            </div>
+          </template>
+        </layout-editor-background-input>
+
+        <div class="d-flex align-center mt-4">
+          <div class="text-title me-auto mb-2">
+            {{ $t('layout.applicationStyling') }}
+          </div>
+        </div>
+        <layout-editor-border-input
+          ref="appBorderInput"
+          v-model="parentContainer"
+          class="mt-4"
+          page-style />
+        <layout-editor-border-radius-input
+          ref="appBorderRadiusInput"
+          v-model="parentContainer"
+          class="mt-4"
+          page-style />
+        <layout-editor-background-input
+          ref="appBackgroundInput"
+          v-if="appBackgroundProperties"
+          v-model="appBackgroundProperties"
+          class="mt-4"
+          page-style />
+        <layout-editor-text-input
+          ref="appTextInput"
+          v-model="parentContainer"
+          class="mt-4"
+          page-style />
       </v-card>
     </template>
     <template #footer>
@@ -87,7 +126,9 @@ export default {
   data: () => ({
     pagePreview: '/layout/images/page-templates/DefaultPreview.webp',
     defaultBackgroundColor: '#F2F2F2FF',
+    layout: null,
     parentContainer: null,
+    appBackgroundProperties: null,
     fullWindow: false,
     drawer: false,
     saving: false,
@@ -120,6 +161,14 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
       this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
       this.fullWindow = this.parentContainer.width === 'fullWindow';
+      this.appBackgroundProperties = {
+        storageId: 0,
+        backgroundColor: this.parentContainer.appBackgroundColor || null,
+        backgroundImage: this.parentContainer.appBackgroundImage || null,
+        backgroundEffect: this.parentContainer.appBackgroundEffect || null,
+        backgroundRepeat: this.parentContainer.appBackgroundRepeat || null,
+        backgroundSize: this.parentContainer.appBackgroundSize || null,
+      };
       this.$refs.drawer.open();
     },
     async apply() {
@@ -127,6 +176,12 @@ export default {
       try {
         this.parentContainer.width = this.fullWindow && 'fullWindow' || null;
         await this.$refs.backgroundInput.apply();
+        await this.$refs.appBackgroundInput.apply();
+        this.parentContainer.appBackgroundColor = this.appBackgroundProperties.backgroundColor;
+        this.parentContainer.appBackgroundImage = this.appBackgroundProperties.backgroundImage;
+        this.parentContainer.appBackgroundEffect = this.appBackgroundProperties.backgroundEffect;
+        this.parentContainer.appBackgroundRepeat = this.appBackgroundProperties.backgroundRepeat;
+        this.parentContainer.appBackgroundSize = this.appBackgroundProperties.backgroundSize;
         const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
         this.parentContainer.children = parentContainer.children;
         Object.assign(parentContainer, this.parentContainer);
