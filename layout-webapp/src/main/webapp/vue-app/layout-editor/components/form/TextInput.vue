@@ -207,11 +207,13 @@ export default {
     textTitleColor() {
       if (this.initialized) {
         this.$set(this.container, 'textTitleColor', this.textTitleColor);
+        this.$emit('refresh');
       }
     },
     textTitleFontSize() {
       if (this.initialized) {
         this.$set(this.container, 'textTitleFontSize', this.textTitleFontSize && `${this.textTitleFontSize}px`);
+        this.$emit('refresh');
       }
     },
     textTitleStyle: {
@@ -220,17 +222,20 @@ export default {
         if (this.initialized) {
           this.$set(this.container, 'textTitleFontWeight', this.textTitleStyle?.find?.(s => s === 'bold') && 'bold' || 'normal');
           this.$set(this.container, 'textTitleFontStyle', this.textTitleStyle?.find?.(s => s === 'italic') && 'italic' || 'normal');
+          this.$emit('refresh');
         }
       },
     },
     textHeaderColor() {
       if (this.initialized) {
         this.$set(this.container, 'textHeaderColor', this.textHeaderColor);
+        this.$emit('refresh');
       }
     },
     textHeaderFontSize() {
       if (this.initialized) {
         this.$set(this.container, 'textHeaderFontSize', this.textHeaderFontSize && `${this.textHeaderFontSize}px`);
+        this.$emit('refresh');
       }
     },
     textHeaderStyle: {
@@ -239,17 +244,20 @@ export default {
         if (this.initialized) {
           this.$set(this.container, 'textHeaderFontWeight', this.textHeaderStyle?.find?.(s => s === 'bold') && 'bold' || 'normal');
           this.$set(this.container, 'textHeaderFontStyle', this.textHeaderStyle?.find?.(s => s === 'italic') && 'italic' || 'normal');
+          this.$emit('refresh');
         }
       }
     },
     textColor() {
       if (this.initialized) {
         this.$set(this.container, 'textColor', this.textColor);
+        this.$emit('refresh');
       }
     },
     textFontSize() {
       if (this.initialized) {
         this.$set(this.container, 'textFontSize', this.textFontSize && `${this.textFontSize}px`);
+        this.$emit('refresh');
       }
     },
     textStyle: {
@@ -258,17 +266,20 @@ export default {
         if (this.initialized) {
           this.$set(this.container, 'textFontWeight', this.textStyle?.find?.(s => s === 'bold') && 'bold' || 'normal');
           this.$set(this.container, 'textFontStyle', this.textStyle?.find?.(s => s === 'italic') && 'italic' || 'normal');
+          this.$emit('refresh');
         }
       }
     },
     textSubtitleColor() {
       if (this.initialized) {
         this.$set(this.container, 'textSubtitleColor', this.textSubtitleColor);
+        this.$emit('refresh');
       }
     },
     textSubtitleFontSize() {
       if (this.initialized) {
         this.$set(this.container, 'textSubtitleFontSize', this.textSubtitleFontSize && `${this.textSubtitleFontSize}px`);
+        this.$emit('refresh');
       }
     },
     textSubtitleStyle: {
@@ -277,6 +288,7 @@ export default {
         if (this.initialized) {
           this.$set(this.container, 'textSubtitleFontWeight', this.textSubtitleStyle?.find?.(s => s === 'bold') && 'bold' || 'normal');
           this.$set(this.container, 'textSubtitleFontStyle', this.textSubtitleStyle?.find?.(s => s === 'italic') && 'italic' || 'normal');
+          this.$emit('refresh');
         }
       }
     },
