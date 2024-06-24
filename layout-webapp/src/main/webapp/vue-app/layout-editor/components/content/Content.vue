@@ -397,6 +397,7 @@ export default {
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
         .then(layout => this.setLayout(layout))
+        .catch(e => this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error'))
         .finally(() => {
           window.setTimeout(() => this.loading--, 200);
           this.$root.$emit('layout-draft-saved');

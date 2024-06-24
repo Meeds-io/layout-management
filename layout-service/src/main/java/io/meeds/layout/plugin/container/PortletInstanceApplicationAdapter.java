@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
@@ -279,7 +280,15 @@ public class PortletInstanceApplicationAdapter extends PortletApplication {
   }
 
   @Override
-  public void resetStorage() {
+  public void checkStorage() throws ObjectNotFoundException {
+    Application<Portlet> portletApplication = getApplication();
+    if (portletApplication != null) {
+      portletApplication.checkStorage();
+    }
+  }
+
+  @Override
+  public void resetStorage() throws ObjectNotFoundException {
     Application<Portlet> portletApplication = getApplication();
     if (portletApplication != null) {
       portletApplication.resetStorage();
