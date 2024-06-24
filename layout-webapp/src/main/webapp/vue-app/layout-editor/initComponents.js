@@ -35,6 +35,9 @@ import ColorPicker from './components/form/ColorPicker.vue';
 import BackgroundImageAttachment from './components/form/BackgroundImageAttachment.vue';
 import BackgroundInput from './components/form/BackgroundInput.vue';
 import TextInput from './components/form/TextInput.vue';
+import MarginInput from './components/form/MarginInput.vue';
+import BorderInput from './components/form/BorderInput.vue';
+import BorderRadiusInput from './components/form/BorderRadiusInput.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -105,6 +108,9 @@ const components = {
   'layout-editor-background-image-attachment': BackgroundImageAttachment,
   'layout-editor-background-input': BackgroundInput,
   'layout-editor-text-input': TextInput,
+  'layout-editor-margin-input': MarginInput,
+  'layout-editor-border-input': BorderInput,
+  'layout-editor-border-radius-input': BorderRadiusInput,
   'layout-editor-application-card': ApplicationCard,
   'layout-editor-application-category-card': ApplicationCategoryCard,
   'layout-editor-application-menu': ApplicationMenu,

@@ -42,198 +42,37 @@
         max-width="100%"
         class="ma-4"
         flat>
-        <div class="d-flex align-center mb-2">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.margins') }}
-          </div>
-          <v-switch
-            v-model="enableMargin"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <div
-          v-if="enableMargin"
-          :class="marginChoice === 'same' && 'flex-row' || 'flex-column'"
-          class="d-flex">
-          <v-radio-group v-model="marginChoice" class="my-auto text-no-wrap ms-n1">
-            <v-radio
-              :label="$t('layout.sameForAllSides')"
-              value="same"
-              class="mx-0" />
-            <v-radio
-              :label="$t('layout.differentForEachSide')"
-              value="different"
-              class="mx-0" />
-          </v-radio-group>
-          <v-list-item class="pe-0 ps-7 py-0" dense>
-            <v-list-item-content v-if="marginChoice === 'different'" class="my-auto">
-              {{ $t('layout.top') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="marginTop"
-              :diff="-20"
-              :class="marginChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
-              class="me-n3" />
-          </v-list-item>
-          <v-list-item
-            v-if="marginChoice === 'different'"
-            class="pe-0 ps-7 py-0"
-            dense>
-            <v-list-item-content class="my-auto">
-              {{ $t('layout.right') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="marginRight"
-              :diff="-20"
-              class="my-auto me-n3" />
-          </v-list-item>
-          <v-list-item
-            v-if="marginChoice === 'different'"
-            class="pe-0 ps-7 py-0"
-            dense>
-            <v-list-item-content class="my-auto">
-              {{ $t('layout.bottom') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="marginBottom"
-              :diff="-20"
-              class="my-auto me-n3" />
-          </v-list-item>
-          <v-list-item
-            v-if="marginChoice === 'different'"
-            class="pe-0 ps-7 py-0"
-            dense>
-            <v-list-item-content class="my-auto">
-              {{ $t('layout.left') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="marginLeft"
-              :diff="-20"
-              class="my-auto me-n3" />
-          </v-list-item>
-        </div>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.borderColor') }}
-          </div>
-          <v-switch
-            v-model="enableBorderColor"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <v-list-item
-          v-if="enableBorderColor"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.color') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-color-picker
-              v-model="borderColor"
-              class="my-auto" />
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item
-          v-if="enableBorderColor"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.borderSize') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <layout-editor-number-input
-              v-model="borderSize"
-              :step="1"
-              :min="0"
-              :max="8"
-              class="me-n3" />
-          </v-list-item-action>
-        </v-list-item>
-        <v-list-item
-          v-if="enableBorderColor"
-          class="pa-0"
-          dense>
-          <v-list-item-content class="my-auto">
-            {{ $t('layout.boxShadow') }}
-          </v-list-item-content>
-          <v-list-item-action class="my-auto me-0 ms-auto">
-            <v-checkbox v-model="boxShadow" />
-          </v-list-item-action>
-        </v-list-item>
-        <div class="d-flex align-center mt-4">
-          <div class="subtitle-1 font-weight-bold me-auto">
-            {{ $t('layout.borderRadius') }}
-          </div>
-          <v-switch
-            v-model="enableBorderRadius"
-            class="ms-auto my-auto me-n2" />
-        </div>
-        <div
-          v-if="enableBorderRadius"
-          :class="radiusChoice === 'same' && 'flex-row' || 'flex-column'"
-          class="d-flex">
-          <v-radio-group v-model="radiusChoice" class="my-auto text-no-wrap ms-n1">
-            <v-radio
-              :label="$t('layout.sameForAllCorners')"
-              value="same"
-              class="mx-0" />
-            <v-radio
-              :label="$t('layout.differentForEachCorner')"
-              value="different"
-              class="mx-0" />
-          </v-radio-group>
-          <v-list-item class="pe-0 ps-7 py-0" dense>
-            <v-list-item-content v-if="radiusChoice === 'different'" class="my-auto">
-              {{ $t('layout.topRight') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="radiusTopRight"
-              :class="radiusChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
-              class="me-n3" />
-          </v-list-item>
-          <v-list-item
-            v-if="radiusChoice === 'different'"
-            class="pe-0 ps-7 py-0"
-            dense>
-            <v-list-item-content class="my-auto">
-              {{ $t('layout.topLeft') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="radiusTopLeft"
-              class="my-auto me-n3" />
-          </v-list-item>
-          <v-list-item
-            v-if="radiusChoice === 'different'"
-            class="pe-0 ps-7 py-0"
-            dense>
-            <v-list-item-content class="my-auto">
-              {{ $t('layout.bottomRight') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="radiusBottomRight"
-              class="my-auto me-n3" />
-          </v-list-item>
-          <v-list-item
-            v-if="radiusChoice === 'different'"
-            class="pe-0 ps-7 py-0"
-            dense>
-            <v-list-item-content class="my-auto">
-              {{ $t('layout.bottomLeft') }}
-            </v-list-item-content>
-            <layout-editor-number-input
-              v-model="radiusBottomLeft"
-              class="my-auto me-n3" />
-          </v-list-item>
-        </div>
+        <layout-editor-margin-input
+          v-if="initialized"
+          ref="marginInput"
+          v-model="container"
+          class="mt-4"
+          @refresh="refresh++" />
+        <layout-editor-border-input
+          v-if="initialized"
+          ref="borderInput"
+          v-model="container"
+          class="mt-4"
+          @refresh="refresh++" />
+        <layout-editor-border-radius-input
+          v-if="initialized"
+          ref="borderInput"
+          v-model="container"
+          class="mt-4"
+          @refresh="refresh++" />
         <layout-editor-background-input
-          v-if="backgroundProperties"
+          v-if="initialized"
           ref="backgroundInput"
           v-model="backgroundProperties"
           immediate-save
-          class="mt-4" />
+          class="mt-4"
+          @refresh="refresh++" />
         <layout-editor-text-input
+          v-if="initialized"
           ref="tectColorInput"
           v-model="container"
-          class="mt-4" />
+          class="mt-4"
+          @refresh="refresh++" />
         <div class="d-flex align-center mt-4">
           <div class="subtitle-1 font-weight-bold me-auto mb-2">
             {{ $t('layout.advancedOptions') }}
@@ -327,24 +166,9 @@ export default {
     section: null,
     container: null,
     backgroundProperties: null,
-    enableMargin: true,
-    marginChoice: 'same',
-    marginTop: 20,
-    marginRight: 20,
-    marginBottom: 20,
-    marginLeft: 20,
-    enableBorderRadius: true,
-    radiusChoice: 'same',
-    radiusTopRight: null,
-    radiusTopLeft: null,
-    radiusBottomRight: null,
-    radiusBottomLeft: null,
-    enableBorderColor: true,
-    borderColor: '#FFFFFF',
-    borderSize: 1,
-    boxShadow: false,
     applicationCategoryTitle: null,
     applicationTitle: null,
+    refresh: 1,
   }),
   computed: {
     applicationId() {
@@ -400,18 +224,18 @@ export default {
       }).format(this.maxHeight);
     },
     styleClasses() {
-      return this.drawer && this.sectionId && {
-        marginTop: this.marginTop,
-        marginRight: this.marginRight,
-        marginBottom: this.marginBottom,
-        marginLeft: this.marginLeft,
-        radiusTopRight: this.radiusTopRight,
-        radiusTopLeft: this.radiusTopLeft,
-        radiusBottomRight: this.radiusBottomRight,
-        radiusBottomLeft: this.radiusBottomLeft,
-        borderColor: this.borderColor,
-        borderSize: this.borderSize || 0,
-        boxShadow: this.boxShadow && 'true' || null,
+      return this.drawer && this.refresh > 0 && this.sectionId && {
+        marginTop: this.container?.marginTop,
+        marginRight: this.container?.marginRight,
+        marginBottom: this.container?.marginBottom,
+        marginLeft: this.container?.marginLeft,
+        radiusTopRight: this.container?.radiusTopRight,
+        radiusTopLeft: this.container?.radiusTopLeft,
+        radiusBottomRight: this.container?.radiusBottomRight,
+        radiusBottomLeft: this.container?.radiusBottomLeft,
+        borderColor: this.container?.borderColor,
+        borderSize: this.container?.borderSize || 0,
+        boxShadow: this.container?.boxShadow && 'true' || null,
         textTitleColor: this.container?.textTitleColor || null,
         textTitleFontSize: this.container?.textTitleFontSize || null,
         textTitleFontWeight: this.container?.textTitleFontWeight || null,
@@ -434,71 +258,6 @@ export default {
     },
   },
   watch: {
-    marginTop() {
-      if (this.marginChoice === 'same') {
-        this.marginRight = this.marginTop;
-        this.marginBottom = this.marginTop;
-        this.marginLeft = this.marginTop;
-      }
-    },
-    radiusTopRight() {
-      if (this.radiusChoice === 'same') {
-        this.radiusTopLeft = this.radiusTopRight;
-        this.radiusBottomRight = this.radiusTopRight;
-        this.radiusBottomLeft = this.radiusTopRight;
-      }
-    },
-    enableBorderColor(val) {
-      if (val) {
-        if (!this.borderColor) {
-          this.borderColor = '#FFFFFF';
-          this.borderSize = 1;
-        }
-      } else {
-        this.boxShadow = null;
-        this.borderColor = null;
-        this.borderSize = 0;
-      }
-    },
-    enableBorderRadius(val) {
-      if (val) {
-        if (this.radiusTopRight !== 0 && !this.radiusTopRight) {
-          const defaultBorderRadius = parseInt(this.$root.branding?.themeStyle?.borderRadius?.replace?.('px', '') || '4');
-          this.radiusTopRight = defaultBorderRadius;
-          this.radiusTopLeft = defaultBorderRadius;
-          this.radiusBottomRight = defaultBorderRadius;
-          this.radiusBottomLeft = defaultBorderRadius;
-        }
-      } else {
-        this.radiusTopRight = null;
-        this.radiusTopLeft = null;
-        this.radiusBottomRight = null;
-        this.radiusBottomLeft = null;
-      }
-    },
-    enableMargin() {
-      if (this.drawer) {
-        this.marginChoice = 'same';
-        this.marginTop = 0;
-        this.marginRight = 0;
-        this.marginBottom = 0;
-        this.marginLeft = 0;
-      }
-    },
-    radiusChoice() {
-      if (this.radiusChoice === 'same') {
-        this.radiusTopLeft = this.radiusTopRight;
-        this.radiusBottomRight = this.radiusTopRight;
-        this.radiusBottomLeft = this.radiusTopRight;
-      }
-    },
-    marginChoice() {
-      if (this.marginChoice === 'same') {
-        this.marginRight = this.marginTop;
-        this.marginBottom = this.marginTop;
-        this.marginLeft = this.marginTop;
-      }
-    },
     styleClasses(value, oldVal) {
       if (value && oldVal) {
         this.$root.$emit('layout-section-history-add', this.sectionId);
@@ -527,6 +286,7 @@ export default {
     open(section, container, applicationCategoryTitle, applicationTitle) {
       this.initialized = false;
 
+      Object.assign(container, Object.assign({...this.$layoutUtils.applicationModel}, container));
       this.section = section;
       this.container = container;
       this.section = section;
@@ -537,22 +297,6 @@ export default {
       this.applicationTitle = applicationTitle;
       this.$layoutUtils.parseContainerStyle(this.container, this.styleClasses);
 
-      this.marginTop = this.container.marginTop || 0;
-      this.marginRight = this.container.marginRight || 0;
-      this.marginBottom = this.container.marginBottom || 0;
-      this.marginLeft = this.container.marginLeft || 0;
-
-      this.radiusTopRight = this.container.radiusTopRight;
-      this.radiusTopLeft = this.container.radiusTopLeft;
-      this.radiusBottomRight = this.container.radiusBottomRight;
-      this.radiusBottomLeft = this.container.radiusBottomLeft;
-      this.enableBorderRadius = this.radiusBottomLeft === 0 || !!this.radiusBottomLeft;
-
-      this.borderColor = this.container.borderColor;
-      this.borderSize = this.container.borderSize || 0;
-      this.boxShadow = this.container.boxShadow === 'true';
-      this.enableBorderColor = !!this.borderColor;
-
       this.backgroundProperties = {
         storageId: this.container.storageId,
         backgroundColor: this.container.backgroundColor || null,
@@ -561,15 +305,6 @@ export default {
         backgroundRepeat: this.container.backgroundRepeat || null,
         backgroundSize: this.container.backgroundSize || null,
       };
-
-      this.marginChoice = this.marginTop === this.marginRight
-        && this.marginRight === this.marginLeft
-        && this.marginLeft === this.marginBottom ? 'same' : 'different';
-      this.radiusChoice = this.radiusTopRight === this.radiusTopLeft
-        && this.radiusBottomRight === this.radiusTopLeft
-        && this.radiusTopLeft === this.radiusBottomLeft
-        && this.radiusBottomLeft === this.radiusTopRight ? 'same' : 'different';
-      this.enableMargin = this.marginChoice !== 'same' || this.marginRight !== 0;
 
       this.$nextTick(() => this.$refs.drawer.open());
     },
