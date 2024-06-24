@@ -67,12 +67,22 @@ export const containerModel = {
   borderColor: null,
   borderSize: null,
   boxShadow: null,
+  radiusTopRight: null,
+  radiusTopLeft: null,
+  radiusBottomRight: null,
+  radiusBottomLeft: null,
   backgroundColor: null,
   backgroundImage: null,
   backgroundEffect: null,
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  appBackgroundColor: null,
+  appBackgroundImage: null,
+  appBackgroundEffect: null,
+  appBackgroundPosition: null,
+  appBackgroundSize: null,
+  appBackgroundRepeat: null,
   textTitleColor: null,
   textTitleFontSize: null,
   textTitleFontWeight: null,
@@ -128,6 +138,10 @@ export const applicationModel = {
   borderColor: null,
   borderSize: null,
   boxShadow: null,
+  radiusTopRight: null,
+  radiusTopLeft: null,
+  radiusBottomRight: null,
+  radiusBottomLeft: null,
   backgroundColor: null,
   backgroundImage: null,
   backgroundEffect: null,
@@ -282,6 +296,12 @@ export function applyContainerStyle(container, containerStyle) {
   Vue.set(container, 'borderColor', containerStyle.borderColor || null);
   Vue.set(container, 'borderSize', containerStyle.borderSize || '0');
   Vue.set(container, 'boxShadow', containerStyle.boxShadow && 'true' || null);
+  Vue.set(container, 'appBackgroundColor', containerStyle.appBackgroundColor || null);
+  Vue.set(container, 'appBackgroundImage', containerStyle.appBackgroundImage || null);
+  Vue.set(container, 'appBackgroundEffect', containerStyle.appBackgroundEffect || null);
+  Vue.set(container, 'appBackgroundPosition', containerStyle.appBackgroundPosition || null);
+  Vue.set(container, 'appBackgroundSize', containerStyle.appBackgroundSize || null);
+  Vue.set(container, 'appBackgroundRepeat', containerStyle.appBackgroundRepeat || null);
   Vue.set(container, 'backgroundColor', containerStyle.backgroundColor || null);
   Vue.set(container, 'backgroundImage', containerStyle.backgroundImage || null);
   Vue.set(container, 'backgroundEffect', containerStyle.backgroundEffect || null);

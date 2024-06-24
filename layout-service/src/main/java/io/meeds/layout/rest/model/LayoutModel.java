@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationBackgroundStyle;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
@@ -87,6 +88,14 @@ public class LayoutModel {
 
   private String                          boxShadow;
 
+  private Integer                         radiusTopRight;
+
+  private Integer                         radiusTopLeft;
+
+  private Integer                         radiusBottomRight;
+
+  private Integer                         radiusBottomLeft;
+
   private String                          backgroundColor;
 
   private String                          backgroundImage;
@@ -98,6 +107,18 @@ public class LayoutModel {
   private String                          backgroundSize;
 
   private String                          backgroundRepeat;
+
+  private String                          appBackgroundColor;
+
+  private String                          appBackgroundImage;
+
+  private String                          appBackgroundEffect;
+
+  private String                          appBackgroundPosition;
+
+  private String                          appBackgroundSize;
+
+  private String                          appBackgroundRepeat;
 
   private String                          textTitleColor;
 
@@ -181,6 +202,10 @@ public class LayoutModel {
       this.borderColor = cssStyle.getBorderColor();
       this.borderSize = cssStyle.getBorderSize();
       this.boxShadow = cssStyle.getBoxShadow();
+      this.radiusTopRight = cssStyle.getRadiusTopRight();
+      this.radiusTopLeft = cssStyle.getRadiusTopLeft();
+      this.radiusBottomRight = cssStyle.getRadiusBottomRight();
+      this.radiusBottomLeft = cssStyle.getRadiusBottomLeft();
       this.backgroundColor = cssStyle.getBackgroundColor();
       this.backgroundImage = cssStyle.getBackgroundImage();
       this.backgroundEffect = cssStyle.getBackgroundEffect();
@@ -224,6 +249,15 @@ public class LayoutModel {
       this.moveContainersPermissions = container.getMoveContainersPermissions();
       this.children = container.getChildren().stream().map(LayoutModel::new).toList();
 
+      ApplicationBackgroundStyle appCssStyle = container.getAppBackgroundStyle();
+      if (appCssStyle != null) {
+        this.appBackgroundColor = appCssStyle.getBackgroundColor();
+        this.appBackgroundImage = appCssStyle.getBackgroundImage();
+        this.appBackgroundEffect = appCssStyle.getBackgroundEffect();
+        this.appBackgroundPosition = appCssStyle.getBackgroundPosition();
+        this.appBackgroundSize = appCssStyle.getBackgroundSize();
+        this.appBackgroundRepeat = appCssStyle.getBackgroundRepeat();
+      }
       if (model instanceof Page page) {
         this.editPermission = page.getEditPermission();
         this.pageKey = page.getPageKey();
@@ -278,44 +312,7 @@ public class LayoutModel {
   }
 
   public static ModelObject toModelObject(LayoutModel layoutModel) { // NOSONAR
-    ModelStyle cssStyle = null;
-    boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
-                       || StringUtils.isNotBlank(layoutModel.getBorderSize())
-                       || StringUtils.isNotBlank(layoutModel.getBoxShadow())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
-                       || StringUtils.isNotBlank(layoutModel.getTextTitleColor())
-                       || StringUtils.isNotBlank(layoutModel.getTextColor())
-                       || StringUtils.isNotBlank(layoutModel.getTextHeaderColor())
-                       || StringUtils.isNotBlank(layoutModel.getTextSubtitleColor());
-    if (hasStyle) {
-      cssStyle = new ModelStyle();
-      cssStyle.setBorderColor(layoutModel.getBorderColor());
-      cssStyle.setBorderSize(layoutModel.getBorderSize());
-      cssStyle.setBoxShadow(layoutModel.getBoxShadow());
-      cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
-      cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
-      cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
-      cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
-      cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
-      cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
-      cssStyle.setTextTitleColor(layoutModel.getTextTitleColor());
-      cssStyle.setTextTitleFontSize(layoutModel.getTextTitleFontSize());
-      cssStyle.setTextTitleFontWeight(layoutModel.getTextTitleFontWeight());
-      cssStyle.setTextTitleFontStyle(layoutModel.getTextTitleFontStyle());
-      cssStyle.setTextHeaderColor(layoutModel.getTextHeaderColor());
-      cssStyle.setTextHeaderFontSize(layoutModel.getTextHeaderFontSize());
-      cssStyle.setTextHeaderFontWeight(layoutModel.getTextHeaderFontWeight());
-      cssStyle.setTextHeaderFontStyle(layoutModel.getTextHeaderFontStyle());
-      cssStyle.setTextColor(layoutModel.getTextColor());
-      cssStyle.setTextFontSize(layoutModel.getTextFontSize());
-      cssStyle.setTextFontWeight(layoutModel.getTextFontWeight());
-      cssStyle.setTextFontStyle(layoutModel.getTextFontStyle());
-      cssStyle.setTextSubtitleColor(layoutModel.getTextSubtitleColor());
-      cssStyle.setTextSubtitleFontSize(layoutModel.getTextSubtitleFontSize());
-      cssStyle.setTextSubtitleFontWeight(layoutModel.getTextSubtitleFontWeight());
-      cssStyle.setTextSubtitleFontStyle(layoutModel.getTextSubtitleFontStyle());
-    }
+    ModelStyle cssStyle = mapToStyle(layoutModel);
 
     if (StringUtils.isNotBlank(layoutModel.template)) {
       Container container = new Container(layoutModel.getStorageId());
@@ -335,6 +332,7 @@ public class LayoutModel {
       container.setMoveAppsPermissions(layoutModel.getMoveAppsPermissions());
       container.setMoveContainersPermissions(layoutModel.getMoveContainersPermissions());
       container.setCssStyle(cssStyle);
+      container.setAppBackgroundStyle(mapToAppStyle(layoutModel));
       if (layoutModel.getChildren() != null) {
         container.setChildren(layoutModel.getChildren()
                                          .stream()
@@ -379,6 +377,68 @@ public class LayoutModel {
       application.setState(state);
       return application;
     }
+  }
+
+  private static ModelStyle mapToStyle(LayoutModel layoutModel) {
+    ModelStyle cssStyle = null;
+    boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
+                       || layoutModel.getRadiusTopRight() != null
+                       || StringUtils.isNotBlank(layoutModel.getBorderSize())
+                       || StringUtils.isNotBlank(layoutModel.getBoxShadow())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
+                       || StringUtils.isNotBlank(layoutModel.getTextTitleColor())
+                       || StringUtils.isNotBlank(layoutModel.getTextColor())
+                       || StringUtils.isNotBlank(layoutModel.getTextHeaderColor())
+                       || StringUtils.isNotBlank(layoutModel.getTextSubtitleColor());
+    if (hasStyle) {
+      cssStyle = new ModelStyle();
+      cssStyle.setBorderColor(layoutModel.getBorderColor());
+      cssStyle.setBorderSize(layoutModel.getBorderSize());
+      cssStyle.setBoxShadow(layoutModel.getBoxShadow());
+      cssStyle.setRadiusTopRight(layoutModel.getRadiusTopRight());
+      cssStyle.setRadiusTopLeft(layoutModel.getRadiusTopLeft());
+      cssStyle.setRadiusBottomRight(layoutModel.getRadiusBottomRight());
+      cssStyle.setRadiusBottomLeft(layoutModel.getRadiusBottomLeft());
+      cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
+      cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
+      cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
+      cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
+      cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
+      cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
+      cssStyle.setTextTitleColor(layoutModel.getTextTitleColor());
+      cssStyle.setTextTitleFontSize(layoutModel.getTextTitleFontSize());
+      cssStyle.setTextTitleFontWeight(layoutModel.getTextTitleFontWeight());
+      cssStyle.setTextTitleFontStyle(layoutModel.getTextTitleFontStyle());
+      cssStyle.setTextHeaderColor(layoutModel.getTextHeaderColor());
+      cssStyle.setTextHeaderFontSize(layoutModel.getTextHeaderFontSize());
+      cssStyle.setTextHeaderFontWeight(layoutModel.getTextHeaderFontWeight());
+      cssStyle.setTextHeaderFontStyle(layoutModel.getTextHeaderFontStyle());
+      cssStyle.setTextColor(layoutModel.getTextColor());
+      cssStyle.setTextFontSize(layoutModel.getTextFontSize());
+      cssStyle.setTextFontWeight(layoutModel.getTextFontWeight());
+      cssStyle.setTextFontStyle(layoutModel.getTextFontStyle());
+      cssStyle.setTextSubtitleColor(layoutModel.getTextSubtitleColor());
+      cssStyle.setTextSubtitleFontSize(layoutModel.getTextSubtitleFontSize());
+      cssStyle.setTextSubtitleFontWeight(layoutModel.getTextSubtitleFontWeight());
+      cssStyle.setTextSubtitleFontStyle(layoutModel.getTextSubtitleFontStyle());
+    }
+    return cssStyle;
+  }
+
+  private static ApplicationBackgroundStyle mapToAppStyle(LayoutModel layoutModel) {
+    ApplicationBackgroundStyle cssStyle = null;
+    if (StringUtils.isNotBlank(layoutModel.getAppBackgroundColor())
+        || StringUtils.isNotBlank(layoutModel.getAppBackgroundImage())) {
+      cssStyle = new ApplicationBackgroundStyle();
+      cssStyle.setBackgroundColor(layoutModel.getAppBackgroundColor());
+      cssStyle.setBackgroundImage(layoutModel.getAppBackgroundImage());
+      cssStyle.setBackgroundEffect(layoutModel.getAppBackgroundEffect());
+      cssStyle.setBackgroundPosition(layoutModel.getAppBackgroundPosition());
+      cssStyle.setBackgroundSize(layoutModel.getAppBackgroundSize());
+      cssStyle.setBackgroundRepeat(layoutModel.getAppBackgroundRepeat());
+    }
+    return cssStyle;
   }
 
 }
