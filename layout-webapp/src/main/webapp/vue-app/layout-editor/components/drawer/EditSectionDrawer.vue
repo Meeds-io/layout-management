@@ -49,7 +49,7 @@
           class="mt-4" />
         <template v-if="isDynamicSection">
           <div class="d-flex align-center mt-4">
-            <div class="subtitle-1 font-weight-bold me-auto mb-2">
+            <div class="text-header mb-2">
               {{ $t('layout.advancedOptions') }}
             </div>
           </div>

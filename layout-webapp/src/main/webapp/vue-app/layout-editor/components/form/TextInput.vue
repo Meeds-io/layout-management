@@ -20,22 +20,24 @@
 -->
 <template>
   <div>
-    <div class="d-flex align-center mt-4">
-      <div class="subtitle-1 font-weight-bold me-auto">
+    <div class="d-flex align-center">
+      <div
+        class="text-header me-auto">
         {{ $t('layout.textStyle') }}
       </div>
       <v-switch
-        v-model="enabledTextColor"
+        v-model="enabled"
         class="ms-auto my-auto me-n2" />
     </div>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
-        <span class="text-font-size text-color">{{ $t('layout.textColorTitle') }}</span>
+        {{ $t('layout.textColorTitle') }}
       </v-list-item-content>
       <v-list-item-action
+        v-if="textTitleStyle"
         class="me-0 my-auto ms-auto">
         <v-btn-toggle v-model="textTitleStyle" multiple>
           <v-btn value="bold" small>
@@ -64,11 +66,11 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
-        <span class="text-font-size text-color">{{ $t('layout.textColorHeader') }}</span>
+        {{ $t('layout.textColorHeader') }}
       </v-list-item-content>
       <v-list-item-action
         class="me-0 my-auto ms-auto">
@@ -99,11 +101,11 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
-        <span class="text-font-size text-color">{{ $t('layout.textColorBody') }}</span>
+        {{ $t('layout.textColorBody') }}
       </v-list-item-content>
       <v-list-item-action
         class="me-0 my-auto ms-auto">
@@ -134,11 +136,11 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
-        <span class="text-font-size text-color">{{ $t('layout.textColorSubtitle') }}</span>
+        {{ $t('layout.textColorSubtitle') }}
       </v-list-item-content>
       <v-list-item-action
         class="me-0 my-auto ms-auto">
@@ -177,13 +179,17 @@ export default {
       type: Object,
       default: null,
     },
+    pageStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     container: null,
-    enabledTextColor: false,
+    enabled: false,
     textTitleColor: null,
     textTitleFontSize: 0,
-    textTitleStyle: [],
+    textTitleStyle: ['bold'],
     textHeaderColor: null,
     textHeaderFontSize: 0,
     textHeaderStyle: [],
@@ -292,33 +298,35 @@ export default {
         }
       }
     },
-    enabledTextColor() {
-      if (this.enabledTextColor) {
-        this.textTitleColor = this.textTitleColor || '#20282C';
-        this.textTitleFontSize = this.textTitleFontSize || 18;
-        this.textTitleStyle = this.textTitleStyle || ['bold'];
-        this.textHeaderColor = this.textHeaderColor || '#707070';
-        this.textHeaderStyle = this.textHeaderStyle || [];
-        this.textHeaderFontSize = this.textHeaderFontSize || 18;
-        this.textColor = this.textColor || '#20282C';
-        this.textStyle = this.textStyle || [];
-        this.textFontSize = this.textFontSize || 14;
-        this.textSubtitleColor = this.textSubtitleColor || '#707070';
-        this.textSubtitleStyle = this.textSubtitleStyle || [];
-        this.textSubtitleFontSize = this.textSubtitleFontSize || 12;
-      } else {
-        this.textTitleColor = null;
-        this.textTitleFontSize = null;
-        this.textTitleStyle = null;
-        this.textHeaderColor = null;
-        this.textHeaderStyle = null;
-        this.textHeaderFontSize = null;
-        this.textColor = null;
-        this.textStyle = null;
-        this.textFontSize = null;
-        this.textSubtitleColor = null;
-        this.textSubtitleStyle = null;
-        this.textSubtitleFontSize = null;
+    enabled() {
+      if (this.initialized) {
+        if (this.enabled) {
+          this.textTitleColor =  '#20282C';
+          this.textTitleFontSize = 18;
+          this.textTitleStyle = ['bold'];
+          this.textHeaderColor = '#707070';
+          this.textHeaderStyle = [];
+          this.textHeaderFontSize = 18;
+          this.textColor = '#20282C';
+          this.textStyle = [];
+          this.textFontSize = 14;
+          this.textSubtitleColor = '#707070';
+          this.textSubtitleStyle = [];
+          this.textSubtitleFontSize = 12;
+        } else {
+          this.textTitleColor = null;
+          this.textTitleFontSize = null;
+          this.textTitleStyle = null;
+          this.textHeaderColor = null;
+          this.textHeaderStyle = null;
+          this.textHeaderFontSize = null;
+          this.textColor = null;
+          this.textStyle = null;
+          this.textFontSize = null;
+          this.textSubtitleColor = null;
+          this.textSubtitleStyle = null;
+          this.textSubtitleFontSize = null;
+        }
       }
     },
   },
@@ -327,7 +335,7 @@ export default {
 
     this.textTitleColor = this.container.textTitleColor;
     this.textTitleFontSize = this.container.textTitleFontSize?.replace?.('px', '');
-    this.textTitleStyle = [];
+    this.textTitleStyle = (this.container.textTitleFontWeight || this.container.textTitleFontStyle) && [] || null;
     if (this.container.textTitleFontWeight === 'bold') {
       this.textTitleStyle.push('bold');
     }
@@ -337,7 +345,7 @@ export default {
 
     this.textHeaderColor = this.container.textHeaderColor;
     this.textHeaderFontSize = this.container.textHeaderFontSize?.replace?.('px', '');
-    this.textHeaderStyle = [];
+    this.textHeaderStyle = (this.container.textHeaderFontWeight || this.container.textHeaderFontStyle) && [] || null;
     if (this.container.textHeaderFontWeight === 'bold') {
       this.textHeaderStyle.push('bold');
     }
@@ -347,7 +355,7 @@ export default {
 
     this.textColor = this.container.textColor;
     this.textFontSize = this.container.textFontSize?.replace?.('px', '');
-    this.textStyle = [];
+    this.textStyle = (this.container.textFontWeight || this.container.textFontStyle) && [] || null;
     if (this.container.textFontWeight === 'bold') {
       this.textStyle.push('bold');
     }
@@ -357,7 +365,7 @@ export default {
 
     this.textSubtitleColor = this.container.textSubtitleColor;
     this.textSubtitleFontSize = this.container.textSubtitleFontSize?.replace?.('px', '');
-    this.textSubtitleStyle = [];
+    this.textSubtitleStyle = (this.container.textSubtitleFontWeight || this.container.textSubtitleFontStyle) && [] || null;
     if (this.container.textSubtitleFontWeight === 'bold') {
       this.textSubtitleStyle.push('bold');
     }
@@ -365,7 +373,7 @@ export default {
       this.textSubtitleStyle.push('italic');
     }
 
-    this.enabledTextColor = !!this.textTitleColor || !!this.textHeaderColor || !!this.textColor || !!this.textSubtitleColor;
+    this.enabled = !!this.textTitleColor || !!this.textHeaderColor || !!this.textColor || !!this.textSubtitleColor;
     this.$nextTick().then(() => this.initialized = true);
   },
 };
