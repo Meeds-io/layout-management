@@ -20,19 +20,20 @@
 -->
 <template>
   <div>
-    <div class="d-flex align-center mt-4">
-      <div class="subtitle-1 font-weight-bold me-auto">
+    <div class="d-flex align-center">
+      <div
+        class="text-header me-auto">
         {{ $t('layout.borderRadius') }}
       </div>
       <v-switch
-        v-model="enableBorderRadius"
+        v-model="enabled"
         class="ms-auto my-auto me-n2" />
     </div>
     <div
-      v-if="enableBorderRadius"
-      :class="radiusChoice === 'same' && 'flex-row' || 'flex-column'"
+      v-if="enabled"
+      :class="choice === 'same' && 'flex-row' || 'flex-column'"
       class="d-flex">
-      <v-radio-group v-model="radiusChoice" class="my-auto text-no-wrap ms-n1">
+      <v-radio-group v-model="choice" class="my-auto text-no-wrap ms-n1">
         <v-radio
           :label="$t('layout.sameForAllCorners')"
           value="same"
@@ -43,16 +44,16 @@
           class="mx-0" />
       </v-radio-group>
       <v-list-item class="pe-0 ps-7 py-0" dense>
-        <v-list-item-content v-if="radiusChoice === 'different'" class="my-auto">
+        <v-list-item-content v-if="choice === 'different'" class="my-auto">
           {{ $t('layout.topRight') }}
         </v-list-item-content>
         <layout-editor-number-input
           v-model="radiusTopRight"
-          :class="radiusChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
+          :class="choice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
           class="me-n3" />
       </v-list-item>
       <v-list-item
-        v-if="radiusChoice === 'different'"
+        v-if="choice === 'different'"
         class="pe-0 ps-7 py-0"
         dense>
         <v-list-item-content class="my-auto">
@@ -63,7 +64,7 @@
           class="my-auto me-n3" />
       </v-list-item>
       <v-list-item
-        v-if="radiusChoice === 'different'"
+        v-if="choice === 'different'"
         class="pe-0 ps-7 py-0"
         dense>
         <v-list-item-content class="my-auto">
@@ -74,7 +75,7 @@
           class="my-auto me-n3" />
       </v-list-item>
       <v-list-item
-        v-if="radiusChoice === 'different'"
+        v-if="choice === 'different'"
         class="pe-0 ps-7 py-0"
         dense>
         <v-list-item-content class="my-auto">
@@ -94,12 +95,16 @@ export default {
       type: Object,
       default: null,
     },
+    pageStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     container: null,
     initialized: false,
-    enableBorderRadius: true,
-    radiusChoice: 'same',
+    enabled: true,
+    choice: 'same',
     radiusTopRight: null,
     radiusTopLeft: null,
     radiusBottomRight: null,
@@ -110,7 +115,7 @@ export default {
       if (this.initialized) {
         this.$set(this.container, 'radiusTopRight', this.radiusTopRight);
         this.$emit('refresh');
-        if (this.radiusChoice === 'same') {
+        if (this.choice === 'same') {
           this.radiusTopLeft = this.radiusTopRight;
           this.radiusBottomRight = this.radiusTopRight;
           this.radiusBottomLeft = this.radiusTopRight;
@@ -135,18 +140,18 @@ export default {
         this.$emit('refresh');
       }
     },
-    enableBorderRadius() {
+    enabled() {
       if (this.initialized) {
         const defaultBorderRadius = parseInt(this.$root.branding?.themeStyle?.borderRadius?.replace?.('px', '') || '4');
-        this.radiusChoice = 'same';
-        this.radiusTopRight = this.enableBorderRadius && defaultBorderRadius || null;
+        this.choice = 'same';
+        this.radiusTopRight = this.enabled && defaultBorderRadius || null;
         this.radiusTopLeft = this.radiusTopRight;
         this.radiusBottomRight = this.radiusTopRight;
         this.radiusBottomLeft = this.radiusTopRight;
       }
     },
-    radiusChoice() {
-      if (this.radiusChoice === 'same') {
+    choice() {
+      if (this.choice === 'same') {
         this.radiusTopLeft = this.radiusTopRight;
         this.radiusBottomRight = this.radiusTopRight;
         this.radiusBottomLeft = this.radiusTopRight;
@@ -159,8 +164,8 @@ export default {
     this.radiusTopLeft = this.container.radiusTopLeft;
     this.radiusBottomRight = this.container.radiusBottomRight;
     this.radiusBottomLeft = this.container.radiusBottomLeft;
-    this.enableBorderRadius = this.radiusBottomLeft === 0 || !!this.radiusBottomLeft;
-    this.radiusChoice =
+    this.enabled = this.radiusBottomLeft === 0 || !!this.radiusBottomLeft;
+    this.choice =
       this.radiusTopRight === this.radiusTopLeft
       && this.radiusBottomRight === this.radiusTopLeft
       && this.radiusTopLeft === this.radiusBottomLeft

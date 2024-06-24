@@ -21,7 +21,7 @@
 <template>
   <div class="pt-4">
     <div class="d-flex pb-2">
-      <div class="text-subtitle-1">
+      <div>
         <slot name="title"></slot>
       </div>
       <v-spacer />
