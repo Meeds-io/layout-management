@@ -92,9 +92,9 @@ export function getStyle(container, options) {
     }
     if (container.borderColor) {
       style[options.isApplicationStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
-    }
-    if (container.borderSize) {
-      style[options.isApplicationStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
+      if (container.borderSize) {
+        style[options.isApplicationStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
+      }
     }
     if (container.boxShadow === 'true') {
       style[options.isApplicationStyle && '--appBoxShadow' || 'box-shadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
@@ -106,13 +106,21 @@ export function getStyle(container, options) {
       || container.backgroundEffect)) {
     if (container.backgroundColor) {
       style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = container.backgroundColor;
+    } else if (container.backgroundEffect || container.backgroundImage) {
+      style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = 'transparent';
     }
+
     if (container.backgroundEffect && container.backgroundImage) {
       style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage}),${container.backgroundEffect}`;
     } else if (container.backgroundImage) {
       style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
     } else if (container.backgroundEffect) {
       style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
+    } else if (container.backgroundColor) {
+      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = 'none';
+      style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = 'no-repeat';
+      style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = 'unset';
+      style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = 'unset';
     }
     if (container.backgroundImage) {
       if (container.backgroundRepeat) {
@@ -125,6 +133,39 @@ export function getStyle(container, options) {
         style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
       }
     }
+  }
+  if (container.appBackgroundColor) {
+    style['--appBackgroundColor'] = container.appBackgroundColor;
+  }
+  if (container.appBackgroundEffect && container.appBackgroundImage) {
+    style['--appBackgroundImage'] = `url(${container.appBackgroundImage}),${container.appBackgroundEffect}`;
+  } else if (container.appBackgroundImage) {
+    style['--appBackgroundImage'] = `url(${container.appBackgroundImage})`;
+  } else if (container.appBackgroundEffect) {
+    style['--appBackgroundImage'] = container.appBackgroundEffect;
+  }
+  if (container.appBackgroundImage) {
+    if (container.appBackgroundRepeat) {
+      style['--appBackgroundRepeat'] = container.appBackgroundRepeat;
+    }
+    if (container.appBackgroundSize) {
+      style['--appBackgroundSize'] = container.appBackgroundSize;
+    }
+    if (container.appBackgroundPosition) {
+      style['--appBackgroundPosition'] = container.appBackgroundPosition;
+    }
+  }
+  if (container.radiusTopRight || container.radiusTopRight === 0) {
+    style['--appBorderRadiusTopRight'] = `${container.radiusTopRight}px`;
+  }
+  if (container.radiusTopLeft || container.radiusTopLeft === 0) {
+    style['--appBorderRadiusTopLeft'] = `${container.radiusTopLeft}px`;
+  }
+  if (container.radiusBottomRight || container.radiusBottomRight === 0) {
+    style['--appBorderRadiusBottomRight'] = `${container.radiusBottomRight}px`;
+  }
+  if (container.radiusBottomLeft || container.radiusBottomLeft === 0) {
+    style['--appBorderRadiusBottomLeft'] = `${container.radiusBottomLeft}px`;
   }
   return style;
 }

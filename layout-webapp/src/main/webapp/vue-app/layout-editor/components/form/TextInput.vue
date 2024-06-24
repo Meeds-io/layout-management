@@ -20,16 +20,16 @@
 -->
 <template>
   <div>
-    <div class="d-flex align-center mt-4">
-      <div class="subtitle-1 font-weight-bold me-auto">
+    <div class="d-flex align-center">
+      <div :class="pageStyle && 'text-header' || 'text-title'" class="me-auto">
         {{ $t('layout.textStyle') }}
       </div>
       <v-switch
-        v-model="enabledTextColor"
+        v-model="enabled"
         class="ms-auto my-auto me-n2" />
     </div>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -64,7 +64,7 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -99,7 +99,7 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -134,7 +134,7 @@
       </v-list-item-action>
     </v-list-item>
     <v-list-item
-      v-if="enabledTextColor"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -177,10 +177,14 @@ export default {
       type: Object,
       default: null,
     },
+    pageStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     container: null,
-    enabledTextColor: false,
+    enabled: false,
     textTitleColor: null,
     textTitleFontSize: 0,
     textTitleStyle: [],
@@ -292,8 +296,8 @@ export default {
         }
       }
     },
-    enabledTextColor() {
-      if (this.enabledTextColor) {
+    enabled() {
+      if (this.enabled) {
         this.textTitleColor = this.textTitleColor || '#20282C';
         this.textTitleFontSize = this.textTitleFontSize || 18;
         this.textTitleStyle = this.textTitleStyle || ['bold'];
@@ -365,7 +369,7 @@ export default {
       this.textSubtitleStyle.push('italic');
     }
 
-    this.enabledTextColor = !!this.textTitleColor || !!this.textHeaderColor || !!this.textColor || !!this.textSubtitleColor;
+    this.enabled = !!this.textTitleColor || !!this.textHeaderColor || !!this.textColor || !!this.textSubtitleColor;
     this.$nextTick().then(() => this.initialized = true);
   },
 };

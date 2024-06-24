@@ -20,21 +20,21 @@
 -->
 <template>
   <div>
-    <div class="d-flex align-center mt-4">
-      <div class="subtitle-1 font-weight-bold me-auto">
+    <div class="d-flex align-center">
+      <div :class="pageStyle && 'text-header' || 'text-title'" class="me-auto">
         {{ $t('layout.background') }}
       </div>
       <v-switch
-        v-model="enableBackground"
+        v-model="enabled"
         class="ms-auto my-auto me-n2" />
     </div>
     <v-list-item
-      v-if="enableBackground"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
         <v-radio-group
-          v-model="backgroundColorStyle"
+          v-model="choice"
           class="my-auto text-no-wrap flex-grow-1 flex-shrink-0"
           mandatory>
           <v-radio
@@ -54,10 +54,10 @@
         </v-radio-group>
       </v-list-item-content>
       <v-list-item-action
-        :class="backgroundColorStyle === 'color' && 'mb-auto' || 'my-auto'"
+        :class="choice === 'color' && 'mb-auto' || 'my-auto'"
         class="me-0 ms-auto">
         <layout-editor-color-picker
-          v-if="backgroundColorStyle === 'color'"
+          v-if="choice === 'color'"
           v-model="container.backgroundColor"
           class="my-auto" />
         <div v-else>
@@ -74,7 +74,7 @@
     </v-list-item>
 
     <v-list-item
-      v-if="enableBackground"
+      v-if="enabled"
       class="pa-0"
       dense>
       <v-list-item-content class="my-auto">
@@ -174,12 +174,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    pageStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     container: null,
-    enableBackground: false,
+    enabled: false,
+    choice: null,
     backgroundImageStyle: null,
-    backgroundColorStyle: null,
     backgroundGradientFrom: null,
     backgroundGradientTo: null,
     initialized: false,
@@ -193,9 +197,9 @@ export default {
         }
       },
     },
-    enableBackground() {
+    enabled() {
       if (this.initialized) {
-        this.container.backgroundColor = this.enableBackground && this.defaultBackgroundColor || null;
+        this.container.backgroundColor = this.enabled && this.defaultBackgroundColor || null;
         this.container.backgroundImage = null;
         this.backgroundImageStyle = null;
         this.backgroundGradientFrom = null;
@@ -214,26 +218,26 @@ export default {
       }
     },
     backgroundGradientFrom() {
-      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.backgroundColorStyle === 'gradient') {
+      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.choice === 'gradient') {
         this.container.backgroundEffect = `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
       } else {
         this.container.backgroundEffect = null;
       }
     },
     backgroundGradientTo() {
-      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.backgroundColorStyle === 'gradient') {
+      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.choice === 'gradient') {
         this.container.backgroundEffect = `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
       } else {
         this.container.backgroundEffect = null;
       }
     },
-    backgroundColorStyle() {
+    choice() {
       if (this.initialized) {
-        if (this.backgroundColorStyle === 'color') {
+        if (this.choice === 'color') {
           this.container.backgroundColor = this.backgroundColor || this.defaultBackgroundColor;
           this.backgroundGradientFrom = null;
           this.backgroundGradientTo = null;
-        } else if (this.backgroundColorStyle === 'gradient') {
+        } else if (this.choice === 'gradient') {
           this.backgroundGradientFrom = this.container.backgroundColor;
           this.backgroundGradientTo = '#999999FF';
           this.container.backgroundColor = '#FFFFFF00';
@@ -252,22 +256,22 @@ export default {
       }
     }
     if (this.container.backgroundEffect) {
-      this.backgroundColorStyle = 'gradient';
+      this.choice = 'gradient';
       this.backgroundGradientFrom = this.container.backgroundEffect.replace('linear-gradient(', '').split(',')[0].trim();
       this.backgroundGradientTo = this.container.backgroundEffect.replace('linear-gradient(', '').split(',')[1].replace(/\)$/g, '').trim();
     } else {
-      this.backgroundColorStyle = 'color';
+      this.choice = 'color';
     }
 
-    this.enableBackground = !!this.container.backgroundColor || !!this.container.backgroundImage;
-    if (this.enableBackground && !this.container.backgroundColor) {
+    this.enabled = !!this.container.backgroundColor || !!this.container.backgroundImage;
+    if (this.enabled && !this.container.backgroundColor) {
       this.container.backgroundColor = this.defaultBackgroundColor;
     }
     this.$nextTick().then(() => this.initialized = true);
   },
   methods: {
     async apply() {
-      if (this.enableBackground && this.$refs.backgroundImage) {
+      if (this.enabled && this.$refs.backgroundImage) {
         const backgroundImage = await this.$refs.backgroundImage.save();
         if (backgroundImage) {
           this.container.backgroundImage = backgroundImage;
