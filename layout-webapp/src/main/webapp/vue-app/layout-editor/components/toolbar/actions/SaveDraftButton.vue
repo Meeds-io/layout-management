@@ -8,6 +8,7 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -51,6 +52,9 @@ export default {
       this.$root.$emit('layout-save-draft');
     },
     stopLoading() {
+      if (this.loading) {
+        this.$root.$emit('alert-message', this.$t('layout.pageDraftSavedSuccessfully'), 'success');
+      }
       this.$root.$off('layout-draft-saved', this.stopLoading);
       this.loading = false;
     },

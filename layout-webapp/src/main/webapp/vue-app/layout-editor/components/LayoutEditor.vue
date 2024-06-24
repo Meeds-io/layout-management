@@ -122,7 +122,8 @@ export default {
                 this.draftPageRef,
                 JSON.parse(this.$root.pageTemplate.content),
                 'contentId'))
-              .then(draftLayout => this.setDraftLayout(draftLayout));
+              .then(draftLayout => this.setDraftLayout(draftLayout))
+              .catch(e => this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error'));
           } else {
             this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
               .then(draftLayout => this.setDraftLayout(draftLayout));
