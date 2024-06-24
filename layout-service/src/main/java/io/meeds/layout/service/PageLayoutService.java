@@ -55,6 +55,8 @@ import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
@@ -69,6 +71,8 @@ import lombok.SneakyThrows;
 public class PageLayoutService {
 
   public static final String      EMPTY_PAGE_TEMPLATE             = "empty";
+
+  private static final Log        LOG                             = ExoLogger.getLogger(PageLayoutService.class);
 
   private static final Pattern    GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_ ]+");
 
@@ -231,9 +235,17 @@ public class PageLayoutService {
       throw new IllegalAccessException(String.format(PAGE_NOT_EDITABLE_MESSAGE, pageKey.format(), username));
     }
 
-    // Update Page Layout only
-    if (publish) {
-      page.resetStorage();
+    try {
+      if (publish) {
+        // Update Page Layout only without resetting preferences
+        page.resetStorage();
+      } else {
+        // Check Page Layout consistency before saving
+        page.checkStorage();
+      }
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("Error while accessing page applications storage information", e);
+      throw new IllegalStateException("layout.pageOutdatedError");
     }
     validateCSSInputs(page);
     existingPage.setChildren(page.getChildren());
