@@ -160,7 +160,7 @@ export default {
     open() {
       const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
       this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
-      this.fullWindow = this.parentContainer.width === 'fullWindow';
+      this.fullWindow = this.parentContainer.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth');
       this.appBackgroundProperties = {
         storageId: 0,
         backgroundColor: this.parentContainer.appBackgroundColor || null,
@@ -174,7 +174,11 @@ export default {
     async apply() {
       this.saving = true;
       try {
-        this.parentContainer.width = this.fullWindow && 'fullWindow' || null;
+        if (this.fullWindow) {
+          this.parentContainer.width = 'fullWindow';
+        } else if (document.body.style.getPropertyValue('--allPagesWidth')) {
+          this.parentContainer.width = 'singlePageApplication';
+        }
         await this.$refs.backgroundInput.apply();
         await this.$refs.appBackgroundInput.apply();
         this.parentContainer.appBackgroundColor = this.appBackgroundProperties.backgroundColor;
