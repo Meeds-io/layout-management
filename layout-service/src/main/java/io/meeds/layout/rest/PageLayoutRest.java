@@ -195,7 +195,7 @@ public class PageLayoutRest {
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
       return getPageLayout(request, pageRef, 0, expand);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | IllegalStateException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());

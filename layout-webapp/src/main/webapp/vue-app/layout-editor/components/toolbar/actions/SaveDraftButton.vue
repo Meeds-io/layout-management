@@ -8,6 +8,7 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -47,11 +48,22 @@ export default {
   methods: {
     saveDraft() {
       this.loading = true;
-      this.$root.$on('layout-draft-saved', this.stopLoading);
+      this.$root.$on('layout-draft-saved', this.stopLoadingSuccess);
+      this.$root.$on('layout-draft-save-error', this.stopLoadingError);
       this.$root.$emit('layout-save-draft');
     },
-    stopLoading() {
-      this.$root.$off('layout-draft-saved', this.stopLoading);
+    stopLoadingSuccess() {
+      this.stopLoading(true);
+    },
+    stopLoadingError() {
+      this.stopLoading();
+    },
+    stopLoading(success) {
+      if (this.loading && success) {
+        this.$root.$emit('alert-message', this.$t('layout.pageDraftSavedSuccessfully'), 'success');
+      }
+      this.$root.$off('layout-draft-saved', this.stopLoadingSuccess);
+      this.$root.$off('layout-draft-save-error', this.stopLoadingError);
       this.loading = false;
     },
   },
