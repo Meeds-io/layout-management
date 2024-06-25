@@ -81,9 +81,9 @@ export function getStyle(container, options) {
       }
     }
     if (container.width === 'fullWindow') {
-      style['--allPagesSinglePageApplicationWidth'] = 'calc(100% - 40px)';
-      style['--allPagesSinglePageApplicationPadding'] = '0';
-      style['--allPagesSinglePageApplicationMargin'] = '20px';
+      style['--allPagesWidth'] = 'calc(100% - 40px)';
+    } else if (container.width === 'singlePageApplication') {
+      style['--allPagesWidth'] = '1320px';
     } else if (container.width) {
       style[options.isApplicationStyle && '--appWidth' || 'width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
       if (options.isApplicationScroll) {
