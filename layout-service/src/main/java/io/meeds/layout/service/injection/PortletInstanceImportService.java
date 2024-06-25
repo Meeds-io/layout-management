@@ -85,8 +85,6 @@ public class PortletInstanceImportService {
 
   private static final String            PORTLET_INSTANCE_VERSION               = "version";
 
-  private static final long              PORTLET_INSTANCE_IMPORT_VERSION        = 1;
-
   private static final Log               LOG                                    =
                                              ExoLogger.getLogger(PortletInstanceImportService.class);
 
@@ -116,6 +114,9 @@ public class PortletInstanceImportService {
   @Value("${meeds.portlets.import.override:false}")
   private boolean                        forceReimport;
 
+  @Value("${meeds.portlets.import.version:2}")
+  private long                           portletInstanceImportVersion;
+
   @PostConstruct
   public void init() {
     CompletableFuture.runAsync(this::importPortletInstances);
@@ -125,7 +126,7 @@ public class PortletInstanceImportService {
   public void importPortletInstances() {
     LOG.info("Importing Portlet instances");
     if (!forceReimport
-        && getSettingValue(PORTLET_INSTANCE_VERSION) != PORTLET_INSTANCE_IMPORT_VERSION) {
+        && getSettingValue(PORTLET_INSTANCE_VERSION) != portletInstanceImportVersion) {
       forceReimport = true;
     }
 
@@ -148,7 +149,7 @@ public class PortletInstanceImportService {
       layoutTranslationService.postImport(PortletInstanceTranslationPlugin.OBJECT_TYPE);
       LOG.info("Processing Post Portlet instances import finished");
 
-      setSettingValue(PORTLET_INSTANCE_VERSION, PORTLET_INSTANCE_IMPORT_VERSION);
+      setSettingValue(PORTLET_INSTANCE_VERSION, portletInstanceImportVersion);
     } catch (Exception e) {
       LOG.warn("An error occurred while importing portlet instances", e);
     } finally {
