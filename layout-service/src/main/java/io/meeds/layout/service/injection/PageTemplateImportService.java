@@ -79,8 +79,6 @@ public class PageTemplateImportService {
 
   private static final String            PAGE_TEMPLATE_VERSION        = "version";
 
-  private static final long              PAGE_TEMPLATE_IMPORT_VERSION = 1;
-
   private static final Log               LOG                          = ExoLogger.getLogger(PageTemplateImportService.class);
 
   private static final Random            RANDOM                       = new Random();
@@ -106,6 +104,9 @@ public class PageTemplateImportService {
   @Value("${meeds.pages.import.override:false}")
   private boolean                        forceReimportTemplates;
 
+  @Value("${meeds.pages.import.version:2}")
+  private long                           pageTemplateImportVersion;
+
   @PostConstruct
   public void init() {
     CompletableFuture.runAsync(this::importPageTemplates);
@@ -115,7 +116,7 @@ public class PageTemplateImportService {
   public void importPageTemplates() {
     LOG.info("Importing Page Templates");
     if (!forceReimportTemplates
-        && getSettingValue(PAGE_TEMPLATE_VERSION) != PAGE_TEMPLATE_IMPORT_VERSION) {
+        && getSettingValue(PAGE_TEMPLATE_VERSION) != pageTemplateImportVersion) {
       forceReimportTemplates = true;
     }
 
@@ -142,7 +143,7 @@ public class PageTemplateImportService {
       layoutTranslationService.postImport(PageTemplateTranslationPlugin.OBJECT_TYPE);
       LOG.info("Processing Post Page Templates import finished");
 
-      setSettingValue(PAGE_TEMPLATE_VERSION, PAGE_TEMPLATE_IMPORT_VERSION);
+      setSettingValue(PAGE_TEMPLATE_VERSION, pageTemplateImportVersion);
     } catch (Exception e) {
       LOG.warn("An error occurred while importing page templates", e);
     } finally {
