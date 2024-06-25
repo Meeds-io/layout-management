@@ -40,13 +40,12 @@
   overflow-y: auto;
   overflow-x: hidden;
 
-  .PORTLET-FRAGMENT {
-    margin-bottom: ~"var(--grid-layout-gap, 20px) !important";
+  .flex-cell:has(.layout-application), .grid-cell:has(.layout-application) {
+    padding-bottom: ~"var(--grid-layout-gap, 20px)";
   }
-  .flex-cell {
-    row-gap: 0;
-    .layout-application {
-      padding-bottom: 0 !important;
+  .layout-section-content {
+    > :last-child {
+      padding-bottom: 0;
     }
   }
   .hidden-sm-and-down {
