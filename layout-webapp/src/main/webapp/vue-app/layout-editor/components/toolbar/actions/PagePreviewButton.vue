@@ -52,7 +52,11 @@ export default {
     previewPage() {
       this.saving = true;
       this.$root.$on('layout-draft-saved', this.openPreviewPage);
+      this.$root.$on('layout-draft-save-error', this.stopLoading);
       this.$root.$emit('layout-save-draft');
+    },
+    stopLoading() {
+      this.saving = false;
     },
     openPreviewPage() {
       this.$root.$off('layout-draft-saved', this.openPreviewPage);

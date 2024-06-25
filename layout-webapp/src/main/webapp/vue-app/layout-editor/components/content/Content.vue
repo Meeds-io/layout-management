@@ -396,10 +396,16 @@ export default {
       this.loading++;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.draftPageRef, layoutToUpdate, 'contentId')
-        .then(layout => this.setLayout(layout))
+        .then(layout => {
+          this.setLayout(layout);
+          this.$root.$emit('layout-draft-saved');
+        })
+        .catch(e => {
+          this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error');
+          this.$root.$emit('layout-draft-save-error');
+        })
         .finally(() => {
           window.setTimeout(() => this.loading--, 200);
-          this.$root.$emit('layout-draft-saved');
           this.$root.$emit('coediting-set-lock');
         });
     },

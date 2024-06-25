@@ -63,7 +63,7 @@ export default {
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout, false, true);
       return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, 'contentId', true)
         .then(() => this.$root.$emit('layout-page-saved'))
-        .catch(() => this.$root.$emit('alert-message', this.$t('layout.pageSavingError'), 'error'))
+        .catch(e => this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error'))
         .finally(() => window.setTimeout(() => this.loading = false));
     },
   },
