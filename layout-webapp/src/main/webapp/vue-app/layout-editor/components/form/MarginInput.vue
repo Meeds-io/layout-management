@@ -26,11 +26,11 @@
         {{ $t('layout.margins') }}
       </div>
       <v-switch
-        v-model="enableMargin"
+        v-model="enabled"
         class="ms-auto my-auto me-n2" />
     </div>
     <div
-      v-if="enableMargin"
+      v-if="enabled"
       :class="marginChoice === 'same' && 'flex-row' || 'flex-column'"
       class="d-flex">
       <v-radio-group v-model="marginChoice" class="my-auto text-no-wrap ms-n1">
@@ -105,7 +105,7 @@ export default {
   data: () => ({
     container: null,
     initialized: false,
-    enableMargin: true,
+    enabled: true,
     marginChoice: 'same',
     marginTop: 20,
     marginRight: 20,
@@ -115,9 +115,9 @@ export default {
   watch: {
     marginTop() {
       if (this.initialized) {
-        this.$set(this.container, 'marginTop', this.marginTop || null);
+        this.$set(this.container, 'marginTop', this.enabled ? this.marginTop || 0 : null);
         this.$emit('refresh');
-        if (this.marginChoice === 'same') {
+        if (this.enabled && this.marginChoice === 'same') {
           this.marginRight = this.marginTop;
           this.marginBottom = this.marginTop;
           this.marginLeft = this.marginTop;
@@ -126,29 +126,31 @@ export default {
     },
     marginRight() {
       if (this.initialized) {
-        this.$set(this.container, 'marginRight', this.marginRight || null);
+        this.$set(this.container, 'marginRight', this.enabled ? this.marginRight || 0 : null);
         this.$emit('refresh');
       }
     },
     marginBottom() {
       if (this.initialized) {
-        this.$set(this.container, 'marginBottom', this.marginBottom || null);
+        this.$set(this.container, 'marginBottom', this.enabled ? this.marginBottom || 0 : null);
         this.$emit('refresh');
       }
     },
     marginLeft() {
       if (this.initialized) {
+        this.$set(this.container, 'marginLeft', this.enabled ? this.marginLeft || 0 : null);
         this.$set(this.container, 'marginLeft', this.marginLeft || null);
         this.$emit('refresh');
       }
     },
-    enableMargin() {
+    enabled() {
       if (this.initialized) {
         this.marginChoice = 'same';
-        this.marginTop = 0;
-        this.marginRight = 0;
-        this.marginBottom = 0;
-        this.marginLeft = 0;
+        this.marginTop = this.enabled ? 0 : null;
+        this.marginRight = this.enabled ? 0 : null;
+        this.marginBottom = this.enabled ? 0 : null;
+        this.marginLeft = this.enabled ? 0 : null;
+        this.$emit('refresh');
       }
     },
     marginChoice() {
@@ -169,7 +171,7 @@ export default {
       this.marginTop === this.marginRight
       && this.marginRight === this.marginLeft
       && this.marginLeft === this.marginBottom ? 'same' : 'different';
-    this.enableMargin = this.marginChoice !== 'same' || this.marginRight !== 0;
+    this.enabled = this.marginChoice !== 'same' || this.marginRight !== 0;
     this.$nextTick().then(() => this.initialized = true);
   },
 };
