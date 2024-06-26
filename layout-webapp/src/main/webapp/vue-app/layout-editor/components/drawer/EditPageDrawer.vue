@@ -8,6 +8,7 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -160,7 +161,7 @@ export default {
     open() {
       const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
       this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
-      this.fullWindow = this.parentContainer.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth');
+      this.fullWindow = this.parentContainer.width !== 'singlePageApplication' && (this.parentContainer.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth'));
       this.appBackgroundProperties = {
         storageId: 0,
         backgroundColor: this.parentContainer.appBackgroundColor || null,
@@ -189,6 +190,7 @@ export default {
         const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
         this.parentContainer.children = parentContainer.children;
         Object.assign(parentContainer, this.parentContainer);
+        this.$root.pageFullWindow = this.fullWindow;
         this.close();
       } finally {
         this.saving = false;
