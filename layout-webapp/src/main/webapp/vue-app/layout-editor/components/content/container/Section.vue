@@ -32,7 +32,6 @@
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
-        :style="sectionMenuStyle"
         :class="hoverSectionMenuButton && 'z-index-two'"
         class="layout-section-border">
         <div class="position-relative full-height full-width">
@@ -99,11 +98,6 @@ export default {
     movingSection: false,
     mobileSectionColumnClass: null,
     sectionWidth: 0,
-    // FIXME can't be set using Less, YUICompressor bug
-    // which deletes spaces
-    sectionMenuStyle: {
-      width: 'calc(var(--allPagesSinglePageApplicationWidth, 1320px) + 24px)',
-    },
   }),
   computed: {
     storageId() {
@@ -121,6 +115,7 @@ export default {
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
         onlyBackgroundStyle: true,
+        sectionStyle: true,
       });
     },
     mobileInColumns() {
