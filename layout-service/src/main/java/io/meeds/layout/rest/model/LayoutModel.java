@@ -88,6 +88,14 @@ public class LayoutModel {
 
   private String                          boxShadow;
 
+  private Integer                         marginTop;
+
+  private Integer                         marginBottom;
+
+  private Integer                         marginRight;
+
+  private Integer                         marginLeft;
+
   private Integer                         radiusTopRight;
 
   private Integer                         radiusTopLeft;
@@ -202,6 +210,13 @@ public class LayoutModel {
       this.borderColor = cssStyle.getBorderColor();
       this.borderSize = cssStyle.getBorderSize();
       this.boxShadow = cssStyle.getBoxShadow();
+      this.marginTop = cssStyle.getMarginTop();
+      this.marginBottom = cssStyle.getMarginBottom();
+      this.marginRight = cssStyle.getMarginRight();
+      this.marginLeft = cssStyle.getMarginLeft();
+      this.radiusTopLeft = cssStyle.getRadiusTopLeft();
+      this.radiusBottomRight = cssStyle.getRadiusBottomRight();
+      this.radiusBottomLeft = cssStyle.getRadiusBottomLeft();
       this.radiusTopRight = cssStyle.getRadiusTopRight();
       this.radiusTopLeft = cssStyle.getRadiusTopLeft();
       this.radiusBottomRight = cssStyle.getRadiusBottomRight();
@@ -383,6 +398,13 @@ public class LayoutModel {
     ModelStyle cssStyle = null;
     boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
                        || layoutModel.getRadiusTopRight() != null
+                       || layoutModel.getRadiusTopLeft() != null
+                       || layoutModel.getRadiusBottomLeft() != null
+                       || layoutModel.getRadiusBottomRight() != null
+                       || layoutModel.getMarginTop() != null
+                       || layoutModel.getMarginBottom() != null
+                       || layoutModel.getMarginLeft() != null
+                       || layoutModel.getMarginRight() != null
                        || StringUtils.isNotBlank(layoutModel.getBorderSize())
                        || StringUtils.isNotBlank(layoutModel.getBoxShadow())
                        || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
@@ -396,6 +418,10 @@ public class LayoutModel {
       cssStyle.setBorderColor(layoutModel.getBorderColor());
       cssStyle.setBorderSize(layoutModel.getBorderSize());
       cssStyle.setBoxShadow(layoutModel.getBoxShadow());
+      cssStyle.setMarginTop(layoutModel.getMarginTop());
+      cssStyle.setMarginBottom(layoutModel.getMarginBottom());
+      cssStyle.setMarginRight(layoutModel.getMarginRight());
+      cssStyle.setMarginLeft(layoutModel.getMarginLeft());
       cssStyle.setRadiusTopRight(layoutModel.getRadiusTopRight());
       cssStyle.setRadiusTopLeft(layoutModel.getRadiusTopLeft());
       cssStyle.setRadiusBottomRight(layoutModel.getRadiusBottomRight());
