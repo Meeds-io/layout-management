@@ -36,6 +36,7 @@ import BackgroundImageAttachment from './components/form/BackgroundImageAttachme
 import BackgroundInput from './components/form/BackgroundInput.vue';
 import TextInput from './components/form/TextInput.vue';
 import MarginInput from './components/form/MarginInput.vue';
+import SectionMarginInput from './components/form/SectionMarginInput.vue';
 import BorderInput from './components/form/BorderInput.vue';
 import BorderRadiusInput from './components/form/BorderRadiusInput.vue';
 
@@ -109,6 +110,7 @@ const components = {
   'layout-editor-background-input': BackgroundInput,
   'layout-editor-text-input': TextInput,
   'layout-editor-margin-input': MarginInput,
+  'layout-editor-section-margin-input': SectionMarginInput,
   'layout-editor-border-input': BorderInput,
   'layout-editor-border-radius-input': BorderRadiusInput,
   'layout-editor-application-card': ApplicationCard,

@@ -42,6 +42,11 @@
           :cols-count="cols"
           :background-properties="section"
           @cols-updated="cols = $event" />
+        <layout-editor-section-margin-input
+          v-if="section"
+          ref="marginInput"
+          v-model="section"
+          class="mt-4" />
         <layout-editor-background-input
           v-if="section"
           ref="backgroundInput"

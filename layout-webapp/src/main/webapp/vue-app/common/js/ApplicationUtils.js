@@ -24,6 +24,14 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 
 export function getStyle(container, options) {
   const style = {};
+  if (options.sectionStyle && (container.marginTop || container.marginBottom)) {
+    if (container.marginTop) {
+      style['--sectionMarginTop'] = `${container.marginTop + 10}px`;
+    }
+    if (container.marginBottom) {
+      style['--sectionMarginBottom'] = `${container.marginBottom + 10}px`;
+    }
+  }
   if (container.textTitleColor) {
     style['--appTextTitleColor'] = container.textTitleColor;
   }
@@ -81,7 +89,7 @@ export function getStyle(container, options) {
       }
     }
     if (container.width === 'fullWindow') {
-      style['--allPagesWidth'] = 'calc(100% - 40px)';
+      style['--allPagesWidth'] = '100%';
     } else if (container.width === 'singlePageApplication') {
       style['--allPagesWidth'] = '1320px';
     } else if (container.width) {
