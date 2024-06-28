@@ -26,7 +26,7 @@
     <v-btn
       icon
       @click="decrementNumber">
-      <v-icon>fa-minus fa-sm</v-icon>
+      <v-icon class="icon-default-color">fa-minus fa-sm</v-icon>
     </v-btn>
     <input
       v-if="editable"
@@ -42,7 +42,7 @@
     <v-btn
       icon
       @click="incrementNumber">
-      <v-icon>fa-plus fa-sm</v-icon>
+      <v-icon class="icon-default-color">fa-plus fa-sm</v-icon>
     </v-btn>
   </v-card>
 </template>
