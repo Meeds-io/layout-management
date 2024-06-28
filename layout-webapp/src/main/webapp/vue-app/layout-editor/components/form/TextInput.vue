@@ -302,14 +302,14 @@ export default {
       if (this.initialized) {
         if (this.enabled) {
           this.textTitleColor =  '#20282C';
-          this.textTitleFontSize = 18;
+          this.textTitleFontSize = 20;
           this.textTitleStyle = ['bold'];
           this.textHeaderColor = '#707070';
           this.textHeaderStyle = [];
           this.textHeaderFontSize = 18;
           this.textColor = '#20282C';
           this.textStyle = [];
-          this.textFontSize = 14;
+          this.textFontSize = 16;
           this.textSubtitleColor = '#707070';
           this.textSubtitleStyle = [];
           this.textSubtitleFontSize = 12;
