@@ -28,7 +28,7 @@
     dense>
     <v-list-item :role="null" class="pe-0">
       <v-list-item-content>
-        <v-list-item-title class="text-header-title font-weight-regular pb-2">{{ $t('layout.portletInstance.category') }}</v-list-item-title>
+        <v-list-item-title class="text-header pb-2">{{ $t('layout.portletInstance.category') }}</v-list-item-title>
       </v-list-item-content>
       <v-list-item-action class="my-auto ms-4">
         <v-btn
