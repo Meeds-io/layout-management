@@ -45,7 +45,7 @@
                     width="32"
                     icon
                     @click="$root.$emit('layout-add-section-drawer', index)">
-                    <v-icon size="20">fa-plus</v-icon>
+                    <v-icon class="icon-default-color" size="20">fa-plus</v-icon>
                   </v-btn>
                 </div>
               </template>
@@ -73,7 +73,7 @@
                       @mouseup="$emit('move-end')"
                       @mouseout="$emit('move-end')"
                       @focusout="$emit('move-end')">
-                      <v-icon size="20">fa-arrows-alt</v-icon>
+                      <v-icon class="icon-default-color" size="20">fa-arrows-alt</v-icon>
                     </v-btn>
                   </div>
                 </template>
@@ -96,7 +96,7 @@
                       width="32"
                       icon
                       @click="$root.$emit('layout-edit-section-drawer', index, length)">
-                      <v-icon size="20">fa-edit</v-icon>
+                      <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
                     </v-btn>
                   </div>
                 </template>
@@ -118,7 +118,7 @@
                     width="32"
                     icon
                     @click="$root.$emit('layout-add-section-drawer', index + 1)">
-                    <v-icon size="20">fa-plus</v-icon>
+                    <v-icon class="icon-default-color" size="20">fa-plus</v-icon>
                   </v-btn>
                 </div>
               </template>
