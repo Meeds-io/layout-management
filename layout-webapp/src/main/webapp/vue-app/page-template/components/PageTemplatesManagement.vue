@@ -21,7 +21,7 @@
 <template>
   <v-app>
     <v-card class="application-body position-static pb-5" flat>
-      <h4 class="title font-weight-bold px-5 pt-5 ma-0">
+      <h4 class="text-title px-5 pt-5 ma-0">
         {{ $t('pageTemplates.title') }}
       </h4>
       <page-templates-management-toolbar

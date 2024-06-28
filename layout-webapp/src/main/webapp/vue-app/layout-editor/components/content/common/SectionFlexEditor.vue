@@ -20,7 +20,7 @@
 -->
 <template>
   <div v-show="cols">
-    <div class="pb-2 subtitle-1 text-color font-weight-bold">{{ $t('layout.chooseSectionDisplay') }}</div>
+    <div class="pb-2 text-header">{{ $t('layout.chooseSectionDisplay') }}</div>
     <div class="d-flex align-center my-2">
       <div class="flex-grow-0 flex-shrink-0 align-start pb-3">
         <span class="subtitle-1 text-color">{{ $t('layout.column') }}</span>
@@ -43,7 +43,7 @@
               fab
               x-small
               @click="decrementCols">
-              <v-icon class="pt-2px">fa-minus</v-icon>
+              <v-icon class="icon-default-color pt-2px">fa-minus</v-icon>
             </v-btn>
           </template>
           <template #append>
@@ -54,7 +54,7 @@
               icon
               x-small
               @click="incrementCols">
-              <v-icon class="pt-2px">fa-plus</v-icon>
+              <v-icon class="icon-default-color pt-2px">fa-plus</v-icon>
             </v-btn>
           </template>
         </v-slider>
