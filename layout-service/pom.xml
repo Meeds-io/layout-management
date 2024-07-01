@@ -41,7 +41,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.exoplatform.social</groupId>
+      <groupId>io.meeds.social</groupId>
       <artifactId>social-component-service</artifactId>
     </dependency>
 
