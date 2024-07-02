@@ -84,7 +84,6 @@ export default {
   methods: {
     selectTemplate() {
       this.$root.$emit('page-template-changed', this.pageTemplate);
-      console.warn('eazrzarerzerzerz',this.pageTemplateId);
     }
   }
 };
