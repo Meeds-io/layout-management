@@ -50,7 +50,7 @@
             @blur="convertSiteName">
             <template #title>
               <v-label>
-                <span class="text-color font-weight-bold">
+                <span class="text-color">
                   {{ $t('siteManagement.label.siteLabel.title') }} *              
                 </span>
               </v-label>
@@ -59,7 +59,7 @@
         </v-card-text>
         <v-card-text class="d-flex pb-2">
           <v-label>
-            <span class="text-color font-weight-bold">
+            <span class="text-color">
               {{ $t('siteManagement.label.siteName.title') }} *              
             </span>
           </v-label>
@@ -90,7 +90,7 @@
             rich-editor>
             <template #title>
               <v-label>
-                <span class="text-color font-weight-bold">
+                <span class="text-color">
                   {{ $t('siteManagement.label.siteDescription.title') }}           
                 </span>
               </v-label>
@@ -106,7 +106,7 @@
         </v-card-text>
         <v-card-text class="mt-3 py-4 px-3">
           <v-label>
-            <span class="text-color font-weight-bold mb-2 px-1 text-capitalize"> {{ $t('siteManagement.label.banner') }}</span>
+            <span class="text-color mb-2 px-1 text-capitalize"> {{ $t('siteManagement.label.banner') }}</span>
           </v-label>
           <v-label>
             <span class="text-color caption px-1 text-capitalize"> {{ $t('siteManagement.label.caption') }}</span>
@@ -122,7 +122,7 @@
         </v-card-text>
         <v-card-text class="mt-4">
           <v-label>
-            <span class="text-color font-weight-bold mb-2"> {{ $t('siteManagement.label.displayOrder') }}</span>
+            <span class="text-color mb-2"> {{ $t('siteManagement.label.displayOrder') }}</span>
           </v-label>
           <v-row class="mx-0 mt-2">
             <v-col class="d-flex flex-row px-0 py-0 col-10">

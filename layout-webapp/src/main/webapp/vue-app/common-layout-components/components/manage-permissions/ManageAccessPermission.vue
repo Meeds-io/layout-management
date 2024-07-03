@@ -18,14 +18,14 @@
 -->
 <template>
   <div>
-    <p class="font-weight-bold text-start text-color body-2">{{ whoCanView }}</p>
+    <p class="text-start text-color subtitle-1">{{ whoCanView }}</p>
     <v-select
       v-model="type"
       :items="typeLabel"
       item-text="text"
       item-value="value"
       dense
-      class="caption"
+      class="caption pt-0"
       outlined />
     <exo-identity-suggester
       v-if="showAccessPermissionsGroupSuggester"
