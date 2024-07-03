@@ -35,6 +35,7 @@ import SiteNavigationExistingPageElement from './components/site-navigation/Site
 import SiteNavigationPageSuggester from './components/site-navigation/SiteNavigationPageSuggester.vue';
 import SiteNavigationSiteSuggester from './components/site-navigation/SiteNavigationSiteSuggester.vue';
 import NodeIconPickerDrawer from './components/site-navigation/NodeIconPickerDrawer.vue';
+import SiteNavigationNewPageElementItem from './components/site-navigation/SiteNavigationNewPageElementItem.vue';
 
 const components = {
   'manage-permissions-drawer': ManagePermissionsDrawer,
@@ -50,6 +51,7 @@ const components = {
   'site-navigation-element-drawer': SiteNavigationElementDrawer,
   'site-navigation-page-element': SiteNavigationPageElement,
   'site-navigation-new-page-element': SiteNavigationNewPageElement,
+  'site-navigation-new-page-element-item': SiteNavigationNewPageElementItem,
   'site-navigation-schedule-date-pickers': SiteNavigationScheduleDatePickers,
   'site-navigation-existing-page-element': SiteNavigationExistingPageElement,
   'site-navigation-page-suggester': SiteNavigationPageSuggester,
