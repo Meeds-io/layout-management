@@ -17,24 +17,14 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <div>
-    <span class="font-weight-bold text-start text-truncate-2 text-color body-2 mt-8">{{ $t('siteNavigation.label.selectExistingPage') }}</span>
-    <v-flex class="mt-4 text-left">
-      <v-chip
-        :class="allSitesChipClass"
-        @click="allSites = true">
-        <span class="text-truncate">
-          {{ $t('siteNavigation.label.allSites') }}
-        </span>
-      </v-chip>
-      <v-chip
-        :class="selectSiteChipClass"
-        @click="allSites = false">
-        <span class="text-truncate">
-          {{ $t('siteNavigation.label.selectSite') }}
-        </span>
-      </v-chip>
-    </v-flex>
+  <div class="ms-8">
+    <div class="d-flex align-center justify-space-between flex-grow-1">
+      <span>{{ $t('siteNavigation.label.choosePage') }}</span>
+      <v-checkbox
+        v-model="allSites"
+        :label="$t('siteNavigation.label.chooseSite')"
+        class="mt-0" />
+    </div>
     <site-navigation-site-suggester
       v-if="!allSites"
       v-model="selectedSiteNavigation"
@@ -44,7 +34,8 @@
       :page="selectedPage"
       :all-sites="allSites"
       :site-type="selectedSiteNavigation?.siteType"
-      :site-name="selectedSiteNavigation?.name" />
+      :site-name="selectedSiteNavigation?.name"
+      class="mb-8" />
   </div>
 </template>
 
