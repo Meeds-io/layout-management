@@ -17,31 +17,14 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <div v-if="!isNewPageElement || hasMoreThanOneTemplate">
-    <site-navigation-existing-page-element
-      v-if="!isNewPageElement"
-      :selected-page="selectedPage" />
-    <site-navigation-new-page-element
-      v-else-if="hasMoreThanOneTemplate" />
+  <div v-if="hasMoreThanOneTemplate">
+    <site-navigation-new-page-element />
   </div>
 </template>
 
 <script>
 export default {
-  props: {
-    elementType: {
-      type: String,
-      default: () => 'PAGE',
-    },
-    selectedPage: {
-      type: Object,
-      default: null,
-    }
-  },
   computed: {
-    isNewPageElement() {
-      return this.elementType === 'PAGE';
-    },
     templatesCount() {
       return this.$root.pageTemplates?.length || 0;
     },
