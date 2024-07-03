@@ -18,83 +18,42 @@
 -->
 <template>
   <div>
-    <span class="font-weight-bold text-start text-color body-2 mt-8">{{ $t('siteNavigation.label.pageTemplate') }}</span>
-    <v-select
-      v-model="pageTemplateId"
-      :items="items"
-      item-text="name"
-      item-value="value"
-      class="caption pt-1 mb-5"
-      mandatory
-      outlined
-      dense />
-    <v-img
-      :src="illustrationSrc"
-      class="align-center mb-5 mx-auto"
-      max-height="350"
-      max-width="500" />
-    <div
-      v-if="description"
-      v-sanitized-html="description"
-      class="mb-5"></div>
+    <span class="font-weight-bold d-block text-start text-color body-2 mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
+    <div class="mb-5">
+      <span class="mb-2 body-2">{{ $t('siteNavigation.label.blankTemplate') }}</span>
+      <div class="d-flex flex-row flex-grow-1 flex-shrink-1">
+        <site-navigation-new-page-element-item
+          v-for="template in blankTemplates"
+          :key="template.id"
+          :page-template="template"
+          class="col-6 ps-0 clickable" />
+      </div>
+    </div>
+    <div>
+      <span class="pb-4 body-2">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
+      <div class="d-flex flex-row flex-grow-1 flex-shrink-1">
+        <site-navigation-new-page-element-item
+          v-for="templates in defaultTemplates"
+          :key="templates.id"
+          :page-template="templates"
+          class="col-6 ps-0 clickable" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  data: () => ({
-    pageTemplateId: null,
-    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
-  }),
   computed: {
     pageTemplates() {
       return this.$root.pageTemplates || [];
     },
-    items() {
-      const items = this.pageTemplates.slice()?.filter?.(t => t?.name) || [];
-      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
-      items.sort((a, b) =>
-        ((b.category === 'blank' && 2) || (b.category === 'default' && 1) || 0) - ((a.category === 'blank' && 2) || (a.category === 'default' && 1) || 0));
-      return items?.map?.(t => ({
-        name: this.$te(t.name) ? this.$t(t.name) : t.name,
-        value: t.id,
-      }));
+    blankTemplates() {
+      return this.pageTemplates.filter(item => item.category === 'blank');
     },
-    pageTemplate() {
-      return this.pageTemplates?.find?.(t => t.id === Number(this.pageTemplateId));
-    },
-    description() {
-      return this.$te(this.pageTemplate?.description) ? this.$t(this.pageTemplate?.description) : this.pageTemplate?.description;
-    },
-    illustrationId() {
-      return this.pageTemplate?.illustrationId;
-    },
-    illustrationSrc() {
-      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.pageTemplateId}/${this.illustrationId}` ||  '/layout/images/page-templates/DefaultPreview.webp';
+    defaultTemplates() {
+      return this.pageTemplates.filter(item => item.category === 'default');
     },
   },
-  watch: {
-    pageTemplate() {
-      if (this.pageTemplate) {
-        this.$root.$emit('page-template-changed', this.pageTemplate);
-      }
-    },
-    items: {
-      immediate: true,
-      handler() {
-        if (this.items?.length) {
-          this.pageTemplateId = this.pageTemplates[0].id;
-        }
-      },
-    },
-  },
-  created() {
-    this.$root.$on('reset-element-drawer', this.reset);
-  },
-  methods: {
-    reset() {
-      this.pageTemplate = null;
-    },
-  }
 };
 </script>
