@@ -19,7 +19,7 @@
 
 -->
 <template>
-  <div class="application-layout-style">
+  <div>
     <v-data-table
       :headers="headers"
       :items="filteredPortlets"
