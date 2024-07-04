@@ -20,10 +20,12 @@
   <div class="ms-8">
     <div class="d-flex align-center justify-space-between flex-grow-1">
       <span>{{ $t('siteNavigation.label.choosePage') }}</span>
-      <v-checkbox
+      <div class="d-flex align-center">
+        <span>{{ $t('siteNavigation.label.chooseSite') }}</span>
+        <v-checkbox
         v-model="allSites"
-        :label="$t('siteNavigation.label.chooseSite')"
-        class="mt-0" />
+        class="mt-1 me-0 ms-1" />
+      </div>
     </div>
     <site-navigation-site-suggester
       v-if="!allSites"
