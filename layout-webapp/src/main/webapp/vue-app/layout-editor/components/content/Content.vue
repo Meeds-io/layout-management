@@ -304,7 +304,8 @@ export default {
     },
     handleEditApplication(sectionId, container, applicationCategoryTitle, applicationTitle) {
       const section = this.$layoutUtils.getSection(this.layoutToEdit, sectionId);
-      this.$refs.applicationPropertiesDrawer.open(section, container, applicationCategoryTitle, applicationTitle);
+      const containerToEdit = this.$layoutUtils.getContainerById(this.layoutToEdit, container.id);
+      this.$refs.applicationPropertiesDrawer.open(section, containerToEdit, applicationCategoryTitle, applicationTitle);
     },
     mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);

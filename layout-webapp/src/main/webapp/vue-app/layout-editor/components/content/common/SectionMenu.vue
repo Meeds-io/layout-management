@@ -54,9 +54,10 @@
           </div>
         </v-hover>
         <div class="position-sticky t-20 b-20 z-index-one d-flex align-center mx-n5">
-          <v-hover v-model="hoverButton2">
+          <v-hover
+            v-if="displayMoveButton"
+            v-model="hoverButton2">
             <div
-              v-if="displayMoveButton"
               :style="leftButtonStyle"
               class="position-absolute">
               <v-tooltip :disabled="moving" bottom>
