@@ -41,11 +41,9 @@
         <v-form
           v-model="isValidInputs">
           <v-card-text class="d-flex pb-2">
-            <v-label>
-              <span class="text-color font-weight-bold text-start text-truncate-2">
-                {{ $t('siteNavigation.label.nodeLabel.title') }}
-              </span>
-            </v-label>
+            <span class="font-weight-bold text-start text-truncate-2">
+              {{ $t('siteNavigation.label.nodeLabel.title') }}
+            </span>
           </v-card-text>
           <v-card-text class="d-flex py-0">
             <v-text-field
@@ -71,7 +69,7 @@
           <v-card-text class="py-2">
             <div class="d-flex align-center justify-space-between">
               <div>
-                <span class="text-color font-weight-bold text-start mr-6 text-truncate-2 v-label">
+                <span class="font-weight-bold text-start mr-6 text-truncate-2">
                   {{ $t('siteNavigation.label.nodeId.title') }}
                 </span>
               </div>
@@ -94,7 +92,7 @@
           </v-card-text>
           <v-card-text class="d-flex flex-grow-1 text-no-wrap text-left font-weight-bold pb-2">
             <v-label>
-              <span class="text-color font-weight-bold">
+              <span class="font-weight-bold">
                 {{ $t('siteNavigation.label.nodeType.title') }}
               </span>
             </v-label>
@@ -114,8 +112,8 @@
                   <site-navigation-existing-page-element
                     v-if="!isNewPageElement"
                     :selected-page="selectedPage" />
-                  <div class="d-flex align-center justify-space-between flex-row pb-2">
-                    <span class="caption">
+                  <div class="d-flex align-center justify-space-between flex-row ms-8 pb-2">
+                    <span>
                       {{ $t('siteNavigation.label.openSameTab') }}
                     </span>
                     <v-switch
@@ -137,7 +135,7 @@
                     outlined
                     dense />
                   <div class="d-flex align-center justify-space-between flex-row pb-2">
-                    <span class="caption">
+                    <span>
                       {{ $t('siteNavigation.label.openSameTab') }}
                     </span>
                     <v-switch
@@ -153,7 +151,7 @@
           </v-card-text>
           <v-card-text class="d-flex flex-grow-1 pb-2 pt-0">
             <v-label>
-              <span class="text-color font-weight-bold text-start mr-6 text-truncate-2">
+              <span class="font-weight-bold text-start mr-6 text-truncate-2">
                 {{ $t('siteNavigation.label.icon.title') }}
               </span>
             </v-label>
@@ -183,15 +181,13 @@
             </div>
           </v-card-text>
           <v-card-text class="d-flex flex-grow-1 pb-0">
-            <v-label>
-              <span class="text-color font-weight-bold pt-2">
-                {{ $t('siteNavigation.label.visibility.title') }}
-              </span>
-            </v-label>
+            <span class="font-weight-bold pt-2">
+              {{ $t('siteNavigation.label.visibility.title') }}
+            </span>
           </v-card-text>
           <v-card-text class="pt-2">
             <div class="d-flex align-center justify-space-between flex-row">
-              <span class="caption">
+              <span>
                 {{ $t('siteNavigation.label.visibility.visible') }}
               </span>
               <v-switch
@@ -201,7 +197,7 @@
             <div
               class="d-flex align-center justify-space-between flex-row"
               v-if="visible">
-              <span class="caption pt-1">
+              <span class="pt-1">
                 {{ $t('siteNavigation.label.visibility.scheduleVisibility') }}
               </span>
               <v-switch
