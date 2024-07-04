@@ -24,7 +24,8 @@
     id="editApplicationDrawer"
     v-model="drawer"
     allow-expand
-    right>
+    right
+    @closed="reset">
     <template #title>
       <span :title="drawerTitle" class="text-truncate">
         {{ drawerTitle }}
@@ -257,6 +258,7 @@ export default {
         textSubtitleFontSize: this.container?.textSubtitleFontSize || null,
         textSubtitleFontWeight: this.container?.textSubtitleFontWeight || null,
         textSubtitleFontStyle: this.container?.textSubtitleFontStyle || null,
+        height: this.container?.height || null,
         ...this.backgroundProperties,
         hiddenOnMobile: this.hiddenOnMobile,
       } || null;
@@ -281,16 +283,14 @@ export default {
     },
     height(value) {
       if (this.initialized) {
-        this.$root.$emit('layout-section-history-add', this.sectionId);
         this.container.height = value;
-        this.$root.$emit('layout-section-application-update-style', this.container);
+        this.refresh++;
       }
     },
   },
   methods: {
     open(section, container, applicationCategoryTitle, applicationTitle) {
       this.initialized = false;
-
       Object.assign(container, Object.assign({...this.$layoutUtils.applicationModel}, container));
       this.section = section;
       this.container = container;
@@ -312,6 +312,24 @@ export default {
       };
 
       this.$nextTick(() => this.$refs.drawer.open());
+    },
+    reset() {
+      window.setTimeout(() => {
+        this.initialized = false;
+        this.fixedHeight = false;
+        this.customHeightValue = false;
+        this.height = null;
+        this.minHeight = 100;
+        this.maxHeight = 1000;
+        this.invalidCustomHeight = false;
+        this.hiddenOnMobile = false;
+        this.section = null;
+        this.container = null;
+        this.backgroundProperties = null;
+        this.applicationCategoryTitle = null;
+        this.applicationTitle = null;
+        this.refresh = 1;
+      }, 200);
     },
     close() {
       this.$refs.drawer.close();
