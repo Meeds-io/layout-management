@@ -33,7 +33,7 @@
         :site="site" />
     </v-toolbar>
     <div class="d-flex flex-grow-0 flex-shrink-1 rich-editor-content">
-      <span class="align-self-center text-wrap text-left text-break mx-2 text-truncate-4" v-sanitized-html="site.description"></span>
+      <span class="align-self-center text-wrap text-left text-break mx-4 text-truncate-4" v-sanitized-html="site.description"></span>
     </div>
     <v-footer absolute class="px-0 py-0">
       <v-toolbar
