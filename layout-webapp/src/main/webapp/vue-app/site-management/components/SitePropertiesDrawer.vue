@@ -49,20 +49,16 @@
             required
             @blur="convertSiteName">
             <template #title>
-              <v-label>
-                <span class="text-color font-weight-bold">
-                  {{ $t('siteManagement.label.siteLabel.title') }} *              
-                </span>
-              </v-label>
+              <span>
+                {{ $t('siteManagement.label.siteLabel.title') }} *              
+              </span>
             </template>
           </translation-text-field>
         </v-card-text>
         <v-card-text class="d-flex pb-2">
-          <v-label>
-            <span class="text-color font-weight-bold">
-              {{ $t('siteManagement.label.siteName.title') }} *              
-            </span>
-          </v-label>
+          <span>
+            {{ $t('siteManagement.label.siteName.title') }} *              
+          </span>
         </v-card-text>
         <v-card-text class="d-flex py-0">
           <v-text-field
@@ -89,11 +85,9 @@
             back-icon
             rich-editor>
             <template #title>
-              <v-label>
-                <span class="text-color font-weight-bold">
-                  {{ $t('siteManagement.label.siteDescription.title') }}           
-                </span>
-              </v-label>
+              <span>
+                {{ $t('siteManagement.label.siteDescription.title') }}           
+              </span>
             </template>
             <rich-editor
               id="siteDescription"
@@ -105,12 +99,8 @@
           </translation-text-field>
         </v-card-text>
         <v-card-text class="mt-3 py-4 px-3">
-          <v-label>
-            <span class="text-color font-weight-bold mb-2 px-1 text-capitalize"> {{ $t('siteManagement.label.banner') }}</span>
-          </v-label>
-          <v-label>
-            <span class="text-color caption px-1 text-capitalize"> {{ $t('siteManagement.label.caption') }}</span>
-          </v-label>
+          <p class="mb-2 px-1 text-capitalize"> {{ $t('siteManagement.label.banner') }}</p>
+          <p class="text-subtitle  px-1 text-capitalize"> {{ $t('siteManagement.label.caption') }}</p>
           <site-management-banner-selector
             ref="siteBannerSelector"
             :src="siteBannerUrl"
@@ -121,17 +111,15 @@
             @reset="resetBannerUploadId" />
         </v-card-text>
         <v-card-text class="mt-4">
-          <v-label>
-            <span class="text-color font-weight-bold mb-2"> {{ $t('siteManagement.label.displayOrder') }}</span>
-          </v-label>
+          <span class="mb-2"> {{ $t('siteManagement.label.displayOrder') }}</span>
           <v-row class="mx-0 mt-2">
             <v-col class="d-flex flex-row px-0 py-0 col-10">
               <v-switch
                 v-model="displayed"
                 :disabled="displayedDisabled"
                 class="mt-2" />
-              <label v-if="displayed" class="subtitle-1 mx-1"> {{ $t('siteManagement.label.displayed') }} </label>
-              <label v-else class="subtitle-1 mx-1"> {{ $t('siteManagement.label.notDisplayed') }} </label>
+              <p v-if="displayed" class="mx-1"> {{ $t('siteManagement.label.displayed') }} </p>
+              <p v-else class="mx-1"> {{ $t('siteManagement.label.notDisplayed') }} </p>
             </v-col>
             <v-col class="col-2 px-0 py-0 mt-n1 orderDisplay">
               <v-text-field
