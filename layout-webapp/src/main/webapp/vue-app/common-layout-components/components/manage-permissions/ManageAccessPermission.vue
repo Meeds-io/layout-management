@@ -18,14 +18,14 @@
 -->
 <template>
   <div>
-    <p class="text-start text-color subtitle-1">{{ whoCanView }}</p>
+    <p class="text-start">{{ whoCanView }}</p>
     <v-select
       v-model="type"
       :items="typeLabel"
       item-text="text"
       item-value="value"
       dense
-      class="caption pt-0"
+      class="pt-0"
       outlined />
     <exo-identity-suggester
       v-if="showAccessPermissionsGroupSuggester"
@@ -41,7 +41,7 @@
       include-groups
       include-spaces
       required />
-    <span v-if="!accessPermissions.length && showAccessPermissionsGroupSuggester" class="caption mx-2 mt-n3 position-absolute error-color">
+    <span v-if="!accessPermissions.length && showAccessPermissionsGroupSuggester" class="text-subtitle mx-2 mt-n3 position-absolute error-color">
       {{ $t('siteNavigation.required.error.message') }}
     </span>
     <template v-if="showAccessPermissionsList">

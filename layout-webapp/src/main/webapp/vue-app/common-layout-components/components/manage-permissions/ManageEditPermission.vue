@@ -18,7 +18,7 @@
 -->
 <template>
   <div>
-    <p class="text-start text-color subtitle-1">{{ whoCanEdit }}</p>
+    <p class="text-start">{{ whoCanEdit }}</p>
     <exo-identity-suggester
       ref="navigationNodeEditPermissions"
       :labels="suggesterLabels"
