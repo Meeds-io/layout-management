@@ -21,7 +21,8 @@
   <div>
     <div
       :style="imageContainerStyle"
-      class="overflow-hidden border-color rounded pa-1 hover-elevation"
+      :class="selected && 'primary-border-color' || 'border-color'"
+      class="overflow-hidden rounded pa-1 hover-elevation"
       @click="selectTemplate">
       <img
         :src="illustrationSrc"
@@ -32,11 +33,11 @@
       <p
         v-if="title"
         v-sanitized-html="title"
-        class="mb-0 font-weight-regular text-truncate subtitle-2"></p>
+        class="mb-0 font-weight-regular text-truncate"></p>
       <p
         v-if="description"
         v-sanitized-html="description"
-        class="mb-0 caption text-truncate-2"></p>
+        class="mb-0 text-subtitle text-truncate-2"></p>
     </div>
   </div>
 </template>
@@ -47,6 +48,11 @@ export default {
       type: Object,
       default: null
     },
+  },
+  data() {
+    return {
+      selected: false
+    };
   },
   computed: {
     title() {
@@ -79,11 +85,12 @@ export default {
         'max-height': '100px',
         'height': '100px'
       };
-    },
+    }
   },
   methods: {
     selectTemplate() {
       this.$root.$emit('page-template-changed', this.pageTemplate);
+      this.selected = !this.selected;
     }
   }
 };
