@@ -31,8 +31,9 @@
             v-on="on"
             v-bind="attrs">
             <v-btn
-              v-if="value"
+              v-if="value || sendingImage"
               id="deleteImageFileInput"
+              :loading="sendingImage"
               :aria-label="$t('layout.deleteBackgroundImageTitle')"
               icon
               dense
