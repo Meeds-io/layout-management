@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationBackgroundStyle;
 import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
@@ -57,87 +58,147 @@ import lombok.NoArgsConstructor;
 @JsonInclude(value = Include.NON_EMPTY)
 public class LayoutModel {
 
-  protected String                          id;
+  protected String                        id;
 
-  protected String                          storageId;
+  protected String                        storageId;
 
-  protected String                          storageName;
+  protected String                        storageName;
 
-  protected String                          name;
+  protected String                        name;
 
-  protected String                          icon;
+  protected String                        icon;
 
-  protected String                          template;
+  protected String                        template;
 
-  protected String                          factoryId;
+  protected String                        factoryId;
 
-  protected String                          title;
+  protected String                        title;
 
-  protected String                          description;
+  protected String                        description;
 
-  protected String                          width;
+  protected String                        width;
 
-  protected String                          height;
+  protected String                        height;
 
-  protected String                          cssClass;
+  protected String                        cssClass;
 
-  protected String                          borderColor;
+  protected String                        borderColor;
 
-  private String                            borderSize;
+  private String                          borderSize;
 
-  private String                            boxShadow;
+  private String                          boxShadow;
 
-  private String                            backgroundColor;
+  private Integer                         marginTop;
 
-  private String                            backgroundImage;
+  private Integer                         marginBottom;
 
-  private String                            backgroundEffect;
+  private Integer                         marginRight;
 
-  private String                            backgroundPosition;
+  private Integer                         marginLeft;
 
-  private String                            backgroundSize;
+  private Integer                         radiusTopRight;
 
-  private String                            backgroundRepeat;
+  private Integer                         radiusTopLeft;
 
-  protected String[]                        accessPermissions;
+  private Integer                         radiusBottomRight;
+
+  private Integer                         radiusBottomLeft;
+
+  private String                          backgroundColor;
+
+  private String                          backgroundImage;
+
+  private String                          backgroundEffect;
+
+  private String                          backgroundPosition;
+
+  private String                          backgroundSize;
+
+  private String                          backgroundRepeat;
+
+  private String                          appBackgroundColor;
+
+  private String                          appBackgroundImage;
+
+  private String                          appBackgroundEffect;
+
+  private String                          appBackgroundPosition;
+
+  private String                          appBackgroundSize;
+
+  private String                          appBackgroundRepeat;
+
+  private String                          textTitleColor;
+
+  private String                          textTitleFontSize;
+
+  private String                          textTitleFontWeight;
+
+  private String                          textTitleFontStyle;
+
+  private String                          textHeaderColor;
+
+  private String                          textHeaderFontSize;
+
+  private String                          textHeaderFontWeight;
+
+  private String                          textHeaderFontStyle;
+
+  private String                          textColor;
+
+  private String                          textFontSize;
+
+  private String                          textFontWeight;
+
+  private String                          textFontStyle;
+
+  private String                          textSubtitleColor;
+
+  private String                          textSubtitleFontSize;
+
+  private String                          textSubtitleFontWeight;
+
+  private String                          textSubtitleFontStyle;
+
+  private String[]                        accessPermissions;
 
   // Specific to container
-  protected String                          profiles;
+  private String                          profiles;
 
-  protected String[]                        moveAppsPermissions;
+  private String[]                        moveAppsPermissions;
 
-  protected String[]                        moveContainersPermissions;
+  private String[]                        moveContainersPermissions;
 
-  protected List<PortletInstancePreference> preferences;
+  private List<PortletInstancePreference> preferences;
 
-  protected List<LayoutModel>               children;
+  private List<LayoutModel>               children;
 
   // Specific to applications
-  private String                            contentId;
+  private String                          contentId;
 
-  private boolean                           showInfoBar;
+  private boolean                         showInfoBar;
 
-  private boolean                           showApplicationState = true;
+  private boolean                         showApplicationState = true;
 
-  private boolean                           showApplicationMode  = true;
+  private boolean                         showApplicationMode  = true;
 
   // Specific to page
-  private String                            editPermission;
+  private String                          editPermission;
 
   @JsonProperty(access = Access.READ_ONLY)
-  private PageKey                           pageKey;
+  private PageKey                         pageKey;
 
-  private String                            ownerType;
+  private String                          ownerType;
 
-  private String                            ownerId;
+  private String                          ownerId;
 
-  private boolean                           showMaxWindow;
+  private boolean                         showMaxWindow;
 
-  private boolean                           hideSharedLayout;
+  private boolean                         hideSharedLayout;
 
-  private String                            type;
+  private String                          type;
 
-  private String                            link;
+  private String                          link;
 
   public LayoutModel(ModelObject model) {
     init(model);
@@ -149,12 +210,39 @@ public class LayoutModel {
       this.borderColor = cssStyle.getBorderColor();
       this.borderSize = cssStyle.getBorderSize();
       this.boxShadow = cssStyle.getBoxShadow();
+      this.marginTop = cssStyle.getMarginTop();
+      this.marginBottom = cssStyle.getMarginBottom();
+      this.marginRight = cssStyle.getMarginRight();
+      this.marginLeft = cssStyle.getMarginLeft();
+      this.radiusTopLeft = cssStyle.getRadiusTopLeft();
+      this.radiusBottomRight = cssStyle.getRadiusBottomRight();
+      this.radiusBottomLeft = cssStyle.getRadiusBottomLeft();
+      this.radiusTopRight = cssStyle.getRadiusTopRight();
+      this.radiusTopLeft = cssStyle.getRadiusTopLeft();
+      this.radiusBottomRight = cssStyle.getRadiusBottomRight();
+      this.radiusBottomLeft = cssStyle.getRadiusBottomLeft();
       this.backgroundColor = cssStyle.getBackgroundColor();
       this.backgroundImage = cssStyle.getBackgroundImage();
       this.backgroundEffect = cssStyle.getBackgroundEffect();
       this.backgroundPosition = cssStyle.getBackgroundPosition();
       this.backgroundSize = cssStyle.getBackgroundSize();
       this.backgroundRepeat = cssStyle.getBackgroundRepeat();
+      this.textTitleColor = cssStyle.getTextTitleColor();
+      this.textTitleFontSize = cssStyle.getTextTitleFontSize();
+      this.textTitleFontWeight = cssStyle.getTextTitleFontWeight();
+      this.textTitleFontStyle = cssStyle.getTextTitleFontStyle();
+      this.textHeaderColor = cssStyle.getTextHeaderColor();
+      this.textHeaderFontSize = cssStyle.getTextHeaderFontSize();
+      this.textHeaderFontWeight = cssStyle.getTextHeaderFontWeight();
+      this.textHeaderFontStyle = cssStyle.getTextHeaderFontStyle();
+      this.textColor = cssStyle.getTextColor();
+      this.textFontSize = cssStyle.getTextFontSize();
+      this.textFontWeight = cssStyle.getTextFontWeight();
+      this.textFontStyle = cssStyle.getTextFontStyle();
+      this.textSubtitleColor = cssStyle.getTextSubtitleColor();
+      this.textSubtitleFontSize = cssStyle.getTextSubtitleFontSize();
+      this.textSubtitleFontWeight = cssStyle.getTextSubtitleFontWeight();
+      this.textSubtitleFontStyle = cssStyle.getTextSubtitleFontStyle();
     }
 
     if (model instanceof Container container) {
@@ -176,6 +264,15 @@ public class LayoutModel {
       this.moveContainersPermissions = container.getMoveContainersPermissions();
       this.children = container.getChildren().stream().map(LayoutModel::new).toList();
 
+      ApplicationBackgroundStyle appCssStyle = container.getAppBackgroundStyle();
+      if (appCssStyle != null) {
+        this.appBackgroundColor = appCssStyle.getBackgroundColor();
+        this.appBackgroundImage = appCssStyle.getBackgroundImage();
+        this.appBackgroundEffect = appCssStyle.getBackgroundEffect();
+        this.appBackgroundPosition = appCssStyle.getBackgroundPosition();
+        this.appBackgroundSize = appCssStyle.getBackgroundSize();
+        this.appBackgroundRepeat = appCssStyle.getBackgroundRepeat();
+      }
       if (model instanceof Page page) {
         this.editPermission = page.getEditPermission();
         this.pageKey = page.getPageKey();
@@ -229,24 +326,8 @@ public class LayoutModel {
     return page;
   }
 
-  public static ModelObject toModelObject(LayoutModel layoutModel) {
-    ModelStyle cssStyle = null;
-    boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
-                       || StringUtils.isNotBlank(layoutModel.getBoxShadow())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage());
-    if (hasStyle) {
-      cssStyle = new ModelStyle();
-      cssStyle.setBorderColor(layoutModel.getBorderColor());
-      cssStyle.setBorderSize(layoutModel.getBorderSize());
-      cssStyle.setBoxShadow(layoutModel.getBoxShadow());
-      cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
-      cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
-      cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
-      cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
-      cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
-      cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
-    }
+  public static ModelObject toModelObject(LayoutModel layoutModel) { // NOSONAR
+    ModelStyle cssStyle = mapToStyle(layoutModel);
 
     if (StringUtils.isNotBlank(layoutModel.template)) {
       Container container = new Container(layoutModel.getStorageId());
@@ -266,6 +347,7 @@ public class LayoutModel {
       container.setMoveAppsPermissions(layoutModel.getMoveAppsPermissions());
       container.setMoveContainersPermissions(layoutModel.getMoveContainersPermissions());
       container.setCssStyle(cssStyle);
+      container.setAppBackgroundStyle(mapToAppStyle(layoutModel));
       if (layoutModel.getChildren() != null) {
         container.setChildren(layoutModel.getChildren()
                                          .stream()
@@ -310,6 +392,79 @@ public class LayoutModel {
       application.setState(state);
       return application;
     }
+  }
+
+  private static ModelStyle mapToStyle(LayoutModel layoutModel) {
+    ModelStyle cssStyle = null;
+    boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
+                       || layoutModel.getRadiusTopRight() != null
+                       || layoutModel.getRadiusTopLeft() != null
+                       || layoutModel.getRadiusBottomLeft() != null
+                       || layoutModel.getRadiusBottomRight() != null
+                       || layoutModel.getMarginTop() != null
+                       || layoutModel.getMarginBottom() != null
+                       || layoutModel.getMarginLeft() != null
+                       || layoutModel.getMarginRight() != null
+                       || StringUtils.isNotBlank(layoutModel.getBorderSize())
+                       || StringUtils.isNotBlank(layoutModel.getBoxShadow())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
+                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
+                       || StringUtils.isNotBlank(layoutModel.getTextTitleColor())
+                       || StringUtils.isNotBlank(layoutModel.getTextColor())
+                       || StringUtils.isNotBlank(layoutModel.getTextHeaderColor())
+                       || StringUtils.isNotBlank(layoutModel.getTextSubtitleColor());
+    if (hasStyle) {
+      cssStyle = new ModelStyle();
+      cssStyle.setBorderColor(layoutModel.getBorderColor());
+      cssStyle.setBorderSize(layoutModel.getBorderSize());
+      cssStyle.setBoxShadow(layoutModel.getBoxShadow());
+      cssStyle.setMarginTop(layoutModel.getMarginTop());
+      cssStyle.setMarginBottom(layoutModel.getMarginBottom());
+      cssStyle.setMarginRight(layoutModel.getMarginRight());
+      cssStyle.setMarginLeft(layoutModel.getMarginLeft());
+      cssStyle.setRadiusTopRight(layoutModel.getRadiusTopRight());
+      cssStyle.setRadiusTopLeft(layoutModel.getRadiusTopLeft());
+      cssStyle.setRadiusBottomRight(layoutModel.getRadiusBottomRight());
+      cssStyle.setRadiusBottomLeft(layoutModel.getRadiusBottomLeft());
+      cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
+      cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
+      cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
+      cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
+      cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
+      cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
+      cssStyle.setTextTitleColor(layoutModel.getTextTitleColor());
+      cssStyle.setTextTitleFontSize(layoutModel.getTextTitleFontSize());
+      cssStyle.setTextTitleFontWeight(layoutModel.getTextTitleFontWeight());
+      cssStyle.setTextTitleFontStyle(layoutModel.getTextTitleFontStyle());
+      cssStyle.setTextHeaderColor(layoutModel.getTextHeaderColor());
+      cssStyle.setTextHeaderFontSize(layoutModel.getTextHeaderFontSize());
+      cssStyle.setTextHeaderFontWeight(layoutModel.getTextHeaderFontWeight());
+      cssStyle.setTextHeaderFontStyle(layoutModel.getTextHeaderFontStyle());
+      cssStyle.setTextColor(layoutModel.getTextColor());
+      cssStyle.setTextFontSize(layoutModel.getTextFontSize());
+      cssStyle.setTextFontWeight(layoutModel.getTextFontWeight());
+      cssStyle.setTextFontStyle(layoutModel.getTextFontStyle());
+      cssStyle.setTextSubtitleColor(layoutModel.getTextSubtitleColor());
+      cssStyle.setTextSubtitleFontSize(layoutModel.getTextSubtitleFontSize());
+      cssStyle.setTextSubtitleFontWeight(layoutModel.getTextSubtitleFontWeight());
+      cssStyle.setTextSubtitleFontStyle(layoutModel.getTextSubtitleFontStyle());
+    }
+    return cssStyle;
+  }
+
+  private static ApplicationBackgroundStyle mapToAppStyle(LayoutModel layoutModel) {
+    ApplicationBackgroundStyle cssStyle = null;
+    if (StringUtils.isNotBlank(layoutModel.getAppBackgroundColor())
+        || StringUtils.isNotBlank(layoutModel.getAppBackgroundImage())) {
+      cssStyle = new ApplicationBackgroundStyle();
+      cssStyle.setBackgroundColor(layoutModel.getAppBackgroundColor());
+      cssStyle.setBackgroundImage(layoutModel.getAppBackgroundImage());
+      cssStyle.setBackgroundEffect(layoutModel.getAppBackgroundEffect());
+      cssStyle.setBackgroundPosition(layoutModel.getAppBackgroundPosition());
+      cssStyle.setBackgroundSize(layoutModel.getAppBackgroundSize());
+      cssStyle.setBackgroundRepeat(layoutModel.getAppBackgroundRepeat());
+    }
+    return cssStyle;
   }
 
 }

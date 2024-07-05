@@ -30,7 +30,7 @@
       must-sort
       disable-pagination
       hide-default-footer
-      class="card-border-radius overflow-hidden portletsTable px-5">
+      class="application-body portletsTable px-5">
       <template slot="item" slot-scope="props">
         <portlets-item
           :key="props.item.id"

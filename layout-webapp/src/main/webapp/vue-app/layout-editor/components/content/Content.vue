@@ -22,11 +22,11 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="light-grey-background-color layout-sections-parent singlePageApplication mx-auto"
+    class="transparent layout-sections-parent singlePageApplication mx-auto"
     flat>
     <layout-editor-container-extension
       :container="pageLayout"
-      class="layout-page-body" />
+      class="layout-page-body no-border-radius" />
     <layout-editor-section-add-drawer
       ref="sectionAddDrawer" />
     <layout-editor-section-edit-drawer
@@ -304,7 +304,8 @@ export default {
     },
     handleEditApplication(sectionId, container, applicationCategoryTitle, applicationTitle) {
       const section = this.$layoutUtils.getSection(this.layoutToEdit, sectionId);
-      this.$refs.applicationPropertiesDrawer.open(section, container, applicationCategoryTitle, applicationTitle);
+      const containerToEdit = this.$layoutUtils.getContainerById(this.layoutToEdit, container.id);
+      this.$refs.applicationPropertiesDrawer.open(section, containerToEdit, applicationCategoryTitle, applicationTitle);
     },
     mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);

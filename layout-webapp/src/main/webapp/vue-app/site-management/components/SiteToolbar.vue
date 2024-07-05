@@ -18,7 +18,6 @@
 -->
 <template>
   <v-toolbar
-    color="white"
     flat
     dense>
     <v-btn class="primary" @click="$root.$emit('open-site-properties-drawer')">

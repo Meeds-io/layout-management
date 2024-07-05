@@ -21,11 +21,11 @@
 <template>
   <div class="pt-4">
     <div class="d-flex pb-2">
-      <div class="text-subtitle-1">
+      <div>
         <slot name="title"></slot>
       </div>
       <v-spacer />
-      <v-tooltip bottom>
+      <v-tooltip :disabled="disableTooltip" bottom>
         <template #activator="{on, attrs}">
           <div
             v-on="on"
@@ -78,6 +78,7 @@ export default {
     changed: false,
     sendingImage: false,
     uploadId: null,
+    disableTooltip: false,
     attachments: null,
   }),
   computed: {
@@ -91,6 +92,10 @@ export default {
   watch: {
     sendingImage() {
       this.$emit('sending', this.sendingImage);
+    },
+    value() {
+      this.disableTooltip = true;
+      window.setTimeout(() => this.disableTooltip = false, 50);
     },
   },
   methods: {

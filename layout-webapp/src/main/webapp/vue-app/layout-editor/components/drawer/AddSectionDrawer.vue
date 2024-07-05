@@ -30,7 +30,7 @@
     </template>
     <template v-if="drawer && cols" #content>
       <v-card class="pa-4" flat>
-        <div class="subtitle-1 font-weight-bold">
+        <div class="text-header mb-2">
           {{ $t('layout.selectSectionType') }}
         </div>
         <v-radio-group v-model="sectionType" class="my-auto text-no-wrap ms-n1">

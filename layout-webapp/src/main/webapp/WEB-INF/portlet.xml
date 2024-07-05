@@ -29,6 +29,10 @@
       <name>portlet-view-dispatched-file-path</name>
       <value>/WEB-INF/jsp/siteNavigation.jsp</value>
     </init-param>
+    <init-param>
+      <name>layout-css-class</name>
+      <value>no-layout-style</value>
+    </init-param>
     <supports>
       <mime-type>text/html</mime-type>
     </supports>
@@ -67,6 +71,10 @@
       <name>portlet-view-dispatched-file-path</name>
       <value>/WEB-INF/jsp/layoutEditor.jsp</value>
     </init-param>
+    <init-param>
+      <name>layout-css-class</name>
+      <value>no-layout-style</value>
+    </init-param>
     <supports>
       <mime-type>text/html</mime-type>
     </supports>
@@ -85,6 +93,10 @@
     <init-param>
       <name>portlet-view-dispatched-file-path</name>
       <value>/html/portletEditor.html</value>
+    </init-param>
+    <init-param>
+      <name>layout-css-class</name>
+      <value>no-layout-style</value>
     </init-param>
     <expiration-cache>-1</expiration-cache>
     <cache-scope>PUBLIC</cache-scope>
@@ -127,6 +139,10 @@
     <init-param>
       <name>portlet-view-dispatched-file-path</name>
       <value>/html/portlets.html</value>
+    </init-param>
+    <init-param>
+      <name>layout-css-class</name>
+      <value>no-layout-style</value>
     </init-param>
     <expiration-cache>-1</expiration-cache>
     <cache-scope>PUBLIC</cache-scope>

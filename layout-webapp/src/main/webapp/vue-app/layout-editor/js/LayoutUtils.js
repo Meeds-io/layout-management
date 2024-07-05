@@ -60,15 +60,45 @@ export const containerModel = {
   height: null,
   // Used to specify some special CSS Classes to be used on container parent
   cssClass: null,
+  marginTop: null,
+  marginRight: null,
+  marginBottom: null,
+  marginLeft: null,
   borderColor: null,
   borderSize: null,
   boxShadow: null,
+  radiusTopRight: null,
+  radiusTopLeft: null,
+  radiusBottomRight: null,
+  radiusBottomLeft: null,
   backgroundColor: null,
   backgroundImage: null,
   backgroundEffect: null,
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  appBackgroundColor: null,
+  appBackgroundImage: null,
+  appBackgroundEffect: null,
+  appBackgroundPosition: null,
+  appBackgroundSize: null,
+  appBackgroundRepeat: null,
+  textTitleColor: null,
+  textTitleFontSize: null,
+  textTitleFontWeight: null,
+  textTitleFontStyle: null,
+  textHeaderColor: null,
+  textHeaderFontSize: null,
+  textHeaderFontWeight: null,
+  textHeaderFontStyle: null,
+  textColor: null,
+  textFontSize: null,
+  textFontWeight: null,
+  textFontStyle: null,
+  textSubtitleColor: null,
+  textSubtitleFontSize: null,
+  textSubtitleFontWeight: null,
+  textSubtitleFontStyle: null,
   // Used to specify whether the block should be displayed or not
   // when an addon is present
   profiles: null,
@@ -101,15 +131,39 @@ export const applicationModel = {
   theme: null,
   width: null,
   height: null,
+  marginTop: null,
+  marginRight: null,
+  marginBottom: null,
+  marginLeft: null,
   borderColor: null,
   borderSize: null,
   boxShadow: null,
+  radiusTopRight: null,
+  radiusTopLeft: null,
+  radiusBottomRight: null,
+  radiusBottomLeft: null,
   backgroundColor: null,
   backgroundImage: null,
   backgroundEffect: null,
   backgroundPosition: null,
   backgroundSize: null,
   backgroundRepeat: null,
+  textTitleColor: null,
+  textTitleFontSize: null,
+  textTitleFontWeight: null,
+  textTitleFontStyle: null,
+  textHeaderColor: null,
+  textHeaderFontSize: null,
+  textHeaderFontWeight: null,
+  textHeaderFontStyle: null,
+  textColor: null,
+  textFontSize: null,
+  textFontWeight: null,
+  textFontStyle: null,
+  textSubtitleColor: null,
+  textSubtitleFontSize: null,
+  textSubtitleFontWeight: null,
+  textSubtitleFontStyle: null,
   accessPermissions: ['Everyone'],
 };
 
@@ -203,21 +257,24 @@ export function applyContainerStyle(container, containerStyle) {
   if (!container.cssClass) {
     container.cssClass = '';
   }
-  container.cssClass = container.cssClass.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '').replace(/  +/g, ' ');
 
-  // Apply new Classes
-  container.marginTop = containerStyle.marginTop || 0;
-  container.marginRight = containerStyle.marginRight || 0;
-  container.marginBottom = containerStyle.marginBottom || 0;
-  container.marginLeft = containerStyle.marginLeft || 0;
-
-  container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop, 20)) / 4))}`;
-  container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight, 20)) / 4))}`;
-  container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom, 20)) / 4))}`;
-  container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
+  // Apply new Classes on Section or applications
+  if (container.template === flexTemplate || container.template === gridTemplate) {
+    Vue.set(container, 'marginTop', containerStyle.marginTop === 0 || containerStyle.marginTop ? containerStyle.marginTop : null);
+    Vue.set(container, 'marginRight', containerStyle.marginRight === 0 || containerStyle.marginRight ? containerStyle.marginRight : null);
+    Vue.set(container, 'marginBottom', containerStyle.marginBottom === 0 || containerStyle.marginBottom ? containerStyle.marginBottom : null);
+    Vue.set(container, 'marginLeft', containerStyle.marginLeft === 0 || containerStyle.marginLeft ? containerStyle.marginLeft : null);
+  } else {
+    container.cssClass = container.cssClass.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '').replace(/  +/g, ' ');
+    if (containerStyle.marginTop === 0 || containerStyle.marginTop) {
+      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop, 20)) / 4))}`;
+      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight, 20)) / 4))}`;
+      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom, 20)) / 4))}`;
+      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
+    }
+  }
 
   container.cssClass = container.cssClass.replace(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g'), '').replace(/  +/g, ' ');
-
   Vue.set(container, 'cssClass', container.cssClass);
 
   const borderRadiusEnabled = containerStyle.radiusTopRight === 0 || containerStyle.radiusTopRight;
@@ -239,15 +296,38 @@ export function applyContainerStyle(container, containerStyle) {
     container.cssClass += ' hidden-sm-and-down';
   }
   Vue.set(container, 'cssClass', container.cssClass);
+  Vue.set(container, 'height', container.height || null);
   Vue.set(container, 'borderColor', containerStyle.borderColor || null);
   Vue.set(container, 'borderSize', containerStyle.borderSize || '0');
   Vue.set(container, 'boxShadow', containerStyle.boxShadow && 'true' || null);
+  Vue.set(container, 'appBackgroundColor', containerStyle.appBackgroundColor || null);
+  Vue.set(container, 'appBackgroundImage', containerStyle.appBackgroundImage || null);
+  Vue.set(container, 'appBackgroundEffect', containerStyle.appBackgroundEffect || null);
+  Vue.set(container, 'appBackgroundPosition', containerStyle.appBackgroundPosition || null);
+  Vue.set(container, 'appBackgroundSize', containerStyle.appBackgroundSize || null);
+  Vue.set(container, 'appBackgroundRepeat', containerStyle.appBackgroundRepeat || null);
   Vue.set(container, 'backgroundColor', containerStyle.backgroundColor || null);
   Vue.set(container, 'backgroundImage', containerStyle.backgroundImage || null);
   Vue.set(container, 'backgroundEffect', containerStyle.backgroundEffect || null);
   Vue.set(container, 'backgroundPosition', containerStyle.backgroundPosition || null);
   Vue.set(container, 'backgroundSize', containerStyle.backgroundSize || null);
   Vue.set(container, 'backgroundRepeat', containerStyle.backgroundRepeat || null);
+  Vue.set(container, 'textTitleColor', containerStyle.textTitleColor || null);
+  Vue.set(container, 'textTitleFontSize', containerStyle.textTitleFontSize || null);
+  Vue.set(container, 'textTitleFontWeight', containerStyle.textTitleFontWeight || null);
+  Vue.set(container, 'textTitleFontStyle', containerStyle.textTitleFontStyle || null);
+  Vue.set(container, 'textHeaderColor', containerStyle.textHeaderColor || null);
+  Vue.set(container, 'textHeaderFontSize', containerStyle.textHeaderFontSize || null);
+  Vue.set(container, 'textHeaderFontWeight', containerStyle.textHeaderFontWeight || null);
+  Vue.set(container, 'textHeaderFontStyle', containerStyle.textHeaderFontStyle || null);
+  Vue.set(container, 'textColor', containerStyle.textColor || null);
+  Vue.set(container, 'textFontSize', containerStyle.textFontSize || null);
+  Vue.set(container, 'textFontWeight', containerStyle.textFontWeight || null);
+  Vue.set(container, 'textFontStyle', containerStyle.textFontStyle || null);
+  Vue.set(container, 'textSubtitleColor', containerStyle.textSubtitleColor || null);
+  Vue.set(container, 'textSubtitleFontSize', containerStyle.textSubtitleFontSize || null);
+  Vue.set(container, 'textSubtitleFontWeight', containerStyle.textSubtitleFontWeight || null);
+  Vue.set(container, 'textSubtitleFontStyle', containerStyle.textSubtitleFontStyle || null);
 }
 
 export function parseSections(layout) {
@@ -644,11 +724,20 @@ function parseSection(section) {
 }
 
 export function parseContainerStyle(container) {
-  const marginMatches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
-  container.marginTop = parseInt(marginMatches.find(c => c.indexOf('mt-') >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
-  container.marginRight = parseInt(marginMatches.find(c => c.indexOf('me-') >= 0)?.replace?.('me-n', '-')?.replace?.('me-', '') || 0) * 4;
-  container.marginBottom = parseInt(marginMatches.find(c => c.indexOf('mb-') >= 0)?.replace?.('mb-n', '-')?.replace?.('mb-', '') || 0) * 4;
-  container.marginLeft = parseInt(marginMatches.find(c => c.indexOf('ms-') >= 0)?.replace?.('ms-n', '-')?.replace?.('ms-', '') || 0) * 4;
+  if (container.template !== flexTemplate && container.template !== gridTemplate) {
+    const marginMatches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
+    if (marginMatches?.length) {
+      container.marginTop = parseInt(marginMatches.find(c => c.indexOf('mt-') >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
+      container.marginRight = parseInt(marginMatches.find(c => c.indexOf('me-') >= 0)?.replace?.('me-n', '-')?.replace?.('me-', '') || 0) * 4;
+      container.marginBottom = parseInt(marginMatches.find(c => c.indexOf('mb-') >= 0)?.replace?.('mb-n', '-')?.replace?.('mb-', '') || 0) * 4;
+      container.marginLeft = parseInt(marginMatches.find(c => c.indexOf('ms-') >= 0)?.replace?.('ms-n', '-')?.replace?.('ms-', '') || 0) * 4;
+    } else {
+      container.marginTop = null;
+      container.marginRight = null;
+      container.marginBottom = null;
+      container.marginLeft = null;
+    }
+  }
 
   const radiusMatches = container?.cssClass?.match?.(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g')) || [];
   if (radiusMatches?.length) {

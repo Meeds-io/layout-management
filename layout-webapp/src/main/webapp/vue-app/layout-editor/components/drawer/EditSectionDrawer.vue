@@ -42,6 +42,11 @@
           :cols-count="cols"
           :background-properties="section"
           @cols-updated="cols = $event" />
+        <layout-editor-section-margin-input
+          v-if="section"
+          ref="marginInput"
+          v-model="section"
+          class="mt-4" />
         <layout-editor-background-input
           v-if="section"
           ref="backgroundInput"
@@ -49,7 +54,7 @@
           class="mt-4" />
         <template v-if="isDynamicSection">
           <div class="d-flex align-center mt-4">
-            <div class="subtitle-1 font-weight-bold me-auto mb-2">
+            <div class="text-header mb-2">
               {{ $t('layout.advancedOptions') }}
             </div>
           </div>

@@ -20,8 +20,8 @@
 -->
 <template>
   <v-app>
-    <v-card class="card-border-radius app-background-color overflow-hidden position-static pb-5" flat>
-      <h4 class="title font-weight-bold px-5 pt-5 ma-0">
+    <v-card class="application-body position-static pb-5" flat>
+      <h4 class="text-title px-5 pt-5 ma-0">
         {{ $t('pageTemplates.title') }}
       </h4>
       <page-templates-management-toolbar
