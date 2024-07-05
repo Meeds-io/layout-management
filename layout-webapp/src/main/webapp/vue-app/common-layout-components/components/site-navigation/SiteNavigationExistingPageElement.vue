@@ -31,13 +31,13 @@
       v-if="!allSites"
       v-model="selectedSiteNavigation"
       :all-sites="allSites"
-      class="mb-6" />
+      :class="!allSites && 'mb-8' || ''" />
     <site-navigation-page-suggester
       :page="selectedPage"
       :all-sites="allSites"
       :site-type="selectedSiteNavigation?.siteType"
       :site-name="selectedSiteNavigation?.name"
-      class="mb-8" />
+      class="" />
   </div>
 </template>
 
