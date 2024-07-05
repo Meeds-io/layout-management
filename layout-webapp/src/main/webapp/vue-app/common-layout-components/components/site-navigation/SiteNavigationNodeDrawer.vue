@@ -112,7 +112,7 @@
                   <site-navigation-existing-page-element
                     v-if="!isNewPageElement"
                     :selected-page="selectedPage" />
-                  <div class="d-flex align-center justify-space-between flex-row ms-8 pb-2">
+                  <div class="d-flex align-center justify-space-between flex-row ms-8 pb-2 mt-2">
                     <span>
                       {{ $t('siteNavigation.label.openSameTab') }}
                     </span>
@@ -272,7 +272,7 @@ export default {
       isScheduled: false,
       disableNodeId: false,
       displayNodeName: false,
-      elementType: 'Group',
+      elementType: 'PAGE',
       allSites: true,
       nodeTarget: true,
       parentNavigationNodeUrl: '',
@@ -388,7 +388,7 @@ export default {
       this.visible = true;
       this.isScheduled = false;
       this.displayNodeName = false;
-      this.elementType = 'Group';
+      this.elementType = 'PAGE';
       this.nodeTarget = true;
       this.disableNodeId = false;
       this.editMode= false;
