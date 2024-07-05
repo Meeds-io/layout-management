@@ -86,7 +86,7 @@ export default {
       return this.$t('siteNavigation.addElementDrawer.title');
     },
     disabled() {
-      return !this.isValidForm || !this.pageTemplate  || false;
+      return !this.isValidForm || !this.pageTemplate || false;
     },
   },
   created() {
