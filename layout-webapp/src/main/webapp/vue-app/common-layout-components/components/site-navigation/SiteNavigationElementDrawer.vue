@@ -74,7 +74,7 @@ export default {
       navigationNode: null,
       elementName: null,
       elementTitle: null,
-      pageTemplate: 'empty',
+      pageTemplate: null,
       selectedPage: null,
       loading: false,
       resetDrawer: true,
@@ -86,7 +86,7 @@ export default {
       return this.$t('siteNavigation.addElementDrawer.title');
     },
     disabled() {
-      return !this.isValidForm || this.pageTemplate === 'empty'  || false;
+      return !this.isValidForm || !this.pageTemplate  || false;
     },
   },
   created() {
