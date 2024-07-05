@@ -74,7 +74,7 @@ export default {
       navigationNode: null,
       elementName: null,
       elementTitle: null,
-      pageTemplate: 'empty',
+      pageTemplate: null,
       selectedPage: null,
       loading: false,
       resetDrawer: true,
