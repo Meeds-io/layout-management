@@ -281,7 +281,7 @@ export default {
       selectedPage: null,
       pageToEdit: false,
       link: '',
-      linkRules: [url => !!(url?.match(/^((https?:\/\/)?(www\.)?[a-zA-Z0-9:._\\/+=-]+\.[^\s]{2,})|(javascript:)|(\/portal\/)|(\/meeds\/)/))
+      linkRules: [url => !!(url?.match(/^((https?:\/\/)?(www\.)?[a-zA-Z0-9:._\\/+=-]+\.[^\s]{2,})|(javascript:)|(\/portal\/)/))
           || ( !url?.length && this.$t('siteNavigation.required.error.message') || this.$t('siteNavigation.label.invalidLink'))],
       nodeLabelRules: {
         required: value => value == null || !!(value?.length) || this.$t('siteNavigation.required.error.message'),
@@ -612,7 +612,7 @@ export default {
       }
     },
     urlVerify(url) {
-      if (!url.match(/^(https?:\/\/|javascript:|\/portal\/|\/meeds\/)/)) {
+      if (!url.match(/^(https?:\/\/|javascript:|\/portal\/)/)) {
         url = `//${url}`;
       }
       return url ;
