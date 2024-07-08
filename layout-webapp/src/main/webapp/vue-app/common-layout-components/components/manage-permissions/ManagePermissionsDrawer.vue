@@ -27,7 +27,7 @@
     <template slot="title">
       <div class="d-flex">
         <i
-          class="uiIcon uiArrowBAckIcon clickable"
+          class="uiArrowBAckIcon clickable"
           @click="close"></i>
         <span class="ms-2"> {{ drawerTitle }}</span>
       </div>

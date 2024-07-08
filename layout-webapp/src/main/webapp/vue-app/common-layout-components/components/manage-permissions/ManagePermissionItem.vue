@@ -22,7 +22,7 @@
       size="19"
       class="fas fa-users me-3" />
     <span
-      class="d-flex text-truncate font-weight-bold text-start text-color body-2 mt-2">
+      class="d-flex text-truncate font-weight-bold text-start text-color text-body mt-2">
       {{ displayName }}
     </span>
     <v-spacer />
