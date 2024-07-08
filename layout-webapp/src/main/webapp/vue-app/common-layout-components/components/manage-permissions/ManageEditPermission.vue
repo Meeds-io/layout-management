@@ -32,7 +32,7 @@
       include-groups
       include-spaces
       required />
-    <span v-if="!permission.group" class="caption mt-n3 mx-2 position-absolute error-color">
+    <span v-if="!permission.group" class="text-subtitle mt-n3 mx-2 position-absolute error-color">
       {{ $t('siteNavigation.required.error.message') }}
     </span>
     <manage-permission-item
