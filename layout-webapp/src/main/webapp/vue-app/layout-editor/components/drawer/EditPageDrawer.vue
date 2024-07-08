@@ -179,6 +179,8 @@ export default {
           this.parentContainer.width = 'fullWindow';
         } else if (document.body.style.getPropertyValue('--allPagesWidth')) {
           this.parentContainer.width = 'singlePageApplication';
+        } else {
+          this.parentContainer.width = null;
         }
         await this.$refs.backgroundInput.apply();
         await this.$refs.appBackgroundInput.apply();

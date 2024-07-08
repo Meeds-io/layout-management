@@ -32,7 +32,11 @@
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
-        :class="hoverSectionMenuButton && 'z-index-two'"
+        :class="{
+          'z-index-two': hoverSectionMenuButton,
+          'normal-page-width': !$root.pageFullWindow,
+          'full-page-width': $root.pageFullWindow,
+        }"
         class="layout-section-border">
         <div class="position-relative full-height full-width">
           <layout-editor-section-menu
