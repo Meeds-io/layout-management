@@ -129,12 +129,12 @@
                     v-model="link"
                     :placeholder="$t('siteNavigation.label.enterUrl') "
                     :rules="linkRules"
-                    class="pt-0 mb-3"
+                    class="pt-0 mb-0 ms-8"
                     type="text"
                     required
                     outlined
                     dense />
-                  <div class="d-flex align-center justify-space-between flex-row pb-2">
+                  <div class="d-flex align-center justify-space-between flex-row pb-2 ms-8">
                     <span>
                       {{ $t('siteNavigation.label.openSameTab') }}
                     </span>
