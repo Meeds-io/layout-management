@@ -26,9 +26,12 @@
     @closed="close">
     <template slot="title">
       <div class="d-flex">
-        <i
-          class="uiIcon uiArrowBAckIcon clickable"
-          @click="close"></i>
+        <v-icon
+          size="16"
+          class="clickable"
+          @click="close">
+          fas fa-arrow-left
+        </v-icon>
         <span class="ms-2"> {{ drawerTitle }}</span>
       </div>
     </template>
