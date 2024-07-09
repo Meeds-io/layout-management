@@ -363,7 +363,10 @@ export default {
               this.pageToEdit = page;
               this.elementType = page.state?.type === 'LINK' && 'LINK' || 'existingPage';
               this.link = page?.state?.link;
-              this.$root.$emit('set-selected-page', page.state);
+              this.$nextTick()
+                .then(() => {
+                  this.$root.$emit('set-selected-page', page);
+                });
             });
         } else {
           this.elementType = 'Group';
