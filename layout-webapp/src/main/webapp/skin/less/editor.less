@@ -32,6 +32,9 @@
   left: 50% !important;
   transform: translateX(-50%) !important;
   width: @pageWidth;
+  &.normal-page-width {
+    max-width: ~"calc(100% - 20px)";
+  }
 }
 
 .layout-mobile-view {

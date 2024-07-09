@@ -297,6 +297,7 @@ export function applyContainerStyle(container, containerStyle) {
   }
   Vue.set(container, 'cssClass', container.cssClass);
   Vue.set(container, 'height', container.height || null);
+  Vue.set(container, 'width', container.width || null);
   Vue.set(container, 'borderColor', containerStyle.borderColor || null);
   Vue.set(container, 'borderSize', containerStyle.borderSize || '0');
   Vue.set(container, 'boxShadow', containerStyle.boxShadow && 'true' || null);
