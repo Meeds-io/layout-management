@@ -181,7 +181,6 @@ export default {
       }, this.endTypingKeywordTimeout);
     },
     emitSelectedValue(value) {
-      console.warn('olaaaaa');
       this.selectedPage = value;
       this.pages.push(this.selectedPage);
     },
