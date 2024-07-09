@@ -181,8 +181,11 @@ export default {
       }, this.endTypingKeywordTimeout);
     },
     emitSelectedValue(value) {
-      this.selectedPage = value;
-      this.pages.push(this.selectedPage);
+      this.selectedPage = {
+        pageRef: `${ value?.key?.site?.typeName}::${ value?.key?.site?.name}::${value?.key?.name}`,
+        displayName: value?.state?.displayName || value?.key.name,
+      };
+      this.pages.push(value);
     },
   }
 };
