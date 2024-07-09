@@ -99,8 +99,8 @@
           </translation-text-field>
         </v-card-text>
         <v-card-text class="mt-3 py-4 px-3">
-          <p class="mb-2 px-1 text-capitalize"> {{ $t('siteManagement.label.banner') }}</p>
-          <p class="text-subtitle  px-1 text-capitalize"> {{ $t('siteManagement.label.caption') }}</p>
+          <p class="mb-2 px-1"> {{ $t('siteManagement.label.banner') }}</p>
+          <p class="text-subtitle px-1"> {{ $t('siteManagement.label.caption') }}</p>
           <site-management-banner-selector
             ref="siteBannerSelector"
             :src="siteBannerUrl"
