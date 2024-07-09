@@ -36,6 +36,7 @@
     <portlet-name>SiteManagement</portlet-name>
     <skin-name>Enterprise</skin-name>
     <css-path>/skin/css/siteManagement.css</css-path>
+    <additional-module>ImageCropper</additional-module>
   </portlet-skin>
 
   <portlet-skin>
