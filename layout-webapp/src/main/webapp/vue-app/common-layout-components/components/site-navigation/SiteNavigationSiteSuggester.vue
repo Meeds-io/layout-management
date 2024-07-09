@@ -67,7 +67,7 @@
           v-text="data.item.displayName" />
       </template>
     </v-autocomplete>
-    <span v-if="!allSites && !selectedSiteNavigation" class="caption mt-n3 mx-2 position-absolute error-color">
+    <span v-if="!allSites && !selectedSiteNavigation" class="text-subtitle mt-n3 position-absolute error-color">
       {{ $t('siteNavigation.required.error.message') }}
     </span>
   </v-flex>
