@@ -32,7 +32,7 @@ if (extensionRegistry) {
 }
 
 const lang = eXo?.env.portal.language || 'en';
-const url = `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.LayoutEditor-${lang}.json`;
+const url = `/layout/i18n/locale.portlet.LayoutEditor?lang=${lang}`;
 
 const appId = 'pageTemplatesManagement';
 export function init() {
