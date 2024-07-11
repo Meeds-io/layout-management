@@ -18,26 +18,36 @@
 -->
 <template>
   <div>
-    <span class="font-weight-bold d-block text-start text-color body-2 mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
+    <span class="d-block text-start text-sub-title mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
     <div class="mb-5">
-      <span class="mb-2 body-2">{{ $t('siteNavigation.label.blankTemplate') }}</span>
-      <div class="d-flex flex-row flex-grow-1 flex-shrink-1">
+      <span class="mb-2 font-weight-bold text-sub-title">{{ $t('siteNavigation.label.blankTemplate') }}</span>
+      <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
         <site-navigation-new-page-element-item
           v-for="template in blankTemplates"
           :key="template.id"
           :page-template="template"
           class="col-6 ps-0 clickable" />
-      </div>
+      </v-row>
     </div>
     <div>
-      <span class="pb-4 body-2">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
-      <div class="d-flex flex-row flex-grow-1 flex-shrink-1">
+      <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
+      <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
         <site-navigation-new-page-element-item
           v-for="templates in defaultTemplates"
           :key="templates.id"
           :page-template="templates"
           class="col-6 ps-0 clickable" />
-      </div>
+      </v-row>
+    </div>
+    <div>
+      <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
+      <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
+        <site-navigation-new-page-element-item
+          v-for="templates in customizedTemplates"
+          :key="templates.id"
+          :page-template="templates"
+          class="col-6 ps-0 clickable" />
+      </v-row>
     </div>
   </div>
 </template>
@@ -53,6 +63,9 @@ export default {
     },
     defaultTemplates() {
       return this.pageTemplates.filter(item => item.category === 'default');
+    },
+    customizedTemplates() {
+      return this.pageTemplates.filter(item => item.category !== 'blank' && item.category !== 'default');
     },
   },
 };
