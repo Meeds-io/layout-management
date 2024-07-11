@@ -37,8 +37,8 @@ const lang = eXo?.env.portal.language || 'en';
 
 //should expose the locale ressources as REST API
 const urls = [
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteManagement-${lang}.json`,
-  `${eXo.env.portal.context}/${eXo.env.portal.rest}/i18n/bundle/locale.portlet.SiteNavigation-${lang}.json`
+  `/layout/i18n/locale.portlet.SiteManagement?lang=${lang}`,
+  `/layout/i18n/locale.portlet.SiteNavigation?lang=${lang}`
 ];
 
 export function init() {
