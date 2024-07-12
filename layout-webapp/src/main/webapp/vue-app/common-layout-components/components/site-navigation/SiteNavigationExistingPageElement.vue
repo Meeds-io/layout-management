@@ -23,8 +23,8 @@
       <div class="d-flex align-center">
         <span>{{ $t('siteNavigation.label.chooseSite') }}</span>
         <v-checkbox
-        v-model="allSites"
-        class="mt-1 me-0 ms-1" />
+          v-model="allSites"
+          class="mt-1 me-0 ms-1" />
       </div>
     </div>
     <site-navigation-site-suggester
