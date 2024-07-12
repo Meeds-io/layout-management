@@ -312,7 +312,7 @@ export default {
       return !(this.isValidInputs && this.nodeId && this.nodeLabel) || this.isLinkElement && !this.link;
     },
     displayNextBtn() {
-      return this.editMode ? this.elementType === 'PAGE' && !this.navigationNode.pageKey : this.elementType === 'PAGE';
+      return this.elementType === 'PAGE';
     },
     isLinkElement() {
       return this.elementType === 'LINK';
