@@ -18,9 +18,9 @@
 -->
 <template>
   <div>
-    <span class="d-block text-start text-sub-title mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
+    <span class="d-block text-start text-sub-title text-header mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
     <div class="mb-5">
-      <span class="mb-2 font-weight-bold text-sub-title">{{ $t('siteNavigation.label.blankTemplate') }}</span>
+      <span class="mb-2 font-weight-bold">{{ $t('siteNavigation.label.blankTemplate') }}</span>
       <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
         <site-navigation-new-page-element-item
           v-for="template in blankTemplates"
@@ -29,7 +29,7 @@
           class="col-6 ps-0 clickable" />
       </v-row>
     </div>
-    <div>
+    <div class="mb-5">
       <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
       <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
         <site-navigation-new-page-element-item
@@ -40,7 +40,7 @@
       </v-row>
     </div>
     <div>
-      <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
+      <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.customizedTemplate') }}</span>
       <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
         <site-navigation-new-page-element-item
           v-for="templates in customizedTemplates"
@@ -54,18 +54,29 @@
 
 <script>
 export default {
+  data() {
+    return {
+      collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
+    };
+  },
   computed: {
     pageTemplates() {
       return this.$root.pageTemplates || [];
     },
     blankTemplates() {
-      return this.pageTemplates.filter(item => item.category === 'blank');
+      const items = this.pageTemplates.filter(item => item.category === 'blank');
+      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return items;
     },
     defaultTemplates() {
-      return this.pageTemplates.filter(item => item.category === 'default');
+      const items = this.pageTemplates.filter(item => item.category === 'default');
+      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return items;
     },
     customizedTemplates() {
-      return this.pageTemplates.filter(item => item.category !== 'blank' && item.category !== 'default');
+      const items = this.pageTemplates.filter(item => item.category !== 'blank' && item.category !== 'default');
+      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return items;
     },
   },
 };
