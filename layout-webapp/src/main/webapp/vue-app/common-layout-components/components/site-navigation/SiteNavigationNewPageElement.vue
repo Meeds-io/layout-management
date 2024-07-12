@@ -18,37 +18,16 @@
 -->
 <template>
   <div>
-    <span class="d-block text-start text-sub-title text-header mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
-    <div class="mb-5">
-      <span class="mb-2 font-weight-bold">{{ $t('siteNavigation.label.blankTemplate') }}</span>
-      <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
-        <site-navigation-new-page-element-item
-          v-for="template in blankTemplates"
-          :key="template.id"
-          :page-template="template"
-          class="col-6 ps-0 clickable" />
-      </v-row>
-    </div>
-    <div class="mb-5">
-      <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.defaultTemplate') }}</span>
-      <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
-        <site-navigation-new-page-element-item
-          v-for="templates in defaultTemplates"
-          :key="templates.id"
-          :page-template="templates"
-          class="col-6 ps-0 clickable" />
-      </v-row>
-    </div>
-    <div>
-      <span class="pb-4 font-weight-bold">{{ $t('siteNavigation.label.customizedTemplate') }}</span>
-      <v-row class="mx-0 d-flex flex-row flex-grow-1 flex-shrink-1">
-        <site-navigation-new-page-element-item
-          v-for="templates in customizedTemplates"
-          :key="templates.id"
-          :page-template="templates"
-          class="col-6 ps-0 clickable" />
-      </v-row>
-    </div>
+    <span class="d-block text-start text-header mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
+    <site-navigation-new-page-element-item-list
+      :template-items="blankTemplates"
+      :category-name="$t('siteNavigation.label.blankTemplate')" />
+    <site-navigation-new-page-element-item-list
+      :template-items="defaultTemplates"
+      :category-name="$t('siteNavigation.label.defaultTemplate')" />
+    <site-navigation-new-page-element-item-list
+      :template-items="customizedTemplates"
+      :category-name="$t('siteNavigation.label.customizedTemplate')" />
   </div>
 </template>
 
