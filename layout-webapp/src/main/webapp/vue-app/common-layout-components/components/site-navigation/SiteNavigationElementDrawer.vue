@@ -24,7 +24,8 @@
     right
     eager
     allow-expand
-    @closed="close">
+    @closed="close"
+    @expand-updated="$root.$emit('toggle-expand',$event)">
     <template slot="title">
       <div class="d-flex">
         <v-icon
@@ -78,7 +79,7 @@ export default {
       selectedPage: null,
       loading: false,
       resetDrawer: true,
-      isValidForm: true,
+      isValidForm: true
     };
   },
   computed: {
