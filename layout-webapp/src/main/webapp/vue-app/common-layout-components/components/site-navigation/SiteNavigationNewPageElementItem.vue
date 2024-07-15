@@ -37,13 +37,18 @@
       <p
         v-if="description"
         v-sanitized-html="description"
-        class="mb-0 text-subtitle text-truncate-2"></p>
+        :class="!value && 'text-truncate-2'"
+        class="mb-0 text-subtitle"></p>
     </div>
   </div>
 </template>
 <script>
 export default {
   props: {
+    value: {
+      type: Boolean,
+      default: false
+    },
     pageTemplate: {
       type: Object,
       default: null

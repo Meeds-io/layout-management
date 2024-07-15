@@ -34,6 +34,7 @@
       <site-navigation-new-page-element-item
         v-for="template in templatesTodisplay"
         :key="template.id"
+        v-model="expanded"
         :page-template="template"
         :class="!expanded && 'col-6' || 'col-2'"
         class="ps-0 clickable" />
@@ -80,6 +81,8 @@ export default {
   },
   methods: {
     displayItems() {
+      this.$root.$emit('allow-expand');
+      this.toggleExpand(true);
       this.maxItemsToDisplay = this.maxItemsToDisplay + 8;
       if (this.templateItems?.length && this.templateItems?.length > this.maxItemsToDisplay) {
         this.templates = this.templateItems.slice(0, this.maxItemsToDisplay);
