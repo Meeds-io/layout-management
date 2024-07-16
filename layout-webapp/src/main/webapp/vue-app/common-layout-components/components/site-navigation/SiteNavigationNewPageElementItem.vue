@@ -21,8 +21,7 @@
   <div>
     <div
       :style="imageContainerStyle"
-      :class="selected && 'primary-border-color' || 'border-color'"
-      class="overflow-hidden rounded pa-1 hover-elevation"
+      class="overflow-hidden rounded pa-1 hover-elevation border-color"
       @click="selectTemplate">
       <img
         :src="illustrationSrc"
@@ -48,11 +47,6 @@ export default {
       type: Object,
       default: null
     },
-  },
-  data() {
-    return {
-      selected: false
-    };
   },
   computed: {
     title() {
@@ -90,7 +84,6 @@ export default {
   methods: {
     selectTemplate() {
       this.$root.$emit('page-template-changed', this.pageTemplate);
-      this.selected = !this.selected;
     }
   }
 };

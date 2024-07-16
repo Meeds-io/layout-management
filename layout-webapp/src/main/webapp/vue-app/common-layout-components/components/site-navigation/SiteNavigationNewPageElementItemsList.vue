@@ -35,7 +35,7 @@
         v-for="template in templatesTodisplay"
         :key="template.id"
         :page-template="template"
-        :class="!expanded && 'col-6' || 'col-2'"
+        :class="[!expanded && 'col-6' || 'col-2', selectedTemplateId === template.id && 'selected-template']"
         class="ps-0 clickable" />
     </v-row>
   </div>
@@ -59,6 +59,7 @@ export default {
       templates: null,
       expanded: false,
       collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
+      selectedTemplateId: null
     };
   },
   computed: {
@@ -73,12 +74,17 @@ export default {
     this.templates = this.templateItems.slice(0, this.maxItemsToDisplay);
     this.$root.$on('toggle-expand', this.toggleExpand);
     this.$root.$on('reset-element-drawer', this.resetTemplateList);
+    this.$root.$on('page-template-changed', this.changeSeletedTemplate);
   },
   beforeDestroy() {
     this.$root.$off('toggle-expand', this.toggleExpand);
     this.$root.$off('reset-element-drawer', this.toggleExpand);
+    this.$root.$off('page-template-changed', this.changeSeletedTemplate);
   },
   methods: {
+    changeSeletedTemplate(value) {
+      this.selectedTemplateId = value.id;
+    },
     displayItems() {
       this.maxItemsToDisplay = this.maxItemsToDisplay + 8;
       if (this.templateItems?.length && this.templateItems?.length > this.maxItemsToDisplay) {
