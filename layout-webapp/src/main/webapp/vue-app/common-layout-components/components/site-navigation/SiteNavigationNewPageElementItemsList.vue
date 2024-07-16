@@ -34,6 +34,7 @@
       <site-navigation-new-page-element-item
         v-for="template in templatesTodisplay"
         :key="template.id"
+        :expand="expanded"
         :page-template="template"
         :class="!expanded && 'col-6' || 'col-2'"
         class="ps-0 clickable" />
