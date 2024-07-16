@@ -95,14 +95,12 @@ export default {
     this.$root.$on('close-add-element-drawer', this.close);
     this.$root.$on('page-template-changed', this.changePageTemplate);
     this.$root.$on('existing-page-selected', this.changeSelectedPage);
-    this.$root.$on('allow-expand', this.expandDrawer);
   },
   beforeDestroy() {
     this.$root.$off('open-add-element-drawer', this.open);
     this.$root.$off('close-add-element-drawer', this.close);
     this.$root.$off('page-template-changed', this.changePageTemplate);
     this.$root.$off('existing-page-selected', this.changeSelectedPage);
-    this.$root.$off('allow-expand', this.expandDrawer);
   },
   methods: {
     open(elementName, elementTitle, navigationNode) {
@@ -125,9 +123,6 @@ export default {
     reset() {
       this.selectedPage = null;
       this.$root.$emit('reset-element-drawer');
-    },
-    expandDrawer() {
-      this.$refs.siteNavigationAddElementDrawer.expand = true;
     },
     changePageTemplate(pageTemplate) {
       this.pageTemplate = pageTemplate;

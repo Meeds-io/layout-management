@@ -81,8 +81,6 @@ export default {
   },
   methods: {
     displayItems() {
-      this.$root.$emit('allow-expand');
-      this.toggleExpand(true);
       this.maxItemsToDisplay = this.maxItemsToDisplay + 8;
       if (this.templateItems?.length && this.templateItems?.length > this.maxItemsToDisplay) {
         this.templates = this.templateItems.slice(0, this.maxItemsToDisplay);
