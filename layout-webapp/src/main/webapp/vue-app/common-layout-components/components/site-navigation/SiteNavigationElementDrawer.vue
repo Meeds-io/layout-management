@@ -96,6 +96,12 @@ export default {
     this.$root.$on('page-template-changed', this.changePageTemplate);
     this.$root.$on('existing-page-selected', this.changeSelectedPage);
   },
+  beforeDestroy() {
+    this.$root.$off('open-add-element-drawer', this.open);
+    this.$root.$off('close-add-element-drawer', this.close);
+    this.$root.$off('page-template-changed', this.changePageTemplate);
+    this.$root.$off('existing-page-selected', this.changeSelectedPage);
+  },
   methods: {
     open(elementName, elementTitle, navigationNode) {
       this.resetDrawer = true;
