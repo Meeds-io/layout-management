@@ -37,7 +37,7 @@
       <p
         v-if="description"
         v-sanitized-html="description"
-        :class="!value && 'text-truncate-2'"
+        :class="!expand && 'text-truncate-2'"
         class="mb-0 text-subtitle"></p>
     </div>
   </div>
@@ -45,7 +45,7 @@
 <script>
 export default {
   props: {
-    value: {
+    expand: {
       type: Boolean,
       default: false
     },
