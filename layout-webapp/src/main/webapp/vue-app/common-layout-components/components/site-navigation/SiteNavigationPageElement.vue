@@ -18,12 +18,19 @@
 -->
 <template>
   <div v-if="hasMoreThanOneTemplate">
-    <site-navigation-new-page-element />
+    <site-navigation-new-page-element 
+      @input="$emit('input', $event)" />
   </div>
 </template>
 
 <script>
 export default {
+  props: {
+    value: {
+      type: String,
+      default: null
+    }
+  },
   computed: {
     templatesCount() {
       return this.$root.pageTemplates?.length || 0;
