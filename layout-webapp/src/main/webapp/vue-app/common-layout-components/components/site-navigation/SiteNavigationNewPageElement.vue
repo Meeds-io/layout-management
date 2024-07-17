@@ -20,14 +20,20 @@
   <div>
     <span class="d-block text-start text-header mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
     <site-navigation-new-page-element-item-list
+      v-model="selectedTemplateId"
       :template-items="blankTemplates"
-      :category-name="$t('siteNavigation.label.blankTemplate')" />
+      :category-name="$t('siteNavigation.label.blankTemplate')"
+      @input="selectTemplate($event)" />
     <site-navigation-new-page-element-item-list
+      v-model="selectedTemplateId"
       :template-items="defaultTemplates"
-      :category-name="$t('siteNavigation.label.defaultTemplate')" />
+      :category-name="$t('siteNavigation.label.defaultTemplate')"
+      @input="selectTemplate($event)" />
     <site-navigation-new-page-element-item-list
+      v-model="selectedTemplateId"
       :template-items="customizedTemplates"
-      :category-name="$t('siteNavigation.label.customizedTemplate')" />
+      :category-name="$t('siteNavigation.label.customizedTemplate')"
+      @input="selectTemplate($event)" />
   </div>
 </template>
 
@@ -36,6 +42,7 @@ export default {
   data() {
     return {
       collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
+      selectedTemplateId: null
     };
   },
   computed: {
@@ -58,5 +65,14 @@ export default {
       return items;
     },
   },
+  created() {
+    this.selectedTemplateId = this.value;
+  },
+  methods: {
+    selectTemplate(value) {
+      this.selectedTemplateId = value;
+      this.$emit('input', this.selectedTemplateId);
+    },
+  }
 };
 </script>
