@@ -41,7 +41,8 @@
       <v-card class="mx-4 my-4 px-2 py-2 elevation-0">
         <v-form
           v-model="isValidForm">
-          <site-navigation-page-element />
+          <site-navigation-page-element 
+            v-model="pageTempalateId" />
         </v-form>
       </v-card>
     </template>
@@ -75,7 +76,7 @@ export default {
       navigationNode: null,
       elementName: null,
       elementTitle: null,
-      pageTemplate: null,
+      pageTempalateId: null,
       selectedPage: null,
       loading: false,
       resetDrawer: true,
@@ -89,11 +90,13 @@ export default {
     disabled() {
       return !this.isValidForm || !this.pageTemplate || false;
     },
+    pageTemplate() {
+      return this.$root?.pageTemplates && this.$root.pageTemplates.find(item => item.id === this.pageTempalateId);
+    }
   },
   created() {
     this.$root.$on('open-add-element-drawer', this.open);
     this.$root.$on('close-add-element-drawer', this.close);
-    this.$root.$on('page-template-changed', this.changePageTemplate);
     this.$root.$on('existing-page-selected', this.changeSelectedPage);
   },
   beforeDestroy() {
@@ -123,9 +126,6 @@ export default {
     reset() {
       this.selectedPage = null;
       this.$root.$emit('reset-element-drawer');
-    },
-    changePageTemplate(pageTemplate) {
-      this.pageTemplate = pageTemplate;
     },
     changeSelectedPage(selectedPage) {
       this.selectedPage = selectedPage;
