@@ -35,8 +35,10 @@
         v-for="template in templatesTodisplay"
         :key="template.id"
         :page-template="template"
-        :class="[!expanded && 'col-6' || 'col-2', selectedTemplateId === template.id && 'selected-template']"
-        class="ps-0 clickable" />
+        :selected="selectedTemplateId === template.id"
+        :class="!expanded && 'col-6' || 'col-2'"
+        class="ps-0 clickable"
+        @select="selectedTemplateId = template.id" />
     </v-row>
   </div>
 </template>
@@ -44,6 +46,10 @@
 <script>
 export default {
   props: {
+    value: {
+      type: String,
+      default: null
+    },
     templateItems: {
       type: Object,
       default: null
@@ -51,6 +57,10 @@ export default {
     categoryName: {
       type: String, 
       default: ''
+    },
+    selectedList: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -70,21 +80,27 @@ export default {
       return this.templateItems?.length && this.templateItems?.length >= this.maxItemsToDisplay;
     }
   },
+  watch: {
+    selectedTemplateId() {
+      this.$emit('input', this.selectedTemplateId);
+    },
+    value() {
+      this.selectedTemplateId = this.value;
+    }
+  },
   created() {
     this.templates = this.templateItems.slice(0, this.maxItemsToDisplay);
     this.$root.$on('toggle-expand', this.toggleExpand);
     this.$root.$on('reset-element-drawer', this.resetTemplateList);
-    this.$root.$on('page-template-changed', this.changeSeletedTemplate);
+    this.selectedTemplateId = this.value;
+    
   },
   beforeDestroy() {
     this.$root.$off('toggle-expand', this.toggleExpand);
     this.$root.$off('reset-element-drawer', this.toggleExpand);
-    this.$root.$off('page-template-changed', this.changeSeletedTemplate);
+    
   },
   methods: {
-    changeSeletedTemplate(value) {
-      this.selectedTemplateId = value.id;
-    },
     displayItems() {
       this.maxItemsToDisplay = this.maxItemsToDisplay + 8;
       if (this.templateItems?.length && this.templateItems?.length > this.maxItemsToDisplay) {
