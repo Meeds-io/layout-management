@@ -440,10 +440,10 @@ export default {
           const pageRef = this.selectedPage?.pageRef;
           pageData = {
             'pageRef': pageRef,
-            'nodeTarget': this.nodeTarget,
+            'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
             'pageType': this.elementType
           };
-          this.updateNode(pageData,pageRef, startScheduleDate, endScheduleDate, nodeLabels);
+          this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
         } else if (this.elementType === 'LINK') {
           if (this.pageToEdit.state?.type === 'LINK') {
             this.updatePageLink(startScheduleDate, endScheduleDate, nodeLabels);
@@ -458,7 +458,7 @@ export default {
               const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
               pageData = {
                 'pageRef': pageRef,
-                'nodeTarget': this.target,
+                'nodeTarget': this.nodeTarget ? 'NEW_TAB' : 'SAME_TAB',
                 'pageType': this.elementType,
                 'createdPage': createdPage,
                 'openEditLayout': true,
@@ -471,7 +471,7 @@ export default {
             });
           }
         } else {
-          this.updateNode(pageData,pageRef, startScheduleDate, endScheduleDate, nodeLabels);
+          this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
         }
         this.$navigationLayoutService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
           .then(() => {
@@ -503,7 +503,7 @@ export default {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             pageData = {
               'pageRef': pageRef,
-              'nodeTarget': this.target,
+              'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
               'pageType': this.elementType,
               'createdPage': createdPage,
               'openEditLayout': true,
@@ -547,7 +547,7 @@ export default {
         .then(() => {
           const pageData = {
             'pageRef': pageRef,
-            'nodeTarget': this.target,
+            'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
             'pageType': this.elementType
           };
           this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
