@@ -54,7 +54,8 @@
               :rules="[nodeLabelRules.required]"
               :placeholder="$t('siteNavigation.label.nodeLabel.placeholder')"
               outlined
-              dense 
+              dense
+              autofocus
               @blur="blurOnNodeLabel">
               <template #append>
                 <v-btn
@@ -223,8 +224,8 @@
             {{ $t('siteNavigation.label.btn.cancel') }}
           </v-btn>
           <v-btn
-            v-if="displayNextBtn"
-            :disabled="disabled"
+            v-if="isNewPageElement"
+            :disabled="disableNextBtn"
             :loading="loading"
             class="btn btn-primary ms-2"
             @click="openAddElementDrawer">
@@ -281,7 +282,7 @@ export default {
       selectedPage: null,
       pageToEdit: false,
       link: '',
-      linkRules: [url => !!(url?.match(/^((https?:\/\/)?(www\.)?[a-zA-Z0-9:._\\/+=-]+\.[^\s]{2,})|(javascript:)|(\/portal\/)/))
+      linkRules: [url => !!(url?.match(/^((https?:\/\/)?(www\.)?[a-zA-Z0-9:._\\/+=-]+\.[^\s]{2,})|(javascript:)|(\/portal)/))
           || ( !url?.length && this.$t('siteNavigation.required.error.message') || this.$t('siteNavigation.label.invalidLink'))],
       nodeLabelRules: {
         required: value => value == null || !!(value?.length) || this.$t('siteNavigation.required.error.message'),
@@ -311,8 +312,8 @@ export default {
     disabled() {
       return !(this.isValidInputs && this.nodeId && this.nodeLabel) || this.isLinkElement && !this.link;
     },
-    displayNextBtn() {
-      return this.elementType === 'PAGE';
+    disableNextBtn() {
+      return !(this.elementType === 'PAGE' && this.nodeLabel?.length);
     },
     isLinkElement() {
       return this.elementType === 'LINK';
@@ -615,7 +616,7 @@ export default {
       }
     },
     urlVerify(url) {
-      if (!url.match(/^(https?:\/\/|javascript:|\/portal\/)/)) {
+      if (!url.match(/^(https?:\/\/|javascript:|\/portal)/)) {
         url = `//${url}`;
       }
       return url ;
