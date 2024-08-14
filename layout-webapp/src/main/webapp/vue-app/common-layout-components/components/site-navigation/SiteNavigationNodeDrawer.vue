@@ -446,7 +446,7 @@ export default {
           };
           this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
         } else if (this.elementType === 'LINK') {
-          if (this.pageToEdit.state?.type === 'LINK') {
+          if (this.pageToEdit?.type === 'LINK') {
             this.updatePageLink(startScheduleDate, endScheduleDate, nodeLabels);
           } else {
             this.$pageLayoutService.createPage(
@@ -462,7 +462,7 @@ export default {
                 'nodeTarget': this.nodeTarget ? 'NEW_TAB' : 'SAME_TAB',
                 'pageType': this.elementType,
                 'createdPage': createdPage,
-                'openEditLayout': true,
+                'openEditLayout': this.elementType === 'PAGE',
               };
               this.updateNode(pageData,pageRef, startScheduleDate, endScheduleDate, nodeLabels);
             }).then(page => {
@@ -474,15 +474,6 @@ export default {
         } else {
           this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
         }
-        this.$navigationLayoutService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
-          .then(() => {
-            this.openTargetPage(pageData, this.navigationNode.id);
-            this.$root.$emit('refresh-navigation-nodes');
-            this.$root.$emit('close-add-element-drawer');
-            this.close();
-          })
-          .catch(() => this.$root.$emit('alert-message', this.$t('siteNavigation.errorUpdatingNode'), 'error'))
-          .finally(() => this.loading = false);
       } else {
         this.loading = true;
         if (this.elementType === 'existingPage') {
@@ -507,7 +498,7 @@ export default {
               'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
               'pageType': this.elementType,
               'createdPage': createdPage,
-              'openEditLayout': true,
+              'openEditLayout': this.elementType === 'PAGE',
             };
             this.createNode(previousNodeId, pageData, startScheduleDate, endScheduleDate, nodeLabels);
           }).then(page => {
