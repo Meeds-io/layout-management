@@ -147,7 +147,7 @@ export default {
           'nodeTarget': this.target,
           'pageType': this.elementType,
           'createdPage': createdPage,
-          'openEditLayout': true,
+          'openEditLayout': this.elementType === 'PAGE',
         });
         return createdPage;
       }).then(page => {
