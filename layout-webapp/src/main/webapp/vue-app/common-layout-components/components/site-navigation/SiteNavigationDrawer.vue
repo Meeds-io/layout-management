@@ -34,7 +34,8 @@
           flat
           dense>
           <span
-            class="font-weight-bold">
+            :title="siteName"
+            class="font-weight-bold text-truncate">
             {{ siteName }}
           </span>
           <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
@@ -118,7 +119,7 @@ export default {
   },
   methods: {
     open(event) {
-      this.siteName = event?.siteName || eXo.env.portal.siteKeyName;
+      this.siteName = event?.siteName || eXo.env.portal.spaceDisplayName;
       this.siteType = event?.siteType || 'PORTAL';
       this.siteId = event?.siteId || eXo.env.portal.siteId;
       this.includeGlobal = event?.includeGlobal || false;
