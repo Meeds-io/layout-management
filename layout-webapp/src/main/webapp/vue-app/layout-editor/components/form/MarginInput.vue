@@ -139,7 +139,6 @@ export default {
     marginLeft() {
       if (this.initialized) {
         this.$set(this.container, 'marginLeft', this.enabled ? this.marginLeft || 0 : null);
-        this.$set(this.container, 'marginLeft', this.marginLeft || null);
         this.$emit('refresh');
       }
     },

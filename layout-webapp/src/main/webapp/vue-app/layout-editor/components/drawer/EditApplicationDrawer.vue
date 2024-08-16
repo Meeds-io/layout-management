@@ -265,6 +265,11 @@ export default {
     },
   },
   watch: {
+    drawer(value, oldVal) {
+      if (value && !oldVal && this.styleClasses) {
+        this.$layoutUtils.applyContainerStyle(this.container, this.styleClasses);
+      }
+    },
     styleClasses(value, oldVal) {
       if (value && oldVal) {
         this.$root.$emit('layout-section-history-add', this.sectionId);
@@ -300,7 +305,7 @@ export default {
       this.fixedHeight = !!this.height;
       this.applicationCategoryTitle = applicationCategoryTitle;
       this.applicationTitle = applicationTitle;
-      this.$layoutUtils.parseContainerStyle(this.container, this.styleClasses);
+      this.$layoutUtils.parseContainerStyle(this.container);
 
       this.backgroundProperties = {
         storageId: this.container.storageId,

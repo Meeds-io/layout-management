@@ -267,10 +267,10 @@ export function applyContainerStyle(container, containerStyle) {
   } else {
     container.cssClass = container.cssClass.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '').replace(/  +/g, ' ');
     if (containerStyle.marginTop === 0 || containerStyle.marginTop) {
-      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop, 20)) / 4))}`;
-      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight, 20)) / 4))}`;
-      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom, 20)) / 4))}`;
-      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft, 20)) / 4))}`;
+      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop || 0, 20)) / 4))}`;
+      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight || 0, 20)) / 4))}`;
+      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom || 0, 20)) / 4))}`;
+      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft || 0, 20)) / 4))}`;
     }
   }
 
@@ -728,10 +728,10 @@ export function parseContainerStyle(container) {
   if (container.template !== flexTemplate && container.template !== gridTemplate) {
     const marginMatches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
     if (marginMatches?.length) {
-      container.marginTop = parseInt(marginMatches.find(c => c.indexOf('mt-') >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
-      container.marginRight = parseInt(marginMatches.find(c => c.indexOf('me-') >= 0)?.replace?.('me-n', '-')?.replace?.('me-', '') || 0) * 4;
-      container.marginBottom = parseInt(marginMatches.find(c => c.indexOf('mb-') >= 0)?.replace?.('mb-n', '-')?.replace?.('mb-', '') || 0) * 4;
-      container.marginLeft = parseInt(marginMatches.find(c => c.indexOf('ms-') >= 0)?.replace?.('ms-n', '-')?.replace?.('ms-', '') || 0) * 4;
+      container.marginTop = parseInt(marginMatches.find(c => c.search(/mt-n?\d+/) >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
+      container.marginRight = parseInt(marginMatches.find(c => c.search(/me-n?\d+/) >= 0)?.replace?.('me-n', '-')?.replace?.('me-', '') || 0) * 4;
+      container.marginBottom = parseInt(marginMatches.find(c => c.search(/mb-n?\d+/) >= 0)?.replace?.('mb-n', '-')?.replace?.('mb-', '') || 0) * 4;
+      container.marginLeft = parseInt(marginMatches.find(c => c.search(/ms-n?\d+/) >= 0)?.replace?.('ms-n', '-')?.replace?.('ms-', '') || 0) * 4;
     } else {
       container.marginTop = null;
       container.marginRight = null;
