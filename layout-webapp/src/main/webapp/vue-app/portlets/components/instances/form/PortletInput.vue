@@ -21,13 +21,27 @@
 <template>
   <div>
     <div class="mb-2">{{ $t('layout.portlet') }}</div>
+    <v-radio-group
+      v-if="!disabled"
+      v-model="portletType"
+      class="my-auto text-no-wrap ms-n1">
+      <v-radio
+        :label="$t('layout.newPortletChoice')"
+        value="new"
+        class="mx-0" />
+      <v-radio
+        :label="$t('layout.existingPortletChoice')"
+        value="existing"
+        class="mx-0" />
+    </v-radio-group>
     <v-autocomplete
+      v-if="portletType === 'existing' || disabled"
       ref="autocomplete"
       v-model="contentId"
       :items="sortedPortlets"
       :disabled="disabled"
       :placeholder="$t('layout.portlet.placeholder')"
-      class="portlet-instance-category-autocomplete ma-0 pa-0"
+      class="portlet-instance-autocomplete ma-0 pa-0"
       item-value="contentId"
       item-text="name"
       outlined
@@ -39,8 +53,8 @@
 export default {
   props: {
     value: {
-      type: Number,
-      default: () => 0,
+      type: String,
+      default: null,
     },
     disabled: {
       type: Boolean,
@@ -49,6 +63,7 @@ export default {
   },
   data: () => ({
     contentId: null,
+    portletType: null,
   }),
   computed: {
     sortedPortlets() {
@@ -64,6 +79,11 @@ export default {
         this.contentId = this.value;
       },
     },
+    portletType() {
+      if (this.portletType === 'new') {
+        this.contentId = 'ide/WebApplicationWidget';
+      }
+    },
     contentId() {
       if (this.contentId !== this.value) {
         this.$emit('input', this.contentId);
@@ -71,7 +91,11 @@ export default {
     },
   },
   created() {
-    document.addEventListener('click', this.closeMenu);
+    if (this.disabled) {
+      this.portletType = 'existing';
+    } else {
+      this.portletType = 'new';
+    }
   },
   beforeDestroy() {
     document.removeEventListener('click', this.closeMenu);
@@ -79,7 +103,7 @@ export default {
   methods: {
     closeMenu(event) {
       if (this?.$refs?.autocomplete
-          && !event?.target?.closest?.('.portlet-instance-category-autocomplete')) {
+          && !event?.target?.closest?.('.portlet-instance-autocomplete')) {
         this.$refs.autocomplete.blur();
       }
     },
