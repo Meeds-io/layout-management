@@ -81,7 +81,7 @@ export default {
     },
     portletType() {
       if (this.portletType === 'new') {
-        this.contentId = 'ide/WebApplicationWidget';
+        this.contentId = 'ide/WidgetPortlet';
       }
     },
     contentId() {
