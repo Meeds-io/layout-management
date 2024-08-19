@@ -19,6 +19,7 @@
 
 import './initComponents.js';
 import '../common-layout-components/main.js';
+import '../common-illustration/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
