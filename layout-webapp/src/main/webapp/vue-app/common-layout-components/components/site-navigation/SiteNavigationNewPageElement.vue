@@ -20,13 +20,13 @@
   <div>
     <span class="d-block text-start text-header mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
     <site-navigation-new-page-element-item-list
-      v-if="customizedTemplates?.length"
+      v-if="blankTemplates?.length"
       v-model="selectedTemplateId"
       :template-items="blankTemplates"
       :category-name="$t('siteNavigation.label.blankTemplate')"
       @input="selectTemplate($event)" />
     <site-navigation-new-page-element-item-list
-      v-if="customizedTemplates?.length"
+      v-if="defaultTemplates?.length"
       v-model="selectedTemplateId"
       :template-items="defaultTemplates"
       :category-name="$t('siteNavigation.label.defaultTemplate')"
