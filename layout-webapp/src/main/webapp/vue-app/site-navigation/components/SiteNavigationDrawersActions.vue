@@ -22,6 +22,7 @@
     <manage-permissions-drawer />
     <site-navigation-node-drawer />
     <site-navigation-element-drawer />
+    <layout-image-illustration-preview />
   </div>
 </template>
 <script>
