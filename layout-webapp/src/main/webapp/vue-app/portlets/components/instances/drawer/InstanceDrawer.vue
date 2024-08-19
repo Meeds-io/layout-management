@@ -226,16 +226,18 @@ export default {
     save() {
       this.saving = true;
       let message = null;
+      let savedInstance = null;
+      const newInstance = !this.instanceId;
       const saveInstanceRequest =
-        this.instanceId ?
+        !newInstance ?
           this.$portletInstanceService.getPortletInstance(this.instanceId)
             .then(instance => {
               instance.categoryId = this.categoryId;
               instance.permissions = this.getPermissions();
               return this.$portletInstanceService.updatePortletInstance(instance)
                 .then(() => {
-                  this.$root.$emit('portlet-instance-updated', instance);
                   message = this.$t('layout.portletInstanceUpdatedSuccessfully');
+                  savedInstance = instance;
                   return instance;
                 });
             })
@@ -245,8 +247,8 @@ export default {
             permissions: this.getPermissions(),
           })
             .then(instance => {
-              this.$root.$emit('portlet-instance-created', instance);
               message = this.$t('layout.portletInstanceCreatedSuccessfully');
+              savedInstance = instance;
               return instance;
             });
       return saveInstanceRequest
@@ -259,6 +261,31 @@ export default {
         .then(() => this.$translationService.saveTranslations('portletInstance', this.instanceId, 'title', this.titleTranslations))
         .then(() => this.$translationService.saveTranslations('portletInstance', this.instanceId, 'description', this.descriptionTranslations))
         .then(() => this.$refs?.portletInstancePreview?.save())
+        .then(() => {
+          if (newInstance) {
+            if (this.contentId === 'ide/WidgetPortlet') {
+              return this.$portletInstanceService.getPortletInstance(this.instanceId)
+                .then(instance => {
+                  if (!instance?.preferences?.portletInstanceId) {
+                    if (!instance.preferences) {
+                      instance.preferences = [];
+                    }
+                    instance.preferences.push({
+                      name: 'portletInstanceId',
+                      value: this.instanceId,
+                    });
+                    savedInstance = instance;
+                    return this.$portletInstanceService.updatePortletInstance(instance);
+                  }
+                })
+                .then(() => this.$root.$emit('portlet-instance-created', savedInstance, true));
+            } else {
+              this.$root.$emit('portlet-instance-created', savedInstance);
+            }
+          } else {
+            this.$root.$emit('portlet-instance-updated', savedInstance);
+          }
+        })
         .then(() => {
           this.$root.$emit('portlet-instance-saved', this.instanceId);
           this.$root.$emit('alert-message', message, 'success');
