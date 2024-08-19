@@ -73,6 +73,7 @@ export function init() {
         },
         created() {
           this.portletInstanceId = this.getQueryParam('id');
+          this.portletMode = this.getQueryParam('portletMode') || 'view';
           this.$portletInstanceService.getPortletInstance(this.portletInstanceId)
             .then(data => this.portletInstance = data)
             .finally(() => this.$applicationLoaded());

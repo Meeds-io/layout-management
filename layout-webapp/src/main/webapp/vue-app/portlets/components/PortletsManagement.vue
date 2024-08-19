@@ -74,8 +74,8 @@ export default {
       this.tabName = null;
       this.$nextTick(() => window.setTimeout(() => this.tabName = tabName, 10));
     },
-    handleInstanceCreated(instance) {
-      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${instance.id}`;
+    handleInstanceCreated(instance, editMode) {
+      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${instance.id}&portletMode=${editMode && 'edit' || 'view'}`;
       window.open(instanceEditorLink, '_blank');
     },
     handleLayoutUpdated(instance) {
