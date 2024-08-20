@@ -22,7 +22,7 @@
   <div>
     <div class="mb-2">{{ $t('layout.portlet') }}</div>
     <v-radio-group
-      v-if="!disabled"
+      v-if="!disabled && ideEnabled"
       v-model="portletType"
       class="my-auto text-no-wrap ms-n1">
       <v-radio
@@ -64,6 +64,7 @@ export default {
   data: () => ({
     contentId: null,
     portletType: null,
+    ideEnabled: eXo.env.portal.ideEnabled,
   }),
   computed: {
     sortedPortlets() {
@@ -91,7 +92,7 @@ export default {
     },
   },
   created() {
-    if (this.disabled) {
+    if (this.disabled || !this.ideEnabled) {
       this.portletType = 'existing';
     } else {
       this.portletType = 'new';
