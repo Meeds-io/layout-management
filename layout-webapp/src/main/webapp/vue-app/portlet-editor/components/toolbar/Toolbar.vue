@@ -31,12 +31,19 @@
     <portlet-editor-toolbar-edit-button
       v-if="canSwitchToEditMode"
       class="mx-2" />
+    <extension-registry-component
+      v-if="extendedComponentOptions"
+      :component="extendedComponentOptions" />
     <portlet-editor-toolbar-save-button
+      v-else
       :disabled="$root.portletMode !== 'view'" />
   </v-card>
 </template>
 <script>
 export default {
+  data: () => ({
+    saveButtonExtension: null,
+  }),
   computed: {
     title() {
       return this.$t('layout.editPortletInstance', {0: `<strong>${this.$root?.portletInstance?.name}</strong>`});
@@ -44,9 +51,30 @@ export default {
     canSwitchToEditMode() {
       return this.$root.portletInstance?.supportedModes?.find?.(mode => mode === 'edit');
     },
+    extendedComponentOptions() {
+      return this.saveButtonExtension
+        && (!this.saveButtonExtension.portletMode
+            || this.saveButtonExtension.portletMode === this.$root.portletMode)
+        && {
+          componentName: this.saveButtonExtension.id,
+          componentOptions: {
+            vueComponent: this.saveButtonExtension.component,
+          },
+        };
+    },
+  },
+  created() {
+    document.addEventListener('extension-Layout-PortletEditorSaveButton-updated', this.refreshSaveButtonExtension);
+    this.refreshSaveButtonExtension();
   },
   mounted() {
     document.querySelector('#layoutTopBarContentChildren').append(this.$el);
+  },
+  methods: {
+    refreshSaveButtonExtension() {
+      const extensions = extensionRegistry.loadExtensions('Layout', 'PortletEditorSaveButton');
+      this.saveButtonExtension = extensions?.[0];
+    },
   },
 };
 </script>
