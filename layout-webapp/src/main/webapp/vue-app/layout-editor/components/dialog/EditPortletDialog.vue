@@ -22,7 +22,7 @@
   <v-dialog
     v-model="dialog"
     :width="width"
-    content-class="uiPopup full-width full-height"
+    content-class="uiPopup full-width full-height overflow-x-hidden"
     persistent
     max-width="100vw">
     <v-card class="full-height full-width" flat>
