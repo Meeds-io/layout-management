@@ -80,6 +80,9 @@ export default {
     displayResizeButton() {
       return !this.$root.isMobile;
     },
+    portletMode() {
+      return this.$root.portletMode;
+    },
     width() {
       return this.diffX && `calc(100% ${this.diffX > 0 ? '+' : '-'} ${Math.abs(this.diffX) * 2}px)` || '100%';
     },
@@ -101,6 +104,14 @@ export default {
     },
   },
   watch: {
+    portletMode() {
+      this.movingStartX = 0;
+      this.movingStartY = 0;
+      this.movingX = 0;
+      this.movingY = 0;
+      this.diffX = 0;
+      this.diffY = 0;
+    },
     isEmpty() {
       this.$root.portletInstanceEmpty = this.isEmpty;
     },
