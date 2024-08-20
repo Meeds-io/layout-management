@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     open(event) {
-      this.siteName = event?.siteName || eXo.env.portal.spaceDisplayName;
+      this.siteName = event?.siteName || eXo.env.portal.spaceDisplayName || eXo.env.portal.siteKeyName;
       this.siteType = event?.siteType || 'PORTAL';
       this.siteId = event?.siteId || eXo.env.portal.siteId;
       this.includeGlobal = event?.includeGlobal || false;
