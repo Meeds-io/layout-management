@@ -18,6 +18,7 @@
  */
 package io.meeds.layout.service;
 
+import static io.meeds.layout.service.PortletInstanceService.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -47,6 +48,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.social.attachment.AttachmentService;
@@ -101,6 +103,9 @@ public class PortletInstanceServiceTest {
 
   @MockBean
   private PortletService                  portletService;
+
+  @MockBean
+  private ListenerService                 listenerService;
 
   @Mock
   private PortletInstanceCategory         portletInstanceCategory;
@@ -308,8 +313,10 @@ public class PortletInstanceServiceTest {
     assertThrows(IllegalAccessException.class, () -> portletInstanceService.createPortletInstance(portletInstance, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    when(portletInstanceStorage.createPortletInstance(any())).thenAnswer(invocation -> invocation.getArgument(0));
     portletInstanceService.createPortletInstance(portletInstance, testuser);
     verify(portletInstanceStorage, times(1)).createPortletInstance(portletInstance);
+    verify(listenerService).broadcast(INSTANCE_CREATED_EVENT, testuser, portletInstance);
   }
 
   @Test
@@ -329,6 +336,7 @@ public class PortletInstanceServiceTest {
     verify(attachmentService, times(1)).deleteAttachments(PortletInstanceAttachmentPlugin.OBJECT_TYPE, "2");
     verify(translationService, times(1)).deleteTranslationLabels(PortletInstanceTranslationPlugin.OBJECT_TYPE, 2l);
     verify(portletInstanceStorage, times(1)).deletePortletInstance(2l);
+    verify(listenerService).broadcast(INSTANCE_DELETED_EVENT, testuser, portletInstance);
   }
 
   @Test
@@ -348,8 +356,10 @@ public class PortletInstanceServiceTest {
     assertThrows(IllegalAccessException.class, () -> portletInstanceService.updatePortletInstance(portletInstance, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    when(portletInstanceStorage.updatePortletInstance(any())).thenAnswer(invocation -> invocation.getArgument(0));
     portletInstanceService.updatePortletInstance(portletInstance, testuser);
     verify(portletInstanceStorage, times(1)).updatePortletInstance(portletInstance);
+    verify(listenerService).broadcast(INSTANCE_UPDATED_EVENT, testuser, portletInstance);
   }
 
   @Test
@@ -485,8 +495,10 @@ public class PortletInstanceServiceTest {
                  () -> portletInstanceService.createPortletInstanceCategory(portletInstanceCategory, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    when(portletInstanceCategoryStorage.createPortletInstanceCategory(any())).thenAnswer(invocation -> invocation.getArgument(0));
     portletInstanceService.createPortletInstanceCategory(portletInstanceCategory, testuser);
     verify(portletInstanceCategoryStorage, times(1)).createPortletInstanceCategory(portletInstanceCategory);
+    verify(listenerService).broadcast(CATEGORY_CREATED_EVENT, testuser, portletInstanceCategory);
   }
 
   @Test
@@ -505,6 +517,7 @@ public class PortletInstanceServiceTest {
 
     verify(translationService, times(1)).deleteTranslationLabels(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE, 2l);
     verify(portletInstanceCategoryStorage, times(1)).deletePortletInstanceCategory(2l);
+    verify(listenerService).broadcast(CATEGORY_DELETED_EVENT, testuser, portletInstanceCategory);
   }
 
   @Test
@@ -524,8 +537,10 @@ public class PortletInstanceServiceTest {
                  () -> portletInstanceService.updatePortletInstanceCategory(portletInstanceCategory, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    when(portletInstanceCategoryStorage.updatePortletInstanceCategory(any())).thenAnswer(invocation -> invocation.getArgument(0));
     portletInstanceService.updatePortletInstanceCategory(portletInstanceCategory, testuser);
     verify(portletInstanceCategoryStorage, times(1)).updatePortletInstanceCategory(portletInstanceCategory);
+    verify(listenerService).broadcast(CATEGORY_UPDATED_EVENT, testuser, portletInstanceCategory);
   }
 
   @Test
