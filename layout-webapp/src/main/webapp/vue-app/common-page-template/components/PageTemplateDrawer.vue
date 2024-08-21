@@ -144,6 +144,7 @@ export default {
     async open(pageTemplate, duplicate, generateIllustration) {
       this.templateId = pageTemplate.id || this.$root.pageTemplate?.id || null;
       this.pageLayoutContent = pageTemplate.content;
+      this.description = pageTemplate?.description || '';
       this.duplicate = duplicate;
       if (generateIllustration) {
         const parentElement = document.querySelector('.layout-sections-parent .layout-page-body').parentElement;
