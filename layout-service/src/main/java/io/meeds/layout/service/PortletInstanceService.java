@@ -36,6 +36,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -58,7 +59,20 @@ import io.meeds.social.translation.service.TranslationService;
 @Service
 public class PortletInstanceService {
 
-  private static final List<String>                    EVERYONE_PERMISSIONS_LIST = Collections.singletonList(UserACL.EVERYONE);
+  public static final String                           INSTANCE_CREATED_EVENT    = "layout.portletInstance.created";
+
+  public static final String                           INSTANCE_UPDATED_EVENT    = "layout.portletInstance.updated";
+
+  public static final String                           INSTANCE_DELETED_EVENT    = "layout.portletInstance.deleted";
+
+  public static final String                           CATEGORY_CREATED_EVENT    = "layout.portletInstanceCategory.created";
+
+  public static final String                           CATEGORY_UPDATED_EVENT    = "layout.portletInstanceCategory.updated";
+
+  public static final String                           CATEGORY_DELETED_EVENT    = "layout.portletInstanceCategory.deleted";
+
+  private static final List<String>                    EVERYONE_PERMISSIONS_LIST =
+                                                                                 Collections.singletonList(UserACL.EVERYONE);
 
   private static final Log                             LOG                       =
                                                            ExoLogger.getLogger(PortletInstanceService.class);
@@ -86,6 +100,9 @@ public class PortletInstanceService {
 
   @Autowired
   private PortletService                               portletService;
+
+  @Autowired
+  private ListenerService                              listenerService;
 
   private Map<String, PortletInstancePreferencePlugin> preferencePlugins         = new ConcurrentHashMap<>();
 
@@ -174,11 +191,15 @@ public class PortletInstanceService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to create a Portlet instance");
     }
-    return createPortletInstance(portletInstance);
+    PortletInstance createdPortletInstance = portletInstanceStorage.createPortletInstance(portletInstance);
+    listenerService.broadcast(INSTANCE_CREATED_EVENT, username, createdPortletInstance);
+    return createdPortletInstance;
   }
 
   public PortletInstance createPortletInstance(PortletInstance portletInstance) {
-    return portletInstanceStorage.createPortletInstance(portletInstance);
+    PortletInstance createdPortletInstance = portletInstanceStorage.createPortletInstance(portletInstance);
+    listenerService.broadcast(INSTANCE_CREATED_EVENT, null, createdPortletInstance);
+    return createdPortletInstance;
   }
 
   public PortletInstanceCategory createPortletInstanceCategory(PortletInstanceCategory portletInstanceCategory,
@@ -186,11 +207,17 @@ public class PortletInstanceService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to create a Portlet instance Category");
     }
-    return createPortletInstanceCategory(portletInstanceCategory);
+    PortletInstanceCategory createdPortletInstanceCategory =
+                                                           portletInstanceCategoryStorage.createPortletInstanceCategory(portletInstanceCategory);
+    listenerService.broadcast(CATEGORY_CREATED_EVENT, username, createdPortletInstanceCategory);
+    return createdPortletInstanceCategory;
   }
 
   public PortletInstanceCategory createPortletInstanceCategory(PortletInstanceCategory category) {
-    return portletInstanceCategoryStorage.createPortletInstanceCategory(category);
+    PortletInstanceCategory createdPortletInstanceCategory =
+                                                           portletInstanceCategoryStorage.createPortletInstanceCategory(category);
+    listenerService.broadcast(CATEGORY_CREATED_EVENT, null, createdPortletInstanceCategory);
+    return createdPortletInstanceCategory;
   }
 
   public void deletePortletInstance(long id, String username) throws IllegalAccessException, ObjectNotFoundException {
@@ -204,21 +231,17 @@ public class PortletInstanceService {
     if (portletInstance.isSystem()) {
       throw new IllegalAccessException("Can't delete a system Portlet instance");
     }
-    deletePortletInstance(id);
+    deletePortletInstanceFromStore(id);
+    listenerService.broadcast(INSTANCE_DELETED_EVENT, username, portletInstance);
   }
 
   public void deletePortletInstance(long id) throws ObjectNotFoundException {
-    try {
-      attachmentService.deleteAttachments(PortletInstanceAttachmentPlugin.OBJECT_TYPE, String.valueOf(id));
-    } catch (Exception e) {
-      LOG.debug("Error while deleting attachments of deleted Portlet instance", e);
+    PortletInstance portletInstance = getPortletInstance(id);
+    if (portletInstance == null) {
+      throw new ObjectNotFoundException("Portlet instance doesn't exist");
     }
-    try {
-      translationService.deleteTranslationLabels(PortletInstanceTranslationPlugin.OBJECT_TYPE, id);
-    } catch (ObjectNotFoundException e) {
-      LOG.debug("Error while deleting translation labels of deleted Portlet instance", e);
-    }
-    portletInstanceStorage.deletePortletInstance(id);
+    deletePortletInstanceFromStore(id);
+    listenerService.broadcast(INSTANCE_DELETED_EVENT, null, portletInstance);
   }
 
   public void deletePortletInstanceCategory(long id, String username) throws IllegalAccessException, ObjectNotFoundException {
@@ -232,16 +255,17 @@ public class PortletInstanceService {
     if (portletInstanceCategory.isSystem()) {
       throw new IllegalAccessException("Can't delete a system Portlet instance Category");
     }
-    deletePortletInstanceCategory(id);
+    deletePortletInstanceCategoryFromStore(id);
+    listenerService.broadcast(CATEGORY_DELETED_EVENT, username, portletInstanceCategory);
   }
 
   public void deletePortletInstanceCategory(long id) throws ObjectNotFoundException {
-    try {
-      translationService.deleteTranslationLabels(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE, id);
-    } catch (ObjectNotFoundException e) {
-      LOG.debug("Error while deleting translation labels of deleted Portlet instance Category", e);
+    PortletInstanceCategory portletInstanceCategory = getPortletInstanceCategory(id);
+    if (portletInstanceCategory == null) {
+      throw new ObjectNotFoundException("Portlet instance Category doesn't exist");
     }
-    portletInstanceCategoryStorage.deletePortletInstanceCategory(id);
+    deletePortletInstanceCategoryFromStore(id);
+    listenerService.broadcast(CATEGORY_DELETED_EVENT, null, portletInstanceCategory);
   }
 
   public PortletInstance updatePortletInstance(PortletInstance portletInstance, String username) throws ObjectNotFoundException,
@@ -249,11 +273,15 @@ public class PortletInstanceService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to update a Portlet instance");
     }
-    return updatePortletInstance(portletInstance);
+    PortletInstance updatedPortletInstance = portletInstanceStorage.updatePortletInstance(portletInstance);
+    listenerService.broadcast(INSTANCE_UPDATED_EVENT, username, updatedPortletInstance);
+    return updatedPortletInstance;
   }
 
   public PortletInstance updatePortletInstance(PortletInstance portletInstance) throws ObjectNotFoundException {
-    return portletInstanceStorage.updatePortletInstance(portletInstance);
+    PortletInstance updatedPortletInstance = portletInstanceStorage.updatePortletInstance(portletInstance);
+    listenerService.broadcast(INSTANCE_UPDATED_EVENT, null, updatedPortletInstance);
+    return updatedPortletInstance;
   }
 
   public PortletInstanceCategory updatePortletInstanceCategory(PortletInstanceCategory portletInstanceCategory,
@@ -262,11 +290,15 @@ public class PortletInstanceService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to update a Portlet instance category");
     }
-    return updatePortletInstanceCategory(portletInstanceCategory);
+    PortletInstanceCategory updatedPortletInstanceCategory = portletInstanceCategoryStorage.updatePortletInstanceCategory(portletInstanceCategory);
+    listenerService.broadcast(CATEGORY_UPDATED_EVENT, username, updatedPortletInstanceCategory);
+    return updatedPortletInstanceCategory;
   }
 
-  public PortletInstanceCategory updatePortletInstanceCategory(PortletInstanceCategory category) throws ObjectNotFoundException {
-    return portletInstanceCategoryStorage.updatePortletInstanceCategory(category);
+  public PortletInstanceCategory updatePortletInstanceCategory(PortletInstanceCategory portletInstanceCategory) throws ObjectNotFoundException {
+    PortletInstanceCategory updatedPortletInstanceCategory = portletInstanceCategoryStorage.updatePortletInstanceCategory(portletInstanceCategory);
+    listenerService.broadcast(CATEGORY_UPDATED_EVENT, null, updatedPortletInstanceCategory);
+    return updatedPortletInstanceCategory;
   }
 
   public Application<Portlet> getPortletInstanceApplication(long portletInstanceId,
@@ -313,6 +345,29 @@ public class PortletInstanceService {
 
   public List<PortletInstance> getPortletInstances() {
     return portletInstanceStorage.getPortletInstances();
+  }
+
+  private void deletePortletInstanceFromStore(long id) throws ObjectNotFoundException {
+    try {
+      attachmentService.deleteAttachments(PortletInstanceAttachmentPlugin.OBJECT_TYPE, String.valueOf(id));
+    } catch (Exception e) {
+      LOG.debug("Error while deleting attachments of deleted Portlet instance", e);
+    }
+    try {
+      translationService.deleteTranslationLabels(PortletInstanceTranslationPlugin.OBJECT_TYPE, id);
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("Error while deleting translation labels of deleted Portlet instance", e);
+    }
+    portletInstanceStorage.deletePortletInstance(id);
+  }
+
+  private void deletePortletInstanceCategoryFromStore(long id) throws ObjectNotFoundException {
+    try {
+      translationService.deleteTranslationLabels(PortletInstanceCategoryTranslationPlugin.OBJECT_TYPE, id);
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("Error while deleting translation labels of deleted Portlet instance Category", e);
+    }
+    portletInstanceCategoryStorage.deletePortletInstanceCategory(id);
   }
 
   private void computePortletInstanceAttributes(Locale locale, PortletInstance portletInstance) {
