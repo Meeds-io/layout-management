@@ -40,6 +40,7 @@
             :placeholder="$t('layout.templateTitlePlaceholder')"
             :maxlength="maxTitleLength"
             :object-id="templateId"
+            :rules="rules.title"
             object-type="pageTemplate"
             field-name="title"
             drawer-title="layout.templateTitleDrawerTitle"
@@ -117,8 +118,8 @@ export default {
     titleTranslations: {},
     descriptionTranslations: {},
     illustration: null,
-    maxTitleLength: 250,
-    maxDescriptionLength: 1000,
+    maxTitleLength: 50,
+    maxDescriptionLength: 100,
     illustrationUploadId: null,
     duplicate: null,
     templateId: null,
@@ -132,6 +133,18 @@ export default {
       if (this.$refs.pageTemplateDescriptionEditor?.editor && this.description !== this.$refs.pageTemplateDescriptionEditor.inputVal) {
         this.$refs.pageTemplateDescriptionEditor.editor.setData(this.description);
       }
+    },
+  },
+  computed: {
+    rules() {
+      return {
+        title: [
+          v => !!v?.length || ' ',
+          v => !v?.length || v.length < this.maxTitleLength || this.$t('layout.templateTitle.exceedsMaxLength', {
+            0: this.maxTitleLength,
+          }),
+        ],
+      };
     },
   },
   created() {
