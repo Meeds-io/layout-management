@@ -115,8 +115,11 @@ export default {
     name() {
       return this.$te(this.portletInstance?.name) ? this.$t(this.portletInstance?.name) : this.portletInstance?.name;
     },
+    hasEditMode() {
+      return this.portletInstance?.supportedModes?.find?.(mode => mode === 'edit');
+    },
     editLayoutLink() {
-      return `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${this.portletInstanceId}`;
+      return `/portal/${eXo.env.portal.portalName}/portlet-editor?id=${this.portletInstanceId}&portletMode=${this.hasEditMode && 'edit' || 'view'}`;
     },
   },
   watch: {
