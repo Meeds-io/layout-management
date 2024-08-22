@@ -20,9 +20,7 @@
 <template>
   <div>
     <v-hover
-      v-model="hover"
-      open-delay="200"
-      close-delay="100">
+      v-model="hover">
       <div
         :style="containerStyle"
         :class="selected && 'selected'"
@@ -43,7 +41,8 @@
         </div>
         <div
           v-if="hover"
-          class="position-absolute full-height full-width t-0 l-0 mask-color rounded z-index-drawer d-flex flex-column pa-2 overflow-hidden">
+          class="position-absolute full-height full-width t-0 l-0 mask-color rounded z-index-drawer d-flex flex-column pa-2 overflow-hidden"
+          @click="$root.$emit('layout-illustration-preview', illustrationSrc, illustrationAction)">
           <p
             v-if="title"
             v-sanitized-html="title"
@@ -51,19 +50,19 @@
           <p
             v-if="description"
             v-sanitized-html="description"
-            class="white--text mb-0 text-subtitle text-truncate-2"></p>
-          <div class="d-flex flex-grow-1 align-center justify-space-around">
+            class="white--text mb-0 text-subtitle text-truncate-3"></p>
+          <div class="d-flex flex-grow-1 align-center justify-end">
             <v-btn
               small
               class="btn btn-primary me-2"
-              @click="$emit('select')">
+              @click.prevent.stop="$emit('select')">
               {{ $t('siteNavigation.label.use') }}
             </v-btn>
             <v-btn
               small
               class="btn"
               color="white"
-              @click="$root.$emit('layout-illustration-preview', illustrationSrc)">
+              @click="$root.$emit('layout-illustration-preview', illustrationSrc, illustrationAction)">
               {{ $t('siteNavigation.label.templatePreview') }}
             </v-btn>
           </div>
@@ -131,7 +130,14 @@ export default {
         'max-height': '150px',
         'height': '150px'
       };
-    }
+    },
+    illustrationAction() {
+      return {
+        label: this.$t('siteNavigation.label.templateAdd'),
+        closeOnClick: true,
+        click: () => this.$emit('select'),
+      };
+    },
   },
 };
 
