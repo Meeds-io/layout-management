@@ -98,6 +98,7 @@
           {{ $t('layout.cancel') }}
         </v-btn>
         <v-btn
+          :disabled="disabled"
           :loading="saving"
           class="btn btn-primary"
           @click="save">
@@ -145,6 +146,11 @@ export default {
           }),
         ],
       };
+    },
+    disabled() {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = this.description;
+      return this.title?.length && tempDiv.innerText.length - 1 > this.maxDescriptionLength;
     },
   },
   created() {
