@@ -61,6 +61,7 @@
             :field-value.sync="description"
             :maxlength="maxDescriptionLength"
             :object-id="templateId"
+            :rules="rules.description"
             object-type="pageTemplate"
             field-name="description"
             drawer-title="layout.templateDescriptionDrawerTitle"
@@ -98,6 +99,7 @@
           {{ $t('layout.cancel') }}
         </v-btn>
         <v-btn
+          :disabled="disabled"
           :loading="saving"
           class="btn btn-primary"
           @click="save">
@@ -144,7 +146,15 @@ export default {
             0: this.maxTitleLength,
           }),
         ],
+        description: [
+          v => !v?.length || v.length < this.maxDescriptionLength || this.$t('layout.templateTitle.exceedsMaxLength', {
+            0: this.maxDescriptionLength,
+          }),
+        ],
       };
+    },
+    disabled() {
+      return !this.title?.length || this.title.length > this.maxTitleLength || (this.description?.length && this.description.length > this.maxDescriptionLength);
     },
   },
   created() {
