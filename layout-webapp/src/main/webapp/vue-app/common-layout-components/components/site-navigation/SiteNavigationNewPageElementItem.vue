@@ -51,7 +51,7 @@
             v-if="description"
             v-sanitized-html="description"
             class="white--text mb-0 text-subtitle text-truncate-3"></p>
-          <div class="d-flex flex-grow-1 align-center justify-end">
+          <div class="d-flex flex-grow-1 align-end justify-end">
             <v-btn
               small
               class="btn btn-primary me-2"
