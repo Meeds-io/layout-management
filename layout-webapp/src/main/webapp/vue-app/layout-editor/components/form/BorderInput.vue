@@ -50,7 +50,7 @@
         {{ $t('layout.borderSize') }}
       </v-list-item-content>
       <v-list-item-action class="my-auto me-0 ms-auto">
-        <layout-editor-number-input
+        <number-input
           v-model="borderSize"
           :step="1"
           :min="0"
