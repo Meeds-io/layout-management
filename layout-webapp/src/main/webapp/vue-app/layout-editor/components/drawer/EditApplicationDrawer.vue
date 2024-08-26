@@ -125,7 +125,7 @@
                 <template #label>
                   <div class="d-flex full-width align-center">
                     <span class="text-font-size">{{ $t('layout.fixedHeightCustom') }}</span>
-                    <layout-editor-number-input
+                    <number-input
                       v-model="height"
                       v-if="height === customHeight"
                       :label="$t('layout.fixedHeight')"

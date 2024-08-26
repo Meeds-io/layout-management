@@ -50,7 +50,7 @@
       </v-list-item-action>
       <v-list-item-action
         class="me-0 my-auto">
-        <layout-editor-number-input
+        <number-input
           v-if="textTitleFontSize"
           v-model="textTitleFontSize"
           :min="1"
@@ -85,7 +85,7 @@
       </v-list-item-action>
       <v-list-item-action
         class="me-0 my-auto">
-        <layout-editor-number-input
+        <number-input
           v-if="textHeaderFontSize"
           v-model="textHeaderFontSize"
           :min="1"
@@ -120,7 +120,7 @@
       </v-list-item-action>
       <v-list-item-action
         class="me-0 my-auto">
-        <layout-editor-number-input
+        <number-input
           v-if="textFontSize"
           v-model="textFontSize"
           :min="1"
@@ -155,7 +155,7 @@
       </v-list-item-action>
       <v-list-item-action
         class="me-0 my-auto">
-        <layout-editor-number-input
+        <number-input
           v-if="textSubtitleFontSize"
           v-model="textSubtitleFontSize"
           :min="1"
