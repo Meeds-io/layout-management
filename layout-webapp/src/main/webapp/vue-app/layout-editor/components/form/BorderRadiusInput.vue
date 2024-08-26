@@ -47,7 +47,7 @@
         <v-list-item-content v-if="choice === 'different'" class="my-auto">
           {{ $t('layout.topRight') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="radiusTopRight"
           :class="choice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
           class="me-n3" />
@@ -59,7 +59,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.topLeft') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="radiusTopLeft"
           class="my-auto me-n3" />
       </v-list-item>
@@ -70,7 +70,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.bottomRight') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="radiusBottomRight"
           class="my-auto me-n3" />
       </v-list-item>
@@ -81,7 +81,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.bottomLeft') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="radiusBottomLeft"
           class="my-auto me-n3" />
       </v-list-item>

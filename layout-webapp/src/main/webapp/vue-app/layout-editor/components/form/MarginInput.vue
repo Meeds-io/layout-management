@@ -49,7 +49,7 @@
           class="my-auto">
           {{ $t('layout.top') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="marginTop"
           :diff="-20"
           :class="marginChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
@@ -62,7 +62,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.right') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="marginRight"
           :diff="-20"
           class="my-auto me-n3" />
@@ -74,7 +74,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.bottom') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="marginBottom"
           :diff="-20"
           class="my-auto me-n3" />
@@ -86,7 +86,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.left') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="marginLeft"
           :diff="-20"
           class="my-auto me-n3" />
