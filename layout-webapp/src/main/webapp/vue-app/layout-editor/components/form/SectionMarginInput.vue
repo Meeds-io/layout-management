@@ -36,7 +36,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.top') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="marginTop"
           :max="48"
           class="my-auto me-n3" />
@@ -45,7 +45,7 @@
         <v-list-item-content class="my-auto">
           {{ $t('layout.bottom') }}
         </v-list-item-content>
-        <layout-editor-number-input
+        <number-input
           v-model="marginBottom"
           :max="48"
           class="my-auto me-n3" />
