@@ -30,7 +30,6 @@ import PagePreviewButton from './components/toolbar/actions/PagePreviewButton.vu
 import PagePropertiesButton from './components/toolbar/actions/PagePropertiesButton.vue';
 
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
-import NumberInput from './components/form/NumberInput.vue';
 import ColorPicker from './components/form/ColorPicker.vue';
 import BackgroundImageAttachment from './components/form/BackgroundImageAttachment.vue';
 import BackgroundInput from './components/form/BackgroundInput.vue';
@@ -87,7 +86,6 @@ const components = {
   'layout-editor-content': Content,
   'layout-editor-color-picker': ColorPicker,
   'layout-editor-border-radius-selector': BorderRadiusSelector,
-  'layout-editor-number-input': NumberInput,
   'layout-editor-container': Container,
   'layout-editor-container-extension': ContainerExtension,
   'layout-editor-container-base': ContainerBase,
