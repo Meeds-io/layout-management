@@ -221,6 +221,27 @@ public class PageLayoutService {
     return page.getPageKey();
   }
 
+  public void updatePageApplicationPreferences(PageKey pageKey,
+                                               long applicationId,
+                                               List<PortletInstancePreference> preferences,
+                                               String username) throws IllegalAccessException, ObjectNotFoundException {
+    Page page = layoutService.getPage(pageKey);
+    if (page == null) {
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
+    } else if (!aclService.canEditPage(pageKey, username)) {
+      throw new IllegalAccessException(String.format(PAGE_NOT_EDITABLE_MESSAGE, pageKey.format(), username));
+    }
+    Application<Portlet> application = findApplication(page, applicationId);
+    if (application == null) {
+      throw new ObjectNotFoundException(String.format("Application with id %s wasn't found in page %s",
+                                                      applicationId,
+                                                      pageKey));
+    }
+    Portlet portletPreferences = new Portlet();
+    preferences.forEach(preference -> portletPreferences.setValue(preference.getName(), preference.getValue()));
+    layoutService.save(application.getState(), portletPreferences);
+  }
+
   public PageContext updatePageLayout(String pageRef,
                                       Page page,
                                       boolean publish,
