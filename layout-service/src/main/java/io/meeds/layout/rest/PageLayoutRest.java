@@ -44,6 +44,7 @@ import org.exoplatform.portal.mop.service.LayoutService;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
+import io.meeds.layout.model.PortletPreferenceList;
 import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.util.RestEntityBuilder;
 import io.meeds.layout.service.PageLayoutService;
@@ -247,6 +248,34 @@ public class PageLayoutRest {
                                     PermissionUpdateModel permissionUpdateModel) {
     try {
       pageLayoutService.updatePagePermissions(PageKey.parse(pageRef), permissionUpdateModel, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @PatchMapping("application/preferences")
+  @Secured("users")
+  @Operation(summary = "Update a page application preferences", method = "PATCH",
+             description = "This updates a given application preferences added in an existing page")
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public void updatePageApplicationPreferences(
+                                               HttpServletRequest request,
+                                               @Parameter(description = "Page reference", required = true)
+                                               @RequestParam("pageRef")
+                                               String pageRef,
+                                               @Parameter(description = "Application storage identifier", required = true)
+                                               @RequestParam("applicationId")
+                                               long applicationId,
+                                               @RequestBody
+                                               PortletPreferenceList portletPreferenceList) {
+    try {
+      pageLayoutService.updatePageApplicationPreferences(PageKey.parse(pageRef), applicationId, portletPreferenceList.getPreferences(), request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
