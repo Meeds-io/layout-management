@@ -35,6 +35,32 @@
     </template>
     <v-list class="pa-0" dense>
       <v-list-item
+        @click="$root.$emit('open-site-navigation-add-node-drawer', navigationNode)">
+        <v-icon
+          size="13"
+          class="pe-1">
+          fas fa-plus
+        </v-icon>
+        <v-list-item-title
+          class="subtitle-2">
+          <span class="ps-1">{{ $t('siteNavigation.drawer.addNode.title') }}</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-divider />
+      <v-list-item
+        class="subtitle-2"
+        @click="copyNodeLink">
+        <v-icon
+          size="13"
+          class="pe-1">
+          fas fa-link
+        </v-icon>
+        <v-list-item-title
+          class="subtitle-2">
+          <span class="ps-1">{{ $t('siteNavigation.label.copyLink') }}</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
         v-if="canEditPageLayout"
         class="subtitle-2" 
         @click="editLayout">
@@ -46,19 +72,6 @@
         <v-list-item-title
           class="subtitle-2">
           <span class="ps-1">{{ $t('siteNavigation.label.editLayout') }}</span>
-        </v-list-item-title>
-      </v-list-item>
-      <v-divider />
-      <v-list-item
-        @click="$root.$emit('open-site-navigation-add-node-drawer', navigationNode)">
-        <v-icon
-          size="13"
-          class="pe-1">
-          fas fa-plus
-        </v-icon>
-        <v-list-item-title
-          class="subtitle-2">
-          <span class="ps-1">{{ $t('siteNavigation.drawer.addNode.title') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
@@ -73,21 +86,9 @@
           <span class="ps-1">{{ $t('siteNavigation.drawer.editNode.title') }}</span>
         </v-list-item-title>
       </v-list-item>
-      <v-list-item
-        @click="deleteNode()">
-        <v-icon
-          size="13"
-          class="pe-1">
-          fas fa-trash
-        </v-icon>
-        <v-list-item-title
-          class="subtitle-2">
-          <span class="ps-1">{{ $t('siteNavigation.label.delete') }}</span>
-        </v-list-item-title>
-      </v-list-item>
       <v-divider />
       <v-list-item
-        class="subtitle-2" 
+        class="subtitle-2"
         @click="cutNode">
         <v-icon
           size="13"
@@ -100,7 +101,7 @@
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        class="subtitle-2" 
+        class="subtitle-2"
         @click="copyNode">
         <v-icon
           size="13"
@@ -114,7 +115,7 @@
       </v-list-item>
       <v-list-item
         v-if="pasteMode"
-        class="subtitle-2" 
+        class="subtitle-2"
         @click="pasteNode">
         <v-icon
           size="16"
@@ -126,7 +127,6 @@
           <span class="ps-1">{{ $t('siteNavigation.label.pasteNode') }}</span>
         </v-list-item-title>
       </v-list-item>
-      <v-divider />
       <v-list-item
         @click="moveUpNode()"
         v-if="canMoveUp">
@@ -153,7 +153,6 @@
           <span class="ps-1">{{ $t('siteNavigation.label.moveDown') }}</span>
         </v-list-item-title>
       </v-list-item>
-      <v-divider />
       <v-list-item
         v-if="canEditPage"
         @click="openManagePermissionsDrawer">
@@ -167,6 +166,20 @@
           <span class="ps-1">{{ $t('siteNavigation.label.manageAccess') }}</span>
         </v-list-item-title>
       </v-list-item>
+      <v-divider />
+      <v-list-item
+        @click="deleteNode()">
+        <v-icon
+          size="13"
+          class="pe-1 error-color">
+          fas fa-trash
+        </v-icon>
+        <v-list-item-title
+          class="subtitle-2">
+          <span class="ps-1 error-color">{{ $t('siteNavigation.label.delete') }}</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-divider />
     </v-list>
   </v-menu>
 </template>
@@ -352,7 +365,23 @@ export default {
           this.$root.$emit('close-alert-message');
           this.$root.$emit('alert-message', successMsg, 'success');
         });
-    }
+    },
+    copyNodeLink() {
+      try {
+        if (this.navigationNode?.pageLink) {
+          navigator.clipboard.writeText(this.navigationNode?.pageLink);
+        } else {
+          if (this.navigationNode?.siteKey?.typeName === 'portal') {
+            navigator.clipboard.writeText(`${window.location.origin}/portal/${this.navigationNode.siteKey.name}/${this.navigationNode.uri}`);
+          } else {
+            navigator.clipboard.writeText(`${window.location.origin}/portal/g/${this.navigationNode.siteKey.name.replaceAll('/', ':')}/${this.navigationNode.uri}`);
+          }
+        }
+        this.$root.$emit('alert-message', this.$t('siteNavigation.label.pageUrlCopiedSuccessfully'), 'success');
+      } catch (e) {
+        this.$root.$emit('alert-message', this.$t('siteNavigation.label.pageUrlCopiedError'), 'warning');
+      }
+    },
   }
 };
 </script>
