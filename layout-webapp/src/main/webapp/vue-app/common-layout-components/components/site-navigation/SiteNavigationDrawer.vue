@@ -25,11 +25,7 @@
     allow-expand
     @closed="close">
     <template slot="title">
-      <span>{{ $t('siteNavigation.drawer.title') }}<v-chip
-        v-if="isMetaSite"
-        class="ms-4 primary">
-        {{ siteName }}
-      </v-chip></span> 
+      <span>{{ $t('siteNavigation.drawer.title') }}</span>
     </template>
     <template slot="content">
       <div :class="$refs.siteNavigationDrawer?.expand ? 'singlePageApplication' : ' ' ">
@@ -37,18 +33,19 @@
           color="white"
           flat
           dense>
+          <span
+            :title="siteName"
+            class="font-weight-bold text-truncate">
+            {{ siteName }}
+          </span>
+          <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
           <v-btn
             v-if="isMetaSite"
             @click="createNode"
             class="btn btn-primary ms-2">
             {{ $t('siteNavigation.label.btn.createNode') }}
           </v-btn>
-          <v-chip
-            v-else
-            class="ms-4 mt-3 mb-4 primary">
-            {{ siteName }}
-          </v-chip>
-          <v-spacer />
+          <v-spacer v-if="$refs.siteNavigationDrawer?.expand" />
           <select
             id="siteNavigationDrawerFilterSelect"
             v-model="filter"
@@ -122,7 +119,7 @@ export default {
   },
   methods: {
     open(event) {
-      this.siteName = event?.siteName || eXo.env.portal.siteKeyName;
+      this.siteName = event?.siteName || eXo.env.portal.spaceDisplayName || eXo.env.portal.siteKeyName;
       this.siteType = event?.siteType || 'PORTAL';
       this.siteId = event?.siteId || eXo.env.portal.siteId;
       this.includeGlobal = event?.includeGlobal || false;

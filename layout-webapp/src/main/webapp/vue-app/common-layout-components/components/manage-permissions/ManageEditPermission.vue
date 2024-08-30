@@ -18,7 +18,7 @@
 -->
 <template>
   <div>
-    <p class="font-weight-bold text-start text-color body-2">{{ whoCanEdit }}</p>
+    <p class="text-start">{{ whoCanEdit }}</p>
     <exo-identity-suggester
       ref="navigationNodeEditPermissions"
       :labels="suggesterLabels"
@@ -32,7 +32,7 @@
       include-groups
       include-spaces
       required />
-    <span v-if="!permission.group" class="caption mt-n3 mx-2 position-absolute error-color">
+    <span v-if="!permission.group" class="text-subtitle mt-n3 mx-2 position-absolute error-color">
       {{ $t('siteNavigation.required.error.message') }}
     </span>
     <manage-permission-item

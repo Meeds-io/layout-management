@@ -18,82 +18,63 @@
 -->
 <template>
   <div>
-    <span class="font-weight-bold text-start text-color body-2 mt-8">{{ $t('siteNavigation.label.pageTemplate') }}</span>
-    <v-select
-      v-model="pageTemplateId"
-      :items="items"
-      item-text="name"
-      item-value="value"
-      class="caption pt-1 mb-5"
-      mandatory
-      outlined
-      dense />
-    <v-img
-      :src="illustrationSrc"
-      class="align-center mb-5 mx-auto"
-      max-height="350"
-      max-width="500" />
-    <div
-      v-if="description"
-      v-sanitized-html="description"
-      class="mb-5"></div>
+    <span class="d-block text-start text-header mb-5">{{ $t('siteNavigation.label.pageTemplate') }}</span>
+    <site-navigation-new-page-element-item-list
+      v-if="blankTemplates?.length"
+      v-model="selectedTemplateId"
+      :template-items="blankTemplates"
+      :category-name="$t('siteNavigation.label.blankTemplate')"
+      @input="selectTemplate($event)" />
+    <site-navigation-new-page-element-item-list
+      v-if="defaultTemplates?.length"
+      v-model="selectedTemplateId"
+      :template-items="defaultTemplates"
+      :category-name="$t('siteNavigation.label.defaultTemplate')"
+      @input="selectTemplate($event)" />
+    <site-navigation-new-page-element-item-list
+      v-if="customizedTemplates?.length"
+      v-model="selectedTemplateId"
+      :template-items="customizedTemplates"
+      :category-name="$t('siteNavigation.label.customizedTemplate')"
+      @input="selectTemplate($event)" />
   </div>
 </template>
 
 <script>
 export default {
-  data: () => ({
-    pageTemplateId: null,
-    collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
-  }),
+  data() {
+    return {
+      collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
+      selectedTemplateId: null
+    };
+  },
   computed: {
     pageTemplates() {
       return this.$root.pageTemplates || [];
     },
-    items() {
-      const items = this.pageTemplates.slice()?.filter?.(t => t?.name) || [];
+    blankTemplates() {
+      const items = this.pageTemplates.filter(item => item.category === 'blank');
       items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
-      items.sort((a, b) =>
-        ((b.category === 'blank' && 2) || (b.category === 'default' && 1) || 0) - ((a.category === 'blank' && 2) || (a.category === 'default' && 1) || 0));
-      return items?.map?.(t => ({
-        name: this.$te(t.name) ? this.$t(t.name) : t.name,
-        value: t.id,
-      }));
+      return items;
     },
-    pageTemplate() {
-      return this.pageTemplates?.find?.(t => t.id === Number(this.pageTemplateId));
+    defaultTemplates() {
+      const items = this.pageTemplates.filter(item => item.category === 'default');
+      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return items;
     },
-    description() {
-      return this.$te(this.pageTemplate?.description) ? this.$t(this.pageTemplate?.description) : this.pageTemplate?.description;
-    },
-    illustrationId() {
-      return this.pageTemplate?.illustrationId;
-    },
-    illustrationSrc() {
-      return this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/pageTemplate/${this.pageTemplateId}/${this.illustrationId}` ||  '/layout/images/page-templates/DefaultPreview.webp';
-    },
-  },
-  watch: {
-    pageTemplate() {
-      if (this.pageTemplate) {
-        this.$root.$emit('page-template-changed', this.pageTemplate);
-      }
-    },
-    items: {
-      immediate: true,
-      handler() {
-        if (this.items?.length) {
-          this.pageTemplateId = this.pageTemplates[0].id;
-        }
-      },
+    customizedTemplates() {
+      const items = this.pageTemplates.filter(item => item.category !== 'blank' && item.category !== 'default');
+      items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
+      return items;
     },
   },
   created() {
-    this.$root.$on('reset-element-drawer', this.reset);
+    this.selectedTemplateId = this.value;
   },
   methods: {
-    reset() {
-      this.pageTemplate = null;
+    selectTemplate(value) {
+      this.selectedTemplateId = value;
+      this.$emit('input', this.selectedTemplateId);
     },
   }
 };

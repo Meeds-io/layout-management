@@ -40,6 +40,7 @@
             :placeholder="$t('layout.templateTitlePlaceholder')"
             :maxlength="maxTitleLength"
             :object-id="templateId"
+            :rules="rules.title"
             object-type="pageTemplate"
             field-name="title"
             drawer-title="layout.templateTitleDrawerTitle"
@@ -60,6 +61,7 @@
             :field-value.sync="description"
             :maxlength="maxDescriptionLength"
             :object-id="templateId"
+            :rules="rules.description"
             object-type="pageTemplate"
             field-name="description"
             drawer-title="layout.templateDescriptionDrawerTitle"
@@ -97,6 +99,7 @@
           {{ $t('layout.cancel') }}
         </v-btn>
         <v-btn
+          :disabled="disabled"
           :loading="saving"
           class="btn btn-primary"
           @click="save">
@@ -117,8 +120,8 @@ export default {
     titleTranslations: {},
     descriptionTranslations: {},
     illustration: null,
-    maxTitleLength: 250,
-    maxDescriptionLength: 1000,
+    maxTitleLength: 50,
+    maxDescriptionLength: 100,
     illustrationUploadId: null,
     duplicate: null,
     templateId: null,
@@ -134,6 +137,26 @@ export default {
       }
     },
   },
+  computed: {
+    rules() {
+      return {
+        title: [
+          v => !!v?.length || ' ',
+          v => !v?.length || v.length < this.maxTitleLength || this.$t('layout.templateTitle.exceedsMaxLength', {
+            0: this.maxTitleLength,
+          }),
+        ],
+        description: [
+          v => !v?.length || v.length < this.maxDescriptionLength || this.$t('layout.templateTitle.exceedsMaxLength', {
+            0: this.maxDescriptionLength,
+          }),
+        ],
+      };
+    },
+    disabled() {
+      return !this.title?.length || this.title.length > this.maxTitleLength || (this.description?.length && this.description.length > this.maxDescriptionLength);
+    },
+  },
   created() {
     this.$root.$on('layout-page-template-drawer-open', this.open);
   },
@@ -144,6 +167,7 @@ export default {
     async open(pageTemplate, duplicate, generateIllustration) {
       this.templateId = pageTemplate.id || this.$root.pageTemplate?.id || null;
       this.pageLayoutContent = pageTemplate.content;
+      this.description = pageTemplate?.description || '';
       this.duplicate = duplicate;
       if (generateIllustration) {
         const parentElement = document.querySelector('.layout-sections-parent .layout-page-body').parentElement;

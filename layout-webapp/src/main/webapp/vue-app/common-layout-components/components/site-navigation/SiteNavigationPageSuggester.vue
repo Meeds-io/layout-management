@@ -27,7 +27,7 @@
       hide-no-data
       append-icon=""
       menu-props="closeOnClick, closeOnContentClick, maxHeight = 100"
-      class="identitySuggester identitySuggesterInputStyle"
+      class="identitySuggester identitySuggesterInputStyle mt-0"
       content-class="identitySuggesterContent"
       width="100%"
       max-width="100%"
@@ -67,7 +67,7 @@
           v-text="data.item.displayName" />
       </template>
     </v-autocomplete>
-    <span v-if="!page" class="caption mt-n3 mx-2 position-absolute error-color">
+    <span v-if="!page" class="text-subtitle mt-n3 position-absolute error-color">
       {{ $t('siteNavigation.required.error.message') }}
     </span>
   </v-flex>
@@ -181,8 +181,11 @@ export default {
       }, this.endTypingKeywordTimeout);
     },
     emitSelectedValue(value) {
-      this.selectedPage = value;
-      this.pages.push(this.selectedPage);
+      this.selectedPage = {
+        pageRef: `${ value?.key?.site?.typeName}::${ value?.key?.site?.name}::${value?.key?.name}`,
+        displayName: value?.state?.displayName || value?.key.name,
+      };
+      this.pages.push(value);
     },
   }
 };

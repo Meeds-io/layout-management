@@ -26,7 +26,7 @@
       :loading="loadingSuggestions"
       append-icon=""
       menu-props="closeOnClick, closeOnContentClick, maxHeight = 100"
-      class="identitySuggester identitySuggesterInputStyle"
+      class="identitySuggester identitySuggesterInputStyle mt-0"
       content-class="identitySuggesterContent"
       width="100%"
       max-width="100%"
@@ -67,7 +67,7 @@
           v-text="data.item.displayName" />
       </template>
     </v-autocomplete>
-    <span v-if="!allSites && !selectedSiteNavigation" class="caption mt-n3 mx-2 position-absolute error-color">
+    <span v-if="!allSites && !selectedSiteNavigation" class="text-subtitle mt-n3 position-absolute error-color">
       {{ $t('siteNavigation.required.error.message') }}
     </span>
   </v-flex>
