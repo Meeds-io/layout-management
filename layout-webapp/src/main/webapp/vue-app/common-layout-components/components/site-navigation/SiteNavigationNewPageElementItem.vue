@@ -35,6 +35,7 @@
             class="overflow-hidden">
             <img
               :src="illustrationSrc"
+              :alt="title"
               :style="imageStyle"
               class="align-center mx-auto object-fit-cover">
           </div>
