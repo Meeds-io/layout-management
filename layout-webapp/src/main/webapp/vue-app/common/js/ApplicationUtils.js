@@ -201,6 +201,10 @@ export function handleApplicationContent(applicationContent, applicationElement)
   const newHtmlDocument = document.createElement('div');
   newHtmlDocument.innerHTML = newBodyContent;
   const portletContent = newHtmlDocument.querySelector('.UIWorkingWorkspace .PORTLET-FRAGMENT');
+  if (!portletContent) {
+    applicationElement.classList.add('hidden');
+    return;
+  }
   const oldPortletContent = applicationElement.querySelector('.PORTLET-FRAGMENT');
   if (oldPortletContent) {
     oldPortletContent.remove();
