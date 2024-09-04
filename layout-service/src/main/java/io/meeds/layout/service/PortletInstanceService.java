@@ -355,7 +355,7 @@ public class PortletInstanceService {
     }
     try {
       translationService.deleteTranslationLabels(PortletInstanceTranslationPlugin.OBJECT_TYPE, id);
-    } catch (ObjectNotFoundException e) {
+    } catch (Exception e) {
       LOG.debug("Error while deleting translation labels of deleted Portlet instance", e);
     }
     portletInstanceStorage.deletePortletInstance(id);
