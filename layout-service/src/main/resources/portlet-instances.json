@@ -77,25 +77,6 @@
       "system":true
     },
     {
-      "nameId":"ExternalSpacesList",
-      "categoryNameId":"tools",
-      "portletName":"ExternalSpacesList",
-      "names":{
-        "en":"layout.portletInstance.ExternalSpacesList.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.ExternalSpacesList.description"
-      },
-      "illustrationPath":"war:/../images/portlets/spacesList.webp",
-      "preferences":[
-        
-      ],
-      "permissions":[
-        "*:/platform/users"
-      ],
-      "system":true
-    },
-    {
       "nameId":"GettingStarted",
       "categoryNameId":"tools",
       "portletName":"GettingStarted",
