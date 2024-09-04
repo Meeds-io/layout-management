@@ -25,11 +25,15 @@ import lombok.Data;
 @Data
 public class ApplicationReferenceUpgrade {
 
-  private String modificationType = ApplicationReferenceModificationType.UPDATE.name();
+  private String  modificationType       = ApplicationReferenceModificationType.UPDATE.name();
 
-  private String oldContentId;
+  private String  oldContentId;
 
-  private String newContentId;
+  private String  newContentId;
+
+  private boolean upgradePages           = true;
+
+  private boolean upgradePortletInstance = true;
 
   public boolean isModification() {
     return StringUtils.equalsIgnoreCase(ApplicationReferenceModificationType.UPDATE.name(), modificationType);
