@@ -78,28 +78,39 @@ public class LayoutApplicationReferenceUpgradePlugin extends UpgradeProductPlugi
 
   @SneakyThrows
   @ContainerTransactional
-  public void upgradeApplications() {
+  public void upgradeApplications() { // NOSONAR
     List<PortletInstance> portletInstances = portletInstanceService.getPortletInstances();
 
     for (ApplicationReferenceUpgrade applicationModification : upgrades) {
       String oldContentId = applicationModification.getOldContentId();
       String newContentId = applicationModification.getNewContentId();
-      PortletInstance portletInstance = portletInstances.stream()
-                                                        .filter(p -> StringUtils.equals(oldContentId, p.getContentId()))
-                                                        .findFirst()
-                                                        .orElse(null);
-
       int modifiedLines = 0;
       if (applicationModification.isModification()) {
-        modifiedLines = windowDAO.updateContentId(oldContentId, newContentId);
-        if (portletInstance != null) {
-          portletInstance.setContentId(newContentId);
-          portletInstanceService.updatePortletInstance(portletInstance);
+        if (applicationModification.isUpgradePages()) {
+          modifiedLines = windowDAO.updateContentId(oldContentId, newContentId);
+        }
+        if (applicationModification.isUpgradePortletInstance()) {
+          PortletInstance portletInstance = portletInstances.stream()
+                                                            .filter(p -> StringUtils.equals(oldContentId, p.getContentId()))
+                                                            .findFirst()
+                                                            .orElse(null);
+          if (portletInstance != null) {
+            portletInstance.setContentId(newContentId);
+            portletInstanceService.updatePortletInstance(portletInstance);
+          }
         }
       } else if (applicationModification.isRemoval()) {
-        modifiedLines = windowDAO.deleteByContentId(oldContentId);
-        if (portletInstance != null) {
-          portletInstanceService.deletePortletInstance(portletInstance.getId());
+        if (applicationModification.isUpgradePages()) {
+          modifiedLines = windowDAO.deleteByContentId(oldContentId);
+        }
+        if (applicationModification.isUpgradePortletInstance()) {
+          PortletInstance portletInstance = portletInstances.stream()
+                                                            .filter(p -> StringUtils.equals(oldContentId, p.getContentId()))
+                                                            .findFirst()
+                                                            .orElse(null);
+          if (portletInstance != null) {
+            portletInstanceService.deletePortletInstance(portletInstance.getId());
+          }
         }
       }
 
