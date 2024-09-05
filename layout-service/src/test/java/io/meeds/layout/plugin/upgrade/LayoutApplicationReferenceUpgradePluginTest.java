@@ -18,9 +18,9 @@
  */
 package io.meeds.layout.plugin.upgrade;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
@@ -73,6 +73,8 @@ public class LayoutApplicationReferenceUpgradePluginTest {
     when(applicationModification.isModification()).thenReturn(true);
     when(applicationModification.getOldContentId()).thenReturn(oldContentId);
     when(applicationModification.getNewContentId()).thenReturn(newContentId);
+    when(applicationModification.isUpgradePages()).thenReturn(true);
+    when(applicationModification.isUpgradePortletInstance()).thenReturn(true);
 
     LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
                                                                               new LayoutApplicationReferenceUpgradePlugin(settingService,
@@ -96,6 +98,8 @@ public class LayoutApplicationReferenceUpgradePluginTest {
     when(applicationModification.isRemoval()).thenReturn(true);
     when(applicationModification.getOldContentId()).thenReturn(oldContentId);
     when(applicationModification.getNewContentId()).thenReturn(newContentId);
+    when(applicationModification.isUpgradePages()).thenReturn(true);
+    when(applicationModification.isUpgradePortletInstance()).thenReturn(true);
     when(portletInstance.getId()).thenReturn(2l);
 
     LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
@@ -109,6 +113,49 @@ public class LayoutApplicationReferenceUpgradePluginTest {
 
     verify(windowDAO).deleteByContentId(oldContentId);
     verify(portletInstanceService).deletePortletInstance(2l);
+  }
+
+  @Test
+  @SneakyThrows
+  public void processUpgradeWithModificationIgnoreAll() {
+    when(initParams.getObjectParamValues(ApplicationReferenceUpgrade.class)).thenReturn(Collections.singletonList(applicationModification));
+    when(portletInstanceService.getPortletInstances()).thenReturn(Collections.singletonList(portletInstance));
+    when(applicationModification.isModification()).thenReturn(true);
+    when(applicationModification.getOldContentId()).thenReturn(oldContentId);
+    when(applicationModification.getNewContentId()).thenReturn(newContentId);
+
+    LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
+                                                                              new LayoutApplicationReferenceUpgradePlugin(settingService,
+                                                                                                                          portletInstanceService,
+                                                                                                                          windowDAO,
+                                                                                                                          initParams);
+    assertTrue(applicationReferenceUpgradePlugin.shouldProceedToUpgrade(null, null));
+
+    applicationReferenceUpgradePlugin.processUpgrade(null, null);
+
+    verify(windowDAO, never()).updateContentId(oldContentId, newContentId);
+    verify(portletInstanceService, never()).updatePortletInstance(portletInstance);
+  }
+
+  @Test
+  @SneakyThrows
+  public void processUpgradeWithRemovalIgnoreAll() {
+    when(initParams.getObjectParamValues(ApplicationReferenceUpgrade.class)).thenReturn(Collections.singletonList(applicationModification));
+    when(portletInstanceService.getPortletInstances()).thenReturn(Collections.singletonList(portletInstance));
+    when(applicationModification.isRemoval()).thenReturn(true);
+    when(applicationModification.getOldContentId()).thenReturn(oldContentId);
+    when(applicationModification.getNewContentId()).thenReturn(newContentId);
+
+    LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
+                                                                              new LayoutApplicationReferenceUpgradePlugin(settingService,
+                                                                                                                          portletInstanceService,
+                                                                                                                          windowDAO,
+                                                                                                                          initParams);
+    assertTrue(applicationReferenceUpgradePlugin.shouldProceedToUpgrade(null, null));
+    applicationReferenceUpgradePlugin.processUpgrade(null, null);
+
+    verify(windowDAO, never()).deleteByContentId(oldContentId);
+    verify(portletInstanceService, never()).deletePortletInstance(2l);
   }
 
 }
