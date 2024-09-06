@@ -35,7 +35,7 @@
     </template>
     <v-list class="pa-0" dense>
       <v-list-item
-        class="subtitle-2"
+        class="text-body menu-text-color"
         @click="$root.$emit('open-site-navigation-add-node-drawer', navigationNode)">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -45,14 +45,12 @@
           </v-icon>
         </v-list-item-icon>
         <v-list-item-title
-          class="subtitle-2">
+          class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.drawer.addNode.title') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-divider />
-      <v-list-item
-        class="subtitle-2"
-        @click="copyNodeLink">
+      <v-list-item @click="copyNodeLink">
         <v-list-item-icon class="me-1">
           <v-icon
             size="16"
@@ -61,13 +59,12 @@
           </v-icon>
         </v-list-item-icon>
         <v-list-item-title
-          class="subtitle-2">
+          class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.copyLink') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
         v-if="canEditPageLayout"
-        class="subtitle-2" 
         @click="editLayout">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -76,13 +73,11 @@
             fas fa-table
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.editLayout') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        class="subtitle-2"
         @click="$root.$emit('open-site-navigation-edit-node-drawer', navigationNode)">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -91,14 +86,12 @@
             fas fa-edit
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.drawer.editNode.title') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-divider />
       <v-list-item
-        class="subtitle-2"
         @click="cutNode">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -107,13 +100,11 @@
             fas fa-cut
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.cutNode') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        class="subtitle-2"
         @click="copyNode">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -122,14 +113,12 @@
             fas fa-copy
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.copyNode') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
         v-if="pasteMode"
-        class="subtitle-2"
         @click="pasteNode">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -138,14 +127,12 @@
             fas fa-paste
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.pasteNode') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
         v-if="canMoveUp"
-        class="subtitle-2"
         @click="moveUpNode()">
         <v-list-item-icon class="me-1">
           <v-icon
@@ -154,13 +141,11 @@
             mdi-mouse-move-up
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.moveUp') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        class="subtitle-2"
         v-if="canMoveDown"
         @click="moveDownNode()">
         <v-list-item-icon class="me-1">
@@ -170,13 +155,11 @@
             mdi-mouse-move-down
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.moveDown') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        class="subtitle-2"
         v-if="canEditPage"
         @click="openManagePermissionsDrawer">
         <v-list-item-icon class="me-1">
@@ -186,28 +169,38 @@
             fas fa-shield-alt
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
+        <v-list-item-title class="text-body menu-text-color">
           <span class="ps-1">{{ $t('siteNavigation.label.manageAccess') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-divider />
-      <v-list-item
-        class="subtitle-2"
-        @click="deleteNode()">
-        <v-list-item-icon class="me-1">
-          <v-icon
-            width="50"
-            size="16"
-            class="pe-1 error-color">
-            fas fa-trash
-          </v-icon>
-        </v-list-item-icon>
-        <v-list-item-title
-          class="subtitle-2">
-          <span class="ps-1 error-color">{{ $t('siteNavigation.label.delete') }}</span>
-        </v-list-item-title>
-      </v-list-item>
+      <v-tooltip :disabled="canDelete" top>
+        <template #activator="{on, attrs}">
+          <div
+            v-bind="attrs"
+            v-on="on">
+            <v-list-item
+              :disabled="!canDelete"
+              v-on="canDelete && {
+                click: deleteNode,
+              }">
+              <v-list-item-icon class="me-1">
+                <v-icon
+                  :class="canDelete && 'error-color' || 'text--disabled'"
+                  width="50"
+                  size="16"
+                  class="pe-1">
+                  fas fa-trash
+                </v-icon>
+              </v-list-item-icon>
+              <v-list-item-title class="text-body ps-1">
+                <span :class="canDelete && 'error-color' || 'text--disabled'">{{ $t('siteNavigation.label.delete') }}</span>
+              </v-list-item-title>
+            </v-list-item>
+          </div>
+        </template>
+        <span>{{ $t('layout.rootNodeCantBeDeleted') }}</span>
+      </v-tooltip>
       <v-divider />
     </v-list>
   </v-menu>
@@ -224,6 +217,10 @@ export default {
       type: Object,
       default: null,
     },
+    canDelete: {
+      type: Boolean,
+      default: false,
+    },
     canMoveUp: {
       type: Boolean,
       default: () => false,
@@ -239,7 +236,7 @@ export default {
     pasteMode: {
       type: String,
       default: null,
-    }
+    },
   },
   data: () => ({
     displayActionMenu: false,
