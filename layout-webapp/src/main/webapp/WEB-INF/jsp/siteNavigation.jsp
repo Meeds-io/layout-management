@@ -12,12 +12,10 @@
   boolean isAdministrator = aclService.isAdministrator(request.getRemoteUser());
   boolean canManageSiteNavigation = aclService.canEditNavigation(siteKey, request.getRemoteUser());
   if (canManageSiteNavigation) {
-    String siteName = userNavigation.getKey().getName(); // In case, it's global site
 %>
 <div class="VuetifyApp">
   <div id="siteNavigation">
     <script type="text/javascript">
-      eXo.env.portal.siteKeyName = '<%=siteName%>';
       eXo.env.portal.isAdministrator = <%=isAdministrator%>;
       eXo.env.portal.canManageSiteNavigation = <%=canManageSiteNavigation%>;
       require(['PORTLET/layout/SiteNavigation'], app => app.init(<%=canManageSiteNavigation%>));
