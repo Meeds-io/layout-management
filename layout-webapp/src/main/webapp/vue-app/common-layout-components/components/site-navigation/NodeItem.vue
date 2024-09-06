@@ -69,10 +69,11 @@
             </v-col>
             <v-col
               cols="2"
-              class="my-0 py-0">
+              class="mb-1 mt-0 py-0">
               <site-navigation-node-item-menu
                 :navigation-node="navigationNode"
                 :hover="hover"
+                :can-delete="canDelete"
                 :can-move-up="canMoveUp"
                 :can-move-down="canMoveDown"
                 :node-to-paste="nodeToPaste"
@@ -126,14 +127,15 @@
     </tr>
     <template v-if="displayChildren && !hideChildren">
       <site-navigation-node-item
-        v-for="child in navigationNode.children"
+        v-for="(child, index) in navigationNode.children"
         :key="child.id"
         :navigation-node="child"
-        :can-move-up="canMoveUpChildNode(child)"
-        :can-move-down="canMoveDownChildNode(child)"
+        :can-move-up="index > 0"
+        :can-move-down="index < (navigationNode.children.length - 1)"
         :cols="cols + 1"
         :hide-children="hideChildren"
-        :expanded="expanded" />
+        :expanded="expanded"
+        can-delete />
     </template>
   </div>
 </template>
@@ -143,6 +145,10 @@ export default {
   props: {
     navigationNode: {
       type: Object,
+      default: null,
+    },
+    rootNodeId: {
+      type: String,
       default: null,
     },
     canMoveUp: {
@@ -196,6 +202,9 @@ export default {
     },
     navigationNodeType() {
       return !this.navigationNode.pageKey && 'group' || this.navigationNode.pageLink && 'link' ||  this.navigationNode.pageKey && 'page';
+    },
+    canDelete() {
+      return Number(this.navigationNode.id) !== Number(this.rootNodeId);
     },
     visibilityIcon() {
       switch (this.navigationNode?.visibility) {
@@ -251,12 +260,6 @@ export default {
     });
   },
   methods: {
-    canMoveUpChildNode(navigationNode) {
-      return this.navigationNode.children.indexOf(navigationNode) > 0;
-    },
-    canMoveDownChildNode(navigationNode) {
-      return this.navigationNode.children.indexOf(navigationNode) < this.navigationNode.children.length - 1;
-    },
     moveUpChildNode(navigationNodeId) {
       if (this.navigationNode.children.length) {
         const index = this.navigationNode?.children?.findIndex?.(navigationNode => navigationNode.id === navigationNodeId);

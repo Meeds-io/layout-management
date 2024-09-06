@@ -31,7 +31,8 @@
             :can-move-up="canMoveUpNode(props.item)"
             :can-move-down="canMoveDownNode(props.item)"
             :hide-children="hideChildren"
-            :expanded="expanded" />
+            :expanded="expanded"
+            :root-node-id="rootNodeId" />
         </template>
       </v-data-table>
     </template>
@@ -59,6 +60,9 @@ export default {
     },
   },
   computed: {
+    rootNodeId() {
+      return this.navigationNodes?.length === 1 && this.navigationNodes[0].id;
+    },
     headers() {
       return [
         {
