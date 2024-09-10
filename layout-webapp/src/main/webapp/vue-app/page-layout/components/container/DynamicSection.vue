@@ -20,7 +20,10 @@
 -->
 <template>
   <div
-    :class="isMobileColumns && 'layout-section-mobile-pages' || ''"
+    :class="{
+      'layout-section-mobile-pages': isMobileColumns,
+      'hidden-sm-and-down': isHiddenOnMobile,
+    }"
     :style="cssStyle"
     class="layout-section">
     <layout-section-mobile-column-menu-drawer
@@ -53,8 +56,11 @@ export default {
   computed: {
     isMobileColumns() {
       return this.$vuetify.breakpoint.smAndDown
-        && this.container?.template === 'FlexContainer'
         && this.container?.cssClass?.includes?.('layout-mobile-columns');
+    },
+    isHiddenOnMobile() {
+      return this.$vuetify.breakpoint.smAndDown
+        && !this.container?.children?.find(c => !c?.children?.length || !c?.children?.[0]?.cssClass?.includes?.('hidden-sm-and-down'));
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
