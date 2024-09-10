@@ -94,25 +94,6 @@
       "system":true
     },
     {
-      "nameId":"SpaceBannerPortlet",
-      "categoryNameId":"spaceTools",
-      "portletName":"SpaceBannerPortlet",
-      "names":{
-        "en":"layout.portletInstance.SpaceBannerPortlet.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.SpaceBannerPortlet.description"
-      },
-      "illustrationPath":"war:/../images/portlets/spaceBanner.webp",
-      "preferences":[
-        
-      ],
-      "permissions":[
-        "*:/platform/users"
-      ],
-      "system":true
-    },
-    {
       "nameId":"WhoIsOnLinePortlet",
       "categoryNameId":"tools",
       "portletName":"WhoIsOnLinePortlet",
