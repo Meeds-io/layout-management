@@ -32,7 +32,7 @@
       <v-icon class="mt-auto mb-2">{{ categoryIcon }}</v-icon>
       <div
         v-sanitized-html="categoryLabel"
-        class="text-truncate full-width mb-auto subtitle-2 mt-2 px-1"></div>
+        class="text-truncate-2 full-width mb-auto mt-2 px-1"></div>
     </v-card>
   </v-hover>
 </template>
