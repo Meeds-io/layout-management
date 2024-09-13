@@ -18,6 +18,7 @@
  */
 package io.meeds.layout.rest;
 
+import static io.meeds.layout.util.JsonUtils.toJsonString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -52,12 +53,6 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 
 import io.meeds.layout.model.PortletInstance;
@@ -66,7 +61,6 @@ import io.meeds.spring.web.security.PortalAuthenticationManager;
 import io.meeds.spring.web.security.WebSecurityConfiguration;
 
 import jakarta.servlet.Filter;
-import lombok.SneakyThrows;
 
 @SpringBootTest(classes = { PortletInstanceRest.class, PortalAuthenticationManager.class, })
 @ContextConfiguration(classes = { WebSecurityConfiguration.class })
@@ -75,23 +69,11 @@ import lombok.SneakyThrows;
 @ExtendWith(MockitoExtension.class)
 public class PortletInstanceRestTest {
 
-  private static final String REST_PATH     = "/portlet/instances"; // NOSONAR
+  private static final String    REST_PATH     = "/portlet/instances"; // NOSONAR
 
-  private static final String SIMPLE_USER   = "simple";
+  private static final String    SIMPLE_USER   = "simple";
 
-  private static final String TEST_PASSWORD = "testPassword";
-
-  static final ObjectMapper   OBJECT_MAPPER;
-
-  static {
-    // Workaround when Jackson is defined in shared library with different
-    // version and without artifact jackson-datatype-jsr310
-    OBJECT_MAPPER = JsonMapper.builder()
-                              .configure(JsonReadFeature.ALLOW_MISSING_VALUES, true)
-                              .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                              .build();
-    OBJECT_MAPPER.registerModule(new JavaTimeModule());
-  }
+  private static final String    TEST_PASSWORD = "testPassword";
 
   @MockBean
   private PortletInstanceService portletInstanceService;
@@ -141,7 +123,7 @@ public class PortletInstanceRestTest {
 
   @Test
   void createPortletInstanceAnonymously() throws Exception {
-    ResultActions response = mockMvc.perform(post(REST_PATH).content(asJsonString(new PortletInstance()))
+    ResultActions response = mockMvc.perform(post(REST_PATH).content(toJsonString(new PortletInstance()))
                                                             .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
     verifyNoInteractions(portletInstanceService);
@@ -151,7 +133,7 @@ public class PortletInstanceRestTest {
   void createPortletInstanceWithUser() throws Exception {
     PortletInstance portletInstance = new PortletInstance();
     ResultActions response = mockMvc.perform(post(REST_PATH).with(testSimpleUser())
-                                                            .content(asJsonString(portletInstance))
+                                                            .content(toJsonString(portletInstance))
                                                             .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isOk());
     verify(portletInstanceService).createPortletInstance(portletInstance, SIMPLE_USER);
@@ -164,14 +146,14 @@ public class PortletInstanceRestTest {
                                                       SIMPLE_USER)).thenThrow(IllegalAccessException.class);
 
     ResultActions response = mockMvc.perform(post(REST_PATH).with(testSimpleUser())
-                                                            .content(asJsonString(portletInstance))
+                                                            .content(toJsonString(portletInstance))
                                                             .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
   }
 
   @Test
   void updatePortletInstanceAnonymously() throws Exception {
-    ResultActions response = mockMvc.perform(put(REST_PATH + "/1").content(asJsonString(new PortletInstance()))
+    ResultActions response = mockMvc.perform(put(REST_PATH + "/1").content(toJsonString(new PortletInstance()))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
     verifyNoInteractions(portletInstanceService);
@@ -181,7 +163,7 @@ public class PortletInstanceRestTest {
   void updatePortletInstanceWithUser() throws Exception {
     PortletInstance portletInstance = new PortletInstance();
     ResultActions response = mockMvc.perform(put(REST_PATH + "/1").with(testSimpleUser())
-                                                                  .content(asJsonString(portletInstance))
+                                                                  .content(toJsonString(portletInstance))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isOk());
 
@@ -197,7 +179,7 @@ public class PortletInstanceRestTest {
                                                       SIMPLE_USER)).thenThrow(IllegalAccessException.class);
 
     ResultActions response = mockMvc.perform(put(REST_PATH + "/1").with(testSimpleUser())
-                                                                  .content(asJsonString(portletInstance))
+                                                                  .content(toJsonString(portletInstance))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
   }
@@ -210,7 +192,7 @@ public class PortletInstanceRestTest {
                                                       SIMPLE_USER)).thenThrow(ObjectNotFoundException.class);
 
     ResultActions response = mockMvc.perform(put(REST_PATH + "/1").with(testSimpleUser())
-                                                                  .content(asJsonString(portletInstance))
+                                                                  .content(toJsonString(portletInstance))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isNotFound());
   }
@@ -255,11 +237,6 @@ public class PortletInstanceRestTest {
   private RequestPostProcessor testSimpleUser() {
     return user(SIMPLE_USER).password(TEST_PASSWORD)
                             .authorities(new SimpleGrantedAuthority("users"));
-  }
-
-  @SneakyThrows
-  public static String asJsonString(final Object obj) {
-    return OBJECT_MAPPER.writeValueAsString(obj);
   }
 
 }

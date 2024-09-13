@@ -19,17 +19,18 @@
 <template>
   <exo-drawer
     id="sitePropertiesDrawer"
-    ref="sitePropertiesDrawer"
-    v-model="sitePropertiesDrawer"
+    ref="drawer"
+    v-model="drawer"
+    :loading="loading"
     :right="!$vuetify.rtl"
     :allow-expand="!$root.isMobile && editMode"
     eager
     @expand-updated="expanded = $event"
     @closed="close">
-    <template slot="title">
+    <template #title>
       <span>{{ $t('siteManagement.drawer.properties.title') }}</span>
     </template>
-    <template v-if="initialized" slot="content">
+    <template v-if="drawer" #content>
       <v-form>
         <v-card-text class="d-flex pb-2">
           <translation-text-field
@@ -38,8 +39,10 @@
             :field-value.sync="siteLabel"
             :maxlength="maxTitleLength"
             :no-expand-icon="!expanded"
-            drawer-title="siteManagement.label.translateTitle"
+            :supported-languages="supportedLanguages"
+            :default-language="defaultLanguage"
             :object-id="siteId"
+            drawer-title="siteManagement.label.translateTitle"
             object-type="site"
             field-name="label"
             name="siteTitle"
@@ -78,6 +81,8 @@
             :object-id="siteId"
             :max-length="maxDescriptionLength"
             :no-expand-icon="!expanded"
+            :supported-languages="supportedLanguages"
+            :default-language="defaultLanguage"
             drawer-title="siteManagement.label.translateDescription"
             object-type="site"
             field-name="description"
@@ -162,12 +167,11 @@
     </template>
   </exo-drawer>
 </template>
-
 <script>
 export default {
   data() {
     return {
-      sitePropertiesDrawer: false,
+      drawer: false,
       site: null,
       siteName: '',
       siteLabel: '',
@@ -177,6 +181,8 @@ export default {
       displayed: true,
       siteTitleTranslations: {},
       siteDescriptionTranslations: {},
+      supportedLanguages: {},
+      defaultLanguage: 'en',
       siteId: null,
       expanded: false,
       siteBannerUrl: '',
@@ -189,7 +195,6 @@ export default {
       },
       editMode: false,
       loading: false,
-      initialized: false,
     };
   },
   created() {
@@ -198,7 +203,7 @@ export default {
   },
   watch: {
     siteDescription() {
-      if (this.$refs.siteDescriptionTranslation) {
+      if (this.$refs.siteDescriptionTranslation && this.drawer) {
         this.$refs.siteDescriptionTranslation.setValue(this.siteDescription);
       }
     },
@@ -212,14 +217,10 @@ export default {
     },
   },
   methods: {
-    open(site, freshInstance) {
+    async open(site) {
+      this.loading = true;
       if (site) {
         this.editMode = true;
-        if (!freshInstance) {
-          this.$refs.sitePropertiesDrawer.open();
-          return this.$siteLayoutService.getSiteById(site.siteId, 'en')
-            .then(freshSite => this.open(freshSite, true));
-        }
         this.site = site;
         this.siteName = site.name;
         this.siteId = site.siteId;
@@ -232,6 +233,8 @@ export default {
         this.isDefaultBanner = site.bannerFileId === 0 ;
         this.hasDefaultBanner = this.isDefaultBanner;
         this.bannerUploadId = null;
+        await this.getSiteLabels();
+        await this.getSiteDescriptions();
       } else {
         this.displayed = false;
         this.displayOrder = 0;
@@ -239,18 +242,44 @@ export default {
         this.isDefaultBanner = true ;
         this.hasDefaultBanner = true;
         this.bannerUploadId = null;
+        this.siteTitleTranslations = {};
+        this.siteDescriptionTranslations = {};
       }
-      this.siteTitleTranslations = {};
-      this.siteDescriptionTranslations = {};
-      this.initialized = true;
-      this.$nextTick().then(() => {
-        this.$refs.sitePropertiesDrawer.open();
-      });
+      await this.$nextTick().then(() => this.$refs.drawer.open());
+      this.loading = false;
+    },
+    getSiteLabels() {
+      return this.$siteLayoutService.getSiteLabels(this.site.siteId)
+        .then(data => {
+          if (this.editMode && data.labels) {
+            this.siteTitleTranslations = data.labels;
+          } else {
+            this.siteTitleTranslations = {
+              'en': null,
+            };
+          }
+          this.defaultLanguage = data.defaultLanguage;
+          this.supportedLanguages = data.supportedLanguages;
+        });
+    },
+    getSiteDescriptions() {
+      return this.$siteLayoutService.getSiteDescriptions(this.site.siteId)
+        .then(data => {
+          if (this.editMode && data.labels != null) {
+            this.siteDescriptionTranslations = data.labels;
+          } else {
+            this.siteDescriptionTranslations = {
+              'en': null,
+            };
+          }
+          this.defaultLanguage = data.defaultLanguage;
+          this.supportedLanguages = data.supportedLanguages;
+        });
     },
     close() {
       this.site = null;
       this.reset();
-      this.$refs.sitePropertiesDrawer.close();
+      this.$refs.drawer.close();
     },
     updateBannerUploadId(bannerUploadId) {
       this.bannerUploadId = bannerUploadId;
@@ -270,16 +299,14 @@ export default {
       this.editMode = false;
       this.siteTitleTranslations = {};
       this.siteDescriptionTranslations = {};
-      this.initialized = false;
-      this.sitePropertiesDrawer = false;
+      this.drawer = false;
       this.isDefaultBanner = true;
       this.siteBannerUrl = null;
       this.defaultSiteBannerUrl = null;
-      this.$refs.siteBannerSelector.reset();
+      this.$refs.siteBannerSelector?.reset?.();
     },
     updateSite() {
       this.loading = true;
-      this.$refs.sitePropertiesDrawer.startLoading();
       return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.displayed, this.displayed && this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'label', this.siteTitleTranslations))
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'description', this.siteDescriptionTranslations))
@@ -292,10 +319,7 @@ export default {
           const message = e.message ==='401' &&  this.$t('siteManagement.label.updateSite.unauthorized') || this.$t('siteManagement.label.updateSite.error');
           this.$root.$emit('alert-message', message, 'error');
         })
-        .finally(() => {
-          this.loading = false;
-          this.$refs.sitePropertiesDrawer.endLoading();
-        });
+        .finally(() => this.loading = false);
     },
     createSite(template) {
       if (!template) {
@@ -305,7 +329,6 @@ export default {
       }
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
-      this.$refs.sitePropertiesDrawer.startLoading();
       return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, this.displayed, this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
         .then((site) =>{
           this.siteId = site.siteId;
@@ -324,10 +347,7 @@ export default {
           const message = this.$t('siteManagement.label.createSite.error');
           this.$root.$emit('alert-message', message, 'error');
         })
-        .finally(() => {
-          this.loading = false;
-          this.$refs.sitePropertiesDrawer.endLoading();
-        });
+        .finally(() => this.loading = false);
     },
     convertSiteName() {
       if (!this.editMode && !this.siteName) {
