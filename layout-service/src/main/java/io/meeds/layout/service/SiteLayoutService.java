@@ -18,17 +18,31 @@
  */
 package io.meeds.layout.service;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.services.resources.LocaleConfig;
+import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.LocaleContextInfo;
 
+import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
 import io.meeds.layout.model.SiteUpdateModel;
@@ -42,10 +56,17 @@ public class SiteLayoutService {
   private LayoutService           layoutService;
 
   @Autowired
+  private LocaleConfigService     localeConfigService;
+
+  @Autowired
   private UserPortalConfigService portalConfigService;
 
   @Autowired
   private LayoutAclService        aclService;
+
+  private Map<String, String>     supportedLanguages;
+
+  private Locale                  defaultConfiguredLocale;
 
   public PortalConfig getSite(long siteId, String username) throws ObjectNotFoundException, IllegalAccessException {
     PortalConfig portalConfig = layoutService.getPortalConfig(siteId);
@@ -151,6 +172,76 @@ public class SiteLayoutService {
       portalConfig.setAccessPermissions(permissionUpdateModel.getAccessPermissions().toArray(new String[0]));
     }
     layoutService.save(portalConfig);
+  }
+
+  public NodeLabel getSiteLabels(Long siteId, String username) throws ObjectNotFoundException, IllegalAccessException {
+    return getSiteLabel(siteId, username, true);
+  }
+
+  public NodeLabel getSiteDescriptions(Long siteId, String username) throws ObjectNotFoundException, IllegalAccessException {
+    return getSiteLabel(siteId, username, false);
+  }
+
+  private NodeLabel getSiteLabel(long siteId, String username, boolean isLabel) throws ObjectNotFoundException,
+                                                                                IllegalAccessException {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteId);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException(String.format("Site with id %s doesn't exists", siteId));
+    } else if (!aclService.canViewSite(new SiteKey(portalConfig.getType(), portalConfig.getName()), username)) {
+      throw new IllegalAccessException();
+    }
+    Locale defaultLocale = getDefaultLocale();
+
+    NodeLabel nodeLabel = new NodeLabel();
+    nodeLabel.setDefaultLanguage(defaultLocale.getLanguage());
+    nodeLabel.setSupportedLanguages(getSupportedLanguages(defaultLocale));
+    Map<String, String> labels = getLabels(portalConfig, defaultLocale, username, isLabel);
+    nodeLabel.setLabels(labels);
+    return nodeLabel;
+  }
+
+  private Map<String, String> getLabels(PortalConfig portalConfig, Locale defaultLocale, String username, boolean isLabel) {
+    SiteKey siteKey = new SiteKey(SiteType.valueOf(portalConfig.getType().toUpperCase()), portalConfig.getName());
+    UserPortalConfig userPortalConfig = portalConfigService.getUserPortalConfig(siteKey.getName(), username);
+    UserPortal userPortal = userPortalConfig.getUserPortal();
+
+    Map<String, String> labels = new HashMap<>();
+    localeConfigService.getLocalConfigs()
+                       .stream()
+                       .map(LocaleConfig::getLocale)
+                       .forEach(locale -> {
+                         String translatedLabel = isLabel ? userPortal.getPortalLabel(siteKey, locale) :
+                                                          userPortal.getPortalDescription(siteKey, locale);
+                         labels.put(LocaleContextInfo.getLocaleAsString(locale), translatedLabel);
+                       });
+    if (!labels.containsKey(defaultLocale.getLanguage()) && !labels.isEmpty()) {
+      labels.put(defaultLocale.getLanguage(), labels.values().iterator().next());
+    }
+    return labels;
+  }
+
+  private Map<String, String> getSupportedLanguages(Locale defaultLocale) {
+    if (supportedLanguages == null || !defaultConfiguredLocale.equals(defaultLocale)) {
+      supportedLanguages = CollectionUtils.isEmpty(localeConfigService.getLocalConfigs()) ?
+                                                                                          Collections.singletonMap(defaultLocale.toLanguageTag(),
+                                                                                                                   defaultLocale.getDisplayName()) :
+                                                                                          localeConfigService.getLocalConfigs()
+                                                                                                             .stream()
+                                                                                                             .filter(localeConfig -> !StringUtils.equals(localeConfig.getLocale()
+                                                                                                                                                                     .toLanguageTag(),
+                                                                                                                                                         "ma"))
+                                                                                                             .map(LocaleConfig::getLocale)
+                                                                                                             .collect(Collectors.toMap(Locale::toLanguageTag,
+                                                                                                                                       Locale::getDisplayName));
+      defaultConfiguredLocale = defaultLocale;
+    }
+    return supportedLanguages;
+  }
+
+  private Locale getDefaultLocale() {
+    return localeConfigService.getDefaultLocaleConfig() == null ? Locale.ENGLISH :
+                                                                localeConfigService.getDefaultLocaleConfig()
+                                                                                   .getLocale();
   }
 
   private String getAdministratorsPermission() {

@@ -18,6 +18,7 @@
  */
 package io.meeds.layout.rest;
 
+import static io.meeds.layout.util.JsonUtils.toJsonString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,12 +52,6 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 
 import io.meeds.layout.model.PortletInstanceCategory;
@@ -65,7 +60,6 @@ import io.meeds.spring.web.security.PortalAuthenticationManager;
 import io.meeds.spring.web.security.WebSecurityConfiguration;
 
 import jakarta.servlet.Filter;
-import lombok.SneakyThrows;
 
 @SpringBootTest(classes = { PortletInstanceCategoryRest.class, PortalAuthenticationManager.class, })
 @ContextConfiguration(classes = { WebSecurityConfiguration.class })
@@ -79,18 +73,6 @@ public class PortletInstanceCategoryRestTest {
   private static final String SIMPLE_USER   = "simple";
 
   private static final String TEST_PASSWORD = "testPassword";
-
-  static final ObjectMapper   OBJECT_MAPPER;
-
-  static {
-    // Workaround when Jackson is defined in shared library with different
-    // version and without artifact jackson-datatype-jsr310
-    OBJECT_MAPPER = JsonMapper.builder()
-                              .configure(JsonReadFeature.ALLOW_MISSING_VALUES, true)
-                              .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                              .build();
-    OBJECT_MAPPER.registerModule(new JavaTimeModule());
-  }
 
   @MockBean
   private PortletInstanceService portletInstanceService;
@@ -140,7 +122,7 @@ public class PortletInstanceCategoryRestTest {
 
   @Test
   void createPortletInstanceCategoryAnonymously() throws Exception {
-    ResultActions response = mockMvc.perform(post(REST_PATH).content(asJsonString(new PortletInstanceCategory()))
+    ResultActions response = mockMvc.perform(post(REST_PATH).content(toJsonString(new PortletInstanceCategory()))
                                                             .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
     verifyNoInteractions(portletInstanceService);
@@ -150,7 +132,7 @@ public class PortletInstanceCategoryRestTest {
   void createPortletInstanceCategoryWithUser() throws Exception {
     PortletInstanceCategory portletInstanceCategory = new PortletInstanceCategory();
     ResultActions response = mockMvc.perform(post(REST_PATH).with(testSimpleUser())
-                                                            .content(asJsonString(portletInstanceCategory))
+                                                            .content(toJsonString(portletInstanceCategory))
                                                             .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isOk());
     verify(portletInstanceService).createPortletInstanceCategory(portletInstanceCategory, SIMPLE_USER);
@@ -163,14 +145,14 @@ public class PortletInstanceCategoryRestTest {
                                                               SIMPLE_USER)).thenThrow(IllegalAccessException.class);
 
     ResultActions response = mockMvc.perform(post(REST_PATH).with(testSimpleUser())
-                                                            .content(asJsonString(portletInstanceCategory))
+                                                            .content(toJsonString(portletInstanceCategory))
                                                             .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
   }
 
   @Test
   void updatePortletInstanceCategoryAnonymously() throws Exception {
-    ResultActions response = mockMvc.perform(put(REST_PATH + "/1").content(asJsonString(new PortletInstanceCategory()))
+    ResultActions response = mockMvc.perform(put(REST_PATH + "/1").content(toJsonString(new PortletInstanceCategory()))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
     verifyNoInteractions(portletInstanceService);
@@ -180,7 +162,7 @@ public class PortletInstanceCategoryRestTest {
   void updatePortletInstanceCategoryWithUser() throws Exception {
     PortletInstanceCategory portletInstanceCategory = new PortletInstanceCategory();
     ResultActions response = mockMvc.perform(put(REST_PATH + "/1").with(testSimpleUser())
-                                                                  .content(asJsonString(portletInstanceCategory))
+                                                                  .content(toJsonString(portletInstanceCategory))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isOk());
 
@@ -196,7 +178,7 @@ public class PortletInstanceCategoryRestTest {
                                                               SIMPLE_USER)).thenThrow(IllegalAccessException.class);
 
     ResultActions response = mockMvc.perform(put(REST_PATH + "/1").with(testSimpleUser())
-                                                                  .content(asJsonString(portletInstanceCategory))
+                                                                  .content(toJsonString(portletInstanceCategory))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isForbidden());
   }
@@ -209,7 +191,7 @@ public class PortletInstanceCategoryRestTest {
                                                               SIMPLE_USER)).thenThrow(ObjectNotFoundException.class);
 
     ResultActions response = mockMvc.perform(put(REST_PATH + "/1").with(testSimpleUser())
-                                                                  .content(asJsonString(portletInstanceCategory))
+                                                                  .content(toJsonString(portletInstanceCategory))
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isNotFound());
   }
@@ -254,11 +236,6 @@ public class PortletInstanceCategoryRestTest {
   private RequestPostProcessor testSimpleUser() {
     return user(SIMPLE_USER).password(TEST_PASSWORD)
                             .authorities(new SimpleGrantedAuthority("users"));
-  }
-
-  @SneakyThrows
-  public static String asJsonString(final Object obj) {
-    return OBJECT_MAPPER.writeValueAsString(obj);
   }
 
 }

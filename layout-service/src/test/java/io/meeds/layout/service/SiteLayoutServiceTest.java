@@ -19,7 +19,9 @@
 package io.meeds.layout.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,11 +45,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.services.resources.LocaleConfig;
+import org.exoplatform.services.resources.LocaleConfigService;
+import org.exoplatform.services.resources.impl.LocaleConfigImpl;
 
+import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
 import io.meeds.layout.model.SiteUpdateModel;
@@ -54,7 +63,7 @@ import io.meeds.layout.model.SiteUpdateModel;
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-  SiteLayoutService.class,
+                            SiteLayoutService.class,
 })
 @ExtendWith(MockitoExtension.class)
 public class SiteLayoutServiceTest {
@@ -71,6 +80,9 @@ public class SiteLayoutServiceTest {
 
   @MockBean
   private LayoutAclService        aclService;
+
+  @MockBean
+  private LocaleConfigService     localeConfigService;
 
   @Autowired
   private SiteLayoutService       siteLayoutService;
@@ -218,6 +230,88 @@ public class SiteLayoutServiceTest {
     verify(layoutService).save(portalConfig);
     portalConfig.setAccessPermissions(argThat(p -> Arrays.asList("access", "permissions").equals(Arrays.asList(p))));
     portalConfig.setEditPermission(argThat(editPermission::equals));
+  }
+
+  @Test
+  @SneakyThrows
+  public void getSiteLabels() {
+    assertThrows(ObjectNotFoundException.class, () -> siteLayoutService.getSiteLabels(2l, TEST_USER));
+    when(layoutService.getPortalConfig(2l)).thenReturn(portalConfig);
+    when(portalConfig.getType()).thenReturn("PORTAL");
+    when(portalConfig.getName()).thenReturn("test");
+
+    assertThrows(IllegalAccessException.class, () -> siteLayoutService.getSiteLabels(2l, TEST_USER));
+    when(aclService.canViewSite(new SiteKey(portalConfig.getType(), portalConfig.getName()),
+                                TEST_USER))
+                                           .thenReturn(true);
+
+    LocaleConfig enLocaleConfig = new LocaleConfigImpl();
+    enLocaleConfig.setLocale(Locale.ENGLISH);
+    LocaleConfig frLocaleConfig = new LocaleConfigImpl();
+    frLocaleConfig.setLocale(Locale.FRENCH);
+    when(localeConfigService.getLocalConfigs()).thenReturn(Arrays.asList(enLocaleConfig, frLocaleConfig));
+    UserPortalConfig userPortalConfig = mock(UserPortalConfig.class);
+    UserPortal userPortal = mock(UserPortal.class);
+    when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
+    when(portalConfigService.getUserPortalConfig("test", TEST_USER)).thenReturn(userPortalConfig);
+
+    SiteKey siteKey = SiteKey.portal("test");
+    when(userPortal.getPortalLabel(siteKey, enLocaleConfig.getLocale())).thenReturn("Test Name");
+    when(userPortal.getPortalLabel(siteKey, frLocaleConfig.getLocale())).thenReturn("Nom pour le test");
+
+    NodeLabel siteLabels = siteLayoutService.getSiteLabels(2l, TEST_USER);
+    assertNotNull(siteLabels);
+    assertNotNull(siteLabels.getLabels());
+    assertNotNull(siteLabels.getSupportedLanguages());
+    assertNotNull(siteLabels.getDefaultLanguage());
+    assertEquals("en", siteLabels.getDefaultLanguage());
+    assertEquals(2, siteLabels.getSupportedLanguages().size());
+    assertTrue(siteLabels.getSupportedLanguages().containsKey(enLocaleConfig.getLocale().getLanguage()));
+    assertTrue(siteLabels.getSupportedLanguages().containsKey(frLocaleConfig.getLocale().getLanguage()));
+    assertEquals(2, siteLabels.getLabels().size());
+    assertEquals("Test Name", siteLabels.getLabels().get(enLocaleConfig.getLocale().getLanguage()));
+    assertEquals("Nom pour le test", siteLabels.getLabels().get(frLocaleConfig.getLocale().getLanguage()));
+  }
+
+  @Test
+  @SneakyThrows
+  public void getSiteDescriptions() {
+    assertThrows(ObjectNotFoundException.class, () -> siteLayoutService.getSiteDescriptions(2l, TEST_USER));
+    when(layoutService.getPortalConfig(2l)).thenReturn(portalConfig);
+    when(portalConfig.getType()).thenReturn("PORTAL");
+    when(portalConfig.getName()).thenReturn("test");
+
+    assertThrows(IllegalAccessException.class, () -> siteLayoutService.getSiteDescriptions(2l, TEST_USER));
+    when(aclService.canViewSite(new SiteKey(portalConfig.getType(), portalConfig.getName()),
+                                TEST_USER))
+                                           .thenReturn(true);
+
+    LocaleConfig enLocaleConfig = new LocaleConfigImpl();
+    enLocaleConfig.setLocale(Locale.ENGLISH);
+    LocaleConfig frLocaleConfig = new LocaleConfigImpl();
+    frLocaleConfig.setLocale(Locale.FRENCH);
+    when(localeConfigService.getLocalConfigs()).thenReturn(Arrays.asList(enLocaleConfig, frLocaleConfig));
+    UserPortalConfig userPortalConfig = mock(UserPortalConfig.class);
+    UserPortal userPortal = mock(UserPortal.class);
+    when(userPortalConfig.getUserPortal()).thenReturn(userPortal);
+    when(portalConfigService.getUserPortalConfig("test", TEST_USER)).thenReturn(userPortalConfig);
+
+    SiteKey siteKey = SiteKey.portal("test");
+    when(userPortal.getPortalDescription(siteKey, enLocaleConfig.getLocale())).thenReturn("Test Description");
+    when(userPortal.getPortalDescription(siteKey, frLocaleConfig.getLocale())).thenReturn("Description pour le test");
+
+    NodeLabel siteLabels = siteLayoutService.getSiteDescriptions(2l, TEST_USER);
+    assertNotNull(siteLabels);
+    assertNotNull(siteLabels.getLabels());
+    assertNotNull(siteLabels.getSupportedLanguages());
+    assertNotNull(siteLabels.getDefaultLanguage());
+    assertEquals("en", siteLabels.getDefaultLanguage());
+    assertEquals(2, siteLabels.getSupportedLanguages().size());
+    assertTrue(siteLabels.getSupportedLanguages().containsKey(enLocaleConfig.getLocale().getLanguage()));
+    assertTrue(siteLabels.getSupportedLanguages().containsKey(frLocaleConfig.getLocale().getLanguage()));
+    assertEquals(2, siteLabels.getLabels().size());
+    assertEquals("Test Description", siteLabels.getLabels().get(enLocaleConfig.getLocale().getLanguage()));
+    assertEquals("Description pour le test", siteLabels.getLabels().get(frLocaleConfig.getLocale().getLanguage()));
   }
 
 }

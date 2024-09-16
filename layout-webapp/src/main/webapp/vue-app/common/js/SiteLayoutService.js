@@ -83,6 +83,32 @@ export function getSite(siteType, siteName, lang) {
   });
 }
 
+export function getSiteLabels(siteId) {
+  return fetch(`/layout/rest/sites/${siteId}/labels`, {
+    credentials: 'include',
+    method: 'GET'
+  }).then(resp => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when retrieving site labels');
+    }
+  });
+}
+
+export function getSiteDescriptions(siteId) {
+  return fetch(`/layout/rest/sites/${siteId}/descriptions`, {
+    credentials: 'include',
+    method: 'GET'
+  }).then(resp => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when retrieving site descriptions');
+    }
+  });
+}
+
 export function updateSite(siteName, siteType, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, bannerRemoved) {
   const updateModel = {
     siteType,

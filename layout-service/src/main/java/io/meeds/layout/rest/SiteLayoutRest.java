@@ -45,6 +45,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
+import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
 import io.meeds.layout.model.SiteUpdateModel;
@@ -231,6 +232,48 @@ public class SiteLayoutRest {
                            .eTag(String.valueOf(Objects.hash(siteEntity, request.getLocale())))
                            .body(siteEntity);
     } catch (ObjectAlreadyExistsException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @GetMapping("{siteId}/labels")
+  @Operation(summary = "Retrieve site I18N labels", method = "GET", description = "This retrieves site labels")
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public NodeLabel getSiteLabels(
+                                 HttpServletRequest request,
+                                 @Parameter(description = "Site id", required = true)
+                                 @PathVariable("siteId")
+                                 Long siteId) {
+    try {
+      return siteLayoutService.getSiteLabels(siteId, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @GetMapping("{siteId}/descriptions")
+  @Operation(summary = "Retrieve site I18N descriptions", method = "GET", description = "This retrieves site descriptions")
+  @ApiResponses(value = {
+                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+                          @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public NodeLabel getSiteDescriptions(
+                                       HttpServletRequest request,
+                                       @Parameter(description = "Site id", required = true)
+                                       @PathVariable("siteId")
+                                       Long siteId) {
+    try {
+      return siteLayoutService.getSiteDescriptions(siteId, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
