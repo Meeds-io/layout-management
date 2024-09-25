@@ -117,23 +117,20 @@ export default {
     displayActionMenu: false,
   }),
   computed: {
-    isDefaultPortalSite() {
-      return this.site.name.toLowerCase() === eXo.env.portal.defaultPortalName.toLowerCase();
+    isMetaSite() {
+      return this.site.name === eXo.env.portal.defaultPortal;
     },
     isGlobalSite() {
-      return this.site.name.toLowerCase() === eXo.env.portal.globalPortalName.toLowerCase();
+      return this.site.name === 'global';
     },
     isGroupSite() {
       return this.site.siteType === 'GROUP';
     },
-    canDelete() {
-      return !(this.isDefaultPortalSite || this.isGlobalSite || this.isGroupSite);
-    },
     isPortalSite() {
       return this.site.siteType === 'PORTAL';
     },
-    canEditLayout() {
-      return !(this.isGlobalSite || this.isGroupSite) && (this.site?.metaSite || !this.site.displayed);
+    canDelete() {
+      return !this.isMetaSite && !this.isGlobalSite && !this.isGroupSite;
     },
     canEditSite() {
       return this.site.canEdit;
