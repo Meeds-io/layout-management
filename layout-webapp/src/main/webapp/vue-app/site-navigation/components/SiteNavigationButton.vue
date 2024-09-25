@@ -18,78 +18,31 @@
 -->
 <template>
   <v-tooltip bottom>
-    <template #activator="{ on, attrs }">
-      <v-card
-        :height="embedded && 22 || 'auto'"
-        :class="embedded && 'position-relative mx-2'"
-        class="transparent"
-        flat
-        v-bind="attrs"
-        v-on="on">
-        <v-btn
-          :aria-label="$t('siteNavigation.button.tooltip.label')"
-          :disabled="disabled"
-          :class="embedded && 'absolute-vertical-center mt-1'"
-          role="button"
-          outlined
-          icon
-          @click="openSiteNavigationDrawer">
-          <v-icon
-            :color="iconColor"
-            :class="iconClass"
-            size="16">
-            fas fa-sitemap
-          </v-icon>
-        </v-btn>
-      </v-card>
+    <template #activator="{on, bind}">
+      <v-btn
+        id="topBarSiteNavigation"
+        v-on="on"
+        v-bind="bind"
+        :role="'button'"
+        class="ms-5"
+        icon
+        @click="openSiteNavigationDrawer">
+        <v-icon size="20">fa-sitemap</v-icon>
+      </v-btn>
     </template>
     <span>{{ $t('siteNavigation.button.tooltip.label') }}</span>
   </v-tooltip>
 </template>
-
 <script>
 export default {
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    embedded: {
-      type: Boolean,
-      default: false,
-    },
-    iconClass: {
-      type: String,
-      default: null,
-    },
-    iconColor: {
-      type: String,
-      default: null,
-    },
-    siteName: {
-      type: String,
-      default: null,
-    },
-    siteType: {
-      type: String,
-      default: null,
-    },
-    siteId: {
-      type: String,
-      default: null,
-    },
-  },
   methods: {
     openSiteNavigationDrawer() {
-      let params;
-      if (this.siteName && this.siteType) {
-        params = {
-          siteName: this.siteName,
-          siteType: this.siteType,
-          siteId: this.siteId,
-        };
-      }
-      document.dispatchEvent(new CustomEvent('open-site-navigation-drawer',{detail: params}));
+      document.dispatchEvent(new CustomEvent('open-site-navigation-drawer',{detail: {
+        siteName: this.siteName,
+        siteType: this.siteType,
+        siteId: this.siteId,
+        includeGlobal: eXo.env.portal.metaPortalName === eXo.env.portal.siteKeyName && eXo.env.portal.siteKeyType === 'portal',
+      }}));
     }
   }
 };
