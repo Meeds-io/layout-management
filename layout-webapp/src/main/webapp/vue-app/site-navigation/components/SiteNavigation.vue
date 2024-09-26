@@ -18,9 +18,7 @@
 -->
 <template>
   <v-app v-if="canManageSiteNavigation && !isMobile">
-    <site-navigation-button
-      icon-class="text-color"
-      embedded />
+    <site-navigation-button />
     <site-navigation-drawers-actions />
     <layout-analytics application-name="siteNavigation" />
   </v-app>
