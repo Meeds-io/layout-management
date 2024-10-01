@@ -98,7 +98,7 @@ public class PortletInstanceAttachmentPluginTest {
     when(portletInstance.getPermissions()).thenReturn(Collections.singletonList(permissionExpression));
     assertFalse(attachmentPlugin.hasAccessPermission(userIdentity, "1"));
 
-    when(layoutAclService.isMemberOf(username, permissionExpression)).thenReturn(true);
+    when(layoutAclService.hasPermission(username, permissionExpression)).thenReturn(true);
     assertTrue(attachmentPlugin.hasAccessPermission(userIdentity, "1"));
   }
 
