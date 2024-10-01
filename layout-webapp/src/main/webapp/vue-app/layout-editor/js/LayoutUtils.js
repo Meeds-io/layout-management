@@ -105,10 +105,6 @@ export const containerModel = {
   // Generally kept to be accessible to everyone to make
   // the parent page access permissions applied globally 
   accessPermissions: ['Everyone'],
-  // Deprecated, not used for containers
-  moveAppsPermissions: ['Everyone'],
-  // Deprecated, not used for containers
-  moveContainersPermissions: ['Everyone'],
   // List of children which can be of type:
   // 1. Container
   //   or

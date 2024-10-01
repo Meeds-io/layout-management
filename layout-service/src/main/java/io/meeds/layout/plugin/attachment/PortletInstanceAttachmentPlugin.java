@@ -77,7 +77,7 @@ public class PortletInstanceAttachmentPlugin extends AttachmentPlugin {
     List<String> permissions = portletInstance.getPermissions();
     return CollectionUtils.isEmpty(permissions)
            || (userIdentity != null
-               && permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(userIdentity.getUserId(), p)));
+               && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(userIdentity.getUserId(), p)));
   }
 
   @Override

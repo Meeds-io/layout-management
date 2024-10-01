@@ -37,8 +37,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.services.security.Authenticator;
-import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
 
 @SpringBootTest(classes = { LayoutAclService.class })
@@ -52,19 +51,13 @@ public class LayoutAclServiceTest {
   private static final PageKey PAGE_KEY  = PageKey.parse("portal::test::test");
 
   @MockBean
-  private UserACL              userAcl;
-
-  @MockBean
   private LayoutService        layoutService;
-
-  @MockBean
-  private Authenticator        authenticator;
 
   @MockBean
   private IdentityManager      identityManager;
 
-  @Mock
-  private IdentityRegistry     identityRegistry;
+  @MockBean
+  private UserACL              userAcl;
 
   @Autowired
   private LayoutAclService     layoutAclService;
@@ -75,15 +68,18 @@ public class LayoutAclServiceTest {
   @Mock
   private Page                 page;
 
+  @Mock
+  private Identity             aclIdentity;
+
   @BeforeEach
   public void setup() {
-    layoutAclService.setIdentityRegistry(identityRegistry);
+    when(userAcl.getUserIdentity(TEST_USER)).thenReturn(aclIdentity);
   }
 
   @Test
   public void canAddSite() {
     assertFalse(layoutAclService.canAddSite(TEST_USER));
-    when(userAcl.hasCreatePortalPermission()).thenReturn(true);
+    when(userAcl.hasCreatePortalPermission(aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canAddSite(TEST_USER));
   }
 
@@ -92,7 +88,7 @@ public class LayoutAclServiceTest {
     assertFalse(layoutAclService.canEditSite(SITE_KEY, TEST_USER));
     when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
     assertFalse(layoutAclService.canEditSite(SITE_KEY, TEST_USER));
-    when(userAcl.hasEditPermission(portalConfig)).thenReturn(true);
+    when(userAcl.hasEditPermission(portalConfig, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canEditSite(SITE_KEY, TEST_USER));
   }
 
@@ -101,7 +97,7 @@ public class LayoutAclServiceTest {
     assertFalse(layoutAclService.canViewSite(SITE_KEY, TEST_USER));
     when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
     assertFalse(layoutAclService.canViewSite(SITE_KEY, TEST_USER));
-    when(userAcl.hasPermission(portalConfig)).thenReturn(true);
+    when(userAcl.hasAccessPermission(portalConfig, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canViewSite(SITE_KEY, TEST_USER));
   }
 
@@ -110,7 +106,7 @@ public class LayoutAclServiceTest {
     assertFalse(layoutAclService.canEditNavigation(SITE_KEY, TEST_USER));
     when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
     assertFalse(layoutAclService.canEditNavigation(SITE_KEY, TEST_USER));
-    when(userAcl.hasEditPermission(portalConfig)).thenReturn(true);
+    when(userAcl.hasEditPermission(portalConfig, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canEditNavigation(SITE_KEY, TEST_USER));
   }
 
@@ -119,7 +115,7 @@ public class LayoutAclServiceTest {
     assertFalse(layoutAclService.canViewNavigation(SITE_KEY, null, TEST_USER));
     when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
     assertFalse(layoutAclService.canViewNavigation(SITE_KEY, null, TEST_USER));
-    when(userAcl.hasAccessPermission(portalConfig)).thenReturn(true);
+    when(userAcl.hasAccessPermission(portalConfig, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canViewNavigation(SITE_KEY, null, TEST_USER));
   }
 
@@ -128,9 +124,9 @@ public class LayoutAclServiceTest {
     when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertFalse(layoutAclService.canViewNavigation(SITE_KEY, PAGE_KEY, TEST_USER));
-    when(userAcl.hasPermission(page)).thenReturn(true);
+    when(userAcl.hasAccessPermission(page, aclIdentity)).thenReturn(true);
     assertFalse(layoutAclService.canViewNavigation(SITE_KEY, PAGE_KEY, TEST_USER));
-    when(userAcl.hasAccessPermission(portalConfig)).thenReturn(true);
+    when(userAcl.hasAccessPermission(portalConfig, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canViewNavigation(SITE_KEY, PAGE_KEY, TEST_USER));
   }
 
@@ -139,7 +135,7 @@ public class LayoutAclServiceTest {
     assertFalse(layoutAclService.canViewPage(PAGE_KEY, TEST_USER));
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertFalse(layoutAclService.canViewPage(PAGE_KEY, TEST_USER));
-    when(userAcl.hasPermission(page)).thenReturn(true);
+    when(userAcl.hasAccessPermission(page, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canViewPage(PAGE_KEY, TEST_USER));
   }
 
@@ -148,22 +144,14 @@ public class LayoutAclServiceTest {
     assertFalse(layoutAclService.canEditPage(PAGE_KEY, TEST_USER));
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertFalse(layoutAclService.canEditPage(PAGE_KEY, TEST_USER));
-    when(userAcl.hasEditPermission(page)).thenReturn(true);
+    when(userAcl.hasEditPermission(page, aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.canEditPage(PAGE_KEY, TEST_USER));
-  }
-
-  @Test
-  public void isSuperUser() {
-    assertFalse(layoutAclService.isAdministrator(TEST_USER));
-    when(userAcl.isSuperUser()).thenReturn(true);
-    assertTrue(layoutAclService.isAdministrator(TEST_USER));
   }
 
   @Test
   public void isAdministrator() {
     assertFalse(layoutAclService.isAdministrator(TEST_USER));
-    when(userAcl.getAdminGroups()).thenReturn("superGroup");
-    when(userAcl.isUserInGroup(userAcl.getAdminGroups())).thenReturn(true);
+    when(userAcl.isAdministrator(aclIdentity)).thenReturn(true);
     assertTrue(layoutAclService.isAdministrator(TEST_USER));
   }
 
