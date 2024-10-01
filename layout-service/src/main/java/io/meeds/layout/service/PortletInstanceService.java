@@ -329,7 +329,7 @@ public class PortletInstanceService {
     }
     if (!layoutAclService.isAdministrator(username)
         && Arrays.stream(application.getAccessPermissions())
-                 .noneMatch(permission -> layoutAclService.isMemberOf(username, permission))) {
+                 .noneMatch(permission -> layoutAclService.hasPermission(username, permission))) {
       throw new IllegalAccessException(String.format("Application with id %s access denied", applicationId));
     }
     return getApplicationPreferences(application);
@@ -453,13 +453,13 @@ public class PortletInstanceService {
     List<String> permissions = portletInstance.getPermissions();
     return CollectionUtils.isEmpty(permissions)
            || permissions.equals(EVERYONE_PERMISSIONS_LIST)
-           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(username, p)));
+           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p)));
   }
 
   private boolean hasPermission(PortletInstanceCategory category, String username) {
     List<String> permissions = category.getPermissions();
     return CollectionUtils.isEmpty(permissions)
            || permissions.equals(EVERYONE_PERMISSIONS_LIST)
-           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(username, p)));
+           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p)));
   }
 }
