@@ -18,61 +18,33 @@
  */
 package io.meeds.layout.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.services.security.Authenticator;
 import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.IdentityConstants;
-import org.exoplatform.services.security.IdentityRegistry;
+import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
-
-import jakarta.annotation.PostConstruct;
-import lombok.Setter;
-import lombok.SneakyThrows;
 
 @Service
 public class LayoutAclService {
 
   @Autowired
-  private UserACL          userAcl;
+  private LayoutService   layoutService;
 
   @Autowired
-  private LayoutService    layoutService;
+  private IdentityManager identityManager;
 
   @Autowired
-  private Authenticator    authenticator;
-
-  @Autowired
-  private IdentityManager  identityManager;
-
-  @Setter
-  private IdentityRegistry identityRegistry;
-
-  @PostConstruct
-  public void init() {
-    // Can't be autowired from Kernel IoC, thus inject it once Spring Bean
-    // initialized
-    setIdentityRegistry(ExoContainerContext.getService(IdentityRegistry.class));
-  }
+  private UserACL         userAcl;
 
   public boolean canAddSite(String username) {
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasCreatePortalPermission();
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return userAcl.hasCreatePortalPermission(userAcl.getUserIdentity(username));
   }
 
   public boolean canEditSite(SiteKey siteKey, String username) {
@@ -80,13 +52,7 @@ public class LayoutAclService {
     if (portalConfig == null) {
       return false;
     }
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasEditPermission(portalConfig);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return userAcl.hasEditPermission(portalConfig, userAcl.getUserIdentity(username));
   }
 
   public boolean canViewSite(SiteKey siteKey, String username) {
@@ -94,43 +60,15 @@ public class LayoutAclService {
     if (portalConfig == null) {
       return false;
     }
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasPermission(portalConfig);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return userAcl.hasAccessPermission(portalConfig, userAcl.getUserIdentity(username));
   }
 
   public boolean canEditNavigation(SiteKey siteKey, String username) {
-    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
-    if (portalConfig == null) {
-      return false;
-    }
-
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasEditPermission(portalConfig) || userAcl.hasEditPermissionOnNavigation(siteKey);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return canEditSite(siteKey, username);
   }
 
   public boolean canViewNavigation(SiteKey siteKey, PageKey pageKey, String username) {
-    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
-    if (portalConfig == null) {
-      return false;
-    }
-    Page page = pageKey == null ? null : layoutService.getPage(pageKey);
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasAccessPermission(portalConfig) && (page == null || userAcl.hasPermission(page));
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return canViewSite(siteKey, username) && (pageKey == null || canViewPage(pageKey, username));
   }
 
   public boolean canViewPage(PageKey pageKey, String username) {
@@ -138,14 +76,7 @@ public class LayoutAclService {
     if (page == null) {
       return false;
     }
-
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasPermission(page);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return userAcl.hasAccessPermission(page, userAcl.getUserIdentity(username));
   }
 
   public boolean canEditPage(PageKey pageKey, String username) {
@@ -153,34 +84,15 @@ public class LayoutAclService {
     if (page == null) {
       return false;
     }
-
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasEditPermission(page);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return userAcl.hasEditPermission(page, userAcl.getUserIdentity(username));
   }
 
   public boolean isAdministrator(String username) {
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.isSuperUser() || userAcl.isUserInGroup(getAdministratorsGroup());
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+    return userAcl.isAdministrator(userAcl.getUserIdentity(username));
   }
 
-  public boolean isMemberOf(String username, String expression) {
-    ConversationState currentConversationState = ConversationState.getCurrent();
-    ConversationState.setCurrent(getConversationState(username));
-    try {
-      return userAcl.hasPermission(expression);
-    } finally {
-      ConversationState.setCurrent(currentConversationState);
-    }
+  public boolean hasPermission(String username, String expression) {
+    return userAcl.hasPermission(userAcl.getUserIdentity(username), expression);
   }
 
   public String getAdministratorsGroup() {
@@ -188,31 +100,12 @@ public class LayoutAclService {
   }
 
   public ConversationState getSuperUserConversationState() {
-    return new ConversationState(getUserIdentity(userAcl.getSuperUser()));
+    return new ConversationState(userAcl.getUserIdentity(userAcl.getSuperUser()));
   }
 
   public long getSuperUserIdentityId() {
-    org.exoplatform.social.core.identity.model.Identity userIdentity =
-                                                                     identityManager.getOrCreateUserIdentity(userAcl.getSuperUser());
-    String id = userIdentity == null ? null : userIdentity.getId();
-    return id == null ? 0 : Long.parseLong(id);
-  }
-
-  private ConversationState getConversationState(String username) {
-    return new ConversationState(getUserIdentity(username));
-  }
-
-  @SneakyThrows
-  private Identity getUserIdentity(String username) {
-    if (StringUtils.isBlank(username) || IdentityConstants.ANONIM.equals(username)) {
-      return null;
-    }
-    Identity identity = identityRegistry.getIdentity(username);
-    if (identity != null) {
-      return identity;
-    } else {
-      return authenticator.createIdentity(username);
-    }
+    Identity userIdentity = identityManager.getOrCreateUserIdentity(userAcl.getSuperUser());
+    return userIdentity == null ? 0l : Long.parseLong(userIdentity.getId());
   }
 
 }

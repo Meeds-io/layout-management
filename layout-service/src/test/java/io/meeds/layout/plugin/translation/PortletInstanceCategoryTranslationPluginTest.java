@@ -91,7 +91,7 @@ public class PortletInstanceCategoryTranslationPluginTest {
     when(portletInstanceCategory.getPermissions()).thenReturn(Collections.singletonList(permissionExpression));
     assertFalse(translationPlugin.hasAccessPermission(1, username));
 
-    when(layoutAclService.isMemberOf(username, permissionExpression)).thenReturn(true);
+    when(layoutAclService.hasPermission(username, permissionExpression)).thenReturn(true);
     assertTrue(translationPlugin.hasAccessPermission(1, username));
   }
 

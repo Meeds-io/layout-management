@@ -296,8 +296,6 @@ public class PageLayoutService {
                                        pageState.getFactoryId(),
                                        pageState.getAccessPermissions(),
                                        pageState.getEditPermission(),
-                                       pageState.getMoveAppsPermissions(),
-                                       pageState.getMoveContainersPermissions(),
                                        pageState.getType(),
                                        link));
     layoutService.save(pageContext);
@@ -323,8 +321,6 @@ public class PageLayoutService {
                                        pageState.getFactoryId(),
                                        accessPermissionsList,
                                        editPermission,
-                                       pageState.getMoveAppsPermissions(),
-                                       pageState.getMoveContainersPermissions(),
                                        pageState.getType(),
                                        pageState.getLink()));
     layoutService.save(pageContext);
