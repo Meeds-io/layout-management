@@ -76,7 +76,7 @@ public class PortletInstanceCategoryTranslationPlugin extends TranslationPlugin 
     }
     List<String> permissions = category.getPermissions();
     return CollectionUtils.isEmpty(permissions)
-           || permissions.stream().anyMatch(p -> layoutAclService.isMemberOf(username, p));
+           || permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p));
   }
 
   @Override
