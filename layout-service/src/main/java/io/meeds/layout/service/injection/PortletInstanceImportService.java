@@ -114,7 +114,7 @@ public class PortletInstanceImportService {
   @Value("${meeds.portlets.import.override:false}")
   private boolean                        forceReimport;
 
-  @Value("${meeds.portlets.import.version:2}")
+  @Value("${meeds.portlets.import.version:4}")
   private long                           portletInstanceImportVersion;
 
   @PostConstruct
@@ -124,11 +124,10 @@ public class PortletInstanceImportService {
 
   @ContainerTransactional
   public void importPortletInstances() {
-    LOG.info("Importing Portlet instances");
-    if (!forceReimport
-        && getSettingValue(PORTLET_INSTANCE_VERSION) != portletInstanceImportVersion) {
+    if (!forceReimport && getSettingValue(PORTLET_INSTANCE_VERSION) != portletInstanceImportVersion) {
       forceReimport = true;
     }
+    LOG.info("Importing Portlet instances with version {}, force reimport = {}", portletInstanceImportVersion, forceReimport);
 
     ConversationState.setCurrent(layoutAclService.getSuperUserConversationState());
     try {
