@@ -220,6 +220,7 @@
       "descriptions":{
         "en":"layout.portletInstance.SpaceWidgetDescription.description"
       },
+      "illustrationPath":"war:/../images/portlets/spaceWidgetDescription.webp",
       "permissions":["Everyone"],
       "system":true
     },
@@ -233,6 +234,7 @@
       "descriptions":{
         "en":"layout.portletInstance.SpaceWidgetManagers.description"
       },
+      "illustrationPath":"war:/../images/portlets/spaceWidgetManagers.webp",
       "permissions":["Everyone"],
       "system":true
     },
@@ -246,6 +248,7 @@
       "descriptions":{
         "en":"layout.portletInstance.SpaceWidgetMembers.description"
       },
+      "illustrationPath":"war:/../images/portlets/spaceWidgetMembers.webp",
       "permissions":["Everyone"],
       "system":true
     },
