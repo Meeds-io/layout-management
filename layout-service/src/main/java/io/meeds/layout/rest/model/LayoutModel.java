@@ -165,10 +165,6 @@ public class LayoutModel {
   // Specific to container
   private String                          profiles;
 
-  private String[]                        moveAppsPermissions;
-
-  private String[]                        moveContainersPermissions;
-
   private List<PortletInstancePreference> preferences;
 
   private List<LayoutModel>               children;
@@ -260,8 +256,6 @@ public class LayoutModel {
       this.cssClass = container.getCssClass();
       this.profiles = container.getProfiles();
       this.accessPermissions = container.getAccessPermissions();
-      this.moveAppsPermissions = container.getMoveAppsPermissions();
-      this.moveContainersPermissions = container.getMoveContainersPermissions();
       this.children = container.getChildren().stream().map(LayoutModel::new).toList();
 
       ApplicationBackgroundStyle appCssStyle = container.getAppBackgroundStyle();
@@ -344,8 +338,6 @@ public class LayoutModel {
       container.setCssClass(layoutModel.getCssClass());
       container.setProfiles(layoutModel.getProfiles());
       container.setAccessPermissions(layoutModel.getAccessPermissions());
-      container.setMoveAppsPermissions(layoutModel.getMoveAppsPermissions());
-      container.setMoveContainersPermissions(layoutModel.getMoveContainersPermissions());
       container.setCssStyle(cssStyle);
       container.setAppBackgroundStyle(mapToAppStyle(layoutModel));
       if (layoutModel.getChildren() != null) {

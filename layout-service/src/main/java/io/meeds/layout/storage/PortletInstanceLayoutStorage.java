@@ -207,9 +207,7 @@ public class PortletInstanceLayoutStorage {
                                           false,
                                           null,
                                           Arrays.asList(UserACL.EVERYONE),
-                                          page.getEditPermission(),
-                                          Arrays.asList(UserACL.EVERYONE),
-                                          Arrays.asList(UserACL.EVERYONE));
+                                          page.getEditPermission());
       layoutService.save(new PageContext(PORTLET_EDITOR_SYSTEM_PAGE_KEY, pageState), page);
       page = layoutService.getPage(PORTLET_EDITOR_SYSTEM_PAGE_KEY);
     }

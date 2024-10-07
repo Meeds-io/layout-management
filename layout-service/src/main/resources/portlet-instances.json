@@ -211,22 +211,45 @@
       "system":true
     },
     {
-      "nameId":"SpaceInfos",
+      "nameId":"SpaceWidgetDescription",
       "categoryNameId":"spaceTools",
-      "portletName":"SpaceInfos",
+      "portletName":"SpaceWidgetDescription",
       "names":{
-        "en":"layout.portletInstance.SpaceInfos.name"
+        "en":"layout.portletInstance.SpaceWidgetDescription.name"
       },
       "descriptions":{
-        "en":"layout.portletInstance.SpaceInfos.description"
+        "en":"layout.portletInstance.SpaceWidgetDescription.description"
       },
-      "illustrationPath":"war:/../images/portlets/SpaceInfos.webp",
-      "preferences":[
-        
-      ],
-      "permissions":[
-        "*:/platform/users"
-      ],
+      "illustrationPath":"war:/../images/portlets/spaceWidgetDescription.webp",
+      "permissions":["Everyone"],
+      "system":true
+    },
+    {
+      "nameId":"SpaceWidgetManagers",
+      "categoryNameId":"spaceTools",
+      "portletName":"SpaceWidgetManagers",
+      "names":{
+        "en":"layout.portletInstance.SpaceWidgetManagers.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.SpaceWidgetManagers.description"
+      },
+      "illustrationPath":"war:/../images/portlets/spaceWidgetManagers.webp",
+      "permissions":["Everyone"],
+      "system":true
+    },
+    {
+      "nameId":"SpaceWidgetMembers",
+      "categoryNameId":"spaceTools",
+      "portletName":"SpaceWidgetMembers",
+      "names":{
+        "en":"layout.portletInstance.SpaceWidgetMembers.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.SpaceWidgetMembers.description"
+      },
+      "illustrationPath":"war:/../images/portlets/spaceWidgetMembers.webp",
+      "permissions":["Everyone"],
       "system":true
     },
     {
