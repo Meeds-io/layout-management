@@ -151,26 +151,6 @@
       "system":true
     },
     {
-      "nameId":"SpacesOverview",
-      "categoryNameId":"tools",
-      "portletName":"SpacesOverview",
-      "names":{
-        "en":"layout.portletInstance.SpacesOverview.name"
-      },
-      "descriptions":{
-        "en":"layout.portletInstance.SpacesOverview.description"
-      },
-      "illustrationPath":"war:/../images/portlets/spacesOverview.webp",
-      "preferences":[
-        
-      ],
-      "permissions":[
-        "*:/platform/administrators",
-        "*:/platform/web-contributors"
-      ],
-      "system":true
-    },
-    {
       "nameId":"SuggestionsPeopleAndSpace",
       "categoryNameId":"tools",
       "portletName":"SuggestionsPeopleAndSpace",
