@@ -27,6 +27,8 @@ import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.commons.upgrade.UpgradeProductPlugin;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.mop.dao.WindowDAO;
+import org.exoplatform.portal.mop.storage.cache.CacheLayoutStorage;
+import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
@@ -43,6 +45,8 @@ public class LayoutApplicationReferenceUpgradePlugin extends UpgradeProductPlugi
 
   private static final Log                  LOG           = ExoLogger.getLogger(LayoutApplicationReferenceUpgradePlugin.class);
 
+  private CacheService                      cacheService;
+
   private PortletInstanceService            portletInstanceService;
 
   private WindowDAO                         windowDAO;
@@ -51,13 +55,15 @@ public class LayoutApplicationReferenceUpgradePlugin extends UpgradeProductPlugi
 
   private boolean                           enabled;
 
-  public LayoutApplicationReferenceUpgradePlugin(SettingService settingService,
+  public LayoutApplicationReferenceUpgradePlugin(CacheService cacheService,
+                                                 SettingService settingService,
                                                  PortletInstanceService portletInstanceService,
                                                  WindowDAO windowDAO,
                                                  InitParams initParams) {
     super(settingService, initParams);
     this.portletInstanceService = portletInstanceService;
     this.windowDAO = windowDAO;
+    this.cacheService = cacheService;
     this.upgrades = initParams.getObjectParamValues(ApplicationReferenceUpgrade.class);
     this.enabled = !initParams.containsKey(ENABLED_PARAM)
                    || Boolean.parseBoolean(initParams.getValueParam(ENABLED_PARAM).getValue());
@@ -67,8 +73,12 @@ public class LayoutApplicationReferenceUpgradePlugin extends UpgradeProductPlugi
   public void processUpgrade(String oldVersion, String newVersion) {
     long start = System.currentTimeMillis();
     LOG.info("Start:: Upgrade Application ContentId {}", getName());
-    upgradeApplications();
-    LOG.info("End:: Upgrade Application ContentId {} in {} ms", getName(), System.currentTimeMillis() - start);
+    try {
+      upgradeApplications();
+      LOG.info("End:: Upgrade Application ContentId {} in {} ms", getName(), System.currentTimeMillis() - start);
+    } finally {
+      this.cacheService.getCacheInstance(CacheLayoutStorage.PORTLET_PREFERENCES_CACHE_NAME).clearCache();
+    }
   }
 
   @Override

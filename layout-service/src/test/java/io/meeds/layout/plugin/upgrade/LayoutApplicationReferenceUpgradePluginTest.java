@@ -22,8 +22,10 @@ import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import java.io.Serializable;
 import java.util.Collections;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -32,6 +34,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.exoplatform.commons.api.settings.SettingService;
 import org.exoplatform.container.xml.InitParams;
 import org.exoplatform.portal.mop.dao.WindowDAO;
+import org.exoplatform.portal.mop.storage.cache.CacheLayoutStorage;
+import org.exoplatform.services.cache.CacheService;
+import org.exoplatform.services.cache.ExoCache;
 
 import io.meeds.layout.model.ApplicationReferenceUpgrade;
 import io.meeds.layout.model.PortletInstance;
@@ -43,26 +48,37 @@ import lombok.SneakyThrows;
 public class LayoutApplicationReferenceUpgradePluginTest {
 
   @Mock
-  private SettingService              settingService;
+  private CacheService                   cacheService;
 
   @Mock
-  private PortletInstanceService      portletInstanceService;
+  private SettingService                 settingService;
 
   @Mock
-  private WindowDAO                   windowDAO;
+  private PortletInstanceService         portletInstanceService;
 
   @Mock
-  private InitParams                  initParams;
+  private WindowDAO                      windowDAO;
 
   @Mock
-  private ApplicationReferenceUpgrade applicationModification;
+  private InitParams                     initParams;
 
   @Mock
-  private PortletInstance             portletInstance;
+  private ApplicationReferenceUpgrade    applicationModification;
 
-  private String                      oldContentId = "oldApp/oldContentId";
+  @Mock
+  private PortletInstance                portletInstance;
 
-  private String                      newContentId = "newApp/newContentId";
+  @Mock
+  private ExoCache<Serializable, Object> portletPreferencesCache;
+
+  private String                         oldContentId = "oldApp/oldContentId";
+
+  private String                         newContentId = "newApp/newContentId";
+
+  @BeforeEach
+  public void before() {
+    when(cacheService.getCacheInstance(CacheLayoutStorage.PORTLET_PREFERENCES_CACHE_NAME)).thenReturn(portletPreferencesCache);
+  }
 
   @Test
   @SneakyThrows
@@ -77,7 +93,8 @@ public class LayoutApplicationReferenceUpgradePluginTest {
     when(applicationModification.isUpgradePortletInstance()).thenReturn(true);
 
     LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
-                                                                              new LayoutApplicationReferenceUpgradePlugin(settingService,
+                                                                              new LayoutApplicationReferenceUpgradePlugin(cacheService,
+                                                                                                                          settingService,
                                                                                                                           portletInstanceService,
                                                                                                                           windowDAO,
                                                                                                                           initParams);
@@ -87,6 +104,7 @@ public class LayoutApplicationReferenceUpgradePluginTest {
 
     verify(windowDAO).updateContentId(oldContentId, newContentId);
     verify(portletInstanceService).updatePortletInstance(portletInstance);
+    verify(portletPreferencesCache).clearCache();
   }
 
   @Test
@@ -103,7 +121,8 @@ public class LayoutApplicationReferenceUpgradePluginTest {
     when(portletInstance.getId()).thenReturn(2l);
 
     LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
-                                                                              new LayoutApplicationReferenceUpgradePlugin(settingService,
+                                                                              new LayoutApplicationReferenceUpgradePlugin(cacheService,
+                                                                                                                          settingService,
                                                                                                                           portletInstanceService,
                                                                                                                           windowDAO,
                                                                                                                           initParams);
@@ -113,6 +132,7 @@ public class LayoutApplicationReferenceUpgradePluginTest {
 
     verify(windowDAO).deleteByContentId(oldContentId);
     verify(portletInstanceService).deletePortletInstance(2l);
+    verify(portletPreferencesCache).clearCache();
   }
 
   @Test
@@ -125,7 +145,8 @@ public class LayoutApplicationReferenceUpgradePluginTest {
     when(applicationModification.getNewContentId()).thenReturn(newContentId);
 
     LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
-                                                                              new LayoutApplicationReferenceUpgradePlugin(settingService,
+                                                                              new LayoutApplicationReferenceUpgradePlugin(cacheService,
+                                                                                                                          settingService,
                                                                                                                           portletInstanceService,
                                                                                                                           windowDAO,
                                                                                                                           initParams);
@@ -135,6 +156,7 @@ public class LayoutApplicationReferenceUpgradePluginTest {
 
     verify(windowDAO, never()).updateContentId(oldContentId, newContentId);
     verify(portletInstanceService, never()).updatePortletInstance(portletInstance);
+    verify(portletPreferencesCache).clearCache();
   }
 
   @Test
@@ -147,7 +169,8 @@ public class LayoutApplicationReferenceUpgradePluginTest {
     when(applicationModification.getNewContentId()).thenReturn(newContentId);
 
     LayoutApplicationReferenceUpgradePlugin applicationReferenceUpgradePlugin =
-                                                                              new LayoutApplicationReferenceUpgradePlugin(settingService,
+                                                                              new LayoutApplicationReferenceUpgradePlugin(cacheService,
+                                                                                                                          settingService,
                                                                                                                           portletInstanceService,
                                                                                                                           windowDAO,
                                                                                                                           initParams);
@@ -156,6 +179,7 @@ public class LayoutApplicationReferenceUpgradePluginTest {
 
     verify(windowDAO, never()).deleteByContentId(oldContentId);
     verify(portletInstanceService, never()).deletePortletInstance(2l);
+    verify(portletPreferencesCache).clearCache();
   }
 
 }
