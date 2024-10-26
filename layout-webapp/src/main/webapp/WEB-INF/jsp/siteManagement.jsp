@@ -4,7 +4,7 @@
 <%
   PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
   UserPortalConfigService userPortalConfigService = portalContainer.getComponentInstanceOfType(UserPortalConfigService.class);
-  String defaultPortalName = userPortalConfigService.getDefaultPortal();
+  String defaultPortalName = userPortalConfigService.getMetaPortal();
   String globalPortalName = userPortalConfigService.getGlobalPortal();
 %>
 <div class="VuetifyApp singlePageApplication">

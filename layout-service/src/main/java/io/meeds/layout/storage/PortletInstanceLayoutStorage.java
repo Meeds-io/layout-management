@@ -79,7 +79,7 @@ public class PortletInstanceLayoutStorage {
   @Autowired
   private LayoutService        layoutService;
 
-  public Application<Portlet> getPortletInstanceApplication(PortletInstance portletInstance, long applicationStorageId) {
+  public Application getPortletInstanceApplication(PortletInstance portletInstance, long applicationStorageId) {
     if (portletInstance != null) {
       // Display the portlet instance by id
       return getOrCreatePortletInstanceApplication(portletInstance);
@@ -91,7 +91,7 @@ public class PortletInstanceLayoutStorage {
     }
   }
 
-  public Application<Portlet> getOrCreatePortletInstanceApplication(PortletInstance portletInstance) { // NOSONAR
+  public Application getOrCreatePortletInstanceApplication(PortletInstance portletInstance) { // NOSONAR
     long applicationId = getPortletInstanceApplicationId(portletInstance.getId());
     if (applicationId == 0) {
       return createPortletInstanceApplication(portletInstance);
@@ -104,16 +104,16 @@ public class PortletInstanceLayoutStorage {
     }
   }
 
-  public Application<Portlet> getApplication(long applicationId) {
+  public Application getApplication(long applicationId) {
     return layoutService.getApplicationModel(String.valueOf(applicationId));
   }
 
   public Portlet getApplicationPreferences(long applicationId) {
-    Application<Portlet> application = getApplication(applicationId);
-    return layoutService.load(application.getState(), application.getType());
+    Application application = getApplication(applicationId);
+    return layoutService.load(application.getState());
   }
 
-  public String getApplicationPortletName(Application<Portlet> application) {
+  public String getApplicationPortletName(Application application) {
     String contentId = layoutService.getId(application.getState());
     return StringUtils.isBlank(contentId) ? null : contentId.split("/")[1];
   }
@@ -126,9 +126,8 @@ public class PortletInstanceLayoutStorage {
     return getSettingValue(PORTLET_INSTANCE_SCOPE, portletInstanceId);
   }
 
-  @SuppressWarnings("unchecked")
-  private synchronized Application<Portlet> createPortletInstanceApplication(PortletInstance portletInstance) {
-    TransientApplicationState<Portlet> state = new TransientApplicationState<>(portletInstance.getContentId());
+  private synchronized Application createPortletInstanceApplication(PortletInstance portletInstance) {
+    TransientApplicationState state = new TransientApplicationState(portletInstance.getContentId());
 
     List<String> permissions = portletInstance.getPermissions();
     List<PortletInstancePreference> preferences = portletInstance.getPreferences();
@@ -160,7 +159,7 @@ public class PortletInstanceLayoutStorage {
     layoutService.save(page);
 
     container = getPortletInstanceSystemContainer();
-    Application<Portlet> application = (Application<Portlet>) container.getChildren().get(index);
+    Application application = (Application) container.getChildren().get(index);
     savePortletInstanceApplicationId(Long.parseLong(application.getStorageId()),
                                      portletInstance.getId());
     return application;

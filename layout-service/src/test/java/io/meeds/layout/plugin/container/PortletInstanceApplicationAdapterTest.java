@@ -18,12 +18,15 @@
  */
 package io.meeds.layout.plugin.container;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.*;
-
-import org.exoplatform.portal.config.model.Properties;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,9 +41,8 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.application.PortalRequestContext;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.ModelStyle;
-import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.portal.config.model.Properties;
 
 import io.meeds.layout.service.PortletInstanceService;
 
@@ -58,20 +60,18 @@ public class PortletInstanceApplicationAdapterTest {
   private PortletInstanceService            portletInstanceService;
 
   @Mock
-  private Application<Portlet>              application;
+  private Application              application;
 
   @Autowired
   private PortletInstanceApplicationAdapter portletInstanceApplicationAdapter;
 
   @Test
   public void testNullApplication() {
-    assertEquals(ApplicationType.PORTLET, portletInstanceApplicationAdapter.getType());
     assertNull(portletInstanceApplicationAdapter.getCssStyle());
     assertNull(portletInstanceApplicationAdapter.getWidth());
     assertNull(portletInstanceApplicationAdapter.getHeight());
     assertNotNull(portletInstanceApplicationAdapter.getId());
     assertNotNull(portletInstanceApplicationAdapter.getState());
-    assertFalse(portletInstanceApplicationAdapter.isModifiable());
     assertFalse(portletInstanceApplicationAdapter.getShowInfoBar());
     assertFalse(portletInstanceApplicationAdapter.getShowApplicationState());
     assertFalse(portletInstanceApplicationAdapter.getShowApplicationMode());
@@ -92,7 +92,6 @@ public class PortletInstanceApplicationAdapterTest {
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setWidth(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setHeight(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setId(null));
-    assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setModifiable(false));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setState(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setShowInfoBar(false));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setShowApplicationState(false));
@@ -119,20 +118,18 @@ public class PortletInstanceApplicationAdapterTest {
       when(request.getParameter("portletInstanceId")).thenReturn(String.valueOf(portletInstanceId));
       when(request.getRemoteUser()).thenReturn(USERNAME);
 
-      Application<Portlet> portletApplication = portletInstanceApplicationAdapter.getApplication();
+      Application portletApplication = portletInstanceApplicationAdapter.getApplication();
       assertNotNull(portletApplication);
 
       int i = 0;
       ModelStyle cssStyle = mock(ModelStyle.class);
-      @SuppressWarnings("unchecked")
-      ApplicationState<Portlet> state = mock(ApplicationState.class);
+      ApplicationState state = mock(ApplicationState.class);
       Properties properties = mock(Properties.class);
       when(portletApplication.getCssStyle()).thenReturn(cssStyle);
       when(portletApplication.getWidth()).thenReturn(String.valueOf(++i));
       when(portletApplication.getHeight()).thenReturn(String.valueOf(++i));
       when(portletApplication.getId()).thenReturn(String.valueOf(++i));
       when(portletApplication.getState()).thenReturn(state);
-      when(portletApplication.isModifiable()).thenReturn(true);
       when(portletApplication.getShowInfoBar()).thenReturn(true);
       when(portletApplication.getShowApplicationState()).thenReturn(true);
       when(portletApplication.getShowApplicationMode()).thenReturn(true);
@@ -150,7 +147,6 @@ public class PortletInstanceApplicationAdapterTest {
       assertEquals(String.valueOf(++i), portletInstanceApplicationAdapter.getHeight());
       assertEquals(String.valueOf(++i), portletInstanceApplicationAdapter.getId());
       assertEquals(state, portletInstanceApplicationAdapter.getState());
-      assertTrue(portletInstanceApplicationAdapter.isModifiable());
       assertTrue(portletInstanceApplicationAdapter.getShowInfoBar());
       assertTrue(portletInstanceApplicationAdapter.getShowApplicationState());
       assertTrue(portletInstanceApplicationAdapter.getShowApplicationMode());

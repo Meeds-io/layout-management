@@ -59,7 +59,6 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
-import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
@@ -166,7 +165,6 @@ public class PageLayoutServiceTest {
     assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void getPageApplicationLayout() throws IllegalAccessException, ObjectNotFoundException {
     assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
@@ -177,13 +175,12 @@ public class PageLayoutServiceTest {
 
     Container container = mock(Container.class);
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
-    Application<Portlet> application = mock(Application.class);
+    Application application = mock(Application.class);
     when(application.getStorageId()).thenReturn("2");
     when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
     assertNotNull(pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void getPageLayoutWithDynamicContainer() {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
@@ -191,7 +188,7 @@ public class PageLayoutServiceTest {
     when(dynamicContainer.getFactoryId()).thenReturn(ADDON_CONTAINER);
     when(dynamicContainer.getName()).thenReturn(TEST_ADDON_CONTAINER);
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
-    Application<Portlet> application = mock(Application.class);
+    Application application = mock(Application.class);
     when(addOnService.getApplications(TEST_ADDON_CONTAINER)).thenReturn(Collections.singletonList(application));
     pageLayoutService.getPageLayout(PAGE_KEY);
     verify(dynamicContainer).setChildren(argThat(children -> children != null && children.size() == 1
@@ -219,9 +216,6 @@ public class PageLayoutServiceTest {
     when(portalConfig.getAccessPermissions()).thenReturn(new String[] { sitePermission });
     String siteEditPermission = "site edit permission";
     when(portalConfig.getEditPermission()).thenReturn(siteEditPermission);
-    when(userPortalConfigService.createPageTemplate(PageLayoutService.EMPTY_PAGE_TEMPLATE,
-                                                    SITE_KEY.getTypeName(),
-                                                    SITE_KEY.getName())).thenReturn(page);
     assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.createPage(pageModel, TEST_USER));
 
     PageTemplate pageTemplate = mock(PageTemplate.class);
@@ -229,18 +223,19 @@ public class PageLayoutServiceTest {
     when(pageTemplateService.getPageTemplate(2l)).thenReturn(pageTemplate);
 
     pageLayoutService.createPage(pageModel, TEST_USER);
-    verify(layoutService).save(any(PageContext.class), eq(page));
-    verify(page).setAccessPermissions(argThat(permissions -> permissions[0].equals(sitePermission)));
-    verify(page).setEditPermission(argThat(permission -> permission.equals(siteEditPermission)));
-    verify(page).setTitle(pageTitle);
+    verify(layoutService).save(any(PageContext.class),
+                               argThat(p -> p.getAccessPermissions()[0].equals(sitePermission)
+                                            && p.getEditPermission().equals(siteEditPermission)
+                                            && p.getTitle().equals(pageTitle)));
 
     String pagePermission = "page permission";
     when(pageModel.getAccessPermissions()).thenReturn(new String[] { pagePermission });
     String pageEditPermission = "page edit permission";
     when(pageModel.getEditPermission()).thenReturn(pageEditPermission);
     pageLayoutService.createPage(pageModel, TEST_USER);
-    verify(page).setAccessPermissions(argThat(permissions -> permissions[0].equals(pagePermission)));
-    verify(page).setEditPermission(argThat(permission -> permission.equals(pageEditPermission)));
+    verify(layoutService).save(any(PageContext.class),
+                               argThat(p -> p.getAccessPermissions()[0].equals(pagePermission)
+                                            && p.getEditPermission().equals(pageEditPermission)));
   }
 
   @Test
@@ -285,7 +280,6 @@ public class PageLayoutServiceTest {
     verify(layoutService).save(any(PageContext.class), eq(page));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void clonePageWithDynamicContainer() throws IllegalAccessException, ObjectNotFoundException {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
@@ -293,7 +287,7 @@ public class PageLayoutServiceTest {
     when(dynamicContainer.getFactoryId()).thenReturn(ADDON_CONTAINER);
     when(dynamicContainer.getName()).thenReturn(TEST_ADDON_CONTAINER);
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(dynamicContainer)));
-    Application<Portlet> application = mock(Application.class);
+    Application application = mock(Application.class);
     when(addOnService.getApplications(TEST_ADDON_CONTAINER)).thenReturn(Collections.singletonList(application));
     when(aclService.canEditPage(PAGE_KEY, TEST_USER)).thenReturn(true);
     when(page.getName()).thenReturn(PAGE_KEY.getName());
@@ -302,7 +296,6 @@ public class PageLayoutServiceTest {
     verify(page).setChildren(argThat(children -> children != null && children.size() == 1 && children.get(0) == application));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void updatePageLayout() throws IllegalAccessException, ObjectNotFoundException {
     assertThrows(ObjectNotFoundException.class,
@@ -349,7 +342,7 @@ public class PageLayoutServiceTest {
 
     assertDoesNotThrow(() -> pageLayoutService.updatePageLayout(PAGE_KEY.format(), page, true, TEST_USER));
 
-    Application<Portlet> application = mock(Application.class);
+    Application application = mock(Application.class);
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singletonList(application)));
 
     when(application.getWidth()).thenReturn("eval('alert(`XSS in application width CSS style`)')");
