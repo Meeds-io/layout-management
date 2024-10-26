@@ -114,7 +114,7 @@ public class PortletInstanceServiceTest {
   private PortletInstance                 portletInstance;
 
   @Mock
-  private Application<Portlet>            application;
+  private Application            application;
 
   @Mock
   private LocaleConfig                    defaultLocaleConfig;
@@ -550,7 +550,7 @@ public class PortletInstanceServiceTest {
                  () -> portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME));
     when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
     when(portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0)).thenReturn(application);
-    Application<Portlet> portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME);
+    Application portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME);
     assertEquals(application, portletInstanceApplication);
   }
 
@@ -620,22 +620,10 @@ public class PortletInstanceServiceTest {
 
   @Test
   @SneakyThrows
-  public void getPortletInstanceApplicationByInstanceIdAndCreateApplication() {
-    assertThrows(ObjectNotFoundException.class,
-                 () -> portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME));
-    when(portletInstanceStorage.getPortletInstance(2)).thenReturn(portletInstance);
-    when(portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0)).thenReturn(application);
-
-    Application<?> portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(2, 0, USERNAME);
-    assertEquals(application, portletInstanceApplication);
-  }
-
-  @Test
-  @SneakyThrows
   public void getPortletInstanceApplicationByApplicationId() {
     when(portletInstanceLayoutStorage.getPortletInstanceApplication(null, 3)).thenReturn(application);
 
-    Application<?> portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(0, 3, USERNAME);
+    Application portletInstanceApplication = portletInstanceService.getPortletInstanceApplication(0, 3, USERNAME);
     assertEquals(application, portletInstanceApplication);
   }
 

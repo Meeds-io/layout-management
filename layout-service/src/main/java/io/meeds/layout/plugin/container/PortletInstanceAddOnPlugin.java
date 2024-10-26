@@ -57,7 +57,7 @@ public class PortletInstanceAddOnPlugin extends AddOnPlugin {
   }
 
   @Override
-  public List<Application<?>> getApplications() {
+  public List<Application> getApplications() {
     return Collections.singletonList(portletInstanceApplicationAdapter);
   }
 
