@@ -98,7 +98,7 @@ public class PortletInstanceRenderServiceTest {
     when(layoutService.getApplicationModel("3")).thenReturn(application);
     when(portletInstance.getId()).thenReturn(2l);
 
-    Application<?> portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0);
+    Application portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0);
     assertEquals(application, portletInstanceApplication);
   }
 
@@ -113,7 +113,7 @@ public class PortletInstanceRenderServiceTest {
   public void getPortletInstancePreferencesWhenNoPlugin() {
     when(layoutService.getApplicationModel("3")).thenReturn(application);
     Portlet portlet = new Portlet();
-    when(layoutService.load(any(), any())).thenReturn(portlet);
+    when(layoutService.load(any())).thenReturn(portlet);
     portlet.setValue("test", "testValue");
 
     Portlet portletInstancePreferences = portletInstanceLayoutStorage.getApplicationPreferences(3);
@@ -151,7 +151,7 @@ public class PortletInstanceRenderServiceTest {
       return null;
     }).when(container).setChildren(any());
 
-    Application<?> portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0);
+    Application portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(portletInstance, 0);
     assertEquals(application, portletInstanceApplication);
   }
 
@@ -161,7 +161,7 @@ public class PortletInstanceRenderServiceTest {
     when(settingService.get(any(), any(), eq("2"))).thenReturn(new SettingValue("3"));
 
     when(layoutService.getApplicationModel("3")).thenReturn(application);
-    Application<?> portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(null, 3);
+    Application portletInstanceApplication = portletInstanceLayoutStorage.getPortletInstanceApplication(null, 3);
     assertEquals(application, portletInstanceApplication);
   }
 
