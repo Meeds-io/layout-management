@@ -46,6 +46,6 @@ public interface PortletInstancePreferencePlugin {
    * @param preferences current {@link Portlet} preferences
    * @return
    */
-  List<PortletInstancePreference> generatePreferences(Application<Portlet> application, Portlet preferences);
+  List<PortletInstancePreference> generatePreferences(Application application, Portlet preferences);
 
 }

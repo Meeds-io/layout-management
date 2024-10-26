@@ -72,7 +72,6 @@ public class RestEntityBuilder {
     return layoutModel;
   }
 
-  @SuppressWarnings("unchecked")
   private static void computeApplicationContentId(LayoutService layoutService,
                                                   ArrayList<ModelObject> children,
                                                   Map<String, String> contentIds) {

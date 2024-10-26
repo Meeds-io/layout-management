@@ -66,7 +66,7 @@ public class ImagePortletInstancePreferencePlugin implements PortletInstancePref
 
   @Override
   @SneakyThrows
-  public List<PortletInstancePreference> generatePreferences(Application<Portlet> application,
+  public List<PortletInstancePreference> generatePreferences(Application application,
                                                              Portlet preferences) {
     String settingName = getCmsSettingName(preferences);
     if (StringUtils.isBlank(settingName)) {
