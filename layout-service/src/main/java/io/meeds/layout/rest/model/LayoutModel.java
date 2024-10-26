@@ -35,7 +35,6 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationBackgroundStyle;
 import org.exoplatform.portal.config.model.ApplicationState;
-import org.exoplatform.portal.config.model.ApplicationType;
 import org.exoplatform.portal.config.model.CloneApplicationState;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
@@ -292,12 +291,11 @@ public class LayoutModel {
       this.showApplicationMode = application.getShowApplicationMode();
       this.accessPermissions = application.getAccessPermissions();
 
-      @SuppressWarnings("unchecked")
-      ApplicationState<Portlet> state = application.getState();
+      ApplicationState state = application.getState();
       switch (state) {
-      case PersistentApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
-      case CloneApplicationState<Portlet> persistentState -> this.storageId = persistentState.getStorageId();
-      case TransientApplicationState<Portlet> transientState -> {
+      case PersistentApplicationState persistentState -> this.storageId = persistentState.getStorageId();
+      case CloneApplicationState persistentState -> this.storageId = persistentState.getStorageId();
+      case TransientApplicationState transientState -> {
         this.contentId = transientState.getContentId();
         Portlet portlet = transientState.getContentState();
         this.preferences = portlet == null ? Collections.emptyList() :
@@ -348,8 +346,7 @@ public class LayoutModel {
       }
       return container;
     } else { // NOSONAR
-      Application<Portlet> application = new Application<>(ApplicationType.PORTLET,
-                                                           layoutModel.getStorageId());
+      Application application = new Application(layoutModel.getStorageId());
       application.setId(layoutModel.getId());
       application.setStorageName(layoutModel.getStorageName());
       application.setIcon(layoutModel.getIcon());
@@ -364,11 +361,11 @@ public class LayoutModel {
       application.setAccessPermissions(layoutModel.getAccessPermissions());
       application.setCssStyle(cssStyle);
 
-      ApplicationState<Portlet> state;
+      ApplicationState state;
       if (StringUtils.isNotBlank(layoutModel.getStorageId())) {
-        state = new PersistentApplicationState<>(layoutModel.getStorageId());
+        state = new PersistentApplicationState(layoutModel.getStorageId());
       } else if (StringUtils.isNotBlank(layoutModel.getContentId())) {
-        TransientApplicationState<Portlet> transientState = new TransientApplicationState<>(layoutModel.getContentId());
+        TransientApplicationState transientState = new TransientApplicationState(layoutModel.getContentId());
         transientState.setOwnerId(layoutModel.getOwnerId());
         transientState.setOwnerType(layoutModel.getOwnerType());
         if (CollectionUtils.isNotEmpty(layoutModel.getPreferences())) {
