@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -36,6 +37,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
+import org.exoplatform.portal.pom.spi.portlet.Preference;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -345,6 +347,23 @@ public class PortletInstanceService {
 
   public List<PortletInstance> getPortletInstances() {
     return portletInstanceStorage.getPortletInstances();
+  }
+
+  public Portlet exportApplicationPreferences(Application application) {
+    String portletName = portletInstanceLayoutStorage.getApplicationPortletName(application);
+    if (preferencePlugins.containsKey(portletName)) {
+      PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletName);
+      Portlet preferences = portletInstanceLayoutStorage.getApplicationPreferences(Long.parseLong(application.getStorageId()));
+      List<PortletInstancePreference> exportedPreferences = plugin.generatePreferences(application, preferences);
+      Map<String, Preference> preferencesMap = exportedPreferences.stream()
+                                                                  .collect(Collectors.toMap(PortletInstancePreference::getName,
+                                                                                            p -> new Preference(p.getName(),
+                                                                                                                p.getValue(),
+                                                                                                                false)));
+      return new Portlet(preferencesMap);
+    } else {
+      return null;
+    }
   }
 
   private void deletePortletInstanceFromStore(long id) throws ObjectNotFoundException {
