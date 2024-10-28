@@ -139,6 +139,20 @@ public class PageLayoutService {
     return application;
   }
 
+  public void impersonateSite(SiteKey siteKey) {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    impersonateModel(portalConfig.getPortalLayout());
+    List<PageContext> pages = layoutService.findPages(siteKey);
+    if (CollectionUtils.isNotEmpty(pages)) {
+      pages.forEach(page -> impersonatePage(page.getKey()));
+    }
+  }
+
+  public void impersonatePage(PageKey pageKey) {
+    Page page = getPageLayout(pageKey);
+    impersonateModel(page);
+  }
+
   public Page getPageLayout(PageKey pageKey, String username) throws ObjectNotFoundException, IllegalAccessException {
     Page page = getPageLayout(pageKey);
     if (page == null) {
@@ -460,6 +474,21 @@ public class PageLayoutService {
     Portlet portletPreferences = getApplicationPreferences(Long.parseLong(application.getStorageId()), username);
     TransientApplicationState applicationState = new TransientApplicationState(portletContentId, portletPreferences);
     application.setState(applicationState);
+  }
+
+  @SneakyThrows
+  private void impersonateModel(ModelObject object) {
+    if (object instanceof Container container) {
+      ArrayList<ModelObject> children = container.getChildren();
+      if (CollectionUtils.isNotEmpty(children)) {
+        children.forEach(this::impersonateModel);
+      }
+    } else if (object instanceof Application application) {
+      Portlet preferences = portletInstanceService.exportApplicationPreferences(application);
+      if (preferences != null) {
+        layoutService.save(application.getState(), preferences);
+      }
+    }
   }
 
   private Portlet getApplicationPreferences(long applicationId, String username) throws IllegalAccessException,
