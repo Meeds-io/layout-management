@@ -37,7 +37,10 @@ import org.springframework.stereotype.Service;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.portal.application.PortalRequestHandler;
+import org.exoplatform.portal.application.PortalTemplateRequestHandler;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.State;
 import org.exoplatform.portal.mop.Visibility;
 import org.exoplatform.portal.mop.navigation.NodeContext;
@@ -297,11 +300,19 @@ public class NavigationLayoutService {
     Router router = webController.getRouter();
 
     Map<QualifiedName, String> params = new HashMap<>();
-    params.put(WebAppController.HANDLER_PARAM, "portal"); // PortalRequestHandler.NAME
-    params.put(PortalRequestHandler.REQUEST_SITE_NAME, siteKey.getName());
-    params.put(PortalRequestHandler.REQUEST_SITE_TYPE, siteKey.getTypeName());
-    params.put(PortalRequestHandler.REQUEST_PATH, uriBuilder.toString().replaceFirst("/", ""));
-    params.put(PortalRequestHandler.LANG, Locale.ENGLISH.toLanguageTag());
+    if (siteKey.getType() == SiteType.GROUP_TEMPLATE) {
+      PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+      params.put(WebAppController.HANDLER_PARAM, PortalTemplateRequestHandler.HANDLER_NAME);
+      params.put(PortalTemplateRequestHandler.REQUEST_SITE_ID, (portalConfig.getStorageId().split("_"))[1]);
+      params.put(PortalTemplateRequestHandler.REQUEST_PATH, uriBuilder.toString().replaceFirst("/", ""));
+      params.put(PortalTemplateRequestHandler.LANG, Locale.ENGLISH.toLanguageTag());
+    } else {
+      params.put(WebAppController.HANDLER_PARAM, PortalRequestHandler.HANDLER_NAME);
+      params.put(PortalRequestHandler.REQUEST_SITE_NAME, siteKey.getName());
+      params.put(PortalRequestHandler.REQUEST_SITE_TYPE, siteKey.getTypeName());
+      params.put(PortalRequestHandler.REQUEST_PATH, uriBuilder.toString().replaceFirst("/", ""));
+      params.put(PortalRequestHandler.LANG, Locale.ENGLISH.toLanguageTag());
+    }
     return router.render(params).replace("/en", "").replace("?lang=en", "").replace("&lang=en", "");
   }
 
