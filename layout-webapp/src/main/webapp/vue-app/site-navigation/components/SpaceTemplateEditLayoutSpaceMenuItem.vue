@@ -19,7 +19,10 @@
 
 -->
 <template>
-  <v-tooltip v-if="spaceTemplate.layout" :disabled="!spaceTemplate.system" bottom>
+  <v-tooltip
+    v-if="spaceTemplate.layout"
+    :disabled="!spaceTemplate.system"
+    bottom>
     <template #activator="{ on, attrs }">
       <div
         v-on="on"
