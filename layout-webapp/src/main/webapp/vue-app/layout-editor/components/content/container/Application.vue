@@ -136,6 +136,9 @@ export default {
     applicationInstalled() {
       this.$emit('initialized');
       this.computeHasContent();
+      window.setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
+      }, 200);
     },
     storageId(newVal, oldVal) {
       if (!oldVal && newVal) {
