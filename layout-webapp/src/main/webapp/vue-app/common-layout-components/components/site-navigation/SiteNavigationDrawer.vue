@@ -19,7 +19,8 @@
 <template>
   <exo-drawer
     id="siteNavigationDrawer"
-    ref="siteNavigationDrawer"
+    ref="drawer"
+    v-model="drawer"
     :right="!$vuetify.rtl"
     eager
     allow-expand
@@ -28,7 +29,16 @@
       <span>{{ $t('siteNavigation.drawer.title') }}</span>
     </template>
     <template slot="content">
-      <div :class="$refs.siteNavigationDrawer?.expand ? 'singlePageApplication' : ' ' ">
+      <div :class="$refs.drawer?.expand ? 'singlePageApplication' : ' ' ">
+        <v-alert
+          v-if="information"
+          class="mx-4 mt-4 mb-0"
+          type="info"
+          outlined>
+          <div class="text-color">
+            <span v-sanitized-html="$t(information)"></span>
+          </div>
+        </v-alert>
         <v-toolbar
           color="white"
           flat
@@ -38,18 +48,18 @@
             class="font-weight-bold text-truncate">
             {{ label }}
           </span>
-          <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
+          <v-spacer v-if="!$refs.drawer?.expand" />
           <v-btn
             v-if="isMetaSite"
             @click="createNode"
             class="btn btn-primary ms-2">
             {{ $t('siteNavigation.label.btn.createNode') }}
           </v-btn>
-          <v-spacer v-if="$refs.siteNavigationDrawer?.expand" />
+          <v-spacer v-if="$refs.drawer?.expand" />
           <select
             id="siteNavigationDrawerFilterSelect"
             v-model="filter"
-            v-if="$refs.siteNavigationDrawer?.expand"
+            v-if="$refs.drawer?.expand"
             class="ignore-vuetify-classes width-auto pa-0 me-5 mb-0">
             <option
               v-for="item in navigationsFilter"
@@ -61,9 +71,18 @@
         </v-toolbar>
         <site-navigation-nodes-list
           :navigation-nodes="navigationNodesToDisplay"
-          :expanded="$refs.siteNavigationDrawer && $refs.siteNavigationDrawer?.expand"
+          :expanded="$refs.drawer?.expand"
           :loading="loading"
           :hide-children="hideChildren" />
+      </div>
+    </template>
+    <template v-if="displayCloseFooter" #footer>
+      <div class="d-flex justify-end">
+        <v-btn
+          class="btn"
+          @click="drawer = false">
+          {{ $t('siteNavigation.label.btn.close') }}
+        </v-btn>
       </div>
     </template>
   </exo-drawer>
@@ -74,10 +93,12 @@ export default {
     return {
       navigationNodes: [],
       navigationNodesToDisplay: [],
-      siteName: null,
+      displayCloseFooter: false,
+      drawer: false,
       siteType: null,
       siteId: null,
       siteLabel: null,
+      information: null,
       includeGlobal: false,
       loading: false,
       filter: 'ALL',
@@ -127,9 +148,11 @@ export default {
       this.siteType = event?.siteType || eXo.env.portal.siteKeyType;
       this.siteLabel = event?.siteLabel;
       this.siteId = event?.siteId || eXo.env.portal.siteId;
+      this.information = event?.information;
       this.includeGlobal = event?.includeGlobal || false;
+      this.displayCloseFooter = event?.displayCloseFooter || false;
       this.getNavigationNodes();
-      this.$refs.siteNavigationDrawer.open();
+      this.$refs.drawer.open();
       this.$nextTick().then(() =>  this.$root.$emit('site-navigation-drawer-opened'));
     },
     close() {
@@ -140,7 +163,7 @@ export default {
       this.navigationNodes = [];
       this.navigationNodesToDisplay = [];
       this.$root.$emit('site-navigation-hide-nodes-tree');
-      this.$refs.siteNavigationDrawer.close();
+      this.$refs.drawer.close();
     },
     getNavigationNodes() {
       this.loading = true;

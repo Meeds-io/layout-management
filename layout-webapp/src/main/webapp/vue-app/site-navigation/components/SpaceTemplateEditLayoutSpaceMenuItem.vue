@@ -19,7 +19,10 @@
 
 -->
 <template>
-  <v-tooltip v-if="spaceTemplate.layout" :disabled="!spaceTemplate.system" bottom>
+  <v-tooltip
+    v-if="spaceTemplate.layout"
+    :disabled="!spaceTemplate.system"
+    bottom>
     <template #activator="{ on, attrs }">
       <div
         v-on="on"
@@ -34,7 +37,7 @@
             fa-columns
           </v-icon>
           <v-list-item-title class="ps-2">
-            <span :class="spaceTemplate.system && 'disabled--text'">{{ $t('spaceTemplate.label.editLayout') }}</span>
+            <span :class="spaceTemplate.system && 'disabled--text'">{{ $t('spaceTemplate.label.editNavigation') }}</span>
           </v-list-item-title>
         </v-list-item>
       </div>
