@@ -54,7 +54,6 @@
     </v-footer>
   </v-card>
 </template>
-
 <script>
 export default {
   props: {
@@ -69,7 +68,7 @@ export default {
     },
     siteTypeLabel() {
       return this.$t(`siteManagement.label.${this.site.siteType.toLowerCase()}`) ;
-    }
+    },
   },
   methods: {
     openSiteNavigationDrawer() {

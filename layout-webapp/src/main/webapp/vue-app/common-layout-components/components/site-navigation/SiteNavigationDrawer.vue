@@ -36,7 +36,7 @@
           <span
             :title="siteName"
             class="font-weight-bold text-truncate">
-            {{ siteName }}
+            {{ label }}
           </span>
           <v-spacer v-if="!$refs.siteNavigationDrawer?.expand" />
           <v-btn
@@ -77,6 +77,7 @@ export default {
       siteName: null,
       siteType: null,
       siteId: null,
+      siteLabel: null,
       includeGlobal: false,
       loading: false,
       filter: 'ALL',
@@ -104,7 +105,10 @@ export default {
     },
     isMetaSite() {
       return this.site?.metaSite;
-    }
+    },
+    label() {
+      return this.siteLabel || this.siteName;
+    },
   },
   watch: {
     filter() {
@@ -121,6 +125,7 @@ export default {
     open(event) {
       this.siteName = event?.siteName || eXo.env.portal.spaceDisplayName || eXo.env.portal.siteKeyName;
       this.siteType = event?.siteType || eXo.env.portal.siteKeyType;
+      this.siteLabel = event?.siteLabel;
       this.siteId = event?.siteId || eXo.env.portal.siteId;
       this.includeGlobal = event?.includeGlobal || false;
       this.getNavigationNodes();
