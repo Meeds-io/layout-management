@@ -55,6 +55,12 @@ extensionRegistry.registerExtension('space-templates', 'space-templates-item-act
   componentName: 'site-navigation-space-template-manage-layout',
 });
 
+extensionRegistry.registerExtension('space-templates', 'space-templates-main', {
+  rank: 10,
+  name: 'manage-layout',
+  componentName: 'site-navigation-space-template-create-listener',
+});
+
 const appId = 'siteNavigation';
 
 //getting language of the PLF
