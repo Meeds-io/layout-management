@@ -44,6 +44,7 @@ export default {
   data() {
     return {
       sites: [],
+      loading: 0,
       siteToDelete: null,
       deleteConfirmMessage: '',
     };
@@ -55,12 +56,10 @@ export default {
   },
   methods: {
     getSites() {
-      this.loading = true;
-      return this.$siteService.getSites(null, 'USER', null, true, true, false, false, false, null, true)
-        .then(sites => {
-          this.sites = sites || [];
-        })
-        .finally(() => this.loading = false);
+      this.loading++;
+      return this.$siteService.getSites('PORTAL', null, 'public', true, true, false, false, false, null, true)
+        .then(sites => this.sites = sites?.filter(s => !s?.properties?.IS_SPACE_PUBLIC_SITE) || [])
+        .finally(() => this.loading--);
     },
     confirmDelete(siteToDelete) {
       this.siteToDelete = siteToDelete;
@@ -68,10 +67,11 @@ export default {
       this.$refs.deleteSiteConfirmDialog.open();
     },
     deleteSite() {
+      this.loading++;
       return this.$siteLayoutService.deleteSite(this.siteToDelete.siteType, this.siteToDelete.name)
-        .then(() => {
-          this.$root.$emit('refresh-sites');
-        });}
+        .then(() => this.$root.$emit('refresh-sites'))
+        .finally(() => this.loading--);
+    },
   }
 };
 </script>
