@@ -50,6 +50,7 @@ import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -74,6 +75,9 @@ public class SiteLayoutServiceTest {
 
   @MockBean
   private LayoutService           layoutService;
+
+  @MockBean
+  private NavigationService       navigationService;
 
   @MockBean
   private UserPortalConfigService portalConfigService;
