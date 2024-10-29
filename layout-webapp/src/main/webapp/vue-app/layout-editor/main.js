@@ -129,6 +129,9 @@ export function init() {
           pageId() {
             return this.$root.page?.state?.storageId?.replace?.('page_', '');
           },
+          isSpaceSiteTemplate() {
+            return this.pageRef?.toLowerCase?.()?.indexOf('group_template::') === 0;
+          },
         },
         watch: {
           movingParentId() {
