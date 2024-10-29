@@ -27,6 +27,7 @@ import SaveTemplateButton from './components/toolbar/actions/SaveTemplateButton.
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButton.vue';
 import PagePreviewButton from './components/toolbar/actions/PagePreviewButton.vue';
+import PageSpacePreviewButton from './components/toolbar/actions/PageSpacePreviewButton.vue';
 import PagePropertiesButton from './components/toolbar/actions/PagePropertiesButton.vue';
 
 import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
@@ -81,6 +82,7 @@ const components = {
   'layout-editor-toolbar-save-template-button': SaveTemplateButton,
   'layout-editor-toolbar-history-buttons': HistoryButtons,
   'layout-editor-toolbar-page-preview-button': PagePreviewButton,
+  'layout-editor-toolbar-page-space-preview-button': PageSpacePreviewButton,
   'layout-editor-toolbar-page-properties-button': PagePropertiesButton,
   'layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'layout-editor-content': Content,
