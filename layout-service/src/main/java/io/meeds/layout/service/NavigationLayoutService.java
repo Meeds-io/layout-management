@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.commons.utils.ExpressionUtil;
 import org.exoplatform.portal.application.PortalRequestHandler;
-import org.exoplatform.portal.application.PortalTemplateRequestHandler;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
@@ -62,6 +61,7 @@ import io.meeds.common.ContainerTransactional;
 import io.meeds.layout.model.NavigationCreateModel;
 import io.meeds.layout.model.NavigationUpdateModel;
 import io.meeds.layout.model.NodeLabel;
+import io.meeds.portal.web.handler.PortalTemplateRequestHandler;
 
 @Service
 public class NavigationLayoutService {
