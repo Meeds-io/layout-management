@@ -37,6 +37,7 @@ import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.user.UserPortal;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -54,6 +55,9 @@ public class SiteLayoutService {
 
   @Autowired
   private LayoutService           layoutService;
+
+  @Autowired
+  private NavigationService       navigationService;
 
   @Autowired
   private LocaleConfigService     localeConfigService;
@@ -151,6 +155,8 @@ public class SiteLayoutService {
     } else if (!aclService.canEditSite(siteKey, username)) {
       throw new IllegalAccessException(String.format("Site with key %s can't be deleted by user %s", siteKey, username));
     }
+    navigationService.destroyNavigation(siteKey);
+    layoutService.removePages(siteKey);
     layoutService.remove(portalConfig);
   }
 
