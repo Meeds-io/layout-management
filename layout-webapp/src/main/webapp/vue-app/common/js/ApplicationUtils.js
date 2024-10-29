@@ -179,7 +179,8 @@ export function getStyle(container, options) {
 }
 
 export function getApplicationContent(navUri, applicationStorageId, applicationMode) {
-  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}`, {
+  const options = eXo.env.portal.previewSpaceId && `&previewSpaceId=${eXo.env.portal.previewSpaceId}` || '';
+  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${options}`, {
     credentials: 'include',
     method: 'GET',
     redirect: 'manual'

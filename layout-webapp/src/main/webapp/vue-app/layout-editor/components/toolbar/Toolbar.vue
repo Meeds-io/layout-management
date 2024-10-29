@@ -35,8 +35,11 @@
       class="me-3" />
     <layout-editor-toolbar-page-properties-button
       class="me-3" />
+    <layout-editor-toolbar-page-space-preview-button
+      v-if="$root.isSpaceSiteTemplate"
+      class="me-3" />
     <layout-editor-toolbar-page-preview-button
-      v-if="!pageTemplateId"
+      v-else-if="!pageTemplateId"
       class="me-3" />
     <layout-editor-toolbar-mobile-preview-button
       class="me-3" />
