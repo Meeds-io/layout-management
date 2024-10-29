@@ -80,7 +80,8 @@ export default {
       selectedPage: null,
       loading: false,
       resetDrawer: true,
-      isValidForm: true
+      isValidForm: true,
+      pageTemplates: null,
     };
   },
   computed: {
@@ -91,19 +92,21 @@ export default {
       return !this.isValidForm || !this.pageTemplate || false;
     },
     pageTemplate() {
-      return this.$root?.pageTemplates && this.$root.pageTemplates.find(item => item.id === this.pageTempalateId);
-    }
+      return this.pageTemplates?.find?.(item => item.id === this.pageTempalateId);
+    },
   },
   created() {
     this.$root.$on('open-add-element-drawer', this.open);
     this.$root.$on('close-add-element-drawer', this.close);
     this.$root.$on('existing-page-selected', this.changeSelectedPage);
+    this.$root.$on('page-templates-loaded', this.updatePageTemplates);
+    this.pageTemplates = this.$root.pageTemplates;
   },
   beforeDestroy() {
     this.$root.$off('open-add-element-drawer', this.open);
     this.$root.$off('close-add-element-drawer', this.close);
-    this.$root.$off('page-template-changed', this.changePageTemplate);
     this.$root.$off('existing-page-selected', this.changeSelectedPage);
+    this.$root.$off('page-templates-loaded', this.updatePageTemplates);
   },
   methods: {
     open(elementName, elementTitle, navigationNode) {
@@ -129,6 +132,9 @@ export default {
     },
     changeSelectedPage(selectedPage) {
       this.selectedPage = selectedPage;
+    },
+    updatePageTemplates(pageTemplates) {
+      this.pageTemplates = pageTemplates;
     },
     createElement() {
       this.loading = true;
