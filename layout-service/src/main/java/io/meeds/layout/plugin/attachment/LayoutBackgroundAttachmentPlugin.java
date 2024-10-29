@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.security.Identity;
@@ -63,14 +64,14 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
 
   @Override
   public boolean hasEditPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    return layoutAclService.canEditPage(getPageKey(entityId.split("_")[0]),
-                                        userIdentity == null ? null : userIdentity.getUserId());
+    return layoutAclService.canEditPage(getPageKey(entityId), getUsername(userIdentity));
   }
 
   @Override
   public boolean hasAccessPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    return layoutAclService.canViewPage(getPageKey(entityId.split("_")[0]),
-                                        userIdentity == null ? null : userIdentity.getUserId());
+    PageKey pageKey = getPageKey(entityId);
+    return pageKey.getSite().getType() == SiteType.GROUP_TEMPLATE
+           || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
   }
 
   @Override
@@ -84,10 +85,14 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
   }
 
   private PageKey getPageKey(String entityId) {
-    String pageUuid = entityId.replace("page_", "");
+    String pageUuid = entityId.split("_")[0].replace("page_", "");
     long pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
     Page page = layoutService.getPage(pageId);
     return page.getPageKey();
+  }
+
+  private String getUsername(Identity userIdentity) {
+    return userIdentity == null ? null : userIdentity.getUserId();
   }
 
 }
