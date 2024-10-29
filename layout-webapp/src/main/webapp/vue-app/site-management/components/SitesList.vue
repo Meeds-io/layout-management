@@ -33,7 +33,6 @@
     </v-row>
   </v-layout>
 </template>
-
 <script>
 export default {
   props: {
