@@ -42,6 +42,12 @@
 
 <script>
 export default {
+  props: {
+    pageTemplates: {
+      type: Array,
+      default: null,
+    },
+  },
   data() {
     return {
       collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
@@ -49,9 +55,6 @@ export default {
     };
   },
   computed: {
-    pageTemplates() {
-      return this.$root.pageTemplates || [];
-    },
     blankTemplates() {
       const items = this.pageTemplates.filter(item => item.category === 'blank');
       items.sort((a, b) => this.collator.compare(a.name.toLowerCase(), b.name.toLowerCase()));
