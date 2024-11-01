@@ -94,6 +94,8 @@ export function init() {
           diffScrollY: 0,
           gap: 20,
           nodeUri: null,
+          originalUri: `/portal/${window.location.href.split('/portal/')[1]}`,
+          originalHref: window.location.href,
         }),
         computed: {
           parentAppX() {
@@ -157,6 +159,9 @@ export function init() {
           },
         },
         created() {
+          // Some applications will change the window location state when displayed
+          // This will ensure to preserve the original Page location URI
+          new MutationObserver(this.setOriginalUri).observe(document, { subtree: true, childList: true });
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
           this.$on('layout-editor-portlet-instances-refresh', this.refreshPortletInstances);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
@@ -169,6 +174,11 @@ export function init() {
           this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
         },
         methods: {
+          setOriginalUri() {
+            if (window.location.href !== this.originalHref) {
+              window.history.replaceState('', window.document.title, this.originalUri);
+            }
+          },
           setDrawerOpened() {
             this.drawerOpened++;
           },

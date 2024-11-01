@@ -166,9 +166,6 @@ export default {
     openSitePropertiesDrawer() {
       this.$root.$emit('open-site-properties-drawer', this.site);
     },
-    editSiteLayout() {
-      this.$siteLayoutService.editSiteLayout(this.site.name, this.site.type);
-    }
   }
 };
 </script>
