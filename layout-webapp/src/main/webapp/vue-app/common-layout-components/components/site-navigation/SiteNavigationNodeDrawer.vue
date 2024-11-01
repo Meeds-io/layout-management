@@ -462,7 +462,6 @@ export default {
                 'nodeTarget': this.nodeTarget ? 'NEW_TAB' : 'SAME_TAB',
                 'pageType': this.elementType,
                 'createdPage': createdPage,
-                'openEditLayout': this.elementType === 'PAGE',
               };
               this.updateNode(pageData,pageRef, startScheduleDate, endScheduleDate, nodeLabels);
             }).then(page => {
@@ -498,7 +497,6 @@ export default {
               'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
               'pageType': this.elementType,
               'createdPage': createdPage,
-              'openEditLayout': this.elementType === 'PAGE',
             };
             this.createNode(previousNodeId, pageData, startScheduleDate, endScheduleDate, nodeLabels);
           }).then(page => {
@@ -525,7 +523,6 @@ export default {
     updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels) {
       this.$navigationLayoutService.updateNode(this.navigationNode.id, this.nodeLabel, pageRef, this.visible, this.isScheduled, startScheduleDate, endScheduleDate, nodeLabels?.labels, pageData?.nodeTarget || this.navigationNode.target, this.nodeIcon)
         .then(() => {
-          this.openTargetPage(pageData, this.navigationNode.id);
           this.$root.$emit('refresh-navigation-nodes');
           this.$root.$emit('close-add-element-drawer');
           this.close();
@@ -592,16 +589,10 @@ export default {
     },
     openTargetPage(pageData, nodeId) {
       if (pageData?.pageRef) {
-        if (pageData?.pageType === 'PAGE' && pageData?.pageRef && pageData?.openEditLayout) {
+        if (pageData?.pageType === 'PAGE' && pageData?.pageRef) {
           return this.$pageLayoutService.editPageLayout(nodeId || this.nodeId, pageData?.pageRef);
-        } else {
-          let targetPageUrl ;
-          if (pageData?.pageType === 'LINK' ) {
-            targetPageUrl =  this.urlVerify(pageData?.createdPage?.state?.link) ;
-          } else {
-            targetPageUrl = `/portal${this.navigationNode.siteKey.type === 'GROUP' ? '/g' : ''}/${this.navigationNode.siteKey.name.replaceAll('/', ':')}/${this.navigationNode.uri}`;
-            targetPageUrl =  !this.editMode && `${targetPageUrl}/${this.nodeId}` || targetPageUrl;
-          }
+        } else if (pageData?.pageType === 'LINK' ) {
+          const targetPageUrl =  this.urlVerify(pageData?.createdPage?.state?.link) ;
           window.open(targetPageUrl, pageData?.nodeTarget === 'SAME_TAB' && '_self' || '_blank');
         }
       }
