@@ -183,11 +183,3 @@ export function getMembershipTypes() {
     }
   });
 }
-
-export function editSiteLayout(siteName, siteType) {
-  const formData = new FormData();
-  formData.append('siteName', siteName);
-  formData.append('siteType', siteType || 'portal');
-  const params = new URLSearchParams(formData).toString();
-  window.open(`${eXo.env.portal.context}/${eXo.env.portal.portalName}/layout-editor?${params}`, '_blank');
-}
