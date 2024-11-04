@@ -20,11 +20,15 @@
 import SiteNavigation from './components/SiteNavigation.vue';
 import SiteNavigationButton from './components/SiteNavigationButton.vue';
 import SiteNavigationDrawersActions from './components/SiteNavigationDrawersActions.vue';
+import SpaceTemplateEditLayoutSpaceMenuItem from './components/SpaceTemplateEditLayoutSpaceMenuItem.vue';
+import SpaceTemplateCreateListener from './components/SpaceTemplateCreateListener.vue';
 
 const components = {
   'site-navigation': SiteNavigation,
   'site-navigation-button': SiteNavigationButton,
-  'site-navigation-drawers-actions': SiteNavigationDrawersActions
+  'site-navigation-drawers-actions': SiteNavigationDrawersActions,
+  'site-navigation-space-template-manage-layout': SpaceTemplateEditLayoutSpaceMenuItem,
+  'site-navigation-space-template-create-listener': SpaceTemplateCreateListener,
 };
 
 for (const key in components) {

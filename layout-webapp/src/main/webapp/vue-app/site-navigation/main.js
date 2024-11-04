@@ -43,6 +43,24 @@ extensionRegistry.registerComponent('manageSpaceDrawers', 'manage-space-drawers'
   rank: 20,
 });
 
+extensionRegistry.registerComponent('space-templates', 'space-templates-drawers', {
+  id: 'manage-space-drawers',
+  vueComponent: Vue.options.components['site-navigation-drawers-actions'],
+  rank: 10,
+});
+
+extensionRegistry.registerExtension('space-templates', 'space-templates-item-action', {
+  rank: 25,
+  name: 'manage-layout',
+  componentName: 'site-navigation-space-template-manage-layout',
+});
+
+extensionRegistry.registerExtension('space-templates', 'space-templates-main', {
+  rank: 10,
+  name: 'manage-layout',
+  componentName: 'site-navigation-space-template-create-listener',
+});
+
 const appId = 'siteNavigation';
 
 //getting language of the PLF

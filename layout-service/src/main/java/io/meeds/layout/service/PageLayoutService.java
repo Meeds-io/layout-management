@@ -36,7 +36,6 @@ import com.google.javascript.jscomp.jarjar.com.google.re2j.Pattern;
 
 import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
@@ -95,9 +94,6 @@ public class PageLayoutService {
   private PortletInstanceService  portletInstanceService;
 
   @Autowired
-  private UserPortalConfigService userPortalConfigService;
-
-  @Autowired
   private AddOnService            addOnService;
 
   public List<PageContext> getPages(String siteTypeName,
@@ -128,12 +124,12 @@ public class PageLayoutService {
     return page;
   }
 
-  public Application<Portlet> getPageApplicationLayout(PageKey pageKey,
-                                                       long applicationId,
-                                                       String username) throws ObjectNotFoundException,
-                                                                        IllegalAccessException {
+  public Application getPageApplicationLayout(PageKey pageKey,
+                                              long applicationId,
+                                              String username) throws ObjectNotFoundException,
+                                                               IllegalAccessException {
     Page page = getPageLayout(pageKey, username);
-    Application<Portlet> application = findApplication(page, applicationId);
+    Application application = findApplication(page, applicationId);
     if (application == null) {
       throw new ObjectNotFoundException(String.format("Application with id %s wasn't found in page %s",
                                                       applicationId,
@@ -141,6 +137,20 @@ public class PageLayoutService {
     }
     computeApplicationPreferences(application, username);
     return application;
+  }
+
+  public void impersonateSite(SiteKey siteKey) {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    impersonateModel(portalConfig.getPortalLayout());
+    List<PageContext> pages = layoutService.findPages(siteKey);
+    if (CollectionUtils.isNotEmpty(pages)) {
+      pages.forEach(page -> impersonatePage(page.getKey()));
+    }
+  }
+
+  public void impersonatePage(PageKey pageKey) {
+    Page page = getPageLayout(pageKey);
+    impersonateModel(page);
   }
 
   public Page getPageLayout(PageKey pageKey, String username) throws ObjectNotFoundException, IllegalAccessException {
@@ -231,7 +241,7 @@ public class PageLayoutService {
     } else if (!aclService.canEditPage(pageKey, username)) {
       throw new IllegalAccessException(String.format(PAGE_NOT_EDITABLE_MESSAGE, pageKey.format(), username));
     }
-    Application<Portlet> application = findApplication(page, applicationId);
+    Application application = findApplication(page, applicationId);
     if (application == null) {
       throw new ObjectNotFoundException(String.format("Application with id %s wasn't found in page %s",
                                                       applicationId,
@@ -345,14 +355,11 @@ public class PageLayoutService {
       if (pageTemplate.isDisabled()) {
         throw new IllegalArgumentException("pageTemplate with designated Id is disabled");
       }
-      Page page = userPortalConfigService.createPageTemplate(EMPTY_PAGE_TEMPLATE,
-                                                             siteType,
-                                                             siteName);
+      Page page = new Page(siteType, siteName, pageName);
       Page pageLayout = JsonUtils.fromJsonString(pageTemplate.getContent(), LayoutModel.class)
                                  .toPage();
       page.setChildren(pageLayout.getChildren());
       page.resetStorage();
-      page.setName(pageName);
       page.setType(pageType.name());
       yield page;
     }
@@ -374,7 +381,7 @@ public class PageLayoutService {
 
   private void expandAddonContainerChildren(Container container) {
     if (StringUtils.equals(container.getFactoryId(), "addonContainer")) {
-      List<Application<Portlet>> applications = addOnService.getApplications(container.getName());
+      List<Application> applications = addOnService.getApplications(container.getName());
       if (CollectionUtils.isNotEmpty(applications)) {
         container.setChildren(new ArrayList<>(applications));
       }
@@ -393,12 +400,12 @@ public class PageLayoutService {
     if (subContainers == null) {
       return;
     }
-    LinkedHashMap<Integer, List<Application<Portlet>>> addonContainerChildren = new LinkedHashMap<>();
+    LinkedHashMap<Integer, List<Application>> addonContainerChildren = new LinkedHashMap<>();
     for (int i = subContainers.size() - 1; i >= 0; i--) {
       ModelObject modelObject = subContainers.get(i);
       if (modelObject instanceof Container subContainer) {
         if (StringUtils.equals(subContainer.getFactoryId(), "addonContainer")) {
-          List<Application<Portlet>> applications = addOnService.getApplications(subContainer.getName());
+          List<Application> applications = addOnService.getApplications(subContainer.getName());
           if (CollectionUtils.isNotEmpty(applications)) {
             addonContainerChildren.put(i, applications);
           }
@@ -461,12 +468,27 @@ public class PageLayoutService {
     }
   }
 
-  private void computeApplicationPreferences(Application<Portlet> application, String username) throws IllegalAccessException,
-                                                                                                ObjectNotFoundException {
+  private void computeApplicationPreferences(Application application, String username) throws IllegalAccessException,
+                                                                                       ObjectNotFoundException {
     String portletContentId = layoutService.getId(application.getState());
     Portlet portletPreferences = getApplicationPreferences(Long.parseLong(application.getStorageId()), username);
-    TransientApplicationState<Portlet> applicationState = new TransientApplicationState<>(portletContentId, portletPreferences);
+    TransientApplicationState applicationState = new TransientApplicationState(portletContentId, portletPreferences);
     application.setState(applicationState);
+  }
+
+  @SneakyThrows
+  private void impersonateModel(ModelObject object) {
+    if (object instanceof Container container) {
+      ArrayList<ModelObject> children = container.getChildren();
+      if (CollectionUtils.isNotEmpty(children)) {
+        children.forEach(this::impersonateModel);
+      }
+    } else if (object instanceof Application application) {
+      Portlet preferences = portletInstanceService.exportApplicationPreferences(application);
+      if (preferences != null) {
+        layoutService.save(application.getState(), preferences);
+      }
+    }
   }
 
   private Portlet getApplicationPreferences(long applicationId, String username) throws IllegalAccessException,
@@ -480,8 +502,7 @@ public class PageLayoutService {
     return new Portlet(preferencesMap);
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  private Application<Portlet> findApplication(ModelObject modelObject, long applicationId) {
+  private Application findApplication(ModelObject modelObject, long applicationId) {
     return switch (modelObject) {
     case Container container -> {
       if (!CollectionUtils.isEmpty(container.getChildren())) {

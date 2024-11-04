@@ -43,6 +43,13 @@
     <css-path>/skin/css/editor.css</css-path>
   </portlet-skin>
 
+  <portlet-skin>
+    <application-name>social</application-name>
+    <portlet-name>SpaceTemplateManagement</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <css-path>/skin/css/siteNavigation.css</css-path>
+  </portlet-skin>
+
   <module>
     <name>commonLayoutComponents</name>
     <script>
@@ -73,8 +80,40 @@
   </module>
 
   <module>
-    <name>ManageSpacesExtension</name>
+    <name>LayoutManageSpacesExtension</name>
     <load-group>ManageSpaceGRP</load-group>
+    <script>
+      <path>/js/siteNavigation.bundle.js</path>
+    </script>
+    <depends>
+      <module>extensionRegistry</module>
+    </depends>
+    <depends>
+      <module>eXoVueI18n</module>
+    </depends>
+    <depends>
+      <module>vue</module>
+    </depends>
+    <depends>
+      <module>vuetify</module>
+    </depends>
+    <depends>
+      <module>commonVueComponents</module>
+    </depends>
+    <depends>
+      <module>commonLayoutComponents</module>
+    </depends>
+    <depends>
+      <module>translationField</module>
+    </depends>
+    <depends>
+      <module>fontIcons</module>
+    </depends>
+  </module>
+
+  <module>
+    <name>LayoutSpaceTemplateManagementExtension</name>
+    <load-group>SpaceTemplateManagement</load-group>
     <script>
       <path>/js/siteNavigation.bundle.js</path>
     </script>

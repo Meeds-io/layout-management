@@ -16,49 +16,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.plugin.container;
-
-import java.util.Collections;
-import java.util.List;
+package io.meeds.layout.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import org.exoplatform.commons.addons.AddOnPlugin;
-import org.exoplatform.commons.addons.AddOnService;
-import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.services.listener.Event;
+import org.exoplatform.services.listener.ListenerBase;
+import org.exoplatform.services.listener.ListenerService;
+
+import io.meeds.layout.service.PageLayoutService;
 
 import jakarta.annotation.PostConstruct;
 
 @Component
-public class PortletInstanceAddOnPlugin extends AddOnPlugin {
-
-  private static final String               PORTLET_EDITOR_DYNAMIC_CONTAINER = "portlet-viewer";
+public class SiteCreatedFromTemplateListener implements ListenerBase<SiteKey, SiteKey> {
 
   @Autowired
-  private PortletInstanceApplicationAdapter portletInstanceApplicationAdapter;
+  private ListenerService   listenerService;
 
   @Autowired
-  private AddOnService                      addonService;
+  private PageLayoutService pageLayoutService;
 
   @PostConstruct
   public void init() {
-    addonService.addPlugin(this);
+    listenerService.addListener(UserPortalConfigService.SITE_TEMPLATE_INSTANTIATED, this);
   }
 
   @Override
-  public int getPriority() {
-    return 1;
-  }
-
-  @Override
-  public String getContainerName() {
-    return PORTLET_EDITOR_DYNAMIC_CONTAINER;
-  }
-
-  @Override
-  public List<Application> getApplications() {
-    return Collections.singletonList(portletInstanceApplicationAdapter);
+  public void onEvent(Event<SiteKey, SiteKey> event) throws Exception {
+    pageLayoutService.impersonateSite(event.getData());
   }
 
 }

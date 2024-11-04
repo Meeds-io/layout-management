@@ -18,11 +18,11 @@
 -->
 <template>
   <div v-if="hasMoreThanOneTemplate">
-    <site-navigation-new-page-element 
+    <site-navigation-new-page-element
+      :page-templates="pageTemplates"
       @input="$emit('input', $event)" />
   </div>
 </template>
-
 <script>
 export default {
   props: {
@@ -31,23 +31,33 @@ export default {
       default: null
     }
   },
+  data: () => ({
+    pageTemplates: null,
+  }),
   computed: {
     templatesCount() {
-      return this.$root.pageTemplates?.length || 0;
+      return this.pageTemplates?.length || 0;
     },
     hasMoreThanOneTemplate() {
       return this.templatesCount > 1;
     },
   },
   created() {
-    this.getPageTemplates();
+    if (this.$root.pageTemplates?.length) {
+      this.pageTemplates = this.$root.pageTemplates;
+    } else {
+      this.$root.pageTemplates = [];
+      this.getPageTemplates();
+    }
   },
   methods: {
     getPageTemplates() {
-      if (!this.$root.pageTemplates?.length) {
-        return this.$pageTemplateService.getPageTemplates()
-          .then(pageTemplates => this.$root.pageTemplates = pageTemplates && pageTemplates.filter(t => !t.disabled && t.name) || []);
-      }
+      return this.$pageTemplateService.getPageTemplates()
+        .then(pageTemplates => {
+          this.$root.pageTemplates = pageTemplates?.filter?.(t => !t.disabled && t.name) || [];
+          this.pageTemplates = this.$root.pageTemplates;
+          this.$root.$emit('page-templates-loaded', this.pageTemplates);
+        });
     },
   },
 };
