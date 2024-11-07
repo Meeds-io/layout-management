@@ -33,6 +33,7 @@
   </changeSet>
 
   <changeSet author="layout" id="1.0.0-1">
+    <validCheckSum>ANY</validCheckSum>
     <createTable tableName="LAYOUT_PAGE_TEMPLATES">
       <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_LAYOUT_PAGE_TEMPLATE"/>
@@ -42,7 +43,7 @@
       </column>
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci"/>
     </modifySql>
   </changeSet>
 
@@ -60,10 +61,11 @@
   <changeSet
     author="layout"
     id="1.0.0-3">
+    <validCheckSum>ANY</validCheckSum>
     <addColumn tableName="LAYOUT_PAGE_TEMPLATES">
       <column
         name="CATEGORY"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
     </addColumn>
   </changeSet>
 
@@ -202,6 +204,7 @@
   <changeSet
     author="layout"
     id="1.0.0-11">
+    <validCheckSum>ANY</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="PORTAL_APP_CATEGORIES" />
@@ -221,10 +224,10 @@
       <!-- Those columns will be deleted below to make upgrade to new Data Model -->
       <column
         name="NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
       <column
         name="DISPLAY_NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
       <column
         name="DESCRIPTION"
         type="LONGTEXT" />
@@ -236,13 +239,14 @@
         type="BIGINT" />
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci" />
     </modifySql>
   </changeSet>
 
   <changeSet
     author="layout"
     id="1.0.0-12">
+    <validCheckSum>ANY</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="PORTAL_APPLICATIONS" />
@@ -276,7 +280,7 @@
         type="BIGINT" />
       <column
         name="APP_NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
       <column
         name="TYPE"
         type="VARCHAR(50)" />
@@ -285,10 +289,10 @@
         type="LONGTEXT" />
       <column
         name="DISPLAY_NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci" />
     </modifySql>
   </changeSet>
 
@@ -360,6 +364,7 @@
   <changeSet
     author="layout"
     id="1.0.0-19">
+    <validCheckSum>ANY</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="ICON"/>
@@ -368,13 +373,14 @@
     <addColumn tableName="PORTAL_APP_CATEGORIES">
       <column
         name="ICON"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
     </addColumn>
   </changeSet>
 
   <changeSet
     author="layout"
     id="1.0.0-20">
+    <validCheckSum>ANY</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="PERMISSIONS"/>
@@ -383,7 +389,7 @@
     <addColumn tableName="PORTAL_APP_CATEGORIES">
       <column
         name="PERMISSIONS"
-        type="NVARCHAR(2000)" />
+        type="VARCHAR(2000)" />
     </addColumn>
   </changeSet>
 
@@ -460,6 +466,7 @@
   <changeSet
     author="layout"
     id="1.0.0-28">
+    <validCheckSum>ANY</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <columnExists tableName="PORTAL_APPLICATIONS" columnName="PERMISSIONS"/>
@@ -468,7 +475,7 @@
     <addColumn tableName="PORTAL_APPLICATIONS">
       <column
         name="PERMISSIONS"
-        type="NVARCHAR(2000)" />
+        type="VARCHAR(2000)" />
     </addColumn>
   </changeSet>
 
@@ -593,4 +600,11 @@
     <createSequence sequenceName="SEQ_SECTION_TEMPLATE_ID" startValue="1"/>
   </changeSet>
 
+  <changeSet author="layout" id="1.0.0-38" >
+    <sql dbms="mysql">
+      ALTER TABLE LAYOUT_PAGE_TEMPLATES CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+      ALTER TABLE PORTAL_APP_CATEGORIES CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+      ALTER TABLE PORTAL_APPLICATIONS CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+    </sql>
+  </changeSet>
 </databaseChangeLog>
