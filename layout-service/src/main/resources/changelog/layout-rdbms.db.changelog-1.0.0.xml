@@ -33,6 +33,7 @@
   </changeSet>
 
   <changeSet author="layout" id="1.0.0-1">
+    <validCheckSum>9:7b685360fcf479666d97c994b2c67cde</validCheckSum>
     <createTable tableName="LAYOUT_PAGE_TEMPLATES">
       <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}" startWith="1">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_LAYOUT_PAGE_TEMPLATE"/>
@@ -42,7 +43,7 @@
       </column>
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci"/>
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci"/>
     </modifySql>
   </changeSet>
 
@@ -60,10 +61,11 @@
   <changeSet
     author="layout"
     id="1.0.0-3">
+    <validCheckSum>9:803cda2adae47ca04d390a7db367fb2c</validCheckSum>
     <addColumn tableName="LAYOUT_PAGE_TEMPLATES">
       <column
         name="CATEGORY"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
     </addColumn>
   </changeSet>
 
@@ -202,6 +204,8 @@
   <changeSet
     author="layout"
     id="1.0.0-11">
+    <validCheckSum>9:319f59351930c8ed750241bf4f08312d</validCheckSum>
+    <validCheckSum>9:22733f9d4ae5ae6eb65036797f2bd1d6</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="PORTAL_APP_CATEGORIES" />
@@ -221,10 +225,10 @@
       <!-- Those columns will be deleted below to make upgrade to new Data Model -->
       <column
         name="NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
       <column
         name="DISPLAY_NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
       <column
         name="DESCRIPTION"
         type="LONGTEXT" />
@@ -236,13 +240,15 @@
         type="BIGINT" />
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci" />
     </modifySql>
   </changeSet>
 
   <changeSet
     author="layout"
     id="1.0.0-12">
+    <validCheckSum>9:b7a8e59765dd5fd5f458dfe33c97ebf1</validCheckSum>
+    <validCheckSum>9:14c3b93fce77007fdfeb96ea9a64fa86</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="PORTAL_APPLICATIONS" />
@@ -276,7 +282,7 @@
         type="BIGINT" />
       <column
         name="APP_NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
       <column
         name="TYPE"
         type="VARCHAR(50)" />
@@ -285,10 +291,10 @@
         type="LONGTEXT" />
       <column
         name="DISPLAY_NAME"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
     </createTable>
     <modifySql dbms="mysql">
-      <append value=" ENGINE=INNODB CHARSET=UTF8 COLLATE utf8_general_ci" />
+      <append value=" ENGINE=INNODB CHARSET=UTF8MB4 COLLATE utf8mb4_0900_ai_ci" />
     </modifySql>
   </changeSet>
 
@@ -360,6 +366,7 @@
   <changeSet
     author="layout"
     id="1.0.0-19">
+    <validCheckSum>9:7ad73b7bea85f4710160a57231541d6e</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="ICON"/>
@@ -368,13 +375,14 @@
     <addColumn tableName="PORTAL_APP_CATEGORIES">
       <column
         name="ICON"
-        type="NVARCHAR(200)" />
+        type="VARCHAR(200)" />
     </addColumn>
   </changeSet>
 
   <changeSet
     author="layout"
     id="1.0.0-20">
+    <validCheckSum>9:2aec7bffb5bf8493a95fe6818b610469</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <columnExists tableName="PORTAL_APP_CATEGORIES" columnName="PERMISSIONS"/>
@@ -383,7 +391,7 @@
     <addColumn tableName="PORTAL_APP_CATEGORIES">
       <column
         name="PERMISSIONS"
-        type="NVARCHAR(2000)" />
+        type="VARCHAR(2000)" />
     </addColumn>
   </changeSet>
 
@@ -460,6 +468,7 @@
   <changeSet
     author="layout"
     id="1.0.0-28">
+    <validCheckSum>9:39003ab78393a7f105eb0c9d8f0971d8</validCheckSum>
     <preConditions onFail="MARK_RAN">
       <not>
         <columnExists tableName="PORTAL_APPLICATIONS" columnName="PERMISSIONS"/>
@@ -468,7 +477,7 @@
     <addColumn tableName="PORTAL_APPLICATIONS">
       <column
         name="PERMISSIONS"
-        type="NVARCHAR(2000)" />
+        type="VARCHAR(2000)" />
     </addColumn>
   </changeSet>
 
@@ -549,5 +558,11 @@
     <delete tableName="PORTAL_APP_CATEGORIES" />
   </changeSet>
   <!--  -->
-
+  <changeSet author="layout" id="1.0.0-38" >
+    <sql dbms="mysql">
+      ALTER TABLE LAYOUT_PAGE_TEMPLATES CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+      ALTER TABLE PORTAL_APP_CATEGORIES CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+      ALTER TABLE PORTAL_APPLICATIONS CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+    </sql>
+  </changeSet>
 </databaseChangeLog>
