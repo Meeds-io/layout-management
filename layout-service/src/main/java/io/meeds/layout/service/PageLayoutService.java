@@ -69,32 +69,35 @@ import lombok.SneakyThrows;
 @Service
 public class PageLayoutService {
 
-  public static final String      EMPTY_PAGE_TEMPLATE             = "empty";
+  public static final String     EMPTY_PAGE_TEMPLATE             = "empty";
 
-  private static final Log        LOG                             = ExoLogger.getLogger(PageLayoutService.class);
+  private static final Log       LOG                             = ExoLogger.getLogger(PageLayoutService.class);
 
-  private static final Pattern    GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_ ]+");
+  private static final Pattern   GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_ ]+");
 
-  private static final String     PAGE_NOT_EXISTS_MESSAGE         = "Page with key %s doesn't exist";
+  private static final String    PAGE_NOT_EXISTS_MESSAGE         = "Page with key %s doesn't exist";
 
-  private static final String     PAGE_NOT_ACCESSIBLE_MESSAGE     = "Page with ref %s isn't accessible for user %s";
+  private static final String    PAGE_NOT_ACCESSIBLE_MESSAGE     = "Page with ref %s isn't accessible for user %s";
 
-  private static final String     PAGE_NOT_EDITABLE_MESSAGE       = "Page with ref %s isn't editable for user %s";
-
-  @Autowired
-  private LayoutService           layoutService;
+  private static final String    PAGE_NOT_EDITABLE_MESSAGE       = "Page with ref %s isn't editable for user %s";
 
   @Autowired
-  private LayoutAclService        aclService;
+  private LayoutService          layoutService;
 
   @Autowired
-  private PageTemplateService     pageTemplateService;
+  private LayoutAclService       aclService;
 
   @Autowired
-  private PortletInstanceService  portletInstanceService;
+  private ContainerLayoutSrvice  containerLayoutSrvice;
 
   @Autowired
-  private AddOnService            addOnService;
+  private PageTemplateService    pageTemplateService;
+
+  @Autowired
+  private PortletInstanceService portletInstanceService;
+
+  @Autowired
+  private AddOnService           addOnService;
 
   public List<PageContext> getPages(String siteTypeName,
                                     String siteName,
@@ -141,7 +144,7 @@ public class PageLayoutService {
 
   public void impersonateSite(SiteKey siteKey) {
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
-    impersonateModel(portalConfig.getPortalLayout());
+    impersonateModel(portalConfig.getPortalLayout(), null);
     List<PageContext> pages = layoutService.findPages(siteKey);
     if (CollectionUtils.isNotEmpty(pages)) {
       pages.forEach(page -> impersonatePage(page.getKey()));
@@ -150,7 +153,7 @@ public class PageLayoutService {
 
   public void impersonatePage(PageKey pageKey) {
     Page page = getPageLayout(pageKey);
-    impersonateModel(page);
+    impersonateModel(page, page);
   }
 
   public Page getPageLayout(PageKey pageKey, String username) throws ObjectNotFoundException, IllegalAccessException {
@@ -476,12 +479,19 @@ public class PageLayoutService {
     application.setState(applicationState);
   }
 
-  @SneakyThrows
-  private void impersonateModel(ModelObject object) {
+  private void impersonateModel(ModelObject object, Page page) {
     if (object instanceof Container container) {
       ArrayList<ModelObject> children = container.getChildren();
+      try {
+        containerLayoutSrvice.impersonateContainer(container, page);
+      } catch (Exception e) {
+        LOG.warn("Error while impersonating container '{}' in page '{}'. Ignore cloning container background image.",
+                 container.getStorageId(),
+                 page.getStorageId(),
+                 e);
+      }
       if (CollectionUtils.isNotEmpty(children)) {
-        children.forEach(this::impersonateModel);
+        children.forEach(c -> this.impersonateModel(c, page));
       }
     } else if (object instanceof Application application) {
       Portlet preferences = portletInstanceService.exportApplicationPreferences(application);
