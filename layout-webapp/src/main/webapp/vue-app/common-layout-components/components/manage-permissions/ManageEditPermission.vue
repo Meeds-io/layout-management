@@ -63,7 +63,7 @@ export default {
     allGroupsForAdmin: true,
     groupType: 'GROUP',
     userGroup: '/platform/users',
-    searchOptions: {filterType: eXo.env.portal.isAdministrator && 'all' || 'member'},
+    searchOptions: {filterType: eXo.env.portal.isAdministrator && 'all' || 'accessible'},
   }),
   computed: {
     suggesterLabels() {
