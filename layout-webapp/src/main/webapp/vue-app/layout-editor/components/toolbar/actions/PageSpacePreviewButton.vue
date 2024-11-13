@@ -75,7 +75,7 @@ export default {
     saving: false,
     space: null,
     searchOptions: {
-      filterType: 'member'
+      filterType: 'accessible',
     },
   }),
   computed: {
