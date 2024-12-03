@@ -27,7 +27,7 @@
         class="ms-5"
         icon
         @click="openSiteNavigationDrawer">
-        <v-icon size="20">fa-sitemap</v-icon>
+        <v-icon size="20">fa-project-diagram</v-icon>
       </v-btn>
     </template>
     <span>{{ $t('siteNavigation.button.tooltip.label') }}</span>
