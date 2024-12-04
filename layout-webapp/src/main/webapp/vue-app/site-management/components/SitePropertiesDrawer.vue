@@ -115,29 +115,6 @@
             @updated="updateBannerUploadId"
             @reset="resetBannerUploadId" />
         </v-card-text>
-        <v-card-text class="mt-4">
-          <span class="mb-2"> {{ $t('siteManagement.label.displayOrder') }}</span>
-          <v-row class="mx-0 mt-2">
-            <v-col class="d-flex flex-row px-0 py-0 col-10">
-              <v-switch
-                v-model="displayed"
-                :disabled="displayedDisabled"
-                class="mt-2" />
-              <p v-if="displayed" class="mx-1"> {{ $t('siteManagement.label.displayed') }} </p>
-              <p v-else class="mx-1"> {{ $t('siteManagement.label.notDisplayed') }} </p>
-            </v-col>
-            <v-col class="col-2 px-0 py-0 mt-n1 orderDisplay">
-              <v-text-field
-                v-if="displayed"
-                v-model="displayOrder"
-                :rules="[rules.value]"
-                type="number"
-                class="pt-2"
-                outlined
-                required />
-            </v-col>
-          </v-row>
-        </v-card-text>
       </v-form>
     </template>
     <template slot="footer">
@@ -177,8 +154,6 @@ export default {
       siteLabel: '',
       siteDescription: '',
       maxDescriptionLength: 1300,
-      displayOrder: 0,
-      displayed: true,
       siteTitleTranslations: {},
       siteDescriptionTranslations: {},
       supportedLanguages: {},
@@ -210,10 +185,7 @@ export default {
   },
   computed: {
     saveDisabled(){
-      return !this.siteLabel || (this.displayed && this.displayOrder < 1);
-    },
-    displayedDisabled(){
-      return this.site?.metaSite;
+      return !this.siteLabel;
     },
   },
   methods: {
@@ -226,8 +198,6 @@ export default {
         this.siteId = site.siteId;
         this.siteLabel = site.displayName || site.name ;
         this.siteDescription = site.description;
-        this.displayed = site.displayed;
-        this.displayOrder = site.displayOrder;
         this.siteBannerUrl = site.bannerUrl;
         this.defaultSiteBannerUrl = `/portal/rest/v1/social/sites/${site.name}/banner?bannerId=0`;
         this.isDefaultBanner = site.bannerFileId === 0 ;
@@ -236,8 +206,6 @@ export default {
         await this.getSiteLabels();
         await this.getSiteDescriptions();
       } else {
-        this.displayed = false;
-        this.displayOrder = 0;
         this.defaultSiteBannerUrl = '/portal/rest/v1/social/sites/default/banner?bannerId=0';
         this.isDefaultBanner = true ;
         this.hasDefaultBanner = true;
@@ -294,8 +262,6 @@ export default {
       this.siteName = '';
       this.siteLabel = '';
       this.siteDescription = '';
-      this.displayed = false;
-      this.displayOrder = 0;
       this.editMode = false;
       this.siteTitleTranslations = {};
       this.siteDescriptionTranslations = {};
@@ -307,7 +273,7 @@ export default {
     },
     updateSite() {
       this.loading = true;
-      return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.displayed, this.displayed && this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
+      return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.site.displayed, this.site.displayed && this.site.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'label', this.siteTitleTranslations))
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'description', this.siteDescriptionTranslations))
         .then(() => {
@@ -329,7 +295,7 @@ export default {
       }
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
-      return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, this.displayed, this.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
+      return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
         .then((site) =>{
           this.siteId = site.siteId;
           if (this.siteTitleTranslations.length) {
