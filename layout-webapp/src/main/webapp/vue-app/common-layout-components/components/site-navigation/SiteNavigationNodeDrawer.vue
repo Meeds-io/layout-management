@@ -119,6 +119,8 @@
                     </span>
                     <v-switch
                       v-model="nodeTarget"
+                      true-value="SAME_TAB"
+                      false-value="NEW_TAB"
                       class="mt-0 me-0" />
                   </div>  
                 </template>
@@ -141,6 +143,8 @@
                     </span>
                     <v-switch
                       v-model="nodeTarget"
+                      true-value="SAME_TAB"
+                      false-value="NEW_TAB"
                       class="mt-0 me-0" />
                   </div>
                 </template>
@@ -275,7 +279,7 @@ export default {
       displayNodeName: false,
       elementType: 'PAGE',
       allSites: true,
-      nodeTarget: true,
+      nodeTarget: 'SAME_TAB',
       parentNavigationNodeUrl: '',
       editMode: false,
       nodeIcon: null,
@@ -353,6 +357,7 @@ export default {
       if (this.editMode) {
         this.nodeLabel = parentNavigationNode.label;
         this.nodeId = parentNavigationNode.name;
+        this.nodeTarget = parentNavigationNode.target;
         if (this.navigationNode?.pageKey) {
           const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
           this.$pageLayoutService.getPage(pageRef)
@@ -393,7 +398,7 @@ export default {
       this.isScheduled = false;
       this.displayNodeName = false;
       this.elementType = 'PAGE';
-      this.nodeTarget = true;
+      this.nodeTarget = 'SAME_TAB';
       this.disableNodeId = false;
       this.editMode= false;
       this.pageToEdit = null;
@@ -441,7 +446,7 @@ export default {
           const pageRef = this.selectedPage?.pageRef;
           pageData = {
             'pageRef': pageRef,
-            'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
+            'nodeTarget': this.nodeTarget,
             'pageType': this.elementType
           };
           this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
@@ -459,7 +464,7 @@ export default {
               const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
               pageData = {
                 'pageRef': pageRef,
-                'nodeTarget': this.nodeTarget ? 'NEW_TAB' : 'SAME_TAB',
+                'nodeTarget': this.nodeTarget,
                 'pageType': this.elementType,
                 'createdPage': createdPage,
               };
@@ -479,7 +484,7 @@ export default {
           const pageRef = this.selectedPage?.pageRef;
           pageData = {
             'pageRef': pageRef,
-            'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
+            'nodeTarget': this.nodeTarget,
             'pageType': this.elementType
           };
           this.createNode(previousNodeId, pageData, startScheduleDate, endScheduleDate, nodeLabels);
@@ -494,7 +499,7 @@ export default {
             const pageRef = createdPage?.key?.ref || `${createdPage?.key.site.typeName}::${createdPage?.key.site.name}::${createdPage?.pageContext?.key.name}`;
             pageData = {
               'pageRef': pageRef,
-              'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
+              'nodeTarget': this.nodeTarget,
               'pageType': this.elementType,
               'createdPage': createdPage,
             };
@@ -536,7 +541,7 @@ export default {
         .then(() => {
           const pageData = {
             'pageRef': pageRef,
-            'nodeTarget': this.nodeTarget ? 'SAME_TAB' : 'NEW_TAB',
+            'nodeTarget': this.nodeTarget,
             'pageType': this.elementType
           };
           this.updateNode(pageData, pageRef, startScheduleDate, endScheduleDate, nodeLabels);
