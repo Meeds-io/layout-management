@@ -1,6 +1,5 @@
 <%@ page import="org.exoplatform.portal.config.UserPortalConfigService" %>
 <%@ page import="org.exoplatform.container.PortalContainer" %>
-
 <%
   PortalContainer portalContainer = PortalContainer.getCurrentInstance(session.getServletContext());
   UserPortalConfigService userPortalConfigService = portalContainer.getComponentInstanceOfType(UserPortalConfigService.class);

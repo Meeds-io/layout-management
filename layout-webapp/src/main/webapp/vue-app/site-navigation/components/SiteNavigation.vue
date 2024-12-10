@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     isMobile() {
-      return this.$vuetify.breakpoint.width < 768 ;
+      return this.$vuetify.breakpoint.width < this.$vuetify.breakpoint.thresholds.sm;
     },
   }
 };
