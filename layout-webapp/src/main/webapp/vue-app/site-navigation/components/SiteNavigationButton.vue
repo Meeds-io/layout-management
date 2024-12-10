@@ -17,24 +17,21 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <v-tooltip bottom>
-    <template #activator="{on, bind}">
-      <v-btn
-        id="topBarSiteNavigation"
-        v-on="on"
-        v-bind="bind"
-        :role="'button'"
-        class="ms-5"
-        icon
-        @click="openSiteNavigationDrawer">
-        <v-icon size="20">fa-project-diagram</v-icon>
-      </v-btn>
-    </template>
-    <span>{{ $t('siteNavigation.button.tooltip.label') }}</span>
-  </v-tooltip>
+  <v-btn
+    id="topBarSiteNavigation"
+    :title="$t('siteNavigation.button.tooltip.label')"
+    :role="'button'"
+    class="ms-5"
+    icon
+    @click="openSiteNavigationDrawer">
+    <v-icon size="20">fa-project-diagram</v-icon>
+  </v-btn>
 </template>
 <script>
 export default {
+  mounted() {
+    this.openSiteNavigationDrawer();
+  },
   methods: {
     openSiteNavigationDrawer() {
       document.dispatchEvent(new CustomEvent('open-site-navigation-drawer',{detail: {
