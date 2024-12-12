@@ -25,6 +25,13 @@ extensionRegistry.registerExtension('page-layout', 'container', {
 });
 
 extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 400,
+  type: 'cell',
+  isValid: container => container.template === 'CellContainer',
+  containerType: 'page-layout-cell-container',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
   rank: 200,
   type: 'section',
   isValid: container => container.template === 'FlexContainer',
