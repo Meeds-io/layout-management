@@ -20,7 +20,6 @@
 -->
 <template>
   <page-layout-container-base
-    v-if="hasChildren"
     :container="container"
     :parent-id="parentId" />
 </template>
@@ -34,11 +33,6 @@ export default {
     parentId: {
       type: String,
       default: null,
-    },
-  },
-  computed: {
-    hasChildren() {
-      return this.container?.children?.length;
     },
   },
 };
