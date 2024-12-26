@@ -427,6 +427,23 @@
         "*:/platform/web-contributors"
       ],
       "system":true
+    },
+    {
+      "nameId":"SpacesDirectory",
+      "categoryNameId":"tools",
+      "portletName":"SpacesList",
+      "names":{
+        "en":"layout.portletInstance.SpacesList.name"
+      },
+      "descriptions":{
+        "en":"layout.portletInstance.SpacesList.description"
+      },
+      "illustrationPath":"war:/../images/portlets/SpacesDirectory.webp",
+      "permissions":[
+        "*:/platform/administrators",
+        "*:/platform/web-contributors"
+      ],
+      "system":true
     }
   ]
 }
