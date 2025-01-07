@@ -101,15 +101,11 @@ public class SectionTemplateService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to create a Section Template");
     }
-    SectionTemplate createdSectionTemplate = sectionTemplateStorage.createSectionTemplate(sectionTemplate);
-    listenerService.broadcast(TEMPLATE_CREATED_EVENT, username, createdSectionTemplate);
-    return createdSectionTemplate;
+    return createSectionTemplateWithUser(sectionTemplate, username);
   }
 
   public SectionTemplate createSectionTemplate(SectionTemplate sectionTemplate) {
-    SectionTemplate createdSectionTemplate = sectionTemplateStorage.createSectionTemplate(sectionTemplate);
-    listenerService.broadcast(TEMPLATE_CREATED_EVENT, null, createdSectionTemplate);
-    return createdSectionTemplate;
+    return createSectionTemplateWithUser(sectionTemplate, null);
   }
 
   public void deleteSectionTemplate(long id, String username) throws IllegalAccessException, ObjectNotFoundException {
@@ -141,19 +137,11 @@ public class SectionTemplateService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to update a Section Template");
     }
-    SectionTemplate updatedSectionTemplate = sectionTemplateStorage.updateSectionTemplate(sectionTemplate);
-    listenerService.broadcast(TEMPLATE_UPDATED_EVENT, username, updatedSectionTemplate);
-    return updatedSectionTemplate;
+    return updateSectionTemplateWithUser(sectionTemplate, username);
   }
 
   public SectionTemplate updateSectionTemplate(SectionTemplate sectionTemplate) throws ObjectNotFoundException {
-    SectionTemplate updatedSectionTemplate = sectionTemplateStorage.updateSectionTemplate(sectionTemplate);
-    listenerService.broadcast(TEMPLATE_UPDATED_EVENT, null, updatedSectionTemplate);
-    return updatedSectionTemplate;
-  }
-
-  public long getSectionTemplateId(long containerId) {
-    return sectionTemplateLayoutStorage.getSectionTemplateId(containerId);
+    return updateSectionTemplateWithUser(sectionTemplate, null);
   }
 
   public long getSectionTemplateContainerId(long sectionTemplateId) {
@@ -220,6 +208,21 @@ public class SectionTemplateService {
     } catch (ObjectNotFoundException e) {
       return null;
     }
+  }
+
+  private SectionTemplate createSectionTemplateWithUser(SectionTemplate sectionTemplate, String username) {
+    SectionTemplate createdSectionTemplate = sectionTemplateStorage.createSectionTemplate(sectionTemplate);
+    sectionTemplateLayoutStorage.initContainer(createdSectionTemplate);
+    listenerService.broadcast(TEMPLATE_CREATED_EVENT, username, createdSectionTemplate);
+    return createdSectionTemplate;
+  }
+
+  private SectionTemplate updateSectionTemplateWithUser(SectionTemplate sectionTemplate,
+                                                        String username) throws ObjectNotFoundException {
+    SectionTemplate updatedSectionTemplate = sectionTemplateStorage.updateSectionTemplate(sectionTemplate);
+    sectionTemplateLayoutStorage.initContainer(updatedSectionTemplate);
+    listenerService.broadcast(TEMPLATE_UPDATED_EVENT, username, updatedSectionTemplate);
+    return updatedSectionTemplate;
   }
 
 }
