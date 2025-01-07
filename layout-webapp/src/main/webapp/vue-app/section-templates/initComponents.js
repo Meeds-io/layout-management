@@ -20,12 +20,12 @@
 import SectionTemplateManagement from './components/SectionTemplateManagement.vue';
 
 import SectionTemplateToolbar from './components/header/Toolbar.vue';
-import SectionTemplateList from './components/instances/List.vue';
-import SectionTemplateItem from './components/instances/Item.vue';
-import SectionTemplateMenu from './components/instances/Menu.vue';
-import AddSectionDrawer from './components/instances/drawer/AddSectionDrawer.vue';
-import SectionTemplateDrawer from './components/instances/drawer/SectionTemplateDrawer.vue';
-import SectionTemplatePreview from './components/instances/form/SectionTemplatePreview.vue';
+import SectionTemplateList from './components/main/List.vue';
+import SectionTemplateItem from './components/main/Item.vue';
+import SectionTemplateMenu from './components/main/Menu.vue';
+import AddSectionDrawer from './components/main/drawer/AddSectionDrawer.vue';
+import SectionTemplateDrawer from './components/main/drawer/SectionTemplateDrawer.vue';
+import SectionTemplatePreview from './components/main/form/SectionTemplatePreview.vue';
 
 import SectionFlexEditor from '../layout-editor/components/content/common/SectionFlexEditor.vue';
 import SectionGridEditor from '../layout-editor/components/content/common/SectionGridEditor.vue';
