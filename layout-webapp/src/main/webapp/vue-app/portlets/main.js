@@ -111,6 +111,6 @@ export function init() {
               .finally(() => this.loading--);
           },
         },
-      }, `#${appId}`, 'Page Layout')
+      }, `#${appId}`, 'Portlets Management')
     );
 }

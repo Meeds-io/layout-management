@@ -27,10 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.meeds.layout.entity.PortletInstanceCategoryEntity;
 import io.meeds.layout.entity.PortletInstanceEntity;
+import io.meeds.layout.entity.SectionTemplateEntity;
 import io.meeds.layout.model.PortletDescriptor;
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstanceCategory;
 import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.model.SectionTemplate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -87,6 +89,22 @@ public class EntityMapper {
                                      Objects.hash(instance.getCategoryId(),
                                                   getPreferencesString(instance),
                                                   instance.getContentId()));
+  }
+
+  public static SectionTemplateEntity toEntity(SectionTemplate sectionTemplate) {
+    return new SectionTemplateEntity(sectionTemplate.getId(),
+                                     sectionTemplate.getCategory(),
+                                     sectionTemplate.getContent(),
+                                     sectionTemplate.isSystem(),
+                                     sectionTemplate.isDisabled());
+  }
+
+  public static SectionTemplate fromEntity(SectionTemplateEntity entity) {
+    return new SectionTemplate(entity.getId(),
+                               entity.getCategory(),
+                               entity.getContent(),
+                               entity.isSystem(),
+                               entity.isDisabled());
   }
 
   private static String getPreferencesString(PortletInstance instance) {
