@@ -51,6 +51,8 @@ import org.exoplatform.portal.pom.spi.portlet.PortletBuilder;
 import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstancePreference;
 
+import lombok.Synchronized;
+
 /**
  * A plugin that is used to display a selected portlet instance in the context
  * of the PortletEditor page until. This should be changed to use
@@ -126,7 +128,8 @@ public class PortletInstanceLayoutStorage {
     return getSettingValue(PORTLET_INSTANCE_SCOPE, portletInstanceId);
   }
 
-  private synchronized Application createPortletInstanceApplication(PortletInstance portletInstance) {
+  @Synchronized
+  private Application createPortletInstanceApplication(PortletInstance portletInstance) {
     TransientApplicationState state = new TransientApplicationState(portletInstance.getContentId());
 
     List<String> permissions = portletInstance.getPermissions();
