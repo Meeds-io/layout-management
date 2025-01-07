@@ -62,39 +62,13 @@ public class SectionTemplateLayoutStorage {
   @Autowired
   private LayoutService        layoutService;
 
-  public Container getOrCreateSectionTemplateContainer(SectionTemplate sectionTemplate) { // NOSONAR
-    if (getContainerId(sectionTemplate.getId()) == 0) {
-      return createSectionTemplateContainer(sectionTemplate);
-    } else {
-      try {
-        long sectionTemplateId = sectionTemplate.getId();
-        return getContainerBySectionTemplateId(sectionTemplateId);
-      } catch (Exception e) {
-        return createSectionTemplateContainer(sectionTemplate);
-      }
+  public long initContainer(SectionTemplate sectionTemplate) {
+    long containerId = getContainerId(sectionTemplate.getId());
+    if (containerId == 0) {
+      createSectionTemplateContainer(sectionTemplate);
+      containerId = getContainerId(sectionTemplate.getId());
     }
-  }
-
-  public Container getContainerBySectionTemplateId(long sectionTemplateId) {
-    long containerId = getContainerId(sectionTemplateId);
-    return getContainerById(containerId);
-  }
-
-  public Container getContainerById(long containerId) {
-    Page page = getSystemPage();
-    Container parentContainer = (Container) page.getChildren().get(0);
-    ArrayList<ModelObject> children = parentContainer.getChildren();
-    String containerIdString = String.valueOf(getSectionTemplateId(containerId));
-    return children.stream()
-                   .filter(Container.class::isInstance)
-                   .map(Container.class::cast)
-                   .filter(c -> StringUtils.equals(c.getStorageId(), containerIdString))
-                   .findFirst()
-                   .orElse(null);
-  }
-
-  public long getSectionTemplateId(long applicationId) {
-    return getSettingValue(SECTION_TEMPLATE_SCOPE, applicationId);
+    return containerId;
   }
 
   public long getContainerId(long sectionTemplateId) {
