@@ -27,31 +27,10 @@
       <section-editor-toolbar
         :page="pageContext"
         :node="node" />
-      <coediting
-        v-model="draftNodeId"
-        :object-id="nodeId"
-        :messages="{
-          lockConfirmTitle: 'layout.lockConfirmTitle',
-          lockConfirmMessage: 'layout.lockConfirmMessage',
-          lockConfirmQuestion: 'layout.lockConfirmQuestion',
-          lockConfirmOkLabel: 'layout.lockConfirmOkLabel',
-          lockConfirmCancelLabel: 'layout.lockConfirmCancelLabel',
-          draftConfirmTitle: 'layout.draftConfirmTitle',
-          draftConfirmMessage: 'layout.draftConfirmMessage',
-          draftConfirmQuestion: 'layout.draftConfirmQuestion',
-          draftConfirmOkLabel: 'layout.draftConfirmOkLabel',
-          draftConfirmCancelLabel: 'layout.draftConfirmCancelLabel',
-        }"
-        object-type="navigation"
-        @initialized="initDraftPage"
-        @locked="stopLoading"
-        @draft-detected="stopLoading"
-        @canceled="cancelEditPage">
-        <section-editor-content
-          :page="pageContext"
-          :node="draftNode"
-          :layout="draftLayout" />
-      </coediting>
+      <section-editor-content
+        :page="pageContext"
+        :node="draftNode"
+        :layout="draftLayout" />
       <section-template-drawer />
       <layout-editor-cells-selection-box />
     </main>
@@ -63,8 +42,8 @@ export default {
   data: () => ({
     node: null,
     pageContext: null,
-    draftNodeId: null,
     draftNode: null,
+    draftNodeId: null,
     draftLayout: null,
     nodeLabels: null,
   }),
@@ -150,26 +129,21 @@ export default {
   },
   created() {
     this.$root.$on('section-template-saved', this.deleteDraft);
+    this.initDraftPage();
   },
   beforeDestroy() {
     this.$root.$off('section-template-saved', this.deleteDraft);
   },
   methods: {
     initDraftPage() {
-      if (this.draftNodeId) {
-        this.$navigationLayoutService.getNode(this.nodeId)
-          .then(node => this.node = node)
-          .then(() => this.$navigationLayoutService.getNode(this.draftNodeId))
-          .then(draftNode => this.draftNode = draftNode);
-      } else {
-        this.$navigationLayoutService.getNode(this.nodeId)
-          .then(node => this.node = node)
-          .then(() => this.$navigationLayoutService.createDraftNode(this.node.id))
-          .then(draftNode => {
-            this.draftNode = draftNode;
-            this.draftNodeId = draftNode?.id;
-          });
-      }
+      this.$navigationLayoutService.getNode(this.nodeId)
+        .then(node => this.node = node)
+        .then(() => this.$navigationLayoutService.createDraftNode(this.node.id))
+        .then(draftNode => {
+          this.draftNode = draftNode;
+          this.draftNodeId = draftNode?.id;
+        })
+        .finally(() => this.stopLoading());
     },
     cancelEditPage() {
       this.stopLoading();

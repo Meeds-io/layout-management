@@ -197,7 +197,8 @@ export default {
     },
     save() {
       this.saving = true;
-      return this.$translationService.saveTranslations('sectionTemplate', this.sectionTemplateId, 'title', this.titleTranslations)
+      return this.$sectionTemplateService.updateSectionTemplate(this.sectionTemplate)
+        .then(() => this.$translationService.saveTranslations('sectionTemplate', this.sectionTemplateId, 'title', this.titleTranslations))
         .then(() => this.$translationService.saveTranslations('sectionTemplate', this.sectionTemplateId, 'description', this.descriptionTranslations))
         .then(() => this.$refs?.sectionTemplatePreview?.save())
         .then(() => {
