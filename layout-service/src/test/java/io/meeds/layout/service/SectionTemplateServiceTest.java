@@ -48,6 +48,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
@@ -289,7 +290,7 @@ public class SectionTemplateServiceTest {
   }
 
   @Test
-  public void deletePortletInstanceWhenException() throws ObjectNotFoundException, IllegalAccessException {
+  public void deleteSectionTemplateWhenException() throws ObjectNotFoundException, IllegalAccessException {
     assertThrows(IllegalAccessException.class, () -> sectionTemplateService.deleteSectionTemplate(2l, testuser));
 
     when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
@@ -298,6 +299,39 @@ public class SectionTemplateServiceTest {
     doThrow(ObjectNotFoundException.class).when(translationService).deleteTranslationLabels(anyString(), anyLong());
     sectionTemplateService.deleteSectionTemplate(2l, testuser);
     verify(sectionTemplateStorage, times(1)).deleteSectionTemplate(2l);
+  }
+
+  @Test
+  public void generateSectionTemplateNodeId() throws ObjectNotFoundException, IllegalAccessException {
+    assertThrows(IllegalAccessException.class, () -> sectionTemplateService.generateSectionTemplateNodeId(2l, testuser));
+
+    when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    assertThrows(ObjectNotFoundException.class, () -> sectionTemplateService.generateSectionTemplateNodeId(2l, testuser));
+
+    when(sectionTemplateStorage.getSectionTemplate(2l)).thenReturn(sectionTemplate);
+    when(sectionTemplate.isSystem()).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> sectionTemplateService.generateSectionTemplateNodeId(2l, testuser));
+
+    when(sectionTemplate.isSystem()).thenReturn(false);
+    NodeData nodeData = mock(NodeData.class);
+    when(nodeData.getId()).thenReturn("35");
+    when(sectionTemplateLayoutStorage.generateSectionTemplateNodeId(sectionTemplate, testuser)).thenReturn(nodeData);
+    long nodeId = sectionTemplateService.generateSectionTemplateNodeId(2l, testuser);
+    assertEquals(35l, nodeId);
+  }
+
+  @Test
+  public void generateSectionTemplateContent() throws ObjectNotFoundException, IllegalAccessException {
+    assertThrows(IllegalAccessException.class, () -> sectionTemplateService.generateSectionTemplateContent(2l, testuser));
+
+    when(layoutAclService.isAdministrator(testuser)).thenReturn(true);
+    assertThrows(ObjectNotFoundException.class, () -> sectionTemplateService.generateSectionTemplateContent(2l, testuser));
+
+    when(sectionTemplateStorage.getSectionTemplate(2l)).thenReturn(sectionTemplate);
+    String value = "Layout content";
+    when(sectionTemplateLayoutStorage.generateSectionTemplateContent(sectionTemplate, testuser)).thenReturn(value);
+    String result = sectionTemplateService.generateSectionTemplateContent(2l, testuser);
+    assertEquals(value, result);
   }
 
   @Test

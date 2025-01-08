@@ -23,7 +23,7 @@
   <div class="pt-4">
     <div class="d-flex pb-2">
       <div class="text-subtitle-1">
-        {{ $t('sectionTemplates.instancePreview') }}
+        {{ $t('sectionTemplates.preview') }}
       </div>
       <v-spacer />
       <v-tooltip bottom>
@@ -61,7 +61,11 @@ export default {
       type: String,
       default: null,
     },
-    instanceId: {
+    previewImage: {
+      type: String,
+      default: null,
+    },
+    sectionTemplateId: {
       type: Number,
       default: null,
     },
@@ -76,12 +80,15 @@ export default {
       return this.attachments?.[0]?.id;
     },
     illustrationSrc() {
-      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/sectionTemplate/${this.instanceId}/${this.illustrationId}` || '/layout/images/DefaultSectionTmeplate.webp';
+      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/sectionTemplate/${this.sectionTemplateId}/${this.illustrationId}` || '/layout/images/DefaultSectionTmeplate.webp';
     },
   },
   watch: {
     sendingImage() {
       this.$emit('sending', this.sendingImage);
+    },
+    previewImage() {
+      this.avatarData = this.previewImage;
     },
   },
   created() {
@@ -89,8 +96,10 @@ export default {
   },
   methods: {
     init() {
-      if (this.instanceId) {
-        return this.$fileAttachmentService.getAttachments('sectionTemplate', this.instanceId)
+      if (this.previewImage) {
+        this.avatarData = this.previewImage;
+      } else {
+        return this.$fileAttachmentService.getAttachments('sectionTemplate', this.sectionTemplateId)
           .then(data => this.attachments = data?.attachments || []);
       }
     },
@@ -117,26 +126,23 @@ export default {
           .finally(() => this.sendingImage = false);
       }
     },
-    save() {
+    async save() {
       if (this.value) {
-        return this.$fileAttachmentService.saveAttachments({
+        const report = await this.$fileAttachmentService.saveAttachments({
           objectType: 'sectionTemplate',
-          objectId: this.instanceId,
+          objectId: this.sectionTemplateId,
           uploadedFiles: [{uploadId: this.value}],
           attachedFiles: [],
-        }).then((report) => {
-          if (report?.errorByUploadId?.length) {
-            const attachmentHtmlError = Object.values(report.errorByUploadId).join('<br>');
-            this.$root.$emit('alert-message-html', attachmentHtmlError, 'error');
-          } else {
-            return this.init()
-              .then(() => {
-                if (this.$refs.uploadInput) {
-                  this.$refs.uploadInput.reset();
-                }
-              });
-          }
         });
+        if (report?.errorByUploadId?.length) {
+          const attachmentHtmlError = Object.values(report.errorByUploadId).join('<br>');
+          this.$root.$emit('alert-message-html', attachmentHtmlError, 'error');
+        } else {
+          await this.init();
+          if (this.$refs.uploadInput) {
+            this.$refs.uploadInput.reset();
+          }
+        }
       }
     },
   },

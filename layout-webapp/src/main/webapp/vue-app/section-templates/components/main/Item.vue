@@ -55,7 +55,8 @@
         v-model="enabled"
         :loading="loading"
         :aria-label="enabled && $t('sectionTemplates.label.disableInstance') || $t('sectionTemplates.label.enableInstance')"
-        class="mt-0 mx-auto width-fit-content"
+        class="ma-auto pa-0 width-fit-content"
+        hide-details
         @click="changeStatus" />
     </td>
     <td
