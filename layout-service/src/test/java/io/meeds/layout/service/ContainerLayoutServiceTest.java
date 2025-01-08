@@ -54,7 +54,7 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.upload.UploadService;
 
-@SpringBootTest(classes = { ContainerLayoutSrvice.class })
+@SpringBootTest(classes = { ContainerLayoutService.class })
 @ExtendWith(MockitoExtension.class)
 class ContainerLayoutServiceTest {
 
@@ -108,7 +108,7 @@ class ContainerLayoutServiceTest {
   private Identity                   identity;
 
   @Autowired
-  private ContainerLayoutSrvice      containerLayoutSrvice;
+  private ContainerLayoutService      containerLayoutSrvice;
 
   @Test
   void testImpersonateContainerWithNullPage() throws Exception {

@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     handleInstanceCreated(instance) {
-      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/section-template-editor?id=${instance.id}`;
+      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/section-editor?id=${instance.id}`;
       window.open(instanceEditorLink, '_blank');
     },
     handleLayoutUpdated(instance) {

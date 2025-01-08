@@ -126,6 +126,50 @@ public class SectionTemplateRest {
     }
   }
 
+  @GetMapping("{id}/nodeId")
+  @Secured("users")
+  @Operation(summary = "Retrieves the Navigation Node identifier in order to edit the section template", method = "GET", description = "Retrieves the Navigation Node identifier in order to edit the section template")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public long generateSectionTemplateNodeId(
+                                            HttpServletRequest request,
+                                            @Parameter(description = "Section template identifier")
+                                            @PathVariable("id")
+                                            long id) {
+    try {
+      return sectionTemplateService.generateSectionTemplateNodeId(id, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @GetMapping("{id}/content")
+  @Secured("users")
+  @Operation(summary = "Retrieves the Edited Section Template Page Content", method = "GET", description = "Retrieves the container content of Section template switch page edited using layout editor")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public String generateSectionTemplateContent(
+                                               HttpServletRequest request,
+                                               @Parameter(description = "Section template identifier")
+                                               @PathVariable("id")
+                                               long id) {
+    try {
+      return sectionTemplateService.generateSectionTemplateContent(id, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
   @DeleteMapping("{id}")
   @Secured("users")
   @Operation(summary = "Deletes a section template", method = "DELETE", description = "This deletes an existing section template")

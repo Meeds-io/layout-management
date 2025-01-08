@@ -40,6 +40,7 @@
                   v-on="on"
                   v-bind="attrs">
                   <v-btn
+                    v-if="!$root.noSectionAdd"
                     class="white text-color border-color"
                     height="32"
                     width="32"
@@ -66,6 +67,7 @@
                     v-on="on"
                     v-bind="attrs">
                     <v-btn
+                      v-if="!$root.noSectionAdd"
                       class="white text-color border-color draggable"
                       height="32"
                       width="32"
@@ -114,6 +116,7 @@
                   v-on="on"
                   v-bind="attrs">
                   <v-btn
+                    v-if="!$root.noSectionAdd"
                     class="white text-color border-color"
                     height="32"
                     width="32"

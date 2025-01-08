@@ -44,6 +44,32 @@ export function getSectionTemplate(id) {
   });
 }
 
+export function generateSectionTemplateNodeId(id) {
+  return fetch(`/layout/rest/sections/${id}/nodeId`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp?.ok) {
+      throw new Error('Error when retrieving section template working node identifier');
+    } else {
+      return resp.json();
+    }
+  });
+}
+
+export function generateSectionTemplateContent(id) {
+  return fetch(`/layout/rest/sections/${id}/content`, {
+    method: 'GET',
+    credentials: 'include',
+  }).then(resp => {
+    if (!resp?.ok) {
+      throw new Error('Error when retrieving section template content');
+    } else {
+      return resp.json();
+    }
+  });
+}
+
 export function createSectionTemplate(sectionTemplate) {
   return fetch('/layout/rest/sections', {
     credentials: 'include',
