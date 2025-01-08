@@ -33,8 +33,6 @@ public class SectionTemplateDetail extends SectionTemplate {
 
   private long   illustrationId;
 
-  private long   containerId;
-
   public SectionTemplateDetail(SectionTemplate template) {
     super(template.getId(),
           template.getCategory(),

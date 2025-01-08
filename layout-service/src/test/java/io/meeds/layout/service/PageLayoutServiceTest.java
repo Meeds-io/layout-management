@@ -90,7 +90,7 @@ public class PageLayoutServiceTest {
   private PageTemplateService     pageTemplateService;
 
   @MockBean
-  private ContainerLayoutSrvice   containerLayoutSrvice;
+  private ContainerLayoutService   containerLayoutSrvice;
 
   @MockBean
   private UserPortalConfigService userPortalConfigService;

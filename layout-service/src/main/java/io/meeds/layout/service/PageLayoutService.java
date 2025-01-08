@@ -88,7 +88,7 @@ public class PageLayoutService {
   private LayoutAclService       aclService;
 
   @Autowired
-  private ContainerLayoutSrvice  containerLayoutSrvice;
+  private ContainerLayoutService containerLayoutService;
 
   @Autowired
   private PageTemplateService    pageTemplateService;
@@ -212,9 +212,8 @@ public class PageLayoutService {
     return layoutService.getPageContext(page.getPageKey());
   }
 
-  public PageKey clonePage(PageKey pageKey,
-                           String username) throws IllegalAccessException,
-                                            ObjectNotFoundException {
+  public PageKey clonePage(PageKey pageKey, String username) throws IllegalAccessException,
+                                                             ObjectNotFoundException {
     Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
@@ -483,7 +482,7 @@ public class PageLayoutService {
     if (object instanceof Container container) {
       ArrayList<ModelObject> children = container.getChildren();
       try {
-        containerLayoutSrvice.impersonateContainer(container, page);
+        containerLayoutService.impersonateContainer(container, page);
       } catch (Exception e) {
         LOG.warn("Error while impersonating container '{}' in page '{}'. Ignore cloning container background image.",
                  container.getStorageId(),

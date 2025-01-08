@@ -44,24 +44,46 @@
         @mouseout="menu = false"
         @focusout="menu = false">
         <v-list-item-group v-model="listItem">
-          <v-list-item
-            :href="editLayoutLink"
-            target="_blank"
-            rel="opener"
-            dense>
-            <v-icon size="13">
-              fa-edit
-            </v-icon>
-            <v-list-item-title class="ps-2">
-              {{ $t('sectionTemplates.label.editInstance') }}
-            </v-list-item-title>
-          </v-list-item>
+          <v-tooltip :disabled="!sectionTemplate.system" bottom>
+            <template #activator="{ on, attrs }">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-list-item
+                  :href="!sectionTemplate.system && editLayoutLink"
+                  :disabled="sectionTemplate.system"
+                  target="_blank"
+                  rel="opener"
+                  dense>
+                  <v-card
+                    color="transparent"
+                    min-width="15"
+                    flat>
+                    <v-icon
+                      :class="sectionTemplate.system && 'disabled--text'"
+                      size="13">
+                      fa-edit
+                    </v-icon>
+                  </v-card>
+                  <v-list-item-title class="ps-2">
+                    {{ $t('sectionTemplates.label.editInstance') }}
+                  </v-list-item-title>
+                </v-list-item>
+              </div>
+            </template>
+            <span>{{ $t('sectionTemplates.label.system.noEdit') }}</span>
+          </v-tooltip>
           <v-list-item
             dense
             @click="$root.$emit('section-template-edit', sectionTemplate)">
-            <v-icon size="13">
-              fa-edit
-            </v-icon>
+            <v-card
+              color="transparent"
+              min-width="15"
+              flat>
+              <v-icon size="13">
+                fa-edit
+              </v-icon>
+            </v-card>
             <v-list-item-title class="ps-2">
               {{ $t('sectionTemplates.label.editProperties') }}
             </v-list-item-title>
@@ -75,15 +97,18 @@
                   :disabled="sectionTemplate.system"
                   dense
                   @click="$root.$emit('section-template-delete', sectionTemplate)">
-                  <v-icon
-                    :class="!sectionTemplate.system && 'error--text' || 'disabled--text'"
-                    size="13">
-                    fa-trash
-                  </v-icon>
-                  <v-list-item-title
-                    :class="!sectionTemplate.system && 'error--text' || 'disabled--text'"
-                    class="ps-2">
-                    {{ $t('sectionTemplates.label.delete') }}
+                  <v-card
+                    color="transparent"
+                    min-width="15"
+                    flat>
+                    <v-icon
+                      :class="!sectionTemplate.system && 'error--text' || 'disabled--text'"
+                      size="13">
+                      fa-trash
+                    </v-icon>
+                  </v-card>
+                  <v-list-item-title class="ps-2">
+                    <span :class="!sectionTemplate.system && 'error--text' || 'disabled--text'">{{ $t('sectionTemplates.label.delete') }}</span>
                   </v-list-item-title>
                 </v-list-item>
               </div>
@@ -120,7 +145,7 @@ export default {
       return this.sectionTemplate?.supportedModes?.find?.(mode => mode === 'edit');
     },
     editLayoutLink() {
-      return `/portal/${eXo.env.portal.portalName}/section-template-editor?id=${this.sectionTemplateId}`;
+      return `/portal/${eXo.env.portal.portalName}/section-editor?id=${this.sectionTemplateId}`;
     },
   },
   watch: {

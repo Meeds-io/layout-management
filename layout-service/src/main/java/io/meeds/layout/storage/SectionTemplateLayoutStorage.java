@@ -19,132 +19,138 @@
 package io.meeds.layout.storage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import org.exoplatform.commons.api.settings.SettingService;
-import org.exoplatform.commons.api.settings.SettingValue;
-import org.exoplatform.commons.api.settings.data.Context;
-import org.exoplatform.commons.api.settings.data.Scope;
-import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.Utils;
+import org.exoplatform.portal.mop.navigation.NodeContext;
+import org.exoplatform.portal.mop.navigation.NodeData;
+import org.exoplatform.portal.mop.navigation.NodeState;
 import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.mop.service.NavigationService;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
+import io.meeds.layout.model.NavigationCreateModel;
 import io.meeds.layout.model.SectionTemplate;
+import io.meeds.layout.rest.model.LayoutModel;
+import io.meeds.layout.service.NavigationLayoutService;
+import io.meeds.layout.service.PageLayoutService;
+import io.meeds.layout.service.PortletInstanceService;
+import io.meeds.social.util.JsonUtils;
 
 import lombok.Synchronized;
 
 @Component
 public class SectionTemplateLayoutStorage {
 
-  private static final Context CONTEXT                        = Context.GLOBAL.id("SECTION_TEMPLATE");
-
-  private static final Scope   SECTION_TEMPLATE_SCOPE         = Scope.APPLICATION.id("CONTAINER_ID_BY_SECTION_TEMPLATE_ID");
-
-  private static final Scope   PAGE_CONTAINER_SCOPE           = Scope.APPLICATION.id("SECTION_TEMPLATE_ID_BY_CONTAINER_ID");
-
-  private static final PageKey SECTION_EDITOR_SYSTEM_PAGE_KEY = new PageKey(SiteKey.portal("global"), "_sectionEditor");
+  private static final String     GLOBAL_SITE_NAME = "global";
 
   @Autowired
-  private SettingService       settingService;
+  private LayoutService           layoutService;
 
   @Autowired
-  private LayoutService        layoutService;
+  private NavigationService       navigationService;
 
-  public long initContainer(SectionTemplate sectionTemplate) {
-    long containerId = getContainerId(sectionTemplate.getId());
-    if (containerId == 0) {
-      createSectionTemplateContainer(sectionTemplate);
-      containerId = getContainerId(sectionTemplate.getId());
+  @Autowired
+  private PageLayoutService       pageLayoutService;
+
+  @Autowired
+  private PortletInstanceService  portletInstanceService;
+
+  @Autowired
+  private NavigationLayoutService navigationLayoutService;
+
+  @Synchronized
+  public NodeData generateSectionTemplateNodeId(SectionTemplate sectionTemplate, String username) throws IllegalAccessException,
+                                                                                                  ObjectNotFoundException {
+    PageKey clonedPageKey = clonePage(sectionTemplate, username);
+    String clonedNodeName = getSectionNodeName(sectionTemplate.getId(), username);
+    NodeContext<NodeContext<Object>> parentNode = navigationService.loadNode(SiteKey.portal(GLOBAL_SITE_NAME));
+    NodeContext<NodeContext<Object>> clonedNode = navigationLayoutService.findNode(parentNode, clonedNodeName);
+    if (clonedNode == null) {
+      return navigationLayoutService.createNode(new NavigationCreateModel(Long.parseLong(parentNode.getId()),
+                                                                          null,
+                                                                          clonedNodeName,
+                                                                          clonedNodeName,
+                                                                          false,
+                                                                          false,
+                                                                          true,
+                                                                          null,
+                                                                          null,
+                                                                          clonedPageKey.format(),
+                                                                          null,
+                                                                          false,
+                                                                          null,
+                                                                          null),
+                                                username);
+    } else {
+      NodeState state = clonedNode.getState().builder().pageRef(clonedPageKey).build();
+      navigationService.updateNode(Long.parseLong(clonedNode.getId()), state);
+      return navigationService.getNodeById(Long.parseLong(clonedNode.getId()));
     }
-    return containerId;
-  }
-
-  public long getContainerId(long sectionTemplateId) {
-    return getSettingValue(PAGE_CONTAINER_SCOPE, sectionTemplateId);
   }
 
   @Synchronized
-  private Container createSectionTemplateContainer(SectionTemplate sectionTemplate) {
-    Container sectionContainer = new Container();
-    sectionContainer.setAccessPermissions(new String[] { UserACL.EVERYONE });
-    Page page = getSystemPage();
-    Container parentContainer = (Container) page.getChildren().get(0);
-    ArrayList<ModelObject> children = parentContainer.getChildren();
-    if (CollectionUtils.isEmpty(children)) {
-      children = new ArrayList<>();
-    } else {
-      children = new ArrayList<>(children);
+  public String generateSectionTemplateContent(SectionTemplate sectionTemplate, String username) {
+    String clonedNodeName = getSectionNodeName(sectionTemplate.getId(), username);
+    NodeContext<NodeContext<Object>> parentNode = navigationService.loadNode(SiteKey.portal(GLOBAL_SITE_NAME));
+    NodeContext<NodeContext<Object>> nodeData = navigationLayoutService.findNode(parentNode, clonedNodeName);
+    PageKey pageKey = nodeData.getState().getPageRef();
+    Page page = layoutService.getPage(pageKey);
+    Container section = (Container) ((Container) page.getChildren().get(0)).getChildren().get(0);
+    exportPortletPreferences(section);
+    LayoutModel sectionLayoutModel = new LayoutModel(section);
+    sectionLayoutModel.resetStorage();
+    return JsonUtils.toJsonString(sectionLayoutModel);
+  }
+
+  private PageKey clonePage(SectionTemplate sectionTemplate, String username) throws ObjectNotFoundException {
+    Container parentContainer = new Container();
+    parentContainer.setTemplate("system:/groovy/portal/webui/container/UIPageLayout.gtmpl");
+    parentContainer.setChildren(new ArrayList<>());
+    parentContainer.getChildren()
+                   .add(LayoutModel.toModelObject(JsonUtils.fromJsonString(sectionTemplate.getContent(), LayoutModel.class)));
+    parentContainer.resetStorage();
+
+    long sectionTemplateId = sectionTemplate.getId();
+    Page sectionDraftPage = new Page();
+    sectionDraftPage.setOwnerType(PortalConfig.PORTAL_TYPE);
+    sectionDraftPage.setOwnerId(GLOBAL_SITE_NAME);
+    sectionDraftPage.setName(getSectionNodeName(sectionTemplateId, username));
+    sectionDraftPage.setTitle("Section Template Draft " + username);
+    sectionDraftPage.setChildren(new ArrayList<>());
+    sectionDraftPage.getChildren().add(parentContainer);
+
+    PageKey clonedPageKey = sectionDraftPage.getPageKey();
+    layoutService.save(new PageContext(clonedPageKey, Utils.toPageState(sectionDraftPage)), sectionDraftPage);
+    pageLayoutService.impersonatePage(clonedPageKey);
+    return clonedPageKey;
+  }
+
+  private void exportPortletPreferences(ModelObject object) {
+    if (object instanceof Container container && CollectionUtils.isNotEmpty(container.getChildren())) {
+      container.getChildren().forEach(this::exportPortletPreferences);
+    } else if (object instanceof Application application) {
+      Portlet preferences = portletInstanceService.exportApplicationPreferences(application);
+      String portletContentId = layoutService.getId(application.getState());
+      application.setState(new TransientApplicationState(portletContentId, preferences));
     }
-    int index = children.size();
-    children.add(sectionContainer);
-    parentContainer.setChildren(children);
-    page.setChildren(new ArrayList<>(Collections.singletonList(parentContainer)));
-    layoutService.save(page);
-
-    parentContainer = getSystemContainer();
-    sectionContainer = (Container) parentContainer.getChildren().get(index);
-    saveLayoutId(Long.parseLong(sectionContainer.getStorageId()), sectionTemplate.getId());
-    return sectionContainer;
   }
 
-  private long getSettingValue(Scope scope, long id) {
-    SettingValue<?> settingValue = settingService.get(CONTEXT, scope, String.valueOf(id));
-    if (settingValue != null && settingValue.getValue() != null && StringUtils.isNotBlank(settingValue.getValue().toString())) {
-      return Long.parseLong(settingValue.getValue().toString());
-    } else {
-      return 0;
-    }
-  }
-
-  private void saveLayoutId(long applicationStorageId, long portletInstanceId) {
-    settingService.set(CONTEXT,
-                       PAGE_CONTAINER_SCOPE,
-                       String.valueOf(portletInstanceId),
-                       SettingValue.create(applicationStorageId));
-    settingService.set(CONTEXT,
-                       SECTION_TEMPLATE_SCOPE,
-                       String.valueOf(applicationStorageId),
-                       SettingValue.create(portletInstanceId));
-  }
-
-  private Container getSystemContainer() {
-    return (Container) getSystemPage().getChildren().get(0);
-  }
-
-  private Page getSystemPage() {
-    Page page = layoutService.getPage(SECTION_EDITOR_SYSTEM_PAGE_KEY);
-    if (page == null) {
-      page = new Page();
-      page.setTitle("Section Template Working Page");
-      page.setEditPermission("manager:/platform/administrators");
-      page.setPageId(SECTION_EDITOR_SYSTEM_PAGE_KEY.format());
-
-      Container container = new Container();
-      container.setTemplate("nop");
-      page.setChildren(new ArrayList<>(Collections.singletonList(container)));
-
-      PageState pageState = new PageState(page.getTitle(),
-                                          page.getDescription(),
-                                          false,
-                                          null,
-                                          Arrays.asList(UserACL.EVERYONE),
-                                          page.getEditPermission());
-      layoutService.save(new PageContext(SECTION_EDITOR_SYSTEM_PAGE_KEY, pageState), page);
-      page = layoutService.getPage(SECTION_EDITOR_SYSTEM_PAGE_KEY);
-    }
-    return page;
+  private String getSectionNodeName(long sectionTemplateId, String username) {
+    return "section_draft_" + sectionTemplateId + "_" + username;
   }
 
 }
