@@ -153,10 +153,12 @@ export default {
       }
     },
     marginChoice() {
-      if (this.initialized) {
+      if (this.initialized && this.enabled) {
+        this.marginTop = this.marginTop || 0;
         this.marginRight = this.marginTop;
         this.marginBottom = this.marginTop;
         this.marginLeft = this.marginTop;
+        this.container.marginTop = this.marginTop;
       }
     },
   },

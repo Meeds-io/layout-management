@@ -53,7 +53,7 @@ import org.exoplatform.upload.UploadService;
 import lombok.SneakyThrows;
 
 @Service
-public class ContainerLayoutSrvice {
+public class ContainerLayoutService {
 
   private static final String CONTAINER_BACKGROUND_IMAGE_URI = String.format("/%s/", OBJECT_TYPE);
 

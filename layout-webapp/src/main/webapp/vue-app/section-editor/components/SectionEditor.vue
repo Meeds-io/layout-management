@@ -2,12 +2,13 @@
 
   This file is part of the Meeds project (https://meeds.io/).
 
-  Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+  Copyright (C) 2020 - 2025 Meeds Association contact@meeds.io
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
   version 3 of the License, or (at your option) any later version.
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -23,10 +24,9 @@
     class="transparent"
     flat>
     <main class="content-box-sizing">
-      <layout-editor-toolbar
+      <section-editor-toolbar
         :page="pageContext"
-        :node="node"
-        :node-labels="nodeLabels" />
+        :node="node" />
       <coediting
         v-model="draftNodeId"
         :object-id="nodeId"
@@ -47,15 +47,15 @@
         @locked="stopLoading"
         @draft-detected="stopLoading"
         @canceled="cancelEditPage">
-        <layout-editor-content
+        <section-editor-content
           :page="pageContext"
           :node="draftNode"
           :layout="draftLayout" />
       </coediting>
+      <section-template-drawer />
       <layout-editor-cells-selection-box />
     </main>
-    <layout-analytics
-      :application-name="pageTemplateId ? 'pageTemplateManagement' : 'pageLayoutEditor'" />
+    <layout-analytics application-name="sectionEditor" />
   </v-app>
 </template>
 <script>
@@ -72,14 +72,11 @@ export default {
     pageKey() {
       return this.node?.state?.pageRef;
     },
-    pageTemplateId() {
-      return this.$layoutUtils.getQueryParam('pageTemplateId');
-    },
     pageRef() {
       return this.$layoutUtils.getQueryParam('pageId') || this.pageKey?.ref || (this.pageKey && `${this.pageKey.site.typeName}::${this.pageKey.site.name}::${this.pageKey.name}`);
     },
     nodeId() {
-      return this.$layoutUtils.getQueryParam('nodeId') || (this.pageTemplateId && eXo.env.portal.selectedNodeId);
+      return this.$root.nodeId;
     },
     draftPageKey() {
       return this.draftNode?.state?.pageRef;
@@ -89,14 +86,6 @@ export default {
     },
   },
   watch: {
-    pageTemplateId: {
-      immediate: true,
-      handler() {
-        if (this.pageTemplateId) {
-          this.$root.pageTemplateId = this.pageTemplateId;
-        }
-      },
-    },
     pageRef: {
       immediate: true,
       handler() {
@@ -115,19 +104,8 @@ export default {
       handler() {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
-          if (this.pageTemplateId) {
-            this.$pageTemplateService.getPageTemplate(this.pageTemplateId)
-              .then(pageTemplate => this.$root.pageTemplate = pageTemplate)
-              .then(() => this.$pageLayoutService.updatePageLayout(
-                this.draftPageRef,
-                JSON.parse(this.$root.pageTemplate.content),
-                'contentId'))
-              .then(draftLayout => this.setDraftLayout(draftLayout))
-              .catch(e => this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error'));
-          } else {
-            this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
-              .then(draftLayout => this.setDraftLayout(draftLayout));
-          }
+          this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
+            .then(draftLayout => this.setDraftLayout(draftLayout));
         }
       },
     },
@@ -171,20 +149,10 @@ export default {
     },
   },
   created() {
-    this.$root.$on('layout-draft-refresh', this.setDraftLayout);
-    if (this.pageTemplateId) {
-      this.$root.$on('page-templates-saved', this.deleteDraft);
-    } else {
-      this.$root.$on('layout-page-saved', this.deleteDraft);
-    }
+    this.$root.$on('section-template-saved', this.deleteDraft);
   },
   beforeDestroy() {
-    this.$root.$off('layout-draft-refresh', this.setDraftLayout);
-    if (this.pageTemplateId) {
-      this.$root.$off('page-templates-saved', this.deleteDraft);
-    } else {
-      this.$root.$off('layout-page-saved', this.deleteDraft);
-    }
+    this.$root.$off('section-template-saved', this.deleteDraft);
   },
   methods: {
     initDraftPage() {

@@ -29,7 +29,6 @@ import org.exoplatform.social.attachment.AttachmentPlugin;
 import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.service.LayoutAclService;
-import io.meeds.layout.service.SectionTemplateService;
 
 import jakarta.annotation.PostConstruct;
 
@@ -37,16 +36,13 @@ import jakarta.annotation.PostConstruct;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SectionTemplateAttachmentPlugin extends AttachmentPlugin {
 
-  public static final String     OBJECT_TYPE = "sectionTemplate";
+  public static final String OBJECT_TYPE = "sectionTemplate";
 
   @Autowired
-  private LayoutAclService       layoutAclService;
+  private LayoutAclService   layoutAclService;
 
   @Autowired
-  private SectionTemplateService sectionTemplateService;
-
-  @Autowired
-  private AttachmentService      attachmentService;
+  private AttachmentService  attachmentService;
 
   @PostConstruct
   public void init() {
