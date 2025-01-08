@@ -321,6 +321,22 @@ public class NavigationLayoutService {
     navigationService.deleteNode(nodeId);
   }
 
+  public NodeContext<NodeContext<Object>> findNode(NodeContext<NodeContext<Object>> node, String name) {
+    if (node == null || StringUtils.equals(node.getName(), name)) {
+      return node;
+    } else if (node.getNodeCount() > 0) {
+      int count = node.getNodeCount();
+      while (--count >= 0) {
+        NodeContext<NodeContext<Object>> next = node.get(count);
+        NodeContext<NodeContext<Object>> result = findNode(next, name);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
   private NodeState buildNodeState(String label, // NOSONAR
                                    String icon,
                                    PageKey pageKey,
@@ -393,22 +409,6 @@ public class NavigationLayoutService {
     } else {
       return null;
     }
-  }
-
-  private NodeContext<NodeContext<Object>> findNode(NodeContext<NodeContext<Object>> node, String name) {
-    if (node == null || StringUtils.equals(node.getName(), name)) {
-      return node;
-    } else if (node.getNodeCount() > 0) {
-      int count = node.getNodeCount();
-      while (--count >= 0) {
-        NodeContext<NodeContext<Object>> next = node.get(count);
-        NodeContext<NodeContext<Object>> result = findNode(next, name);
-        if (result != null) {
-          return result;
-        }
-      }
-    }
-    return null;
   }
 
   private void buildUri(NodeData node, StringBuilder uriBuilder) {

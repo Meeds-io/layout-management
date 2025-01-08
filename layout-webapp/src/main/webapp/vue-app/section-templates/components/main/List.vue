@@ -31,7 +31,7 @@
       must-sort
       disable-pagination
       hide-default-footer
-      class="application-body sectionTemplatesTable px-5">
+      class="application-body sectionTemplatesTable px-5 pb-5">
       <template slot="item" slot-scope="props">
         <section-template-item
           :key="props.item.id"

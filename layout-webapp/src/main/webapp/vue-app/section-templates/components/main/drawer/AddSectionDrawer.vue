@@ -90,7 +90,7 @@ export default {
   watch: {
     sectionType() {
       if (this.sectionType === this.$layoutUtils.gridTemplate) {
-        this.rows = 3;
+        this.rows = 4;
         this.cols = 12;
       } else if (this.sectionType === this.$layoutUtils.flexTemplate) {
         this.rows = 1;

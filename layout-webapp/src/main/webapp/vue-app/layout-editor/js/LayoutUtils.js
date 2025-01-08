@@ -173,6 +173,12 @@ export const pageJSContextIds = [
   'sitesHeadScripts',
 ];
 
+export function getQueryParam(paramName) {
+  const uri = window.location.search.substring(1);
+  const params = new URLSearchParams(uri);
+  return params.get(paramName);
+}
+
 export function initPageContext(navUri) {
   return fetch(`/portal${navUri}?showMaxWindow=true&hideSharedLayout=true`, {
     credentials: 'include',
