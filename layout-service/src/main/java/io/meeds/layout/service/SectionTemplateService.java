@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.mop.navigation.NodeData;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -45,13 +46,15 @@ import io.meeds.social.translation.service.TranslationService;
 @Service
 public class SectionTemplateService {
 
-  public static final String           TEMPLATE_CREATED_EVENT = "layout.sectionTemplate.created";
+  private static final String          SECTION_TEMPLATE_DOESN_T_EXIST_MESSAGE = "Section Template doesn't exist";
 
-  public static final String           TEMPLATE_UPDATED_EVENT = "layout.sectionTemplate.updated";
+  public static final String           TEMPLATE_CREATED_EVENT                 = "layout.sectionTemplate.created";
 
-  public static final String           TEMPLATE_DELETED_EVENT = "layout.sectionTemplate.deleted";
+  public static final String           TEMPLATE_UPDATED_EVENT                 = "layout.sectionTemplate.updated";
 
-  private static final Log             LOG                    = ExoLogger.getLogger(SectionTemplateService.class);
+  public static final String           TEMPLATE_DELETED_EVENT                 = "layout.sectionTemplate.deleted";
+
+  private static final Log             LOG                                    = ExoLogger.getLogger(SectionTemplateService.class);
 
   @Autowired
   private LayoutAclService             layoutAclService;
@@ -114,7 +117,7 @@ public class SectionTemplateService {
     }
     SectionTemplate sectionTemplate = getSectionTemplate(id);
     if (sectionTemplate == null) {
-      throw new ObjectNotFoundException("Section Template doesn't exist");
+      throw new ObjectNotFoundException(SECTION_TEMPLATE_DOESN_T_EXIST_MESSAGE);
     }
     if (sectionTemplate.isSystem()) {
       throw new IllegalAccessException("Can't delete a system Section Template");
@@ -126,7 +129,7 @@ public class SectionTemplateService {
   public void deleteSectionTemplate(long id) throws ObjectNotFoundException {
     SectionTemplate sectionTemplate = getSectionTemplate(id);
     if (sectionTemplate == null) {
-      throw new ObjectNotFoundException("Section Template doesn't exist");
+      throw new ObjectNotFoundException(SECTION_TEMPLATE_DOESN_T_EXIST_MESSAGE);
     }
     deleteSectionTemplateFromStore(id);
     listenerService.broadcast(TEMPLATE_DELETED_EVENT, null, sectionTemplate);
@@ -144,8 +147,30 @@ public class SectionTemplateService {
     return updateSectionTemplateWithUser(sectionTemplate, null);
   }
 
-  public long getSectionTemplateContainerId(long sectionTemplateId) {
-    return sectionTemplateLayoutStorage.getContainerId(sectionTemplateId);
+  public long generateSectionTemplateNodeId(long id, String username) throws ObjectNotFoundException, IllegalAccessException {
+    if (!layoutAclService.isAdministrator(username)) {
+      throw new IllegalAccessException("User isn't authorized to edit the Section Template layout");
+    }
+    SectionTemplate sectionTemplate = getSectionTemplate(id);
+    if (sectionTemplate == null) {
+      throw new ObjectNotFoundException(SECTION_TEMPLATE_DOESN_T_EXIST_MESSAGE);
+    }
+    if (sectionTemplate.isSystem()) {
+      throw new IllegalAccessException("Can't edit the layout of a system Section Template layout");
+    }
+    NodeData clonedPageNode = sectionTemplateLayoutStorage.generateSectionTemplateNodeId(sectionTemplate, username);
+    return Long.parseLong(clonedPageNode.getId());
+  }
+
+  public String generateSectionTemplateContent(long id, String username) throws IllegalAccessException, ObjectNotFoundException {
+    if (!layoutAclService.isAdministrator(username)) {
+      throw new IllegalAccessException("User isn't authorized to update a Section Template");
+    }
+    SectionTemplate sectionTemplate = getSectionTemplate(id);
+    if (sectionTemplate == null) {
+      throw new ObjectNotFoundException(SECTION_TEMPLATE_DOESN_T_EXIST_MESSAGE);
+    }
+    return sectionTemplateLayoutStorage.generateSectionTemplateContent(sectionTemplate, username);
   }
 
   private void deleteSectionTemplateFromStore(long id) throws ObjectNotFoundException {
@@ -167,7 +192,6 @@ public class SectionTemplateService {
       return new SectionTemplateDetail(sectionTemplate);
     }
     SectionTemplateDetail sectionTemplateDetail = new SectionTemplateDetail(sectionTemplate);
-    sectionTemplateDetail.setContainerId(getSectionTemplateContainerId(sectionTemplate.getId()));
     sectionTemplateDetail.setName(getLabel(SectionTemplateTranslationPlugin.OBJECT_TYPE,
                                            sectionTemplateDetail.getId(),
                                            SectionTemplateTranslationPlugin.TITLE_FIELD_NAME,
@@ -212,7 +236,6 @@ public class SectionTemplateService {
 
   private SectionTemplate createSectionTemplateWithUser(SectionTemplate sectionTemplate, String username) {
     SectionTemplate createdSectionTemplate = sectionTemplateStorage.createSectionTemplate(sectionTemplate);
-    sectionTemplateLayoutStorage.initContainer(createdSectionTemplate);
     listenerService.broadcast(TEMPLATE_CREATED_EVENT, username, createdSectionTemplate);
     return createdSectionTemplate;
   }
@@ -220,7 +243,6 @@ public class SectionTemplateService {
   private SectionTemplate updateSectionTemplateWithUser(SectionTemplate sectionTemplate,
                                                         String username) throws ObjectNotFoundException {
     SectionTemplate updatedSectionTemplate = sectionTemplateStorage.updateSectionTemplate(sectionTemplate);
-    sectionTemplateLayoutStorage.initContainer(updatedSectionTemplate);
     listenerService.broadcast(TEMPLATE_UPDATED_EVENT, username, updatedSectionTemplate);
     return updatedSectionTemplate;
   }

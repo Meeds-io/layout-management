@@ -194,6 +194,48 @@ public class SectionTemplateRestTest {
                                                                   .contentType(MediaType.APPLICATION_JSON));
     response.andExpect(status().isNotFound());
   }
+  
+  @Test
+  void generateSectionTemplateNodeIdWithUser() throws Exception {
+    ResultActions response = mockMvc.perform(get(REST_PATH + "/1/nodeId").with(testSimpleUser()));
+    response.andExpect(status().isOk());
+    verify(sectionTemplateService).generateSectionTemplateNodeId(1l, SIMPLE_USER);
+  }
+  
+  @Test
+  void generateSectionTemplateNodeIdWithUserForbidden() throws Exception {
+    when(sectionTemplateService.generateSectionTemplateNodeId(2l, SIMPLE_USER)).thenThrow(IllegalAccessException.class);
+    ResultActions response = mockMvc.perform(get(REST_PATH + "/2/nodeId").with(testSimpleUser()));
+    response.andExpect(status().isForbidden());
+  }
+  
+  @Test
+  void generateSectionTemplateNodeIdWithUserNotFound() throws Exception {
+    when(sectionTemplateService.generateSectionTemplateNodeId(3l, SIMPLE_USER)).thenThrow(ObjectNotFoundException.class);
+    ResultActions response = mockMvc.perform(get(REST_PATH + "/3/nodeId").with(testSimpleUser()));
+    response.andExpect(status().isNotFound());
+  }
+
+  @Test
+  void generateSectionTemplateContentWithUser() throws Exception {
+    ResultActions response = mockMvc.perform(get(REST_PATH + "/1/content").with(testSimpleUser()));
+    response.andExpect(status().isOk());
+    verify(sectionTemplateService).generateSectionTemplateContent(1l, SIMPLE_USER);
+  }
+
+  @Test
+  void generateSectionTemplateContentWithUserForbidden() throws Exception {
+    when(sectionTemplateService.generateSectionTemplateContent(2l, SIMPLE_USER)).thenThrow(IllegalAccessException.class);
+    ResultActions response = mockMvc.perform(get(REST_PATH + "/2/content").with(testSimpleUser()));
+    response.andExpect(status().isForbidden());
+  }
+
+  @Test
+  void generateSectionTemplateContentWithUserNotFound() throws Exception {
+    when(sectionTemplateService.generateSectionTemplateContent(3l, SIMPLE_USER)).thenThrow(ObjectNotFoundException.class);
+    ResultActions response = mockMvc.perform(get(REST_PATH + "/3/content").with(testSimpleUser()));
+    response.andExpect(status().isNotFound());
+  }
 
   @Test
   void deleteSectionTemplateAnonymously() throws Exception {
