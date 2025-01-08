@@ -22,6 +22,7 @@
 <template>
   <v-menu
     v-model="menu"
+    :loading="loading"
     :left="!$vuetify.rtl"
     :right="$vuetify.rtl"
     :content-class="menuId"
@@ -88,6 +89,21 @@
               {{ $t('sectionTemplates.label.editProperties') }}
             </v-list-item-title>
           </v-list-item>
+          <v-list-item
+            dense
+            @click="duplicateSectionTemplate">
+            <v-card
+              color="transparent"
+              min-width="15"
+              flat>
+              <v-icon size="13">
+                fa-copy
+              </v-icon>
+            </v-card>
+            <v-list-item-title class="ps-2">
+              {{ $t('sectionTemplates.label.duplicate') }}
+            </v-list-item-title>
+          </v-list-item>
           <v-tooltip :disabled="!sectionTemplate.system" bottom>
             <template #activator="{ on, attrs }">
               <div
@@ -130,6 +146,7 @@ export default {
   },
   data: () => ({
     menu: false,
+    loading: false,
     hoverMenu: false,
     listItem: null,
     menuId: `sectionTemplateMenu${parseInt(Math.random() * 10000)}`,
@@ -186,10 +203,63 @@ export default {
         this.menu = false;
       }
     },
-    checkMenuStatus(instanceId) {
-      if (this.menu && instanceId !== this.sectionTemplate.id) {
+    checkMenuStatus(sectionTemplateId) {
+      if (this.menu && sectionTemplateId !== this.sectionTemplate.id) {
         this.menu = false;
       }
+    },
+    async duplicateSectionTemplate() {
+      this.loading = true;
+      try {
+        const sectionTemplate = JSON.parse(JSON.stringify(this.sectionTemplate));
+        sectionTemplate.id = null;
+        sectionTemplate.system = false;
+        sectionTemplate.category = 'custom';
+        const createdSectionTemplate = await this.$sectionTemplateService.createSectionTemplate(sectionTemplate);
+
+        const nameLabels = await this.$translationService.getTranslations('sectionTemplate', this.sectionTemplate.id, 'title');
+        await this.$translationService.saveTranslations('sectionTemplate', createdSectionTemplate.id, 'title', nameLabels);
+
+        const descriptionLabels = await this.$translationService.getTranslations('sectionTemplate', this.sectionTemplate.id, 'description');
+        await this.$translationService.saveTranslations('sectionTemplate', createdSectionTemplate.id, 'description', descriptionLabels);
+
+        if (this.sectionTemplate.illustrationId) {
+          const illustrationSrc = `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/sectionTemplate/${this.sectionTemplate.id}/${this.sectionTemplate.illustrationId}`;
+          const file = await this.getIllustrationFile(illustrationSrc);
+          const uploadId = await this.uploadFile(file);
+          await this.$fileAttachmentService.saveAttachments({
+            objectType: 'sectionTemplate',
+            objectId: createdSectionTemplate.id,
+            uploadedFiles: [{uploadId}],
+            attachedFiles: [],
+          });
+        }
+        this.$root.$emit('section-template-edit', createdSectionTemplate);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async uploadFile(file) {
+      const uploadId =  await this.$uploadService.upload(file);
+      return await new Promise((resolve, reject) => {
+        const interval = window.setInterval(() => {
+          this.$uploadService.getUploadProgress(uploadId)
+            .then(percent => {
+              if (Number(percent) === 100) {
+                window.clearInterval(interval);
+                resolve(uploadId);
+              }
+            })
+            .catch(e => reject(e));
+        }, 200);
+      });
+    },
+    getIllustrationFile(src) {
+      return fetch(src, {
+        'method': 'GET',
+        'credentials': 'include'
+      })
+        .then(resp => resp.ok && resp.blob());
     },
   },
 };

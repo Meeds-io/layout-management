@@ -70,7 +70,6 @@ export default {
         sectionTemplate.category = 'custom';
         this.$root.$emit('section-template-edit', sectionTemplate, false, document.querySelector('.layout-section'));
       } catch (e) {
-        console.error(e);
         this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error');
       } finally {
         if (this.$root.sectionTemplate?.name) {
