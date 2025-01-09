@@ -29,6 +29,8 @@
           'border-color': !selected,
         }"
         class="d-flex flex-column pa-2 hover-elevation overflow-hidden position-relative"
+        min-width="170"
+        max-width="170"
         min-height="150"
         max-height="150"
         flat
