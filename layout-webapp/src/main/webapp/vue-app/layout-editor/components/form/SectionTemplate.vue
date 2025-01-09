@@ -81,10 +81,6 @@
 <script>
 export default {
   props: {
-    expand: {
-      type: Boolean,
-      default: false
-    },
     sectionTemplate: {
       type: Object,
       default: null

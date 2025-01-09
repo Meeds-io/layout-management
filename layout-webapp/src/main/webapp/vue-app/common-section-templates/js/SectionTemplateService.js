@@ -70,6 +70,23 @@ export function generateSectionTemplateContent(id) {
   });
 }
 
+export function saveAsSectionTemplate(pageRef, containerId) {
+  return fetch(`/layout/rest/sections/container/${containerId}`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `pageRef=${pageRef}`,
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when creating a section template based on an existing section container identifier');
+    }
+  });
+}
+
 export function createSectionTemplate(sectionTemplate) {
   return fetch('/layout/rest/sections', {
     credentials: 'include',
