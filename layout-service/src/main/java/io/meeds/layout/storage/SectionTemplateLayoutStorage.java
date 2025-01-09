@@ -19,12 +19,15 @@
 package io.meeds.layout.storage;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
@@ -55,7 +58,9 @@ import lombok.Synchronized;
 @Component
 public class SectionTemplateLayoutStorage {
 
-  private static final String     GLOBAL_SITE_NAME = "global";
+  private static final String     GLOBAL_SITE_NAME     = "global";
+
+  private static final String[]   EVERYONE_PERMISSIONS = new String[] { UserACL.EVERYONE };
 
   @Autowired
   private LayoutService           layoutService;
@@ -108,24 +113,47 @@ public class SectionTemplateLayoutStorage {
     NodeContext<NodeContext<Object>> parentNode = navigationService.loadNode(SiteKey.portal(GLOBAL_SITE_NAME));
     NodeContext<NodeContext<Object>> nodeData = navigationLayoutService.findNode(parentNode, clonedNodeName);
     PageKey pageKey = nodeData.getState().getPageRef();
-    Page page = layoutService.getPage(pageKey);
-    Container section = (Container) ((Container) page.getChildren().get(0)).getChildren().get(0);
+    return generateSectionTemplateContent(pageKey);
+  }
+
+  public String generateSectionTemplateContent(SectionTemplate sectionTemplate,
+                                               Container section,
+                                               String username) {
     exportPortletPreferences(section);
     LayoutModel sectionLayoutModel = new LayoutModel(section);
     sectionLayoutModel.resetStorage();
-    return JsonUtils.toJsonString(sectionLayoutModel);
+    String sectionTemplateContent = JsonUtils.toJsonString(sectionLayoutModel);
+    PageKey pageKey = createSectionTemplatePage(sectionTemplate.getId(), sectionTemplateContent, username);
+    return generateSectionTemplateContent(pageKey);
   }
 
-  private PageKey clonePage(SectionTemplate sectionTemplate, String username) throws ObjectNotFoundException {
+  public Container findContainer(PageKey pageKey, long containerId) {
+    Page page = layoutService.getPage(pageKey);
+    if (page == null) {
+      return null;
+    } else {
+      return findContainer(page, String.valueOf(containerId));
+    }
+  }
+
+  private PageKey clonePage(SectionTemplate sectionTemplate, String username) {
+    long sectionTemplateId = sectionTemplate.getId();
+    String sectionTemplateContent = sectionTemplate.getContent();
+    return createSectionTemplatePage(sectionTemplateId, sectionTemplateContent, username);
+  }
+
+  private PageKey createSectionTemplatePage(long sectionTemplateId,
+                                            String sectionTemplateContent,
+                                            String username) {
     Container parentContainer = new Container();
     parentContainer.setTemplate("system:/groovy/portal/webui/container/UIPageLayout.gtmpl");
     parentContainer.setChildren(new ArrayList<>());
-    parentContainer.getChildren()
-                   .add(LayoutModel.toModelObject(JsonUtils.fromJsonString(sectionTemplate.getContent(), LayoutModel.class)));
-    parentContainer.resetStorage();
+    LayoutModel layoutModel = JsonUtils.fromJsonString(sectionTemplateContent, LayoutModel.class);
+    layoutModel.resetStorage();
+    parentContainer.getChildren().add(LayoutModel.toModelObject(layoutModel));
 
-    long sectionTemplateId = sectionTemplate.getId();
     Page sectionDraftPage = new Page();
+    sectionDraftPage.setAccessPermissions(EVERYONE_PERMISSIONS);
     sectionDraftPage.setOwnerType(PortalConfig.PORTAL_TYPE);
     sectionDraftPage.setOwnerId(GLOBAL_SITE_NAME);
     sectionDraftPage.setName(getSectionNodeName(sectionTemplateId, username));
@@ -137,6 +165,15 @@ public class SectionTemplateLayoutStorage {
     layoutService.save(new PageContext(clonedPageKey, Utils.toPageState(sectionDraftPage)), sectionDraftPage);
     pageLayoutService.impersonatePage(clonedPageKey);
     return clonedPageKey;
+  }
+
+  private String generateSectionTemplateContent(PageKey pageKey) {
+    Page page = layoutService.getPage(pageKey);
+    Container section = (Container) ((Container) page.getChildren().get(0)).getChildren().get(0);
+    exportPortletPreferences(section);
+    LayoutModel sectionLayoutModel = new LayoutModel(section);
+    sectionLayoutModel.resetStorage();
+    return JsonUtils.toJsonString(sectionLayoutModel);
   }
 
   private void exportPortletPreferences(ModelObject object) {
@@ -151,6 +188,26 @@ public class SectionTemplateLayoutStorage {
 
   private String getSectionNodeName(long sectionTemplateId, String username) {
     return "section_draft_" + sectionTemplateId + "_" + username;
+  }
+
+  private Container findContainer(ModelObject modelObject, String containerStorageId) {
+    return switch (modelObject) {
+    case Container container -> {
+      if (StringUtils.equals(containerStorageId, container.getStorageId())) {
+        yield container;
+      } else if (CollectionUtils.isNotEmpty(container.getChildren())) {
+        yield container.getChildren()
+                       .stream()
+                       .map(m -> findContainer(m, containerStorageId))
+                       .filter(Objects::nonNull)
+                       .findFirst()
+                       .orElse(null);
+      } else {
+        yield null;
+      }
+    }
+    default -> null;
+    };
   }
 
 }

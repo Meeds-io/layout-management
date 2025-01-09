@@ -20,27 +20,23 @@
 import SectionTemplateManagement from './components/SectionTemplateManagement.vue';
 
 import SectionTemplateToolbar from './components/header/Toolbar.vue';
+
 import SectionTemplateList from './components/main/List.vue';
 import SectionTemplateItem from './components/main/Item.vue';
 import SectionTemplateMenu from './components/main/Menu.vue';
-import AddSectionDrawer from './components/main/drawer/AddSectionDrawer.vue';
-import SectionTemplateDrawer from './components/main/drawer/SectionTemplateDrawer.vue';
-import SectionTemplatePreview from './components/main/form/SectionTemplatePreview.vue';
 
-import SectionFlexEditor from '../layout-editor/components/content/common/SectionFlexEditor.vue';
-import SectionGridEditor from '../layout-editor/components/content/common/SectionGridEditor.vue';
+import AddSectionTemplateDrawer from './components/drawer/AddSectionTemplateDrawer.vue';
 
 const components = {
   'section-template-management': SectionTemplateManagement,
+
   'section-template-toolbar': SectionTemplateToolbar,
+
   'section-template-list': SectionTemplateList,
   'section-template-item': SectionTemplateItem,
   'section-template-menu': SectionTemplateMenu,
-  'section-template-add-drawer': AddSectionDrawer,
-  'section-template-drawer': SectionTemplateDrawer,
-  'section-template-preview': SectionTemplatePreview,
-  'section-template-flex-editor': SectionFlexEditor,
-  'section-template-grid-editor': SectionGridEditor,
+
+  'section-template-add-drawer': AddSectionTemplateDrawer,
 };
 
 for (const key in components) {

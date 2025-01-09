@@ -105,6 +105,24 @@
                 </template>
                 {{ $t('layout.editSection') }}
               </v-tooltip>
+              <v-tooltip v-if="$root.isAdministrator" bottom>
+                <template #activator="{on, attrs}">
+                  <div
+                    v-on="on"
+                    v-bind="attrs">
+                    <v-btn
+                      :loading="savingAsTemplate"
+                      class="white text-color border-color mt-2"
+                      height="32"
+                      width="32"
+                      icon
+                      @click="saveAsTemplate">
+                      <v-icon class="icon-default-color" size="20">fa-columns</v-icon>
+                    </v-btn>
+                  </div>
+                </template>
+                {{ $t('layout.saveAsSectionTemplate') }}
+              </v-tooltip>
             </div>
           </v-hover>
         </div>
@@ -160,6 +178,7 @@ export default {
   },
   data: () => ({
     open: false,
+    savingAsTemplate: false,
     hoverButton1: false,
     hoverButton2: false,
     hoverButton3: false,
@@ -216,6 +235,23 @@ export default {
         this.$root.hoveredSectionId = this.container.storageId;
       } else if (!newVal && this.$root.hoveredSectionId === this.container.storageId) {
         this.$root.hoveredSectionId = null;
+      }
+    },
+  },
+  methods: {
+    async saveAsTemplate() {
+      this.savingAsTemplate = true;
+      await this.$nextTick();
+      try {
+        this.$root.$emit('layout-save-draft');
+        this.open = false;
+        await this.$nextTick();
+        window.setTimeout(() => {
+          const domId =  this.container.id || this.container.storageId;
+          this.$root.$emit('section-template-save-as-drawer', this.$root.draftPageRef, this.container.storageId, document.querySelector(`*[id="${domId}"]`).closest('.layout-section'));
+        }, 200);
+      } finally {
+        window.setTimeout(() => this.savingAsTemplate = false, 2000);
       }
     },
   },

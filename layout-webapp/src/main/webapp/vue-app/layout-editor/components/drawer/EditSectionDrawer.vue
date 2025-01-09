@@ -30,14 +30,14 @@
     </template>
     <template v-if="drawer && section" #content>
       <v-card class="pa-4" flat>
-        <layout-editor-section-grid-editor
+        <section-template-grid-editor
           v-if="sectionType === $layoutUtils.gridTemplate"
           :rows-count="section.rowsCount"
           :cols-count="section.colsCount"
           :background-properties="section"
           @rows-updated="rows = $event"
           @cols-updated="cols = $event" />
-        <layout-editor-section-flex-editor
+        <section-template-flex-editor
           v-else-if="sectionType === $layoutUtils.flexTemplate"
           :cols-count="cols"
           :background-properties="section"

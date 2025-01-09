@@ -80,7 +80,7 @@ export default {
       return this.attachments?.[0]?.id;
     },
     illustrationSrc() {
-      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/sectionTemplate/${this.sectionTemplateId}/${this.illustrationId}` || '/layout/images/DefaultSectionTmeplate.webp';
+      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/sectionTemplate/${this.sectionTemplateId}/${this.illustrationId}` || '';
     },
   },
   watch: {
@@ -98,7 +98,7 @@ export default {
     init() {
       if (this.previewImage) {
         this.avatarData = this.previewImage;
-      } else {
+      } else if (this.sectionTemplateId) {
         return this.$fileAttachmentService.getAttachments('sectionTemplate', this.sectionTemplateId)
           .then(data => this.attachments = data?.attachments || []);
       }
@@ -126,11 +126,11 @@ export default {
           .finally(() => this.sendingImage = false);
       }
     },
-    async save() {
+    async save(sectionTemplateId) {
       if (this.value) {
         const report = await this.$fileAttachmentService.saveAttachments({
           objectType: 'sectionTemplate',
-          objectId: this.sectionTemplateId,
+          objectId: this.sectionTemplateId || sectionTemplateId,
           uploadedFiles: [{uploadId: this.value}],
           attachedFiles: [],
         });

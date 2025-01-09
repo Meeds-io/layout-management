@@ -40,6 +40,7 @@
     <layout-editor-portlet-edit-dialog />
     <layout-editor-page-template-drawer />
     <layout-editor-page-edit-drawer />
+    <section-template-save-as-drawer />
     <layout-image-illustration-preview />
     <changes-reminder
       ref="changesReminder"
