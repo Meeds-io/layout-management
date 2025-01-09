@@ -40,6 +40,7 @@
     <layout-editor-portlet-edit-dialog />
     <layout-editor-page-template-drawer />
     <layout-editor-page-edit-drawer />
+    <section-template-save-as-drawer />
     <layout-image-illustration-preview />
     <changes-reminder
       ref="changesReminder"
@@ -148,6 +149,7 @@ export default {
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
     this.$root.$on('layout-save-draft', this.saveDraft);
+    this.$root.$on('layout-section-save-as-template', this.saveAsSectionTemplate);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   mounted() {
@@ -392,6 +394,13 @@ export default {
     resetSectionHistory() {
       this.$root.sectionHistory = [];
       this.$root.sectionRedo = [];
+    },
+    async saveAsSectionTemplate(section) {
+      this.saveDraft();
+      window.setTimeout(() => {
+        const domId =  section.id || section.storageId;
+        this.$root.$emit('section-template-save-as-drawer', this.$root.draftPageRef, section.storageId, document.querySelector(`*[id="${domId}"]`).closest('.layout-section'));
+      }, 200);
     },
     saveDraft(layout) {
       this.resetSectionHistory();
