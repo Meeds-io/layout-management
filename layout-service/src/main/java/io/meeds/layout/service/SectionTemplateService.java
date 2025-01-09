@@ -77,6 +77,9 @@ public class SectionTemplateService {
   private SectionTemplateLayoutStorage sectionTemplateLayoutStorage;
 
   @Autowired
+  private ContainerLayoutService       containerLayoutService;
+
+  @Autowired
   private ListenerService              listenerService;
 
   public List<SectionTemplate> getSectionTemplates() {
@@ -149,12 +152,12 @@ public class SectionTemplateService {
     return updateSectionTemplateWithUser(sectionTemplate, null);
   }
 
-  public SectionTemplate saveAsSectionTemplate(String pageRef, long containerId, String username) throws ObjectNotFoundException, IllegalAccessException {
+  public SectionTemplate saveAsSectionTemplate(PageKey pageKey, long containerId, String username) throws ObjectNotFoundException,
+                                                                                                  IllegalAccessException {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to edit the Section Template layout");
     }
-    PageKey pageKey = PageKey.parse(pageRef);
-    Container container = sectionTemplateLayoutStorage.findContainer(pageKey, containerId);
+    Container container = containerLayoutService.findContainer(pageKey, containerId);
     if (container == null) {
       throw new ObjectNotFoundException(String.format("Container %s from Page %s doesn't exist", containerId, pageKey));
     }

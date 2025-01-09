@@ -110,7 +110,6 @@
                 v-on="on"
                 v-bind="attrs">
                 <v-list-item
-                  :disabled="sectionTemplate.system"
                   dense
                   @click="$root.$emit('section-template-delete', sectionTemplate)">
                   <v-card
