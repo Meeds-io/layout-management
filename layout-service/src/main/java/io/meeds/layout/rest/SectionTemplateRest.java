@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.mop.page.PageKey;
 
 import io.meeds.layout.model.SectionTemplate;
 import io.meeds.layout.model.SectionTemplateDetail;
@@ -113,14 +114,14 @@ public class SectionTemplateRest {
   })
   public SectionTemplate saveAsSectionTemplate(
                                                HttpServletRequest request,
-                                               @Parameter(description = "Layout Container Storage identifier")
+                                               @Parameter(description = "Container Storage identifier")
                                                @PathVariable("storageId")
                                                long containerId,
-                                               @Parameter(description = "Layout Page reference containing the identified layout container")
+                                               @Parameter(description = "Page reference")
                                                @RequestParam("pageRef")
                                                String pageRef) {
     try {
-      return sectionTemplateService.saveAsSectionTemplate(pageRef, containerId, request.getRemoteUser());
+      return sectionTemplateService.saveAsSectionTemplate(PageKey.parse(pageRef), containerId, request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
