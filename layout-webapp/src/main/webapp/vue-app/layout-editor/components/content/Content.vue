@@ -337,6 +337,8 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       this.addSectionVersion(section.storageId);
       parentContainer.children.splice(index || 0, 0, section);
+      this.$layoutUtils.parseSections(this.layoutToEdit);
+      this.saveDraft();
     },
     handleRemoveSection(index) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
