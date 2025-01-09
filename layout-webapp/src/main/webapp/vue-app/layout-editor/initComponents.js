@@ -39,6 +39,7 @@ import MarginInput from './components/form/MarginInput.vue';
 import SectionMarginInput from './components/form/SectionMarginInput.vue';
 import BorderInput from './components/form/BorderInput.vue';
 import BorderRadiusInput from './components/form/BorderRadiusInput.vue';
+import SectionTemplate from './components/form/SectionTemplate.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -92,6 +93,7 @@ const components = {
   'layout-editor-container-extension': ContainerExtension,
   'layout-editor-container-base': ContainerBase,
   'layout-editor-container-section': Section,
+  'layout-editor-section-template': SectionTemplate,
   'layout-editor-container-cell': Cell,
   'layout-editor-container-application': Application,
   'layout-editor-section-selection-grid': SectionSelectionGrid,
