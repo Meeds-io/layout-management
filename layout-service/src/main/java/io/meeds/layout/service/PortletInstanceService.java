@@ -36,6 +36,8 @@ import org.springframework.stereotype.Service;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.portal.pom.spi.portlet.Preference;
 import org.exoplatform.services.listener.ListenerService;
@@ -81,6 +83,9 @@ public class PortletInstanceService {
 
   @Autowired
   private LayoutAclService                             layoutAclService;
+
+  @Autowired
+  private LayoutService                                layoutService;
 
   @Autowired
   private TranslationService                           translationService;
@@ -292,21 +297,23 @@ public class PortletInstanceService {
     if (!layoutAclService.isAdministrator(username)) {
       throw new IllegalAccessException("User isn't authorized to update a Portlet instance category");
     }
-    PortletInstanceCategory updatedPortletInstanceCategory = portletInstanceCategoryStorage.updatePortletInstanceCategory(portletInstanceCategory);
+    PortletInstanceCategory updatedPortletInstanceCategory =
+                                                           portletInstanceCategoryStorage.updatePortletInstanceCategory(portletInstanceCategory);
     listenerService.broadcast(CATEGORY_UPDATED_EVENT, username, updatedPortletInstanceCategory);
     return updatedPortletInstanceCategory;
   }
 
   public PortletInstanceCategory updatePortletInstanceCategory(PortletInstanceCategory portletInstanceCategory) throws ObjectNotFoundException {
-    PortletInstanceCategory updatedPortletInstanceCategory = portletInstanceCategoryStorage.updatePortletInstanceCategory(portletInstanceCategory);
+    PortletInstanceCategory updatedPortletInstanceCategory =
+                                                           portletInstanceCategoryStorage.updatePortletInstanceCategory(portletInstanceCategory);
     listenerService.broadcast(CATEGORY_UPDATED_EVENT, null, updatedPortletInstanceCategory);
     return updatedPortletInstanceCategory;
   }
 
   public Application getPortletInstanceApplication(long portletInstanceId,
-                                                            long applicationStorageId,
-                                                            String username) throws IllegalAccessException,
-                                                                             ObjectNotFoundException {
+                                                   long applicationStorageId,
+                                                   String username) throws IllegalAccessException,
+                                                                    ObjectNotFoundException {
     PortletInstance portletInstance = portletInstanceId <= 0 ? null :
                                                              getPortletInstance(portletInstanceId,
                                                                                 username,
@@ -349,7 +356,13 @@ public class PortletInstanceService {
     return portletInstanceStorage.getPortletInstances();
   }
 
-  public Portlet exportApplicationPreferences(Application application) {
+  public void exportApplicationPreferences(Application application) {
+    Portlet preferences = computeApplicationPreferences(application);
+    String portletContentId = layoutService.getId(application.getState());
+    application.setState(new TransientApplicationState(portletContentId, preferences));
+  }
+
+  public Portlet computeApplicationPreferences(Application application) {
     String portletName = portletInstanceLayoutStorage.getApplicationPortletName(application);
     if (preferencePlugins.containsKey(portletName)) {
       PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletName);
@@ -472,13 +485,15 @@ public class PortletInstanceService {
     List<String> permissions = portletInstance.getPermissions();
     return CollectionUtils.isEmpty(permissions)
            || permissions.equals(EVERYONE_PERMISSIONS_LIST)
-           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p)));
+           || (StringUtils.isNotBlank(username)
+               && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p)));
   }
 
   private boolean hasPermission(PortletInstanceCategory category, String username) {
     List<String> permissions = category.getPermissions();
     return CollectionUtils.isEmpty(permissions)
            || permissions.equals(EVERYONE_PERMISSIONS_LIST)
-           || (StringUtils.isNotBlank(username) && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p)));
+           || (StringUtils.isNotBlank(username)
+               && permissions.stream().anyMatch(p -> layoutAclService.hasPermission(username, p)));
   }
 }

@@ -111,6 +111,25 @@
                     v-on="on"
                     v-bind="attrs">
                     <v-btn
+                      :aria-label="$t('layout.cloneSection')"
+                      :loading="savingAsTemplate"
+                      class="white text-color border-color mt-2"
+                      height="32"
+                      width="32"
+                      icon
+                      @click="$root.$emit('layout-section-clone', container, index)">
+                      <v-icon class="icon-default-color" size="20">fa-copy</v-icon>
+                    </v-btn>
+                  </div>
+                </template>
+                {{ $t('layout.cloneSection') }}
+              </v-tooltip>
+              <v-tooltip v-if="$root.isAdministrator" bottom>
+                <template #activator="{on, attrs}">
+                  <div
+                    v-on="on"
+                    v-bind="attrs">
+                    <v-btn
                       :loading="savingAsTemplate"
                       class="white text-color border-color mt-2"
                       height="32"
