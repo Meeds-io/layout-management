@@ -28,16 +28,36 @@
     <template #title>
       {{ $t('layout.editSectionTitle', {0: index + 1}) }}
     </template>
+    <template v-if="$root.isAdministrator" #titleIcons>
+      <v-tooltip bottom>
+        <template #activator="{on, attrs}">
+          <div
+            v-on="on"
+            v-bind="attrs">
+            <v-btn
+              :loading="savingAsTemplate"
+              class="white text-color border-color mt-2"
+              height="32"
+              width="32"
+              icon
+              @click="saveAsTemplate">
+              <v-icon class="icon-default-color" size="20">fa-columns</v-icon>
+            </v-btn>
+          </div>
+        </template>
+        {{ $t('layout.saveAsSectionTemplate') }}
+      </v-tooltip>
+    </template>
     <template v-if="drawer && section" #content>
       <v-card class="pa-4" flat>
-        <layout-editor-section-grid-editor
+        <section-template-grid-editor
           v-if="sectionType === $layoutUtils.gridTemplate"
           :rows-count="section.rowsCount"
           :cols-count="section.colsCount"
           :background-properties="section"
           @rows-updated="rows = $event"
           @cols-updated="cols = $event" />
-        <layout-editor-section-flex-editor
+        <section-template-flex-editor
           v-else-if="sectionType === $layoutUtils.flexTemplate"
           :cols-count="cols"
           :background-properties="section"
@@ -157,6 +177,7 @@ export default {
     backgroundSize: null,
     stickyApplication: false,
     optionsModified: false,
+    savingAsTemplate: false,
   }),
   computed: {
     colsCount() {
@@ -246,6 +267,15 @@ export default {
     close() {
       this.$refs.drawer.close();
       this.section = null;
+    },
+    async saveAsTemplate() {
+      this.savingAsTemplate = true;
+      await this.$nextTick();
+      window.setTimeout(() => {
+        this.$root.$emit('layout-section-save-as-template', this.section);
+        this.close();
+        this.savingAsTemplate = false;
+      }, 200);
     },
   },
 };

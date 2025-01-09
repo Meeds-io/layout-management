@@ -51,8 +51,6 @@ import ContainerBase from './components/content/base/ContainerBase.vue';
 import SectionMenu from './components/content/common/SectionMenu.vue';
 import SectionSelectionGrid from './components/content/common/SectionSelectionGrid.vue';
 import SectionSelectionGridCell from './components/content/common/SectionSelectionGridCell.vue';
-import SectionGridEditor from './components/content/common/SectionGridEditor.vue';
-import SectionFlexEditor from './components/content/common/SectionFlexEditor.vue';
 import ApplicationCategoryCard from './components/content/common/ApplicationCategoryCard.vue';
 import ApplicationCard from './components/content/common/ApplicationCard.vue';
 import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
@@ -98,8 +96,6 @@ const components = {
   'layout-editor-container-application': Application,
   'layout-editor-section-selection-grid': SectionSelectionGrid,
   'layout-editor-section-selection-grid-cell': SectionSelectionGridCell,
-  'layout-editor-section-grid-editor': SectionGridEditor,
-  'layout-editor-section-flex-editor': SectionFlexEditor,
   'layout-editor-section-add-drawer': AddSectionDrawer,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-section-menu': SectionMenu,

@@ -26,9 +26,6 @@ import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButto
 
 import Content from './components/content/Content.vue';
 
-import SectionTemplateDrawer from '../section-templates/components/main/drawer/SectionTemplateDrawer.vue';
-import SectionTemplatePreview from '../section-templates/components/main/form/SectionTemplatePreview.vue';
-
 const components = {
   'section-editor': SectionEditor,
   'section-editor-toolbar': Toolbar,
@@ -36,8 +33,6 @@ const components = {
   'section-editor-toolbar-history-buttons': HistoryButtons,
   'section-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'section-editor-content': Content,
-  'section-template-drawer': SectionTemplateDrawer,
-  'section-template-preview': SectionTemplatePreview,
 };
 
 for (const key in components) {

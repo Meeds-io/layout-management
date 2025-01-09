@@ -31,7 +31,7 @@
     <v-spacer />
     <layout-editor-toolbar-history-buttons class="me-3" />
     <layout-editor-toolbar-save-as-template-button
-      v-if="!pageTemplateId && isAdministrator"
+      v-if="!pageTemplateId && $root.isAdministrator"
       class="me-3" />
     <layout-editor-toolbar-page-properties-button
       class="me-3" />
@@ -71,9 +71,6 @@ export default {
   computed: {
     disabledDraft() {
       return !this.$root.sectionHistory?.length && !this.$root.sectionRedo?.length;
-    },
-    isAdministrator() {
-      return eXo.env.portal.isAdministrator;
     },
     defaultLanguage() {
       return eXo.env.portal.defaultLanguage;

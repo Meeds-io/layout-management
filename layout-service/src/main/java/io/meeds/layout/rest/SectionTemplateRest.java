@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -96,6 +98,31 @@ public class SectionTemplateRest {
                                                SectionTemplate sectionTemplate) {
     try {
       return sectionTemplateService.createSectionTemplate(sectionTemplate, request.getRemoteUser());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @PostMapping(value = "container/{storageId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @Secured("users")
+  @Operation(summary = "Create a section template based on an existing container", method = "POST", description = "This creates a new section template based on an existing section identified by its container storage identifier")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "404", description = "Not Found"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+  })
+  public SectionTemplate saveAsSectionTemplate(
+                                               HttpServletRequest request,
+                                               @Parameter(description = "Layout Container Storage identifier")
+                                               @PathVariable("storageId")
+                                               long containerId,
+                                               @Parameter(description = "Layout Page reference containing the identified layout container")
+                                               @RequestParam("pageRef")
+                                               String pageRef) {
+    try {
+      return sectionTemplateService.saveAsSectionTemplate(pageRef, containerId, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
     }

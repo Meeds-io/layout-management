@@ -27,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
+import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.mop.navigation.NodeData;
+import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
@@ -145,6 +147,26 @@ public class SectionTemplateService {
 
   public SectionTemplate updateSectionTemplate(SectionTemplate sectionTemplate) throws ObjectNotFoundException {
     return updateSectionTemplateWithUser(sectionTemplate, null);
+  }
+
+  public SectionTemplate saveAsSectionTemplate(String pageRef, long containerId, String username) throws ObjectNotFoundException, IllegalAccessException {
+    if (!layoutAclService.isAdministrator(username)) {
+      throw new IllegalAccessException("User isn't authorized to edit the Section Template layout");
+    }
+    PageKey pageKey = PageKey.parse(pageRef);
+    Container container = sectionTemplateLayoutStorage.findContainer(pageKey, containerId);
+    if (container == null) {
+      throw new ObjectNotFoundException(String.format("Container %s from Page %s doesn't exist", containerId, pageKey));
+    }
+    SectionTemplate sectionTemplate = new SectionTemplate();
+    sectionTemplate.setCategory("custom");
+    sectionTemplate.setContent("");
+    sectionTemplate.setDisabled(false);
+    sectionTemplate.setSystem(false);
+    sectionTemplate = createSectionTemplate(sectionTemplate);
+    String content = sectionTemplateLayoutStorage.generateSectionTemplateContent(sectionTemplate, container, username);
+    sectionTemplate.setContent(content);
+    return updateSectionTemplate(sectionTemplate);
   }
 
   public long generateSectionTemplateNodeId(long id, String username) throws ObjectNotFoundException, IllegalAccessException {
