@@ -84,17 +84,19 @@
               </v-tooltip>
             </div>
           </v-hover>
-          <v-hover v-model="hoverButton3">
-            <div
-              :style="rightButtonStyle"
-              class="position-absolute">
+        </div>
+        <v-hover v-model="hoverButton3">
+          <div
+            :style="rightButtonStyle"
+            class="position-absolute t-0 z-index-one full-height">
+            <div class="position-sticky t-20 z-index-one">
               <v-tooltip bottom>
                 <template #activator="{on, attrs}">
                   <div
                     v-on="on"
                     v-bind="attrs">
                     <v-btn
-                      class="white text-color border-color"
+                      class="white text-color border-color elevation-2"
                       height="32"
                       width="32"
                       icon
@@ -112,7 +114,7 @@
                     v-bind="attrs">
                     <v-btn
                       :aria-label="$t('layout.cloneSection')"
-                      class="white text-color border-color mt-2"
+                      class="white text-color border-color elevation-2 mt-2"
                       height="32"
                       width="32"
                       icon
@@ -130,7 +132,7 @@
                     v-bind="attrs">
                     <v-btn
                       :loading="savingAsTemplate"
-                      class="white text-color border-color mt-2"
+                      class="white text-color border-color elevation-2 mt-2"
                       height="32"
                       width="32"
                       icon
@@ -142,8 +144,8 @@
                 {{ $t('layout.saveAsSectionTemplate') }}
               </v-tooltip>
             </div>
-          </v-hover>
-        </div>
+          </div>
+        </v-hover>
         <v-hover v-model="hoverButton4">
           <div class="position-sticky z-index-two d-flex justify-center mb-n4 mt-auto">
             <v-tooltip top>
@@ -226,7 +228,7 @@ export default {
     },
     rightButtonStyle() {
       return {
-        right: this.$root.pageFullWindow && '20px' || 0,
+        right: this.$root.pageFullWindow && '0' || '-20px',
       };
     },
   },
