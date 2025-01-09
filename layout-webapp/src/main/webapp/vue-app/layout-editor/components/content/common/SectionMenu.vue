@@ -84,67 +84,67 @@
               </v-tooltip>
             </div>
           </v-hover>
-          <v-hover v-model="hoverButton3">
-            <div
-              :style="rightButtonStyle"
-              class="position-absolute">
-              <v-tooltip bottom>
-                <template #activator="{on, attrs}">
-                  <div
-                    v-on="on"
-                    v-bind="attrs">
-                    <v-btn
-                      class="white text-color border-color"
-                      height="32"
-                      width="32"
-                      icon
-                      @click="$root.$emit('layout-edit-section-drawer', index, length)">
-                      <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
-                    </v-btn>
-                  </div>
-                </template>
-                {{ $t('layout.editSection') }}
-              </v-tooltip>
-              <v-tooltip v-if="$root.isAdministrator" bottom>
-                <template #activator="{on, attrs}">
-                  <div
-                    v-on="on"
-                    v-bind="attrs">
-                    <v-btn
-                      :aria-label="$t('layout.cloneSection')"
-                      :loading="savingAsTemplate"
-                      class="white text-color border-color mt-2"
-                      height="32"
-                      width="32"
-                      icon
-                      @click="$root.$emit('layout-section-clone', container, index)">
-                      <v-icon class="icon-default-color" size="20">fa-copy</v-icon>
-                    </v-btn>
-                  </div>
-                </template>
-                {{ $t('layout.cloneSection') }}
-              </v-tooltip>
-              <v-tooltip v-if="$root.isAdministrator" bottom>
-                <template #activator="{on, attrs}">
-                  <div
-                    v-on="on"
-                    v-bind="attrs">
-                    <v-btn
-                      :loading="savingAsTemplate"
-                      class="white text-color border-color mt-2"
-                      height="32"
-                      width="32"
-                      icon
-                      @click="saveAsTemplate">
-                      <v-icon class="icon-default-color" size="20">fa-columns</v-icon>
-                    </v-btn>
-                  </div>
-                </template>
-                {{ $t('layout.saveAsSectionTemplate') }}
-              </v-tooltip>
-            </div>
-          </v-hover>
         </div>
+        <v-hover v-model="hoverButton3">
+          <div
+            :style="rightButtonStyle"
+            class="position-absolute">
+            <v-tooltip bottom>
+              <template #activator="{on, attrs}">
+                <div
+                  v-on="on"
+                  v-bind="attrs">
+                  <v-btn
+                    class="white text-color border-color elevation-2"
+                    height="32"
+                    width="32"
+                    icon
+                    @click="$root.$emit('layout-edit-section-drawer', index, length)">
+                    <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
+                  </v-btn>
+                </div>
+              </template>
+              {{ $t('layout.editSection') }}
+            </v-tooltip>
+            <v-tooltip v-if="$root.isAdministrator" bottom>
+              <template #activator="{on, attrs}">
+                <div
+                  v-on="on"
+                  v-bind="attrs">
+                  <v-btn
+                    :aria-label="$t('layout.cloneSection')"
+                    :loading="savingAsTemplate"
+                    class="white text-color border-color elevation-2 mt-2"
+                    height="32"
+                    width="32"
+                    icon
+                    @click="$root.$emit('layout-section-clone', container, index)">
+                    <v-icon class="icon-default-color" size="20">fa-copy</v-icon>
+                  </v-btn>
+                </div>
+              </template>
+              {{ $t('layout.cloneSection') }}
+            </v-tooltip>
+            <v-tooltip v-if="$root.isAdministrator" bottom>
+              <template #activator="{on, attrs}">
+                <div
+                  v-on="on"
+                  v-bind="attrs">
+                  <v-btn
+                    :loading="savingAsTemplate"
+                    class="white text-color border-color elevation-2 mt-2"
+                    height="32"
+                    width="32"
+                    icon
+                    @click="saveAsTemplate">
+                    <v-icon class="icon-default-color" size="20">fa-columns</v-icon>
+                  </v-btn>
+                </div>
+              </template>
+              {{ $t('layout.saveAsSectionTemplate') }}
+            </v-tooltip>
+          </div>
+        </v-hover>
         <v-hover v-model="hoverButton4">
           <div class="position-sticky z-index-two d-flex justify-center mb-n4 mt-auto">
             <v-tooltip top>
@@ -227,7 +227,8 @@ export default {
     },
     rightButtonStyle() {
       return {
-        right: this.$root.pageFullWindow && '20px' || 0,
+        right: this.$root.pageFullWindow && '0' || '-20px',
+        top: '20px',
       };
     },
   },
