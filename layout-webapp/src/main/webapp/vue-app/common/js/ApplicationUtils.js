@@ -231,14 +231,18 @@ function installNewCSS(newHeadContent, newBodyContent) {
         const skinTypeResult = link.match(/skin-type="([a-z]*-skin)"/);
         if (skinTypeResult && skinTypeResult.length === 2) {
           const skinType = skinTypeResult[1];
-          const skinElements = document.querySelectorAll(`[skin-type="${skinType}"]`);
-          if (skinElements.length) {
-            const linkElement = document.createElement('div');
-            linkElement.innerHTML = link;
-            // Install new CSS in the same skin files categories (portal, portlet or custom)
-            const skinElement = skinElements[skinElements.length - 1];
-            skinElement.after(linkElement.childNodes[0]);
+          let skinElements = document.querySelectorAll(`[skin-type="${skinType}"]`);
+          if (!skinElements.length) {
+            skinElements = document.querySelectorAll('[skin-type="portal-skin"]');
           }
+          if (!skinElements.length) {
+            skinElements = document.querySelectorAll('[skin-type="custom-skin"]');
+          }
+          // Install new CSS in the same skin files categories (portal, portlet or custom)
+          const skinElement = skinElements[skinElements.length - 1];
+          const linkElement = document.createElement('div');
+          linkElement.innerHTML = link;
+          skinElement.after(linkElement.childNodes[0]);
         }
       }
     });

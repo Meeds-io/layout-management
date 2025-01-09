@@ -124,13 +124,11 @@ export default {
       this.index = index;
       this.selectedSectionTemplate = null;
       this.$nextTick().then(() => this.$refs.drawer.open());
-      if (!this.sectionTemplates) {
-        this.loading = true;
-        try {
-          this.sectionTemplates = await this.$sectionTemplateService.getSectionTemplates();
-        } finally {
-          this.loading = false;
-        }
+      this.loading = true;
+      try {
+        this.sectionTemplates = await this.$sectionTemplateService.getSectionTemplates();
+      } finally {
+        this.loading = false;
       }
     },
     apply() {

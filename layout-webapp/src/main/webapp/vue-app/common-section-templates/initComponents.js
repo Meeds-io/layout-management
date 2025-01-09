@@ -7,7 +7,6 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -18,10 +17,23 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import * as layoutUtils from '../layout-editor/js/LayoutUtils.js';
+import SectionFlexEditor from './components/SectionFlexEditor.vue';
+import SectionGridEditor from './components/SectionGridEditor.vue';
 
-if (!Vue.prototype.$layoutUtils) {
-  window.Object.defineProperty(Vue.prototype, '$layoutUtils', {
-    value: layoutUtils,
-  });
+import SectionTemplatePreview from './components/SectionTemplatePreview.vue';
+
+import SectionTemplateDrawer from './components/SectionTemplateDrawer.vue';
+import SectionTemplateSaveAsDrawer from './components/SectionTemplateSaveAsDrawer.vue';
+
+const components = {
+  'section-template-flex-editor': SectionFlexEditor,
+  'section-template-grid-editor': SectionGridEditor,
+  'section-template-preview': SectionTemplatePreview,
+
+  'section-template-drawer': SectionTemplateDrawer,
+  'section-template-save-as-drawer': SectionTemplateSaveAsDrawer,
+};
+
+for (const key in components) {
+  Vue.component(key, components[key]);
 }

@@ -21,8 +21,8 @@ import './initComponents.js';
 import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
 import '../common-portlets/main.js';
-import '../common-section-templates/main.js';
 import '../common-illustration/main.js';
+import '../common-section-templates/main.js';
 
 import './extensions.js';
 import './services.js';
@@ -97,6 +97,7 @@ export function init() {
           nodeUri: null,
           originalUri: `/portal/${window.location.href.split('/portal/')[1]}`,
           originalHref: window.location.href,
+          isAdministrator: eXo.env.portal.isAdministrator,
         }),
         computed: {
           parentAppX() {
