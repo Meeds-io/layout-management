@@ -150,6 +150,7 @@ export default {
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
     this.$root.$on('layout-save-draft', this.saveDraft);
     this.$root.$on('layout-section-save-as-template', this.saveAsSectionTemplate);
+    this.$root.$on('layout-section-clone', this.cloneSection);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   mounted() {
@@ -396,11 +397,23 @@ export default {
       this.$root.sectionRedo = [];
     },
     async saveAsSectionTemplate(section) {
-      this.saveDraft();
+      await this.saveDraft();
       window.setTimeout(() => {
         const domId =  section.id || section.storageId;
         this.$root.$emit('section-template-save-as-drawer', this.$root.draftPageRef, section.storageId, document.querySelector(`*[id="${domId}"]`).closest('.layout-section'));
       }, 200);
+    },
+    async cloneSection(section) {
+      this.loading++;
+      try {
+        await this.saveDraft();
+        await this.$pageLayoutService.cloneSection(this.$root.draftPageRef, section.storageId);
+        const layout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, 'contentId');
+        this.setLayout(layout);
+        this.$root.$emit('layout-draft-saved');
+      } finally {
+        this.loading--;
+      }
     },
     saveDraft(layout) {
       this.resetSectionHistory();

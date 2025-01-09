@@ -47,6 +47,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 import org.exoplatform.services.listener.ListenerService;
 import org.exoplatform.services.resources.LocaleConfig;
@@ -84,6 +85,9 @@ public class PortletInstanceServiceTest {
   private LayoutAclService                layoutAclService;
 
   @MockBean
+  private LayoutService                   layoutService;
+
+  @MockBean
   private TranslationService              translationService;
 
   @MockBean
@@ -114,7 +118,7 @@ public class PortletInstanceServiceTest {
   private PortletInstance                 portletInstance;
 
   @Mock
-  private Application            application;
+  private Application                     application;
 
   @Mock
   private LocaleConfig                    defaultLocaleConfig;

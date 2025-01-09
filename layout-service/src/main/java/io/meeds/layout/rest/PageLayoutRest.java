@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,8 +75,7 @@ public class PageLayoutRest {
   })
   public List<PageContext> getPages(
                                     HttpServletRequest request,
-                                    @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER",
-                                               required = false)
+                                    @Parameter(description = "Portal site type, possible values: PORTAL, GROUP or USER", required = false)
                                     @RequestParam(name = "siteType", required = false)
                                     String siteType,
                                     @Parameter(description = "Portal site name", required = false)
@@ -96,9 +96,9 @@ public class PageLayoutRest {
   @GetMapping("layout")
   @Operation(summary = "Retrieve page layout by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public LayoutModel getPageLayout(
                                    HttpServletRequest request,
@@ -128,9 +128,9 @@ public class PageLayoutRest {
   @GetMapping("byRef")
   @Operation(summary = "Retrieve page by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public PageContext getPage(
                              HttpServletRequest request,
@@ -150,9 +150,9 @@ public class PageLayoutRest {
   @Secured("users")
   @Operation(summary = "Create a page", method = "POST", description = "This creates the page")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public PageContext createPage(
                                 HttpServletRequest request,
@@ -171,18 +171,17 @@ public class PageLayoutRest {
   @Secured("users")
   @Operation(summary = "Updates an existing page layout", method = "PUT", description = "This updates the designated page layout")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "400", description = "Invalid request input"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "400", description = "Invalid request input"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public LayoutModel updatePageLayout(
                                       HttpServletRequest request,
                                       @Parameter(description = "page display name", required = true)
                                       @RequestParam("pageRef")
                                       String pageRef,
-                                      @Parameter(description = "Whether the page layout update is a draft page publication or not",
-                                                 required = false)
+                                      @Parameter(description = "Whether the page layout update is a draft page publication or not", required = false)
                                       @RequestParam(name = "publish", required = false)
                                       Optional<Boolean> publish,
                                       @Parameter(description = "expand options", required = true)
@@ -209,9 +208,9 @@ public class PageLayoutRest {
   @Secured("users")
   @Operation(summary = "Update page link", method = "GET", description = "This updates page link")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public void updatePageLink(
                              HttpServletRequest request,
@@ -232,12 +231,11 @@ public class PageLayoutRest {
 
   @PatchMapping("permissions")
   @Secured("users")
-  @Operation(summary = "Update a page access and edit permission", method = "PATCH",
-             description = "This updates the given page access and edit permission")
+  @Operation(summary = "Update a page access and edit permission", method = "PATCH", description = "This updates the given page access and edit permission")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public void updatePagePermissions(
                                     HttpServletRequest request,
@@ -255,14 +253,38 @@ public class PageLayoutRest {
     }
   }
 
+  @PostMapping(value = "cloneSection/{storageId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @Secured("users")
+  @Operation(summary = "Clones a section ", method = "PUT", description = "This updates the given page access and edit permission")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public void cloneSection(
+                           HttpServletRequest request,
+                           @Parameter(description = "Container Storage identifier")
+                           @PathVariable("storageId")
+                           long containerId,
+                           @Parameter(description = "Page reference", required = true)
+                           @RequestParam("pageRef")
+                           String pageRef) {
+    try {
+      pageLayoutService.cloneSection(PageKey.parse(pageRef), containerId, request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
   @PatchMapping("application/preferences")
   @Secured("users")
-  @Operation(summary = "Update a page application preferences", method = "PATCH",
-             description = "This updates a given application preferences added in an existing page")
+  @Operation(summary = "Update a page application preferences", method = "PATCH", description = "This updates a given application preferences added in an existing page")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public void updatePageApplicationPreferences(
                                                HttpServletRequest request,
@@ -275,7 +297,10 @@ public class PageLayoutRest {
                                                @RequestBody
                                                PortletPreferenceList portletPreferenceList) {
     try {
-      pageLayoutService.updatePageApplicationPreferences(PageKey.parse(pageRef), applicationId, portletPreferenceList.getPreferences(), request.getRemoteUser());
+      pageLayoutService.updatePageApplicationPreferences(PageKey.parse(pageRef),
+                                                         applicationId,
+                                                         portletPreferenceList.getPreferences(),
+                                                         request.getRemoteUser());
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {

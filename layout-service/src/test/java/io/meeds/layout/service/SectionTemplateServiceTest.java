@@ -91,6 +91,9 @@ public class SectionTemplateServiceTest {
   private SectionTemplateLayoutStorage sectionTemplateLayoutStorage;
 
   @MockBean
+  private ContainerLayoutService       containerLayoutService;
+
+  @MockBean
   private SectionTemplateStorage       sectionTemplateStorage;
 
   @MockBean
