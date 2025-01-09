@@ -25,6 +25,7 @@
     id="addSectionDrawer"
     v-model="drawer"
     :loading="loading"
+    allow-expand
     right
     disable-pull-to-refresh>
     <template #title>
@@ -45,7 +46,7 @@
               :key="t.id"
               :section-template="t"
               :selected="t.id === selectedSectionTemplate?.id"
-              class="col-6 ps-0 pe-4"
+              class="col-auto ps-0 pe-4"
               @select="selectedSectionTemplate = t" />
           </div>
         </template>
@@ -59,7 +60,7 @@
               :key="t.id"
               :section-template="t"
               :selected="t.id === selectedSectionTemplate?.id"
-              class="col-6 ps-0 pe-4"
+              class="col-auto ps-0 pe-4"
               @select="selectedSectionTemplate = t" />
           </div>
         </template>
@@ -73,7 +74,7 @@
               :key="t.id"
               :section-template="t"
               :selected="t.id === selectedSectionTemplate?.id"
-              class="col-6 ps-0 pe-4"
+              class="col-auto ps-0 pe-4"
               @select="selectedSectionTemplate = t" />
           </div>
         </template>
