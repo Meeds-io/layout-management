@@ -105,6 +105,24 @@
                 </template>
                 {{ $t('layout.editSection') }}
               </v-tooltip>
+              <v-tooltip v-if="$root.isAdministrator" bottom>
+                <template #activator="{on, attrs}">
+                  <div
+                    v-on="on"
+                    v-bind="attrs">
+                    <v-btn
+                      :loading="savingAsTemplate"
+                      class="white text-color border-color mt-2"
+                      height="32"
+                      width="32"
+                      icon
+                      @click="saveAsTemplate">
+                      <v-icon class="icon-default-color" size="20">fa-columns</v-icon>
+                    </v-btn>
+                  </div>
+                </template>
+                {{ $t('layout.saveAsSectionTemplate') }}
+              </v-tooltip>
             </div>
           </v-hover>
         </div>
@@ -160,6 +178,7 @@ export default {
   },
   data: () => ({
     open: false,
+    savingAsTemplate: false,
     hoverButton1: false,
     hoverButton2: false,
     hoverButton3: false,
@@ -217,6 +236,23 @@ export default {
       } else if (!newVal && this.$root.hoveredSectionId === this.container.storageId) {
         this.$root.hoveredSectionId = null;
       }
+    },
+  },
+  methods: {
+    async saveAsTemplate() {
+      this.savingAsTemplate = true;
+      await this.$nextTick();
+      window.setTimeout(() => {
+        this.savingAsTemplate = false;
+        this.open = false;
+        try {
+          this.$root.$emit('layout-section-save-as-template', this.container);
+        } finally {
+          window.setTimeout(() => {
+            this.savingAsTemplate = false;
+          }, 2000);
+        }
+      }, 200);
     },
   },
 };

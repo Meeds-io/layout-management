@@ -18,3 +18,4 @@
  */
 
 import './services.js';
+import './initComponents.js';

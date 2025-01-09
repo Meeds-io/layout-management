@@ -25,11 +25,10 @@
     id="sectionTemplateDrawer"
     v-model="drawer"
     :loading="saving"
-    :go-back-button="goBackButton"
     allow-expand
     right>
     <template #title>
-      <span class="text-wrap">{{ isNew && $t('layout.sectionTemplate.drawerTitie.add') || $t('layout.sectionTemplate.drawerTitie.edit') }}</span>
+      <span class="text-wrap">{{ $t('layout.sectionTemplate.drawerTitie.add') }}</span>
     </template>
     <template v-if="drawer" #content>
       <div class="pa-4" flat>
@@ -40,7 +39,6 @@
           :field-value.sync="title"
           :placeholder="$t('layout.sectionTemplate.namePlaceholder')"
           :maxlength="maxTitleLength"
-          :object-id="sectionTemplateId"
           object-type="sectionTemplate"
           field-name="title"
           drawer-title="layout.sectionTemplate.nameTranslationDrawerTitle"
@@ -58,7 +56,6 @@
           v-model="descriptionTranslations"
           :field-value.sync="description"
           :maxlength="maxDescriptionLength"
-          :object-id="sectionTemplateId"
           object-type="sectionTemplate"
           field-name="description"
           drawer-title="layout.sectionTemplate.descriptionTranslationDrawerTitle"
@@ -83,8 +80,7 @@
         <section-template-preview
           ref="sectionTemplatePreview"
           v-model="illustrationUploadId"
-          :preview-image="previewImage"
-          :section-template-id="sectionTemplateId" />
+          :preview-image="previewImage" />
       </div>
     </template>
     <template #footer>
@@ -110,8 +106,7 @@
 export default {
   data: () => ({
     drawer: false,
-    sectionTemplate: null,
-    sectionTemplateId: null,
+    containerId: null,
     title: null,
     titleTranslations: {},
     description: null,
@@ -121,9 +116,7 @@ export default {
     illustrationUploadId: null,
     lang: eXo.env.portal.language,
     previewImage: null,
-    goBackButton: false,
     saving: false,
-    isNew: false,
   }),
   computed: {
     disabled() {
@@ -139,23 +132,21 @@ export default {
     },
   },
   created() {
-    this.$root.$on('section-template-edit', this.open);
+    this.$root.$on('section-template-save-as-drawer', this.open);
   },
   beforeDestroy() {
-    this.$root.$off('section-template-edit', this.open);
+    this.$root.$off('section-template-save-as-drawer', this.open);
   },
   methods: {
-    async open(sectionTemplate, goBackButton, previewElement) {
+    async open(pageRef, containerId, previewElement) {
       this.$root.$emit('close-alert-message');
-      this.isNew = !sectionTemplate?.name;
-      this.goBackButton = goBackButton;
-      this.sectionTemplate = sectionTemplate || {};
-      this.sectionTemplateId = sectionTemplate?.id || null;
+      this.pageRef = pageRef;
+      this.containerId = containerId;
       this.closeOnSave = !!previewElement;
-      this.title = sectionTemplate?.name || null;
+      this.title = null;
+      this.description = null;
       this.titleTranslations = {};
       this.descriptionTranslations = {};
-      this.description = sectionTemplate?.description || null;
       try {
         if (previewElement) {
           this.illustrationUploadId = await this.generatePreview(previewElement);
@@ -195,31 +186,19 @@ export default {
     close() {
       this.$refs.drawer.close();
     },
-    save() {
+    async save() {
       this.saving = true;
-      return this.$sectionTemplateService.updateSectionTemplate(this.sectionTemplate)
-        .then(() => this.$translationService.saveTranslations('sectionTemplate', this.sectionTemplateId, 'title', this.titleTranslations))
-        .then(() => this.$translationService.saveTranslations('sectionTemplate', this.sectionTemplateId, 'description', this.descriptionTranslations))
-        .then(() => this.$refs?.sectionTemplatePreview?.save())
-        .then(() => {
-          this.$root.$emit('section-template-saved', this.sectionTemplateId);
-          if (this.isNew) {
-            this.$root.$emit('alert-message', this.$t('layout.sectionTemplateCreatedSuccessfully'), 'success');
-          } else {
-            this.$root.$emit('alert-message', this.$t('layout.sectionTemplateUpdatedSuccessfully'), 'success');
-          }
-          this.close();
-
-          if (window?.opener && this.closeOnSave) {
-            window?.opener?.dispatchEvent?.(new CustomEvent('section-template-layout-updated', {
-              detail: this.sectionTemplate,
-            }));
-            window.close();
-          } else {
-            this.$root.$emit('alert-message', this.$t('layout.portletInstanceLayoutUpdatedSuccessfully'), 'success');
-          }
-        })
-        .finally(() => this.saving = false);
+      try {
+        const sectionTemplate = await this.$sectionTemplateService.saveAsSectionTemplate(this.pageRef, this.containerId);
+        this.$translationService.saveTranslations('sectionTemplate', sectionTemplate.id, 'title', this.titleTranslations);
+        this.$translationService.saveTranslations('sectionTemplate', sectionTemplate.id, 'description', this.descriptionTranslations);
+        this.$refs?.sectionTemplatePreview?.save(sectionTemplate.id);
+        this.$root.$emit('section-template-saved', sectionTemplate.id);
+        this.$root.$emit('alert-message', this.$t('layout.sectionTemplateCreatedSuccessfully'), 'success');
+        this.close();
+      } finally {
+        this.saving = false;
+      }
     },
     checkCKEdtiorDisplay() {
       if (this.$refs.sectionTemplateDescriptionEditor?.editor
