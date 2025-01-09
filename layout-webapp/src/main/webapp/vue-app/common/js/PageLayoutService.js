@@ -108,6 +108,21 @@ export function updatePageLink(pageRef, link) {
   });
 }
 
+export function cloneSection(pageRef, containerId) {
+  return fetch(`/layout/rest/pages/cloneSection/${containerId}`, {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `pageRef=${pageRef}`,
+  }).then((resp) => {
+    if (!resp?.ok) {
+      throw new Error('Error when creating a section template based on an existing section container identifier');
+    }
+  });
+}
+
 export function updatePagePermissions(pageRef, editPermission, accessPermissions) {
   return fetch(`/layout/rest/pages/permissions?pageRef=${pageRef}`, {
     method: 'PATCH',
