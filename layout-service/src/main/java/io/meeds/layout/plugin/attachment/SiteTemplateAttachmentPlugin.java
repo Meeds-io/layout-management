@@ -1,7 +1,7 @@
 /**
  * This file is part of the Meeds project (https://meeds.io/).
  *
- * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ * Copyright (C) 2020 - 2025 Meeds Association contact@meeds.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,17 +18,12 @@
  */
 package io.meeds.layout.plugin.attachment;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
-import org.exoplatform.portal.config.model.Page;
-import org.exoplatform.portal.mop.SiteType;
-import org.exoplatform.portal.mop.page.PageKey;
-import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.attachment.AttachmentPlugin;
 import org.exoplatform.social.attachment.AttachmentService;
@@ -39,15 +34,12 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
+public class SiteTemplateAttachmentPlugin extends AttachmentPlugin {
 
-  public static final String OBJECT_TYPE = "containerBackground";
+  public static final String OBJECT_TYPE = "siteTemplate";
 
   @Autowired
   private LayoutAclService   layoutAclService;
-
-  @Autowired
-  private LayoutService      layoutService;
 
   @Autowired
   private AttachmentService  attachmentService;
@@ -63,16 +55,13 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
   }
 
   @Override
-  public boolean hasEditPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    return layoutAclService.canEditPage(getPageKey(entityId), getUsername(userIdentity));
+  public boolean hasEditPermission(Identity userIdentity, String entityId) {
+    return userIdentity != null && layoutAclService.isAdministrator(userIdentity.getUserId());
   }
 
   @Override
-  public boolean hasAccessPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    PageKey pageKey = getPageKey(entityId);
-    return pageKey.getSite().getType() == SiteType.GROUP_TEMPLATE
-           || pageKey.getSite().getType() == SiteType.PORTAL_TEMPLATE
-           || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
+  public boolean hasAccessPermission(Identity userIdentity, String entityId) {
+    return true;
   }
 
   @Override
@@ -83,17 +72,6 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
   @Override
   public long getSpaceId(String objectId) throws ObjectNotFoundException {
     return 0;
-  }
-
-  private PageKey getPageKey(String entityId) {
-    String pageUuid = entityId.split("_")[0].replace("page_", "");
-    long pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
-    Page page = layoutService.getPage(pageId);
-    return page.getPageKey();
-  }
-
-  private String getUsername(Identity userIdentity) {
-    return userIdentity == null ? null : userIdentity.getUserId();
   }
 
 }

@@ -74,7 +74,7 @@ public class PortletInstanceAttachmentPluginTest {
 
   @Test
   @SneakyThrows
-  public void hasEditPermission() {
+  void hasEditPermission() {
     assertFalse(attachmentPlugin.hasEditPermission(null, null));
     assertFalse(attachmentPlugin.hasEditPermission(userIdentity, null));
     when(userIdentity.getUserId()).thenReturn("test");
@@ -84,7 +84,7 @@ public class PortletInstanceAttachmentPluginTest {
 
   @Test
   @SneakyThrows
-  public void hasAccessPermission() {
+  void hasAccessPermission() {
     assertThrows(ObjectNotFoundException.class, () -> attachmentPlugin.hasAccessPermission(null, "1"));
     PortletInstance portletInstance = mock(PortletInstance.class);
     when(portletInstanceService.getPortletInstance(1)).thenReturn(portletInstance);
@@ -104,13 +104,13 @@ public class PortletInstanceAttachmentPluginTest {
 
   @Test
   @SneakyThrows
-  public void getAudienceId() {
+  void getAudienceId() {
     assertEquals(0l, attachmentPlugin.getAudienceId(null));
   }
 
   @Test
   @SneakyThrows
-  public void getSpaceId() {
+  void getSpaceId() {
     assertEquals(0l, attachmentPlugin.getSpaceId(""));
   }
 

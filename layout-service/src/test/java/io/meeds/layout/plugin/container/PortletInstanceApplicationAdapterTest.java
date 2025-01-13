@@ -66,7 +66,7 @@ public class PortletInstanceApplicationAdapterTest {
   private PortletInstanceApplicationAdapter portletInstanceApplicationAdapter;
 
   @Test
-  public void testNullApplication() {
+  void testNullApplication() {
     assertNull(portletInstanceApplicationAdapter.getCssStyle());
     assertNull(portletInstanceApplicationAdapter.getWidth());
     assertNull(portletInstanceApplicationAdapter.getHeight());
@@ -87,7 +87,7 @@ public class PortletInstanceApplicationAdapterTest {
   }
 
   @Test
-  public void testNoThrowWhenNoApplication() {
+  void testNoThrowWhenNoApplication() {
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setCssStyle(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setWidth(null));
     assertDoesNotThrow(() -> portletInstanceApplicationAdapter.setHeight(null));
@@ -106,7 +106,7 @@ public class PortletInstanceApplicationAdapterTest {
   }
 
   @Test
-  public void testApplicationDelegation() throws IllegalAccessException, ObjectNotFoundException {
+  void testApplicationDelegation() throws IllegalAccessException, ObjectNotFoundException {
     int portletInstanceId = 2;
     when(portletInstanceService.getPortletInstanceApplication(portletInstanceId, 0, USERNAME)).thenReturn(application);
 
