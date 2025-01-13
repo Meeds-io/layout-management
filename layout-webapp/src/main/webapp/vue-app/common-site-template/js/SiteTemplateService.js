@@ -70,7 +70,9 @@ export function updateSiteTemplate(siteTemplate) {
     },
     body: JSON.stringify(siteTemplate),
   }).then((resp) => {
-    if (!resp?.ok) {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
       throw new Error('Error when updating site template');
     }
   });
