@@ -57,14 +57,14 @@ public class PageTemplateAttachmentPluginTest {
   private PageTemplateAttachmentPlugin attachmentPlugin;
 
   @Test
-  public void getObjectType() {
+  void getObjectType() {
     assertEquals("pageTemplate", attachmentPlugin.getObjectType());
     assertEquals(PageTemplateAttachmentPlugin.OBJECT_TYPE, attachmentPlugin.getObjectType());
   }
 
   @Test
   @SneakyThrows
-  public void hasEditPermission() {
+  void hasEditPermission() {
     assertFalse(attachmentPlugin.hasEditPermission(null, null));
     assertFalse(attachmentPlugin.hasEditPermission(userIdentity, null));
     when(userIdentity.getUserId()).thenReturn("test");
@@ -74,19 +74,19 @@ public class PageTemplateAttachmentPluginTest {
 
   @Test
   @SneakyThrows
-  public void hasAccessPermission() {
+  void hasAccessPermission() {
     assertTrue(attachmentPlugin.hasAccessPermission(null, null));
   }
 
   @Test
   @SneakyThrows
-  public void getAudienceId() {
+  void getAudienceId() {
     assertEquals(0l, attachmentPlugin.getAudienceId(null));
   }
 
   @Test
   @SneakyThrows
-  public void getSpaceId() {
+  void getSpaceId() {
     assertEquals(0l, attachmentPlugin.getSpaceId(""));
   }
 

@@ -53,14 +53,14 @@ public class PageTemplateTranslationPluginTest {
   private String                        username = "test";
 
   @Test
-  public void getObjectType() {
+  void getObjectType() {
     assertEquals("pageTemplate", translationPlugin.getObjectType());
     assertEquals(PageTemplateTranslationPlugin.OBJECT_TYPE, translationPlugin.getObjectType());
   }
 
   @Test
   @SneakyThrows
-  public void hasEditPermission() {
+  void hasEditPermission() {
     assertFalse(translationPlugin.hasEditPermission(0l, null));
     assertFalse(translationPlugin.hasEditPermission(0l, username));
     when(layoutAclService.isAdministrator(username)).thenReturn(true);
@@ -69,19 +69,19 @@ public class PageTemplateTranslationPluginTest {
 
   @Test
   @SneakyThrows
-  public void hasAccessPermission() {
+  void hasAccessPermission() {
     assertTrue(translationPlugin.hasAccessPermission(0l, null));
   }
 
   @Test
   @SneakyThrows
-  public void getAudienceId() {
+  void getAudienceId() {
     assertEquals(0l, translationPlugin.getAudienceId(0l));
   }
 
   @Test
   @SneakyThrows
-  public void getSpaceId() {
+  void getSpaceId() {
     assertEquals(0l, translationPlugin.getSpaceId(0l));
   }
 

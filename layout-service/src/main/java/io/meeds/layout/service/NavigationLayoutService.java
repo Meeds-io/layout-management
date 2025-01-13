@@ -300,7 +300,7 @@ public class NavigationLayoutService {
     Router router = webController.getRouter();
 
     Map<QualifiedName, String> params = new HashMap<>();
-    if (siteKey.getType() == SiteType.GROUP_TEMPLATE) {
+    if (siteKey.getType() == SiteType.GROUP_TEMPLATE || siteKey.getType() == SiteType.PORTAL_TEMPLATE) {
       PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
       params.put(WebAppController.HANDLER_PARAM, PortalTemplateRequestHandler.HANDLER_NAME);
       params.put(PortalTemplateRequestHandler.REQUEST_SITE_ID, (portalConfig.getStorageId().split("_"))[1]);

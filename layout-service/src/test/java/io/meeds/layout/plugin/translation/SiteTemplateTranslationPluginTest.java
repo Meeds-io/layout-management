@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.plugin.attachment;
+package io.meeds.layout.plugin.translation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,73 +25,68 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.social.attachment.AttachmentService;
-
 import io.meeds.layout.service.LayoutAclService;
-import io.meeds.layout.service.SectionTemplateService;
+import io.meeds.layout.service.SiteTemplateService;
+import io.meeds.social.translation.service.TranslationService;
 
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-  SectionTemplateAttachmentPlugin.class,
+  SiteTemplateTranslationPlugin.class,
 })
 @ExtendWith(MockitoExtension.class)
-public class SectionTemplateAttachmentPluginTest {
-
-  @Mock
-  private Identity                        userIdentity;
+public class SiteTemplateTranslationPluginTest {
 
   @MockBean
-  private AttachmentService               attachmentService;
+  private LayoutAclService              layoutAclService;
 
   @MockBean
-  private LayoutAclService                layoutAclService;
+  private TranslationService            translationService;
 
   @MockBean
-  private SectionTemplateService          sectionTemplateService;
+  private SiteTemplateService           siteTemplateService;
 
   @Autowired
-  private SectionTemplateAttachmentPlugin attachmentPlugin;
+  private SiteTemplateTranslationPlugin translationPlugin;
+
+  private String                        username = "test";
 
   @Test
   void getObjectType() {
-    assertEquals("sectionTemplate", attachmentPlugin.getObjectType());
-    assertEquals(SectionTemplateAttachmentPlugin.OBJECT_TYPE, attachmentPlugin.getObjectType());
+    assertEquals("siteTemplate", translationPlugin.getObjectType());
+    assertEquals(SiteTemplateTranslationPlugin.OBJECT_TYPE, translationPlugin.getObjectType());
   }
 
   @Test
   @SneakyThrows
   void hasEditPermission() {
-    assertFalse(attachmentPlugin.hasEditPermission(null, null));
-    assertFalse(attachmentPlugin.hasEditPermission(userIdentity, null));
-    when(userIdentity.getUserId()).thenReturn("test");
-    when(layoutAclService.isAdministrator(userIdentity.getUserId())).thenReturn(true);
-    assertTrue(attachmentPlugin.hasEditPermission(userIdentity, null));
+    assertFalse(translationPlugin.hasEditPermission(0l, null));
+    assertFalse(translationPlugin.hasEditPermission(0l, username));
+    when(layoutAclService.isAdministrator(username)).thenReturn(true);
+    assertTrue(translationPlugin.hasEditPermission(0l, username));
   }
 
   @Test
   @SneakyThrows
   void hasAccessPermission() {
-    assertTrue(attachmentPlugin.hasAccessPermission(userIdentity, "1"));
+    assertTrue(translationPlugin.hasAccessPermission(1, username));
   }
 
   @Test
   @SneakyThrows
   void getAudienceId() {
-    assertEquals(0l, attachmentPlugin.getAudienceId(null));
+    assertEquals(0l, translationPlugin.getAudienceId(0l));
   }
 
   @Test
   @SneakyThrows
   void getSpaceId() {
-    assertEquals(0l, attachmentPlugin.getSpaceId(""));
+    assertEquals(0l, translationPlugin.getSpaceId(0l));
   }
 
 }

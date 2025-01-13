@@ -22,7 +22,7 @@ import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 import '../common-illustration/main.js';
-import '../common-section-templates/main.js';
+import '../common-section-template/main.js';
 
 import './extensions.js';
 import './services.js';
