@@ -52,7 +52,7 @@ import io.meeds.social.translation.service.TranslationService;
 @Service
 public class SiteTemplateService {
 
-  public static final String      SITE_TEMPLATE_BASE     = "base";
+  public static final String      SITE_TEMPLATE_BASE     = "basic";
 
   public static final String      TEMPLATE_CREATED_EVENT = "layout.siteTemplate.created";
 
@@ -110,26 +110,11 @@ public class SiteTemplateService {
       throw new ObjectAlreadyExistsException(String.format("Site Template with name %s already exists",
                                                            siteTemplate.getLayout()));
     }
-    PortalConfig portalConfig = portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TYPE,
-                                                                           siteTemplate.getLayout(),
-                                                                           SITE_TEMPLATE_BASE);
-    SiteTemplate createdSiteTemplate = updateSiteTemplate(siteTemplate, portalConfig);
-    listenerService.broadcast(TEMPLATE_CREATED_EVENT, createdSiteTemplate, username);
-    return createdSiteTemplate;
+    return createSiteTemplate(siteTemplate, username, true);
   }
 
-  public SiteTemplate saveAsSiteTemplate(SiteTemplate siteTemplate, long siteId, String username) throws IllegalAccessException,
-                                                                                                  ObjectNotFoundException,
-                                                                                                  ObjectAlreadyExistsException {
-    PortalConfig portalConfig = layoutService.getPortalConfig(siteId);
-    if (portalConfig == null) {
-      throw new ObjectNotFoundException(String.format("Site with id %s doesn't exists", siteId));
-    } else if (!aclService.isAdministrator(username)) {
-      throw new IllegalAccessException();
-    }
-    siteTemplate = createSiteTemplate(siteTemplate, username);
-    // TODO skeleton method to implement in next tasks
-    return null;
+  public SiteTemplate createSiteTemplate(SiteTemplate siteTemplate) {
+    return createSiteTemplate(siteTemplate, null, true);
   }
 
   public SiteTemplate updateSiteTemplate(SiteTemplate siteTemplate, String username) throws IllegalAccessException,
@@ -140,9 +125,11 @@ public class SiteTemplateService {
     } else if (!aclService.isAdministrator(username)) {
       throw new IllegalAccessException();
     }
-    SiteTemplate updatedSiteTemplate = updateSiteTemplate(siteTemplate, portalConfig);
-    listenerService.broadcast(TEMPLATE_UPDATED_EVENT, updatedSiteTemplate, username);
-    return updatedSiteTemplate;
+    return updateSiteTemplate(siteTemplate, username, true);
+  }
+
+  public SiteTemplate updateSiteTemplate(SiteTemplate siteTemplate) {
+    return updateSiteTemplate(siteTemplate, null, true);
   }
 
   public void deleteSiteTemplate(long id, String username) throws IllegalAccessException, ObjectNotFoundException {
@@ -157,6 +144,40 @@ public class SiteTemplateService {
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     layoutService.remove(portalConfig);
     listenerService.broadcast(TEMPLATE_DELETED_EVENT, siteTemplate, username);
+  }
+
+  public SiteTemplate saveAsSiteTemplate(SiteTemplate siteTemplate, long siteId, String username) throws IllegalAccessException,
+                                                                                                  ObjectNotFoundException,
+                                                                                                  ObjectAlreadyExistsException {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteId);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException(String.format("Site with id %s doesn't exists", siteId));
+    } else if (!aclService.isAdministrator(username)) {
+      throw new IllegalAccessException();
+    }
+    siteTemplate = createSiteTemplate(siteTemplate, username, true);
+    // TODO skeleton method to implement in next tasks
+    return null;
+  }
+
+  private SiteTemplate createSiteTemplate(SiteTemplate siteTemplate, String username, boolean broadcast) {
+    PortalConfig portalConfig = portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TEMPLATE,
+                                                                           siteTemplate.getLayout(),
+                                                                           SITE_TEMPLATE_BASE);
+    SiteTemplate createdSiteTemplate = updateSiteTemplate(siteTemplate, portalConfig);
+    if (broadcast) {
+      listenerService.broadcast(TEMPLATE_CREATED_EVENT, createdSiteTemplate, username);
+    }
+    return createdSiteTemplate;
+  }
+
+  private SiteTemplate updateSiteTemplate(SiteTemplate siteTemplate, String username, boolean broadcast) {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteTemplate.getId());
+    SiteTemplate updatedSiteTemplate = updateSiteTemplate(siteTemplate, portalConfig);
+    if (broadcast) {
+      listenerService.broadcast(TEMPLATE_UPDATED_EVENT, updatedSiteTemplate, username);
+    }
+    return updatedSiteTemplate;
   }
 
   private SiteTemplate updateSiteTemplate(SiteTemplate siteTemplate, PortalConfig portalConfig) {

@@ -172,7 +172,7 @@ public class SiteTemplateServiceTest {
   @SneakyThrows
   void testCreateSiteTemplate() {
     when(aclService.isAdministrator(testuser)).thenReturn(true);
-    when(portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TYPE,
+    when(portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TEMPLATE,
                                                     siteTemplate.getLayout(),
                                                     SiteTemplateService.SITE_TEMPLATE_BASE)).thenReturn(portalConfig);
     SiteTemplate createdTemplate = siteTemplateService.createSiteTemplate(siteTemplate, testuser);
