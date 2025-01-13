@@ -76,8 +76,8 @@ export default {
       ]) || (this.$vuetify.breakpoint.lgAndDown && [
         {
           text: '',
-          value: 'illustrationId',
-          align: 'center',
+          value: 'icon',
+          align: 'left',
           sortable: false,
           class: 'site-template-illustration-header',
           width: '75px'
