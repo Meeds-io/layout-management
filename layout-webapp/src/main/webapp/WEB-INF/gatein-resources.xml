@@ -352,7 +352,7 @@
     <module>
       <script>
         <minify>false</minify>
-        <path>/js/pageTemplate.bundle.js</path>
+        <path>/js/pageTemplates.bundle.js</path>
       </script>
       <depends>
         <module>commonVueComponents</module>
@@ -418,6 +418,43 @@
       <script>
         <minify>false</minify>
         <path>/js/sectionTemplates.bundle.js</path>
+      </script>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>commonLayoutComponents</module>
+      </depends>
+      <depends>
+        <module>attachImage</module>
+      </depends>
+      <depends>
+        <module>translationField</module>
+      </depends>
+      <depends>
+        <module>applicationToolbarComponent</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <portlet>
+    <name>SiteTemplates</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/siteTemplates.bundle.js</path>
       </script>
       <depends>
         <module>vue</module>
