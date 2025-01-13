@@ -80,7 +80,7 @@ export default {
       return this.attachments?.[0]?.id;
     },
     illustrationSrc() {
-      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/siteTemplate/${this.siteTemplateId}/${this.illustrationId}` || '';
+      return this.avatarData || this.illustrationId && `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/siteTemplate/${this.siteTemplateId}/${this.illustrationId}` || '/layout/images/site-templates/defaultSiteTemplatePreview.png';
     },
   },
   watch: {
