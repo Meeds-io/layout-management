@@ -35,35 +35,35 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.social.attachment.AttachmentService;
 
 import io.meeds.layout.service.LayoutAclService;
-import io.meeds.layout.service.SectionTemplateService;
+import io.meeds.layout.service.SiteTemplateService;
 
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-  SectionTemplateAttachmentPlugin.class,
+  SiteTemplateAttachmentPlugin.class,
 })
 @ExtendWith(MockitoExtension.class)
-public class SectionTemplateAttachmentPluginTest {
+public class SiteTemplateAttachmentPluginTest {
 
   @Mock
-  private Identity                        userIdentity;
+  private Identity                     userIdentity;
 
   @MockBean
-  private AttachmentService               attachmentService;
+  private AttachmentService            attachmentService;
 
   @MockBean
-  private LayoutAclService                layoutAclService;
+  private LayoutAclService             layoutAclService;
 
   @MockBean
-  private SectionTemplateService          sectionTemplateService;
+  private SiteTemplateService          siteTemplateService;
 
   @Autowired
-  private SectionTemplateAttachmentPlugin attachmentPlugin;
+  private SiteTemplateAttachmentPlugin attachmentPlugin;
 
   @Test
   void getObjectType() {
-    assertEquals("sectionTemplate", attachmentPlugin.getObjectType());
-    assertEquals(SectionTemplateAttachmentPlugin.OBJECT_TYPE, attachmentPlugin.getObjectType());
+    assertEquals("siteTemplate", attachmentPlugin.getObjectType());
+    assertEquals(SiteTemplateAttachmentPlugin.OBJECT_TYPE, attachmentPlugin.getObjectType());
   }
 
   @Test
