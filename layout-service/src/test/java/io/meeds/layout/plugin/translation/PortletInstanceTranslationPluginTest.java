@@ -64,14 +64,14 @@ public class PortletInstanceTranslationPluginTest {
   private String                           username = "test";
 
   @Test
-  public void getObjectType() {
+  void getObjectType() {
     assertEquals("portletInstance", translationPlugin.getObjectType());
     assertEquals(PortletInstanceTranslationPlugin.OBJECT_TYPE, translationPlugin.getObjectType());
   }
 
   @Test
   @SneakyThrows
-  public void hasEditPermission() {
+  void hasEditPermission() {
     assertFalse(translationPlugin.hasEditPermission(0l, null));
     assertFalse(translationPlugin.hasEditPermission(0l, username));
     when(layoutAclService.isAdministrator(username)).thenReturn(true);
@@ -80,7 +80,7 @@ public class PortletInstanceTranslationPluginTest {
 
   @Test
   @SneakyThrows
-  public void hasAccessPermission() {
+  void hasAccessPermission() {
     assertThrows(ObjectNotFoundException.class, () -> translationPlugin.hasAccessPermission(1, null));
     PortletInstance portletInstance = mock(PortletInstance.class);
     when(portletInstanceService.getPortletInstance(1)).thenReturn(portletInstance);
@@ -97,13 +97,13 @@ public class PortletInstanceTranslationPluginTest {
 
   @Test
   @SneakyThrows
-  public void getAudienceId() {
+  void getAudienceId() {
     assertEquals(0l, translationPlugin.getAudienceId(0l));
   }
 
   @Test
   @SneakyThrows
-  public void getSpaceId() {
+  void getSpaceId() {
     assertEquals(0l, translationPlugin.getSpaceId(0l));
   }
 

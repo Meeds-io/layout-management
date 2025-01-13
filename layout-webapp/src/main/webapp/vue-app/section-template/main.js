@@ -19,7 +19,7 @@
 
 import './initComponents.js';
 import '../common-illustration/main.js';
-import '../common-section-templates/main.js';
+import '../common-section-template/main.js';
 import '../layout-editor/services.js';
 
 // get overridden components if exists
