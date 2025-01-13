@@ -80,10 +80,12 @@
             ck-editor-type="siteTemplateDescription"
             @ready="checkCKEdtiorDisplay" />
         </translation-text-field>
+        <font-icon-input
+          v-model="siteTemplate.icon"
+          class="mt-4" />
         <site-template-preview
           ref="siteTemplatePreview"
           v-model="illustrationUploadId"
-          :preview-image="previewImage"
           :site-template-id="siteTemplateId" />
       </div>
     </template>
@@ -100,7 +102,7 @@
           :loading="saving"
           class="btn btn-primary"
           @click="save">
-          {{ $t('layout.save') }}
+          {{ $t(isNew && 'layout.create' || 'layout.update') }}
         </v-btn>
       </div>
     </template>
@@ -120,7 +122,6 @@ export default {
     maxDescriptionLength: 1000,
     illustrationUploadId: null,
     lang: eXo.env.portal.language,
-    previewImage: null,
     goBackButton: false,
     saving: false,
     isNew: false,
@@ -147,79 +148,51 @@ export default {
     this.$root.$off('site-template-edit', this.open);
   },
   methods: {
-    async open(siteTemplate, goBackButton, previewElement) {
+    open(siteTemplate, goBackButton) {
       this.$root.$emit('close-alert-message');
-      this.isNew = !siteTemplate?.name;
+      this.isNew = !siteTemplate?.id;
       this.goBackButton = goBackButton;
-      this.siteTemplate = siteTemplate || {};
+      this.siteTemplate = siteTemplate && JSON.parse(JSON.stringify(siteTemplate)) || {
+        icon: 'fa-globe',
+      };
       this.siteTemplateId = siteTemplate?.id || null;
-      this.closeOnSave = !!previewElement;
       this.title = siteTemplate?.name || null;
       this.titleTranslations = {};
       this.descriptionTranslations = {};
       this.description = siteTemplate?.description || null;
-      try {
-        if (previewElement) {
-          this.illustrationUploadId = await this.generatePreview(previewElement);
-        } else {
-          this.previewImage = null;
-        }
-      } finally {
-        this.$nextTick().then(() => this.$refs.drawer.open());
-      }
-    },
-    async generatePreview(previewElement) {
-      const previewCanvas = await window.html2canvas(previewElement);
-      this.previewImage = previewCanvas.toDataURL('image/png');
-      const previewBlob = this.convertPreviewToFile(this.previewImage);
-      const uploadId =  await this.$uploadService.upload(previewBlob);
-      return await new Promise((resolve, reject) => {
-        const interval = window.setInterval(() => {
-          this.$uploadService.getUploadProgress(uploadId)
-            .then(percent => {
-              if (Number(percent) === 100) {
-                window.clearInterval(interval);
-                resolve(uploadId);
-              }
-            })
-            .catch(e => reject(e));
-        }, 200);
-      });
-    },
-    convertPreviewToFile(previewImage) {
-      const imgString = window.atob(previewImage.replace(/^data:image\/\w+;base64,/, ''));
-      const bytes = new Uint8Array(imgString.length);
-      for (let i = 0; i < imgString.length; i++) {
-        bytes[i] = imgString.charCodeAt(i);
-      }
-      return new Blob([bytes], {type: 'image/png'});
+      this.$refs.drawer.open();
     },
     close() {
       this.$refs.drawer.close();
     },
-    save() {
+    async save() {
       this.saving = true;
-      return this.$siteTemplateService.updateSiteTemplate(this.siteTemplate)
-        .then(() => this.$translationService.saveTranslations('siteTemplate', this.siteTemplateId, 'title', this.titleTranslations))
-        .then(() => this.$translationService.saveTranslations('siteTemplate', this.siteTemplateId, 'description', this.descriptionTranslations))
-        .then(() => this.$refs?.siteTemplatePreview?.save())
-        .then(() => {
-          this.$root.$emit('site-template-saved', this.siteTemplateId);
-          if (window?.opener && this.closeOnSave) {
-            window?.opener?.dispatchEvent?.(new CustomEvent('site-template-layout-updated', {
-              detail: this.siteTemplate,
-            }));
-            window.close();
-          } else {
-            if (this.isNew) {
-              this.$root.$emit('alert-message', this.$t('layout.siteTemplateCreatedSuccessfully'), 'success');
-            } else {
-              this.$root.$emit('alert-message', this.$t('layout.siteTemplateUpdatedSuccessfully'), 'success');
-            }
-            this.close();
-          }
-        })
-        .finally(() => this.saving = false);
+      try {
+        let siteTemplate;
+        if (this.isNew) {
+          this.siteTemplate.layout = this.generateLayoutName(this.titleTranslations[eXo.env.portal.defaultLanguage]);
+          siteTemplate = await this.$siteTemplateService.createSiteTemplate(this.siteTemplate);
+        } else {
+          siteTemplate = await this.$siteTemplateService.updateSiteTemplate(this.siteTemplate);
+        }
+        this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'title', this.titleTranslations);
+        this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'description', this.descriptionTranslations);
+        this.siteTemplateId = siteTemplate.id;
+        await this.$nextTick();
+        await this.$refs?.siteTemplatePreview?.save();
+        this.$root.$emit('site-template-saved', this.siteTemplateId);
+        if (this.isNew) {
+          this.$root.$emit('alert-message', this.$t('layout.siteTemplateCreatedSuccessfully'), 'success');
+        } else {
+          this.$root.$emit('alert-message', this.$t('layout.siteTemplateUpdatedSuccessfully'), 'success');
+        }
+        this.close();
+      } finally {
+        this.saving = false;
+      }
+    },
+    generateLayoutName(name) {
+      return `${name.toLowerCase().split('').map(a => a.charCodeAt(0) % 25 + 97).map(a => String.fromCharCode(a)).join('')}${parseInt(Math.random() * 1000)}`;
     },
     checkCKEdtiorDisplay() {
       if (this.$refs.siteTemplateDescriptionEditor?.editor
