@@ -24,20 +24,14 @@
     <!-- Illustration -->
     <td
       v-if="!$root.isMobile"
-      class="px-0"
-      align="center">
-      <layout-image-illustration
-        :value="siteTemplate"
-        object-type="siteTemplate" />
+      align="center"
+      width="35px">
+      <v-icon size="28">{{ siteTemplate.icon }}</v-icon>
     </td>
     <!-- name -->
-    <td align="left">
-      <v-card
-        v-sanitized-html="name"
-        class="transparent"
-        flat
-        @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
-    </td>
+    <td
+      align="left"
+      v-sanitized-html="name"></td>
     <!-- description -->
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
