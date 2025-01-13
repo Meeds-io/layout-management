@@ -47,6 +47,7 @@ import org.exoplatform.portal.config.model.ApplicationBackgroundStyle;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.attachment.AttachmentService;
 import org.exoplatform.social.attachment.model.ObjectAttachmentDetail;
 import org.exoplatform.social.attachment.model.ObjectAttachmentList;
@@ -54,7 +55,7 @@ import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.upload.UploadService;
 
-@SpringBootTest(classes = { ContainerLayoutSrvice.class })
+@SpringBootTest(classes = { ContainerLayoutService.class })
 @ExtendWith(MockitoExtension.class)
 class ContainerLayoutServiceTest {
 
@@ -83,6 +84,12 @@ class ContainerLayoutServiceTest {
   @MockBean
   private IdentityManager            identityManager;
 
+  @MockBean
+  private LayoutService              layoutService;
+
+  @MockBean
+  private PortletInstanceService     portletInstanceService;
+
   @Mock
   private FileItem                   fileItem;
 
@@ -108,7 +115,7 @@ class ContainerLayoutServiceTest {
   private Identity                   identity;
 
   @Autowired
-  private ContainerLayoutSrvice      containerLayoutSrvice;
+  private ContainerLayoutService     containerLayoutSrvice;
 
   @Test
   void testImpersonateContainerWithNullPage() throws Exception {

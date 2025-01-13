@@ -12,6 +12,8 @@ const config = {
     pageTemplate: './src/main/webapp/vue-app/page-template/main.js',
     portlets: './src/main/webapp/vue-app/portlets/main.js',
     portletEditor: './src/main/webapp/vue-app/portlet-editor/main.js',
+    sectionTemplates: './src/main/webapp/vue-app/section-templates/main.js',
+    sectionEditor: './src/main/webapp/vue-app/section-editor/main.js',
   },
   mode: 'production',
   context: path.resolve(__dirname, '.'),

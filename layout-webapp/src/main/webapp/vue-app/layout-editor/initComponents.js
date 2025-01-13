@@ -39,6 +39,7 @@ import MarginInput from './components/form/MarginInput.vue';
 import SectionMarginInput from './components/form/SectionMarginInput.vue';
 import BorderInput from './components/form/BorderInput.vue';
 import BorderRadiusInput from './components/form/BorderRadiusInput.vue';
+import SectionTemplate from './components/form/SectionTemplate.vue';
 
 import Content from './components/content/Content.vue';
 
@@ -50,8 +51,6 @@ import ContainerBase from './components/content/base/ContainerBase.vue';
 import SectionMenu from './components/content/common/SectionMenu.vue';
 import SectionSelectionGrid from './components/content/common/SectionSelectionGrid.vue';
 import SectionSelectionGridCell from './components/content/common/SectionSelectionGridCell.vue';
-import SectionGridEditor from './components/content/common/SectionGridEditor.vue';
-import SectionFlexEditor from './components/content/common/SectionFlexEditor.vue';
 import ApplicationCategoryCard from './components/content/common/ApplicationCategoryCard.vue';
 import ApplicationCard from './components/content/common/ApplicationCard.vue';
 import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
@@ -92,12 +91,11 @@ const components = {
   'layout-editor-container-extension': ContainerExtension,
   'layout-editor-container-base': ContainerBase,
   'layout-editor-container-section': Section,
+  'layout-editor-section-template': SectionTemplate,
   'layout-editor-container-cell': Cell,
   'layout-editor-container-application': Application,
   'layout-editor-section-selection-grid': SectionSelectionGrid,
   'layout-editor-section-selection-grid-cell': SectionSelectionGridCell,
-  'layout-editor-section-grid-editor': SectionGridEditor,
-  'layout-editor-section-flex-editor': SectionFlexEditor,
   'layout-editor-section-add-drawer': AddSectionDrawer,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-section-menu': SectionMenu,

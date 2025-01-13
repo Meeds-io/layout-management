@@ -308,6 +308,16 @@ public class LayoutModel {
     }
   }
 
+  public void resetStorage() {
+    this.storageId = null;
+    this.storageName = null;
+    if (getChildren() != null && !getChildren().isEmpty()) {
+      for (LayoutModel child : getChildren()) {
+        child.resetStorage();
+      }
+    }
+  }
+
   public Page toPage() {
     Page page = new Page(storageId);
     ArrayList<ModelObject> pageContainers = this.children == null ? new ArrayList<>() :

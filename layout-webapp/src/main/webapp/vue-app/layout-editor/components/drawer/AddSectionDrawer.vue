@@ -8,6 +8,7 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -23,39 +24,60 @@
     ref="drawer"
     id="addSectionDrawer"
     v-model="drawer"
+    :loading="loading"
+    allow-expand
     right
     disable-pull-to-refresh>
     <template #title>
       {{ $t('layout.addSectionTitle') }}
     </template>
-    <template v-if="drawer && cols" #content>
+    <template v-if="drawer && sectionTemplates" #content>
       <v-card class="pa-4" flat>
-        <div class="text-header mb-2">
-          {{ $t('layout.selectSectionType') }}
+        <div class="text-header">
+          {{ $t('layout.chooseATemplate') }}
         </div>
-        <v-radio-group v-model="sectionType" class="my-auto text-no-wrap ms-n1">
-          <v-radio
-            :label="$t('layout.dynamicSectionTypeChoice')"
-            value="FlexContainer"
-            class="mx-0" />
-          <v-radio
-            :label="$t('layout.fixedSectionTypeChoice')"
-            value="GridContainer"
-            class="mx-0" />
-        </v-radio-group>
-
-        <layout-editor-section-grid-editor
-          v-if="sectionType === $layoutUtils.gridTemplate"
-          :rows-count="rows"
-          :cols-count="cols"
-          class="mt-4"
-          @rows-updated="rows = $event"
-          @cols-updated="cols = $event" />
-        <layout-editor-section-flex-editor
-          v-else-if="sectionType === $layoutUtils.flexTemplate"
-          :cols-count="cols"
-          class="mt-4"
-          @cols-updated="cols = $event" />
+        <template v-if="blankSectionTemplates?.length">
+          <div class="font-weight-bold mt-4">
+            {{ $t('layout.section.category.blank') }}
+          </div>
+          <div class="d-flex flex-wrap me-n4">
+            <layout-editor-section-template
+              v-for="t in blankSectionTemplates"
+              :key="t.id"
+              :section-template="t"
+              :selected="t.id === selectedSectionTemplate?.id"
+              class="col-auto ps-0 pe-4"
+              @select="selectedSectionTemplate = t" />
+          </div>
+        </template>
+        <template v-if="defaultSectionTemplates?.length">
+          <div class="font-weight-bold mt-4">
+            {{ $t('layout.section.category.default') }}
+          </div>
+          <div class="d-flex flex-wrap me-n4">
+            <layout-editor-section-template
+              v-for="t in defaultSectionTemplates"
+              :key="t.id"
+              :section-template="t"
+              :selected="t.id === selectedSectionTemplate?.id"
+              class="col-auto ps-0 pe-4"
+              @select="selectedSectionTemplate = t" />
+          </div>
+        </template>
+        <template v-if="customSectionTemplates?.length">
+          <div class="font-weight-bold mt-4">
+            {{ $t('layout.section.category.custom') }}
+          </div>
+          <div class="d-flex flex-wrap me-n4">
+            <layout-editor-section-template
+              v-for="t in customSectionTemplates"
+              :key="t.id"
+              :section-template="t"
+              :selected="t.id === selectedSectionTemplate?.id"
+              class="col-auto ps-0 pe-4"
+              @select="selectedSectionTemplate = t" />
+          </div>
+        </template>
       </v-card>
     </template>
     <template #footer>
@@ -67,9 +89,10 @@
           <span class="text-none">{{ $t('layout.cancel') }}</span>
         </v-btn>
         <v-btn
+          :disabled="!selectedSectionTemplate"
           class="btn btn-primary ms-4"
           @click="apply">
-          <span class="text-none">{{ $t('layout.apply') }}</span>
+          <span class="text-none">{{ $t('layout.create') }}</span>
         </v-btn>
       </div>
     </template>
@@ -78,34 +101,39 @@
 <script>
 export default {
   data: () => ({
+    selectedSectionTemplate: null,
     parentContainer: null,
-    section: null,
-    sectionType: null,
+    sectionTemplates: null,
+    loading: false,
     drawer: false,
     index: null,
-    rows: 0,
-    cols: 0,
   }),
-  watch: {
-    sectionType() {
-      if (this.sectionType === this.$layoutUtils.gridTemplate) {
-        this.rows = 3;
-        this.cols = 12;
-      } else if (this.sectionType === this.$layoutUtils.flexTemplate) {
-        this.rows = 1;
-        this.cols = 3;
-      }
+  computed: {
+    blankSectionTemplates() {
+      return this.sectionTemplates?.filter?.(t => t.category === 'blank' && t.name && !t.disabled);
+    },
+    defaultSectionTemplates() {
+      return this.sectionTemplates?.filter?.(t => t.category === 'default' && t.name && !t.disabled);
+    },
+    customSectionTemplates() {
+      return this.sectionTemplates?.filter?.(t => t.category === 'custom' && t.name && !t.disabled);
     },
   },
   methods: {
-    open(parentContainer, index) {
-      this.sectionType = this.$layoutUtils.flexTemplate;
+    async open(parentContainer, index) {
       this.parentContainer = parentContainer;
       this.index = index;
+      this.selectedSectionTemplate = null;
       this.$nextTick().then(() => this.$refs.drawer.open());
+      this.loading = true;
+      try {
+        this.sectionTemplates = await this.$sectionTemplateService.getSectionTemplates();
+      } finally {
+        this.loading = false;
+      }
     },
     apply() {
-      this.section = this.$layoutUtils.newSection(null, null, this.rows, this.cols, this.sectionType);
+      this.section = JSON.parse(this.selectedSectionTemplate.content);
       this.$root.$emit('layout-add-section', this.section, this.index);
       this.close();
     },

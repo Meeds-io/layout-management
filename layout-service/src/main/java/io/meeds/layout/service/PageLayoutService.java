@@ -88,7 +88,7 @@ public class PageLayoutService {
   private LayoutAclService       aclService;
 
   @Autowired
-  private ContainerLayoutSrvice  containerLayoutSrvice;
+  private ContainerLayoutService containerLayoutService;
 
   @Autowired
   private PageTemplateService    pageTemplateService;
@@ -212,9 +212,8 @@ public class PageLayoutService {
     return layoutService.getPageContext(page.getPageKey());
   }
 
-  public PageKey clonePage(PageKey pageKey,
-                           String username) throws IllegalAccessException,
-                                            ObjectNotFoundException {
+  public PageKey clonePage(PageKey pageKey, String username) throws IllegalAccessException,
+                                                             ObjectNotFoundException {
     Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
@@ -232,6 +231,26 @@ public class PageLayoutService {
 
     layoutService.save(new PageContext(page.getPageKey(), Utils.toPageState(page)), page);
     return page.getPageKey();
+  }
+
+  public void cloneSection(PageKey pageKey, long containerId, String username) throws IllegalAccessException,
+                                                                               ObjectNotFoundException {
+    Container container = containerLayoutService.findContainer(pageKey, containerId);
+    if (container == null) {
+      throw new ObjectNotFoundException(String.format(PAGE_NOT_EXISTS_MESSAGE, pageKey.format()));
+    } else if (!aclService.canEditPage(pageKey, username)) {
+      throw new IllegalAccessException(String.format(PAGE_NOT_EDITABLE_MESSAGE, pageKey.format(), username));
+    }
+    Page page = getPageLayout(pageKey);
+    Container parentContainer = findParentContainer(page, String.valueOf(containerId));
+    Container clonedContainer = containerLayoutService.cloneContainer(container);
+    int containerIndex = parentContainer.getChildren()// NOSONAR
+                                        .stream()
+                                        .map(ModelObject::getStorageId)
+                                        .toList()
+                                        .indexOf(container.getStorageId());
+    parentContainer.getChildren().add(containerIndex + 1, clonedContainer);
+    layoutService.save(new PageContext(page.getPageKey(), Utils.toPageState(page)), page);
   }
 
   public void updatePageApplicationPreferences(PageKey pageKey,
@@ -483,7 +502,7 @@ public class PageLayoutService {
     if (object instanceof Container container) {
       ArrayList<ModelObject> children = container.getChildren();
       try {
-        containerLayoutSrvice.impersonateContainer(container, page);
+        containerLayoutService.impersonateContainer(container, page);
       } catch (Exception e) {
         LOG.warn("Error while impersonating container '{}' in page '{}'. Ignore cloning container background image.",
                  container.getStorageId(),
@@ -494,7 +513,7 @@ public class PageLayoutService {
         children.forEach(c -> this.impersonateModel(c, page));
       }
     } else if (object instanceof Application application) {
-      Portlet preferences = portletInstanceService.exportApplicationPreferences(application);
+      Portlet preferences = portletInstanceService.getApplicationPortletPreferences(application);
       if (preferences != null) {
         layoutService.save(application.getState(), preferences);
       }
@@ -530,6 +549,30 @@ public class PageLayoutService {
         yield application;
       }
       yield null;
+    }
+    default -> null;
+    };
+  }
+
+  private Container findParentContainer(ModelObject modelObject, String containerStorageId) {
+    return switch (modelObject) {
+    case Container container -> {
+      if (CollectionUtils.isNotEmpty(container.getChildren())) {
+        if (container.getChildren()
+                     .stream()
+                     .anyMatch(m -> StringUtils.equals(containerStorageId, m.getStorageId()))) {
+          yield container;
+        } else {
+          yield container.getChildren()
+                         .stream()
+                         .map(m -> findParentContainer(m, containerStorageId))
+                         .filter(Objects::nonNull)
+                         .findFirst()
+                         .orElse(null);
+        }
+      } else {
+        yield null;
+      }
     }
     default -> null;
     };

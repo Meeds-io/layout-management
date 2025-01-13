@@ -73,13 +73,13 @@ export default {
       return this.node?.state?.pageRef;
     },
     pageTemplateId() {
-      return this.getQueryParam('pageTemplateId');
+      return this.$layoutUtils.getQueryParam('pageTemplateId');
     },
     pageRef() {
-      return this.getQueryParam('pageId') || this.pageKey?.ref || (this.pageKey && `${this.pageKey.site.typeName}::${this.pageKey.site.name}::${this.pageKey.name}`);
+      return this.$layoutUtils.getQueryParam('pageId') || this.pageKey?.ref || (this.pageKey && `${this.pageKey.site.typeName}::${this.pageKey.site.name}::${this.pageKey.name}`);
     },
     nodeId() {
-      return this.getQueryParam('nodeId') || (this.pageTemplateId && eXo.env.portal.selectedNodeId);
+      return this.$layoutUtils.getQueryParam('nodeId') || (this.pageTemplateId && eXo.env.portal.selectedNodeId);
     },
     draftPageKey() {
       return this.draftNode?.state?.pageRef;
@@ -215,11 +215,6 @@ export default {
     },
     deleteDraft() {
       this.$root.$emit('coediting-remove-revision');
-    },
-    getQueryParam(paramName) {
-      const uri = window.location.search.substring(1);
-      const params = new URLSearchParams(uri);
-      return params.get(paramName);
     },
   },
 };

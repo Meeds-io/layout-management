@@ -40,6 +40,7 @@
                   v-on="on"
                   v-bind="attrs">
                   <v-btn
+                    v-if="!$root.noSectionAdd"
                     class="white text-color border-color"
                     height="32"
                     width="32"
@@ -66,6 +67,7 @@
                     v-on="on"
                     v-bind="attrs">
                     <v-btn
+                      v-if="!$root.noSectionAdd"
                       class="white text-color border-color draggable"
                       height="32"
                       width="32"
@@ -82,17 +84,19 @@
               </v-tooltip>
             </div>
           </v-hover>
-          <v-hover v-model="hoverButton3">
-            <div
-              :style="rightButtonStyle"
-              class="position-absolute">
+        </div>
+        <v-hover v-model="hoverButton3">
+          <div
+            :style="rightButtonStyle"
+            class="position-absolute t-0 z-index-one full-height">
+            <div class="position-sticky t-20 z-index-one">
               <v-tooltip bottom>
                 <template #activator="{on, attrs}">
                   <div
                     v-on="on"
                     v-bind="attrs">
                     <v-btn
-                      class="white text-color border-color"
+                      class="white text-color border-color elevation-2"
                       height="32"
                       width="32"
                       icon
@@ -103,9 +107,45 @@
                 </template>
                 {{ $t('layout.editSection') }}
               </v-tooltip>
+              <v-tooltip v-if="$root.isAdministrator" bottom>
+                <template #activator="{on, attrs}">
+                  <div
+                    v-on="on"
+                    v-bind="attrs">
+                    <v-btn
+                      :aria-label="$t('layout.cloneSection')"
+                      class="white text-color border-color elevation-2 mt-2"
+                      height="32"
+                      width="32"
+                      icon
+                      @click="$root.$emit('layout-section-clone', container, index)">
+                      <v-icon class="icon-default-color" size="20">fa-copy</v-icon>
+                    </v-btn>
+                  </div>
+                </template>
+                {{ $t('layout.cloneSection') }}
+              </v-tooltip>
+              <v-tooltip v-if="$root.isAdministrator" bottom>
+                <template #activator="{on, attrs}">
+                  <div
+                    v-on="on"
+                    v-bind="attrs">
+                    <v-btn
+                      :loading="savingAsTemplate"
+                      class="white text-color border-color elevation-2 mt-2"
+                      height="32"
+                      width="32"
+                      icon
+                      @click="saveAsTemplate">
+                      <v-icon class="icon-default-color" size="20">fa-columns</v-icon>
+                    </v-btn>
+                  </div>
+                </template>
+                {{ $t('layout.saveAsSectionTemplate') }}
+              </v-tooltip>
             </div>
-          </v-hover>
-        </div>
+          </div>
+        </v-hover>
         <v-hover v-model="hoverButton4">
           <div class="position-sticky z-index-two d-flex justify-center mb-n4 mt-auto">
             <v-tooltip top>
@@ -114,6 +154,7 @@
                   v-on="on"
                   v-bind="attrs">
                   <v-btn
+                    v-if="!$root.noSectionAdd"
                     class="white text-color border-color"
                     height="32"
                     width="32"
@@ -157,6 +198,7 @@ export default {
   },
   data: () => ({
     open: false,
+    savingAsTemplate: false,
     hoverButton1: false,
     hoverButton2: false,
     hoverButton3: false,
@@ -186,7 +228,7 @@ export default {
     },
     rightButtonStyle() {
       return {
-        right: this.$root.pageFullWindow && '20px' || 0,
+        right: this.$root.pageFullWindow && '0' || '-20px',
       };
     },
   },
@@ -214,6 +256,23 @@ export default {
       } else if (!newVal && this.$root.hoveredSectionId === this.container.storageId) {
         this.$root.hoveredSectionId = null;
       }
+    },
+  },
+  methods: {
+    async saveAsTemplate() {
+      this.savingAsTemplate = true;
+      await this.$nextTick();
+      window.setTimeout(() => {
+        this.savingAsTemplate = false;
+        this.open = false;
+        try {
+          this.$root.$emit('layout-section-save-as-template', this.container);
+        } finally {
+          window.setTimeout(() => {
+            this.savingAsTemplate = false;
+          }, 2000);
+        }
+      }, 200);
     },
   },
 };

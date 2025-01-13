@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,10 +39,14 @@ import org.exoplatform.commons.file.model.FileInfo;
 import org.exoplatform.commons.file.model.FileItem;
 import org.exoplatform.commons.file.services.FileService;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.ApplicationBackgroundStyle;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.mop.page.PageKey;
+import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.attachment.AttachmentService;
 import org.exoplatform.social.attachment.model.ObjectAttachmentDetail;
 import org.exoplatform.social.attachment.model.ObjectAttachmentList;
@@ -50,29 +55,61 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
+import io.meeds.layout.rest.model.LayoutModel;
+
 import lombok.SneakyThrows;
 
 @Service
-public class ContainerLayoutSrvice {
+public class ContainerLayoutService {
 
-  private static final String CONTAINER_BACKGROUND_IMAGE_URI = String.format("/%s/", OBJECT_TYPE);
-
-  @Autowired
-  private AttachmentService   attachmentService;
+  private static final String    CONTAINER_BACKGROUND_IMAGE_URI = String.format("/%s/", OBJECT_TYPE);
 
   @Autowired
-  private UploadService       uploadService;
+  private AttachmentService      attachmentService;
 
   @Autowired
-  private FileService         fileService;
+  private UploadService          uploadService;
 
   @Autowired
-  private UserACL             userAcl;
+  private FileService            fileService;
 
   @Autowired
-  private IdentityManager     identityManager;
+  private UserACL                userAcl;
 
-  private long                superUserIdentityId;
+  @Autowired
+  private IdentityManager        identityManager;
+
+  @Autowired
+  private LayoutService          layoutService;
+
+  @Autowired
+  private PortletInstanceService portletInstanceService;
+
+  private long                   superUserIdentityId;
+
+  public Container cloneContainer(Container container) {
+    exportPortletPreferences(container);
+    LayoutModel sectionLayoutModel = new LayoutModel(container);
+    sectionLayoutModel.resetStorage();
+    return (Container) LayoutModel.toModelObject(sectionLayoutModel);
+  }
+
+  public void exportPortletPreferences(ModelObject object) {
+    if (object instanceof Container container && CollectionUtils.isNotEmpty(container.getChildren())) {
+      container.getChildren().forEach(this::exportPortletPreferences);
+    } else if (object instanceof Application application) {
+      portletInstanceService.exportApplicationPreferences(application);
+    }
+  }
+
+  public Container findContainer(PageKey pageKey, long containerId) {
+    Page page = layoutService.getPage(pageKey);
+    if (page == null) {
+      return null;
+    } else {
+      return findContainer(page, String.valueOf(containerId));
+    }
+  }
 
   public void impersonateContainer(Container container, Page page) throws Exception {
     if (page == null || container == null) { // PortalConfig isn't managed yet
@@ -168,6 +205,26 @@ public class ContainerLayoutSrvice {
       uploadService.createUploadResource(uploadResource);
       return uploadResource;
     }
+  }
+
+  private Container findContainer(ModelObject modelObject, String containerStorageId) {
+    return switch (modelObject) {
+    case Container container -> {
+      if (StringUtils.equals(containerStorageId, container.getStorageId())) {
+        yield container;
+      } else if (CollectionUtils.isNotEmpty(container.getChildren())) {
+        yield container.getChildren()
+                       .stream()
+                       .map(m -> findContainer(m, containerStorageId))
+                       .filter(Objects::nonNull)
+                       .findFirst()
+                       .orElse(null);
+      } else {
+        yield null;
+      }
+    }
+    default -> null;
+    };
   }
 
   private long getSuperUserIdentityId() {

@@ -40,6 +40,7 @@
     <layout-editor-portlet-edit-dialog />
     <layout-editor-page-template-drawer />
     <layout-editor-page-edit-drawer />
+    <section-template-save-as-drawer />
     <layout-image-illustration-preview />
     <changes-reminder
       ref="changesReminder"
@@ -148,6 +149,8 @@ export default {
     this.$root.$on('layout-page-saved', this.handlePageSaved);
     this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
     this.$root.$on('layout-save-draft', this.saveDraft);
+    this.$root.$on('layout-section-save-as-template', this.saveAsSectionTemplate);
+    this.$root.$on('layout-section-clone', this.cloneSection);
     document.addEventListener('keydown', this.restoreSectionVersion);
   },
   mounted() {
@@ -337,6 +340,8 @@ export default {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
       this.addSectionVersion(section.storageId);
       parentContainer.children.splice(index || 0, 0, section);
+      this.$layoutUtils.parseSections(this.layoutToEdit);
+      this.saveDraft();
     },
     handleRemoveSection(index) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
@@ -390,6 +395,25 @@ export default {
     resetSectionHistory() {
       this.$root.sectionHistory = [];
       this.$root.sectionRedo = [];
+    },
+    async saveAsSectionTemplate(section) {
+      await this.saveDraft();
+      window.setTimeout(() => {
+        const domId =  section.id || section.storageId;
+        this.$root.$emit('section-template-save-as-drawer', this.$root.draftPageRef, section.storageId, document.querySelector(`*[id="${domId}"]`).closest('.layout-section'));
+      }, 200);
+    },
+    async cloneSection(section) {
+      this.loading++;
+      try {
+        await this.saveDraft();
+        await this.$pageLayoutService.cloneSection(this.$root.draftPageRef, section.storageId);
+        const layout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, 'contentId');
+        this.setLayout(layout);
+        this.$root.$emit('layout-draft-saved');
+      } finally {
+        this.loading--;
+      }
     },
     saveDraft(layout) {
       this.resetSectionHistory();
