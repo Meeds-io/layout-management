@@ -48,9 +48,7 @@
         hide-details
         @click="changeStatus" />
     </td>
-    <td
-      v-if="!$root.isMobile"
-      align="center">
+    <td align="center">
       <site-template-menu :site-template="siteTemplate" />
     </td>
   </tr>

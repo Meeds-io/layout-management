@@ -22,18 +22,11 @@
     id="managePermissionsDrawer"
     :right="!$vuetify.rtl"
     :allow-expand="isSite"
+    :go-back-button="goBackButton"
     eager
     @closed="close">
     <template slot="title">
-      <div class="d-flex">
-        <v-icon
-          size="16"
-          class="clickable"
-          @click="close">
-          fas fa-arrow-left
-        </v-icon>
-        <span class="ms-2"> {{ drawerTitle }}</span>
-      </div>
+      {{ drawerTitle }}
     </template>
     <template slot="content">
       <v-card class="mx-4 my-4 px-2 py-2 elevation-0">
@@ -81,6 +74,7 @@ export default {
       isSite: false,
       accessPermissionChanged: false,
       editPermissionChanged: false,
+      goBackButton: false,
     };
   },
   computed: {
@@ -100,11 +94,11 @@ export default {
     this.$root.$on('update-access-permission-membership-type', this.updateAccessPermissionMembership);
     this.$root.$on('change-access-permission-type', this.changeAccessPermissionType);
     this.$root.$on('edit-permission-changed', this.editPermissionChanged = true);
-
   },
   methods: {
-    open(object, isSite) {
+    open(object, isSite, noGoBackButton) {
       this.isSite = isSite || false;
+      this.goBackButton = !noGoBackButton;
       if (this.isSite) {
         this.site = JSON.parse(JSON.stringify(object));
         this.editPermission = JSON.parse(JSON.stringify(object.editPermission));
