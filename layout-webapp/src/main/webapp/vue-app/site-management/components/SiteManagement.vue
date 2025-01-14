@@ -19,8 +19,10 @@
 <template>
   <v-app class="siteManagementApplication">
     <v-main class="pa-5 application-body">
-      <site-management-toolbar />
-      <site-management-sites-list :sites="sites" />
+      <site-management-toolbar
+        ref="toolbar"
+        @site-filter="keyword = $event" />
+      <site-management-list :sites="sites" />
     </v-main>
     <exo-confirm-dialog
       ref="deleteSiteConfirmDialog"
