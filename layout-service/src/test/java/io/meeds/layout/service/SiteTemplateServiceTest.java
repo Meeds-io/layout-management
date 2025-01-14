@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -172,9 +173,12 @@ public class SiteTemplateServiceTest {
   @SneakyThrows
   void testCreateSiteTemplate() {
     when(aclService.isAdministrator(testuser)).thenReturn(true);
-    when(portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TEMPLATE,
-                                                    siteTemplate.getLayout(),
-                                                    SiteTemplateService.SITE_TEMPLATE_BASE)).thenReturn(portalConfig);
+    doAnswer(invocation -> {
+      when(layoutService.getPortalConfig(SiteKey.portalTemplate(siteTemplate.getLayout()))).thenReturn(portalConfig);
+      return null;
+    }).when(portalConfigService)
+      .createSiteFromTemplate(SiteKey.portalTemplate(SiteTemplateService.SITE_TEMPLATE_BASE),
+                              SiteKey.portalTemplate(siteTemplate.getLayout()));
     SiteTemplate createdTemplate = siteTemplateService.createSiteTemplate(siteTemplate, testuser);
     assertNotNull(createdTemplate);
     verify(listenerService).broadcast(SiteTemplateService.TEMPLATE_CREATED_EVENT, createdTemplate, testuser);
