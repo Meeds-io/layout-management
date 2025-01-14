@@ -17,33 +17,37 @@
  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template>
-  <div>
-    <div class="d-flex flex-row">
-      <v-icon
-        size="24"
-        class="pl-4">
-        far fa-clock
-      </v-icon>
-      <date-picker
-        v-model="startScheduleDate"
-        :min-value="minimumStartDate"
-        class="scheduleStartDatePicker pa-0 pl-4" />
-      <time-picker
-        v-model="startScheduleTime"
-        :min="minimumStartTime"
-        class="mb-3" />
+  <v-card
+    class="d-flex"
+    max-width="420"
+    width="100%"
+    flat>
+    <div class="flex-grow-0 flex-shrink-0 me-4 mt-2">
+      <v-icon size="24">far fa-clock</v-icon>
     </div>
-    <div class="d-flex flex-row pl-8">
-      <date-picker
-        v-model="endScheduleDate"
-        :min-value="minimumEndDate"
-        class="scheduleEndDatePicker pa-0 pl-6" />
-      <time-picker
-        v-model="endScheduleTime"
-        :min="minimumEndTime"
-        class="mb-3" />
+    <div class="flex-grow-1 flex-shrink-1">
+      <div class="d-flex full-width overflow-hidden">
+        <date-picker
+          v-model="startScheduleDate"
+          :min-value="minimumStartDate"
+          class="scheduleStartDatePicker flex-grow-1 flex-shrink-1 input-width-full pa-0" />
+        <time-picker
+          v-model="startScheduleTime"
+          :min="minimumStartTime"
+          class="flex-grow-0 flex-shrink-0 mb-3" />
+      </div>
+      <div class="d-flex full-width overflow-hidden">
+        <date-picker
+          v-model="endScheduleDate"
+          :min-value="minimumEndDate"
+          class="scheduleEndDatePicker flex-grow-1 flex-shrink-1 input-width-full pa-0" />
+        <time-picker
+          v-model="endScheduleTime"
+          :min="minimumEndTime"
+          class="flex-grow-0 flex-shrink-0 mb-3" />
+      </div>
     </div>
-  </div>
+  </v-card>
 </template>
 
 <script>

@@ -22,7 +22,6 @@
 <template>
   <v-menu
     v-model="menu"
-    :loading="loading"
     :left="!$vuetify.rtl"
     :right="$vuetify.rtl"
     :content-class="menuId"
@@ -30,6 +29,7 @@
     <template #activator="{ on, attrs }">
       <v-btn
         :aria-label="$t('siteTemplates.menu.open')"
+        :loading="loading"
         icon
         small
         class="mx-auto"
@@ -45,6 +45,16 @@
         @mouseout="menu = false"
         @focusout="menu = false">
         <v-list-item-group v-model="listItem">
+          <v-list-item
+            dense
+            @click="$root.$emit('site-template-navigation-open', siteTemplate)">
+            <v-icon size="13">
+              fa-columns
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('siteTemplate.label.editNavigation') }}
+            </v-list-item-title>
+          </v-list-item>
           <v-list-item
             dense
             @click="$root.$emit('site-template-edit', siteTemplate)">
@@ -119,6 +129,7 @@ export default {
     loading: false,
     hoverMenu: false,
     listItem: null,
+    site: null,
     menuId: `siteTemplateMenu${parseInt(Math.random() * 10000)}`,
   }),
   computed: {
