@@ -35,7 +35,7 @@
       <div class="pa-4" flat>
         <translation-text-field
           ref="title"
-          id="pageTemplateTitle"
+          id="siteTemplateTitle"
           v-model="titleTranslations"
           :field-value.sync="title"
           :placeholder="$t('layout.siteTemplate.namePlaceholder')"
@@ -175,16 +175,20 @@ export default {
         } else {
           siteTemplate = await this.$siteTemplateService.updateSiteTemplate(this.siteTemplate);
         }
-        this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'title', this.titleTranslations);
-        this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'description', this.descriptionTranslations);
         this.siteTemplateId = siteTemplate.id;
+        siteTemplate.name = this.title;
+        siteTemplate.description = this.description;
         await this.$nextTick();
+
+        await this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'title', this.titleTranslations);
+        await this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'description', this.descriptionTranslations);
         await this.$refs?.siteTemplatePreview?.save();
-        this.$root.$emit('site-template-saved', this.siteTemplateId);
         if (this.isNew) {
           this.$root.$emit('alert-message', this.$t('layout.siteTemplateCreatedSuccessfully'), 'success');
+          this.$root.$emit('site-template-created', siteTemplate);
         } else {
           this.$root.$emit('alert-message', this.$t('layout.siteTemplateUpdatedSuccessfully'), 'success');
+          this.$root.$emit('site-template-updated', siteTemplate);
         }
         this.close();
       } finally {

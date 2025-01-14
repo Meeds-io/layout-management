@@ -193,7 +193,7 @@ export default {
         this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'title', this.titleTranslations);
         this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'description', this.descriptionTranslations);
         this.$refs?.siteTemplatePreview?.save(siteTemplate.id);
-        this.$root.$emit('site-template-saved', siteTemplate.id);
+        this.$root.$emit('site-template-created', siteTemplate.id);
         this.$root.$emit('alert-message', this.$t('layout.siteTemplateCreatedSuccessfully'), 'success');
         this.close();
       } finally {
