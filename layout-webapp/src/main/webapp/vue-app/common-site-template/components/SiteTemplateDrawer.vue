@@ -25,7 +25,6 @@
     id="siteTemplateDrawer"
     v-model="drawer"
     :loading="saving"
-    :go-back-button="goBackButton"
     allow-expand
     right>
     <template #title>
@@ -86,6 +85,7 @@
         <site-template-preview
           ref="siteTemplatePreview"
           v-model="illustrationUploadId"
+          :preview-image="illustrationData"
           :site-template-id="siteTemplateId" />
       </div>
     </template>
@@ -121,8 +121,8 @@ export default {
     maxTitleLength: 250,
     maxDescriptionLength: 1000,
     illustrationUploadId: null,
+    illustrationData: null,
     lang: eXo.env.portal.language,
-    goBackButton: false,
     saving: false,
     isNew: false,
   }),
@@ -148,18 +148,20 @@ export default {
     this.$root.$off('site-template-edit', this.open);
   },
   methods: {
-    open(siteTemplate, goBackButton) {
+    open(siteTemplate, sourceSiteId, name, nameTranslations, description, descriptionTranslations, illustrationUploadId, illustrationData) {
       this.$root.$emit('close-alert-message');
       this.isNew = !siteTemplate?.id;
-      this.goBackButton = goBackButton;
       this.siteTemplate = siteTemplate && JSON.parse(JSON.stringify(siteTemplate)) || {
         icon: 'fa-globe',
       };
       this.siteTemplateId = siteTemplate?.id || null;
-      this.title = siteTemplate?.name || null;
-      this.titleTranslations = {};
-      this.descriptionTranslations = {};
-      this.description = siteTemplate?.description || null;
+      this.sourceSiteId = sourceSiteId;
+      this.title = name || siteTemplate?.name || null;
+      this.titleTranslations = nameTranslations || {};
+      this.descriptionTranslations = descriptionTranslations || {};
+      this.description = description || siteTemplate?.description || null;
+      this.illustrationUploadId = illustrationUploadId;
+      this.illustrationData = illustrationData || null;
       this.$refs.drawer.open();
     },
     close() {
@@ -171,7 +173,11 @@ export default {
         let siteTemplate;
         if (this.isNew) {
           this.siteTemplate.layout = this.generateLayoutName(this.titleTranslations[eXo.env.portal.defaultLanguage]);
-          siteTemplate = await this.$siteTemplateService.createSiteTemplate(this.siteTemplate);
+          if (this.sourceSiteId) {
+            siteTemplate = await this.$siteTemplateService.saveAsSiteTemplate(this.siteTemplate, this.sourceSiteId);
+          } else {
+            siteTemplate = await this.$siteTemplateService.createSiteTemplate(this.siteTemplate);
+          }
         } else {
           siteTemplate = await this.$siteTemplateService.updateSiteTemplate(this.siteTemplate);
         }
