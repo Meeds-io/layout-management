@@ -56,16 +56,13 @@ export function init() {
         created() {
           this.$root.$on('site-template-enabled', this.refreshSiteTemplates);
           this.$root.$on('site-template-disabled', this.refreshSiteTemplates);
-          this.$root.$on('site-template-saved', this.refreshSiteTemplates);
+          this.$root.$on('site-template-created', this.refreshSiteTemplates);
+          this.$root.$on('site-template-updated', this.refreshSiteTemplates);
           this.$root.$on('site-template-deleted', this.refreshSiteTemplates);
-          window.addEventListener('site-template-layout-updated', this.propagateEventListenerLocally);
 
           this.refreshSiteTemplates();
         },
         methods: {
-          propagateEventListenerLocally(event) {
-            this.$root.$emit(event.type, event.detail);
-          },
           refreshSiteTemplates() {
             this.loading++;
             return this.$siteTemplateService.getSiteTemplates()
