@@ -19,6 +19,7 @@
 
 import './initComponents.js';
 import '../common-layout-components/initComponents.js';
+import '../common-site-template/initComponents.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
@@ -52,6 +53,11 @@ export function init() {
         data: () => ({
           pageTemplates: null,
         }),
+        computed: {
+          isMobile() {
+            return this.$vuetify.breakpoint.smAndDown;
+          },
+        },
       }, `#${appId}`, 'site-management');
     });
 }

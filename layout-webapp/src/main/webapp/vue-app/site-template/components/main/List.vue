@@ -73,6 +73,14 @@ export default {
           class: 'site-template-name-header',
           width: '100%'
         },
+        {
+          text: this.$t('sites.label.actions'),
+          value: 'actions',
+          align: 'center',
+          sortable: false,
+          class: 'site-template-actions-header',
+          width: '75px'
+        },
       ]) || (this.$vuetify.breakpoint.lgAndDown && [
         {
           text: '',

@@ -36,6 +36,9 @@
           <translation-text-field
             ref="siteTitleTranslation"
             v-model="siteTitleTranslations"
+            v-bind="{
+              autofocus: true,
+            }"
             :field-value.sync="siteLabel"
             :maxlength="maxTitleLength"
             :no-expand-icon="!expanded"
@@ -48,7 +51,6 @@
             name="siteTitle"
             class="width-auto flex-grow-1 pt-4"
             back-icon
-            autofocus
             required
             @blur="convertSiteName">
             <template #title>

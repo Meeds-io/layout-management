@@ -70,10 +70,8 @@
     </template>
   </exo-drawer>
 </template>
-
 <script>
 export default {
-
   data() {
     return {
       template: 'navigationWebsite',
@@ -97,7 +95,6 @@ export default {
   created() {
     this.$root.$on('open-site-template-drawer', this.open);
     this.$root.$on('close-site-template-drawer', this.close);
-
   },
   methods: {
     open() {
