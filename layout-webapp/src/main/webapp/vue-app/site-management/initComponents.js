@@ -18,24 +18,31 @@
  */
 
 import SiteManagement from './components/SiteManagement.vue';
-import SitesList from './components/SitesList.vue';
-import SiteCard from './components/SiteCard.vue';
-import SiteCardMenu from './components/SiteCardMenu.vue';
-import SitePropertiesDrawer from './components/SitePropertiesDrawer.vue';
-import SiteBannerSelector from './components/SiteBannerSelector.vue';
-import SiteToolbar from './components/SiteToolbar.vue';
-import SiteTemplateDrawer from './components/SiteTemplateDrawer.vue';
 
+import SiteToolbar from './components/header/SiteToolbar.vue';
+
+import SiteList from './components/main/List.vue';
+import SiteItem from './components/main/Item.vue';
+import SiteItemMenu from './components/main/Menu.vue';
+
+import SitePropertiesDrawer from './components/drawer/SitePropertiesDrawer.vue';
+import SiteTemplateDrawer from './components/drawer/SiteTemplateDrawer.vue';
+
+import SiteBannerSelector from './components/form/SiteBannerSelector.vue';
 
 const components = {
   'site-management': SiteManagement,
-  'site-management-sites-list': SitesList,
-  'site-management-site-card': SiteCard,
-  'site-management-site-card-menu': SiteCardMenu,
-  'site-properties-drawer': SitePropertiesDrawer ,
-  'site-management-banner-selector': SiteBannerSelector ,
+
   'site-management-toolbar': SiteToolbar ,
-  'site-template-drawer': SiteTemplateDrawer ,
+
+  'site-management-list': SiteList,
+  'site-management-item': SiteItem,
+  'site-management-item-menu': SiteItemMenu,
+
+  'site-properties-drawer': SitePropertiesDrawer,
+  'site-template-drawer': SiteTemplateDrawer,
+
+  'site-management-banner-selector': SiteBannerSelector ,
 };
 
 for (const key in components) {
