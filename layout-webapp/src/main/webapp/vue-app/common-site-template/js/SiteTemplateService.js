@@ -89,13 +89,14 @@ export function deleteSiteTemplate(id) {
   });
 }
 
-export function saveAsSiteTemplate(siteId) {
+export function saveAsSiteTemplate(siteTemplate, siteId) {
   return fetch(`/layout/rest/site/templates/${siteId}`, {
     credentials: 'include',
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify(siteTemplate),
   }).then((resp) => {
     if (resp?.ok) {
       return resp.json();

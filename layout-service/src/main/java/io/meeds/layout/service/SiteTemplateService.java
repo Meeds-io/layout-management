@@ -113,11 +113,11 @@ public class SiteTemplateService {
       throw new ObjectAlreadyExistsException(String.format("Site Template with name %s already exists",
                                                            siteTemplate.getLayout()));
     }
-    return createSiteTemplate(siteTemplate, username, true);
+    return createSiteTemplate(siteTemplate, null, username, true);
   }
 
   public SiteTemplate createSiteTemplate(SiteTemplate siteTemplate) {
-    return createSiteTemplate(siteTemplate, null, true);
+    return createSiteTemplate(siteTemplate, null, null, true);
   }
 
   public SiteTemplate updateSiteTemplate(SiteTemplate siteTemplate, String username) throws IllegalAccessException,
@@ -157,19 +157,22 @@ public class SiteTemplateService {
       throw new ObjectNotFoundException(String.format("Site with id %s doesn't exists", siteId));
     } else if (!aclService.isAdministrator(username)) {
       throw new IllegalAccessException();
+    } else if (layoutService.getPortalConfig(SiteKey.portalTemplate(siteTemplate.getLayout())) != null) {
+      throw new ObjectAlreadyExistsException(String.format("Site Template with name %s already exists",
+                                                           siteTemplate.getLayout()));
     }
-    siteTemplate = createSiteTemplate(siteTemplate, username, true);
-    // TODO skeleton method to implement in next tasks
-    return null;
+    return createSiteTemplate(siteTemplate, new SiteKey(portalConfig.getType(), portalConfig.getName()), username, true);
   }
 
   @SneakyThrows
   private SiteTemplate createSiteTemplate(SiteTemplate siteTemplate,
+                                          SiteKey sourceSiteKey,
                                           String username,
                                           boolean broadcast) {
     PortalConfig portalConfig = layoutService.getPortalConfig(SiteKey.portalTemplate(siteTemplate.getLayout()));
     if (portalConfig == null) {
-      portalConfigService.createSiteFromTemplate(SiteKey.portalTemplate(SITE_TEMPLATE_BASE),
+      portalConfigService.createSiteFromTemplate(sourceSiteKey == null ? SiteKey.portalTemplate(SITE_TEMPLATE_BASE) :
+                                                                       sourceSiteKey,
                                                  SiteKey.portalTemplate(siteTemplate.getLayout()));
       portalConfig = layoutService.getPortalConfig(SiteKey.portalTemplate(siteTemplate.getLayout()));
     }
