@@ -95,12 +95,14 @@ export default {
     this.init();
   },
   methods: {
-    init() {
+    async init() {
       if (this.previewImage) {
         this.avatarData = this.previewImage;
+        this.attachments = null;
       } else if (this.siteTemplateId) {
-        return this.$fileAttachmentService.getAttachments('siteTemplate', this.siteTemplateId)
-          .then(data => this.attachments = data?.attachments || []);
+        const data = await this.$fileAttachmentService.getAttachments('siteTemplate', this.siteTemplateId);
+        this.attachments = data?.attachments || [];
+        this.avatarData = null;
       }
     },
     uploadFile(file) {

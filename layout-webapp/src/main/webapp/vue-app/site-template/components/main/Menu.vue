@@ -72,7 +72,7 @@
           </v-list-item>
           <v-list-item
             dense
-            @click="duplicateSiteTemplate">
+            @click="duplicate">
             <v-card
               color="transparent"
               min-width="15"
@@ -186,57 +186,31 @@ export default {
         this.menu = false;
       }
     },
-    async duplicateSiteTemplate() {
-      this.loading = true;
-      try {
-        const siteTemplate = JSON.parse(JSON.stringify(this.siteTemplate));
-        siteTemplate.id = null;
-        siteTemplate.system = false;
-        const createdSiteTemplate = await this.$siteTemplateService.createSiteTemplate(siteTemplate);
+    async duplicate() {
+      const nameTranslations = await this.$translationService.getTranslations('siteTemplate', this.siteTemplate.id, 'title');
+      const descriptionTranslations = await this.$translationService.getTranslations('siteTemplate', this.siteTemplate.id, 'description');
 
-        const nameLabels = await this.$translationService.getTranslations('siteTemplate', this.siteTemplate.id, 'title');
-        await this.$translationService.saveTranslations('siteTemplate', createdSiteTemplate.id, 'title', nameLabels);
+      const bannerBlob = !this.siteTemplate.illustrationId ? null : await fetch(`${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/siteTemplate/${this.siteTemplate.id}/${this.siteTemplate.illustrationId}`, {
+        credentials: 'include',
+        method: 'GET',
+      }).then(resp => resp?.ok && resp.blob());
+      const bannerData = bannerBlob && await this.$utils.blobToBase64(bannerBlob);
+      const bannerUploadId = bannerBlob && await this.$uploadService.upload(bannerBlob);
 
-        const descriptionLabels = await this.$translationService.getTranslations('siteTemplate', this.siteTemplate.id, 'description');
-        await this.$translationService.saveTranslations('siteTemplate', createdSiteTemplate.id, 'description', descriptionLabels);
-
-        if (this.siteTemplate.illustrationId) {
-          const illustrationSrc = `${eXo.env.portal.context}/${eXo.env.portal.rest}/v1/social/attachments/siteTemplate/${this.siteTemplate.id}/${this.siteTemplate.illustrationId}`;
-          const file = await this.getIllustrationFile(illustrationSrc);
-          const uploadId = await this.uploadFile(file);
-          await this.$fileAttachmentService.saveAttachments({
-            objectType: 'siteTemplate',
-            objectId: createdSiteTemplate.id,
-            uploadedFiles: [{uploadId}],
-            attachedFiles: [],
-          });
-        }
-        this.$root.$emit('site-template-edit', createdSiteTemplate);
-      } finally {
-        this.loading = false;
-      }
-    },
-    async uploadFile(file) {
-      const uploadId =  await this.$uploadService.upload(file);
-      return await new Promise((resolve, reject) => {
-        const interval = window.setInterval(() => {
-          this.$uploadService.getUploadProgress(uploadId)
-            .then(percent => {
-              if (Number(percent) === 100) {
-                window.clearInterval(interval);
-                resolve(uploadId);
-              }
-            })
-            .catch(e => reject(e));
-        }, 200);
-      });
-    },
-    getIllustrationFile(src) {
-      return fetch(src, {
-        'method': 'GET',
-        'credentials': 'include'
-      })
-        .then(resp => resp.ok && resp.blob());
+      this.$root.$emit('site-template-add', {
+        ...this.siteTemplate,
+        id: null,
+        layout: null,
+        illustrationId: null,
+        system: false,
+      },
+      this.siteTemplate.id,
+      nameTranslations?.[eXo.env.portal.defaultLanguage],
+      nameTranslations,
+      descriptionTranslations?.[eXo.env.portal.defaultLanguage],
+      descriptionTranslations,
+      bannerUploadId,
+      bannerData);
     },
   },
 };

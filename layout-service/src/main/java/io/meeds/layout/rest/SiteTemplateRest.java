@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -105,7 +104,7 @@ public class SiteTemplateRest {
     }
   }
 
-  @PostMapping(value = "{siteId}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @PostMapping("{siteId}")
   @Secured("users")
   @Operation(summary = "Create a site template based on an existing site", method = "POST", description = "This creates a new site template based on an existing site identified by its identifier")
   @ApiResponses(value = {
