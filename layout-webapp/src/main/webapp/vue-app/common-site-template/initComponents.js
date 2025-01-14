@@ -22,11 +22,15 @@ import SiteTemplatePreview from './components/SiteTemplatePreview.vue';
 import SiteTemplateDrawer from './components/SiteTemplateDrawer.vue';
 import SiteTemplateSaveAsDrawer from './components/SiteTemplateSaveAsDrawer.vue';
 
+import SiteTemplateNavigationHandler from './components/SiteTemplateNavigationHandler.vue';
+
 const components = {
   'site-template-preview': SiteTemplatePreview,
 
   'site-template-drawer': SiteTemplateDrawer,
   'site-template-save-as-drawer': SiteTemplateSaveAsDrawer,
+
+  'site-template-navigation-handler': SiteTemplateNavigationHandler,
 };
 
 for (const key in components) {

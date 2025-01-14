@@ -24,15 +24,14 @@
     <main class="application-body">
       <site-template-toolbar
         ref="toolbar"
-        :tab-name="tabName"
-        @site-template-filter="keyword = $event"
-        @select-tab="selectTab" />
+        @site-template-filter="keyword = $event" />
       <site-template-list
         :keyword="keyword" />
     </main>
     <site-template-add-drawer />
     <site-template-drawer />
     <layout-image-illustration-preview />
+    <site-template-navigation-handler />
     <layout-analytics application-name="siteTemplateManagement" />
   </v-app>
 </template>
@@ -41,23 +40,5 @@ export default {
   data: () => ({
     keyword: null,
   }),
-  created() {
-    this.$root.$on('site-template-created', this.handleInstanceCreated);
-    this.$root.$on('site-template-layout-updated', this.handleLayoutUpdated);
-  },
-  beforeDestroy() {
-    this.$root.$off('site-template-created', this.handleInstanceCreated);
-    this.$root.$off('site-template-layout-updated', this.handleLayoutUpdated);
-  },
-  methods: {
-    handleInstanceCreated(instance) {
-      const instanceEditorLink = `/portal/${eXo.env.portal.portalName}/section-editor?id=${instance.id}`;
-      window.open(instanceEditorLink, '_blank');
-    },
-    handleLayoutUpdated(instance) {
-      this.$root.$emit('site-template-saved', instance);
-      this.$root.$emit('alert-message', this.$t('layout.siteTemplateLayoutUpdatedSuccessfully'), 'success');
-    },
-  },
 };
 </script>

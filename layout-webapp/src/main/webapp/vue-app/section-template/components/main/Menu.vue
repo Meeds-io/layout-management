@@ -22,7 +22,6 @@
 <template>
   <v-menu
     v-model="menu"
-    :loading="loading"
     :left="!$vuetify.rtl"
     :right="$vuetify.rtl"
     :content-class="menuId"
@@ -30,6 +29,7 @@
     <template #activator="{ on, attrs }">
       <v-btn
         :aria-label="$t('sectionTemplates.menu.open')"
+        :loading="loading"
         icon
         small
         class="mx-auto"
