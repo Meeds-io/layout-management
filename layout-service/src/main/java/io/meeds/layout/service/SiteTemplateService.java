@@ -7,6 +7,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
@@ -48,6 +49,8 @@ import io.meeds.layout.model.SiteTemplate;
 import io.meeds.layout.plugin.attachment.SiteTemplateAttachmentPlugin;
 import io.meeds.layout.plugin.translation.SiteTemplateTranslationPlugin;
 import io.meeds.social.translation.service.TranslationService;
+
+import lombok.SneakyThrows;
 
 @Service
 public class SiteTemplateService {
@@ -160,10 +163,17 @@ public class SiteTemplateService {
     return null;
   }
 
-  private SiteTemplate createSiteTemplate(SiteTemplate siteTemplate, String username, boolean broadcast) {
-    PortalConfig portalConfig = portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TEMPLATE,
-                                                                           siteTemplate.getLayout(),
-                                                                           SITE_TEMPLATE_BASE);
+  @SneakyThrows
+  private SiteTemplate createSiteTemplate(SiteTemplate siteTemplate,
+                                          String username,
+                                          boolean broadcast) {
+    PortalConfig portalConfig = layoutService.getPortalConfig(SiteKey.portalTemplate(siteTemplate.getLayout()));
+    if (portalConfig == null) {
+      portalConfigService.createSiteFromTemplate(SiteKey.portalTemplate(SITE_TEMPLATE_BASE),
+                                                 SiteKey.portalTemplate(siteTemplate.getLayout()));
+      portalConfig = layoutService.getPortalConfig(SiteKey.portalTemplate(siteTemplate.getLayout()));
+    }
+    siteTemplate.setId(portalConfig.getId());
     SiteTemplate createdSiteTemplate = updateSiteTemplate(siteTemplate, portalConfig);
     if (broadcast) {
       listenerService.broadcast(TEMPLATE_CREATED_EVENT, createdSiteTemplate, username);

@@ -31,21 +31,6 @@
 
   <portlet-skin>
     <application-name>layout</application-name>
-    <portlet-name>SiteNavigation</portlet-name>
-    <skin-name>Enterprise</skin-name>
-    <css-path>/skin/css/siteNavigation.css</css-path>
-  </portlet-skin>
-
-  <portlet-skin>
-    <application-name>layout</application-name>
-    <portlet-name>SiteManagement</portlet-name>
-    <skin-name>Enterprise</skin-name>
-    <css-path>/skin/css/siteManagement.css</css-path>
-    <additional-module>ImageCropper</additional-module>
-  </portlet-skin>
-
-  <portlet-skin>
-    <application-name>layout</application-name>
     <portlet-name>LayoutEditor</portlet-name>
     <skin-name>Enterprise</skin-name>
     <additional-module>LayoutEditor</additional-module>
@@ -63,13 +48,6 @@
     <portlet-name>SectionTemplates</portlet-name>
     <skin-name>Enterprise</skin-name>
     <additional-module>LayoutEditor</additional-module>
-  </portlet-skin>
-
-  <portlet-skin>
-    <application-name>social</application-name>
-    <portlet-name>SpaceTemplateManagement</portlet-name>
-    <skin-name>Enterprise</skin-name>
-    <css-path>/skin/css/siteNavigation.css</css-path>
   </portlet-skin>
 
   <module>
