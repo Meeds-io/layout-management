@@ -72,7 +72,7 @@
         :aria-label="$t('siteManagement.label.manageAccess')"
         role="button"
         class="subtitle-2 px-3"
-        @click="$root.$emit('open-manage-permissions-drawer', site, true)">
+        @click="$root.$emit('open-manage-permissions-drawer', site, true, true)">
         <v-icon
           size="13"
           class="me-2 ms-0"
@@ -104,7 +104,6 @@
     </v-list>
   </v-menu>
 </template>
-
 <script>
 export default {
   props: {

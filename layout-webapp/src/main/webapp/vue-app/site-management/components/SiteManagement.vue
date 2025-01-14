@@ -18,9 +18,14 @@
 -->
 <template>
   <v-app class="siteManagementApplication">
-    <v-main class="pa-5 application-body">
-      <site-management-toolbar />
-      <site-management-sites-list :sites="sites" />
+    <v-main class="application-body">
+      <site-management-toolbar
+        ref="toolbar"
+        @site-filter="keyword = $event" />
+      <site-management-list
+        :sites="sites"
+        :loading="loading > 0"
+        :keyword="keyword" />
     </v-main>
     <exo-confirm-dialog
       ref="deleteSiteConfirmDialog"
@@ -46,6 +51,7 @@ export default {
       sites: [],
       loading: 0,
       siteToDelete: null,
+      keyword: null,
       deleteConfirmMessage: '',
     };
   },
