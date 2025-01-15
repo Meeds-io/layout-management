@@ -119,6 +119,7 @@ public class SiteLayoutService {
     createdPortalConfig.setDescription(portalConfig.getDescription());
     createdPortalConfig.setLabel(portalConfig.getLabel());
     createdPortalConfig.setDisplayed(portalConfig.isDisplayed());
+    createdPortalConfig.setIcon(portalConfig.getIcon());
     createdPortalConfig.setDisplayOrder(portalConfig.isDisplayed() ? portalConfig.getDisplayOrder() : 0);
     createdPortalConfig.setAccessPermissions(accessPermissions);
     createdPortalConfig.setEditPermission(editPermission);
@@ -140,6 +141,7 @@ public class SiteLayoutService {
     }
     portalConfig.setDescription(updateModel.getSiteDescription());
     portalConfig.setLabel(updateModel.getSiteLabel());
+    portalConfig.setIcon(updateModel.getSiteIcon());
     portalConfig.setDisplayed(updateModel.isDisplayed());
     portalConfig.setDisplayOrder(updateModel.isDisplayed() ? updateModel.getDisplayOrder() : 0);
     if (updateModel.isBannerRemoved() && portalConfig.getBannerFileId() != 0) {
