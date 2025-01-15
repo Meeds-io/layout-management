@@ -31,6 +31,8 @@ public class SiteUpdateModel {
 
   private String  siteDescription;
 
+  private String  siteIcon;
+
   private boolean displayed;
 
   private int     displayOrder;
