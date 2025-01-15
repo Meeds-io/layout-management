@@ -34,7 +34,7 @@
         min-height="150"
         max-height="150"
         flat
-        @click="$root.$emit('layout-illustration-preview', illustrationSrc, illustrationAction)">
+        @click="$root.$emit('layout-illustration-preview', illustrationSrc, illustrationAction, title, description)">
         <div class="d-flex flex-column flex-grow-1 align-center justify-center">
           <v-icon size="32" class="py-4">{{ siteTemplate.icon }}</v-icon>
           <p

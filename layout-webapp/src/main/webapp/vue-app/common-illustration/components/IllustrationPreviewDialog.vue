@@ -27,7 +27,7 @@
     width="100%"
     max-width="100%"
     overlay-opacity="0.9"
-    content-class="overflow-y-initial full-height full-width pa-5">
+    content-class="overflow-y-initial overflow-x-hidden full-height full-width pa-5">
     <template v-if="dialog">
       <div class="d-flex justify-end">
         <v-btn
@@ -46,17 +46,38 @@
           <v-icon color="white">fa-times</v-icon>
         </v-btn>
       </div>
-      <v-card
-        max-height="80vh"
-        class="transparent"
-        flat
-        @click="dialog = false">
-        <v-img
-          :src="illustrationSrc"
-          :aspect-ratio="2"
-          height="80vh"
-          contain />
-      </v-card>
+      <div class="full-width d-flex align-center justify-center">
+        <v-card
+          :class="title && 'aspect-ratio-1 px-4 pt-4'"
+          :color="!title && 'transparent'"
+          class="d-flex flex-column"
+          :min-width="title && 420"
+          :width="title && '80%'"
+          max-width="100%"
+          max-height="80vh"
+          flat
+          @click="dialog = false">
+          <div
+            v-if="title"
+            class="text-start text-title"
+            v-sanitized-html="title"></div>
+          <div
+            v-if="title && description"
+            class="text-start"
+            v-sanitized-html="description"></div>
+          <div
+            :class="title && 'py-4'"
+            class="d-flex flex-grow-1 flex-shrink-1 align-center justify-center overflow-hidden">
+            <img
+              :src="illustrationSrc"
+              :alt="title || ''"
+              :class="title && 'elevation-2'"
+              class="full-height width-auto"
+              height="100%"
+              width="100%" />
+          </div>
+        </v-card>
+      </div>
     </template>
   </v-dialog>
 </template>
@@ -83,12 +104,14 @@ export default {
     this.$root.$on('layout-illustration-preview', this.open);
   },
   methods: {
-    open(illustrationSrc, action) {
+    open(illustrationSrc, action, title, description) {
       this.illustrationSrc = illustrationSrc;
       this.actionIcon = action?.icon;
       this.actionLabel = action?.label;
       this.actionClick = action?.click;
       this.actionCloseOnClick = action?.closeOnClick;
+      this.title = title;
+      this.description = description;
       this.dialog = true;
     },
     clickOnAction() {
