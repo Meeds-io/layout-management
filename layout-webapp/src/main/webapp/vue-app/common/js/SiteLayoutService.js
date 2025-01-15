@@ -17,7 +17,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function createSite(siteName, siteTemplate, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, icon) {
+export function createSite(siteName, siteTemplate, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, icon, accessPermissions, editPermission) {
   const createModel = {
     siteTemplate,
     portalConfig: {
@@ -27,6 +27,8 @@ export function createSite(siteName, siteTemplate, siteLabel, siteDescription, d
       displayed: displayed,
       displayOrder: displayOrder,
       bannerUploadId: bannerUploadId,
+      accessPermissions,
+      editPermission,
       properties: {
         icon: icon || 'fa-globe',
       },

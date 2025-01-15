@@ -38,6 +38,9 @@ import NodeIconPickerDrawer from './components/site-navigation/NodeIconPickerDra
 import SiteNavigationNewPageElementItemsList from './components/site-navigation/SiteNavigationNewPageElementItemsList.vue';
 import SiteNavigationNewPageElementItem from './components/site-navigation/SiteNavigationNewPageElementItem.vue';
 
+import SiteAccessPermissions from './components/manage-permissions/SiteAccessPermissions.vue';
+import SiteEditPermission from './components/manage-permissions/SiteEditPermission.vue';
+
 const components = {
   'manage-permissions-drawer': ManagePermissionsDrawer,
   'manage-edit-permission': ManageEditPermission,
@@ -58,6 +61,8 @@ const components = {
   'site-navigation-existing-page-element': SiteNavigationExistingPageElement,
   'site-navigation-page-suggester': SiteNavigationPageSuggester,
   'site-navigation-site-suggester': SiteNavigationSiteSuggester,
+  'site-access-permissions': SiteAccessPermissions,
+  'site-edit-permission': SiteEditPermission,
   'node-icon-picker-drawer': NodeIconPickerDrawer,
 };
 
