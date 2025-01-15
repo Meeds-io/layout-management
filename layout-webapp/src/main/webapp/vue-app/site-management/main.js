@@ -19,7 +19,7 @@
 
 import './initComponents.js';
 import '../common-layout-components/initComponents.js';
-import '../common-site-template/initComponents.js';
+import '../common-site-template/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
@@ -39,7 +39,8 @@ const lang = eXo?.env.portal.language || 'en';
 //should expose the locale ressources as REST API
 const urls = [
   `/layout/i18n/locale.portlet.SiteManagement?lang=${lang}`,
-  `/layout/i18n/locale.portlet.SiteNavigation?lang=${lang}`
+  `/layout/i18n/locale.portlet.SiteNavigation?lang=${lang}`,
+  `/layout/i18n/locale.portlet.LayoutEditor?lang=${lang}`
 ];
 
 export function init() {
@@ -52,6 +53,7 @@ export function init() {
         i18n,
         data: () => ({
           pageTemplates: null,
+          collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
         }),
         computed: {
           isMobile() {
