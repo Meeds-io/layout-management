@@ -34,8 +34,8 @@
       :ok-label="$t('siteManagement.label.confirm')"
       :cancel-label="$t('siteManagement.label.cancel')"
       @ok="deleteSite" />
-    <site-properties-drawer />
-    <site-template-drawer />
+    <site-form-drawer
+      :sites="sites" />
     <site-navigation-drawer />
     <site-navigation-node-drawer />
     <site-navigation-element-drawer />
@@ -56,12 +56,18 @@ export default {
     };
   },
   created() {
+    this.$root.$on('site-created', this.refreshSites);
+    this.$root.$on('site-updated', this.refreshSites);
     this.$root.$on('delete-site', this.confirmDelete);
-    this.$root.$on('refresh-sites', this.getSites);
-    this.getSites();
+    this.refreshSites();
+  },
+  beforDestroy() {
+    this.$root.$off('site-created', this.refreshSites);
+    this.$root.$off('site-updated', this.refreshSites);
+    this.$root.$on('delete-site', this.confirmDelete);
   },
   methods: {
-    getSites() {
+    refreshSites() {
       this.loading++;
       return this.$siteService.getSites('PORTAL', null, 'public', true, true, false, false, false, null, true)
         .then(sites => this.sites = sites?.filter(s => !s?.properties?.IS_SPACE_PUBLIC_SITE) || [])
@@ -75,7 +81,7 @@ export default {
     deleteSite() {
       this.loading++;
       return this.$siteLayoutService.deleteSite(this.siteToDelete.siteType, this.siteToDelete.name)
-        .then(() => this.$root.$emit('refresh-sites'))
+        .then(() => this.refreshSites)
         .finally(() => this.loading--);
     },
   }
