@@ -18,10 +18,11 @@
 -->
 <template>
   <exo-drawer
-    ref="managePermissionsDrawer"
+    ref="drawer"
     id="managePermissionsDrawer"
     v-model="drawer"
     :right="!$vuetify.rtl"
+    :loading="loading"
     :allow-expand="isSite"
     :go-back-button="goBackButton"
     eager
@@ -31,17 +32,14 @@
     </template>
     <template v-if="drawer" #content>
       <v-card class="mx-4 my-4 px-2 py-2 elevation-0">
-        <manage-edit-permission
-          :permission="editPermission"
-          :is-site="isSite" />
-        <v-divider class="my-8" />
-        <manage-access-permission
-          :access-permissions="accessPermissions"
-          :type="accessPermissionType"
-          :is-site="isSite" />
+        <site-edit-permission
+          v-model="editPermission" />
+        <site-access-permissions
+          v-model="accessPermissions"
+          class="mt-4" />
       </v-card>
     </template>
-    <template slot="footer">
+    <template #footer>
       <div class="d-flex justify-end">
         <v-btn
           class="btn ms-2"
@@ -61,41 +59,31 @@
 </template>
 <script>
 export default {
-
-  data() {
-    return {
-      drawer: false,
-      loading: false,
-      navigationNode: null,
-      editPermission: {
-        group: {},
-        membershipType: '*'},
-      accessPermissions: [],
-      accessPermissionType: '',
-      site: null,
-      isSite: false,
-      accessPermissionChanged: false,
-      editPermissionChanged: false,
-      goBackButton: false,
-    };
-  },
+  data: () => ({
+    drawer: false,
+    loading: false,
+    navigationNode: null,
+    editPermission: null,
+    accessPermissions: [],
+    site: null,
+    isSite: false,
+    accessPermissionChanged: false,
+    editPermissionChanged: false,
+    goBackButton: false,
+  }),
   computed: {
-    enableSave() {
-      return (this.accessPermissions.length || this.accessPermissionType ==='Everyone' ) && this.editPermission?.group?.id;
-    },
     drawerTitle() {
       return this.isSite && this.$t('siteManagement.label.managePermissions') || this.$t('siteNavigation.managePermissionsDrawer.title');
-    }
+    },
+    enableSave() {
+      return this.accessPermissions?.length && this.editPermission;
+    },
   },
   created() {
     this.$root.$on('open-manage-permissions-drawer', this.open);
-    this.$root.$on('reset-edit-permission', this.resetEditPermission);
-    this.$root.$on('edit-permission-membership-type-changed', this.updateEditPermissionMembershipType);
-    this.$root.$on('add-access-permission', this.addAccessPermission);
-    this.$root.$on('remove-access-permission', this.removeAccessPermission);
-    this.$root.$on('update-access-permission-membership-type', this.updateAccessPermissionMembership);
-    this.$root.$on('change-access-permission-type', this.changeAccessPermissionType);
-    this.$root.$on('edit-permission-changed', this.editPermissionChanged = true);
+  },
+  beforeDestroy() {
+    this.$root.$off('open-manage-permissions-drawer', this.open);
   },
   methods: {
     open(object, isSite, noGoBackButton) {
@@ -103,86 +91,29 @@ export default {
       this.goBackButton = !noGoBackButton;
       if (this.isSite) {
         this.site = JSON.parse(JSON.stringify(object));
-        this.editPermission = JSON.parse(JSON.stringify(object.editPermission));
-        this.accessPermissionType = object.accessPermissions[0].membershipType === 'Everyone' && 'Everyone' || 'GROUP';
-        this.accessPermissions = this.accessPermissionType === 'Everyone' && [] ||  JSON.parse(JSON.stringify(object.accessPermissions));
+        this.editPermission = this.site?.editPermission?.group?.id;
+        this.accessPermissions = this.site?.accessPermissions?.length && this.site?.accessPermissions.map(p => p.group?.id) || [];
       } else {
         this.navigationNode = JSON.parse(JSON.stringify(object));
-        this.editPermission = JSON.parse(JSON.stringify(object.pageEditPermission));
-        this.accessPermissionType = object.pageAccessPermissions[0].membershipType === 'Everyone' && 'Everyone' || 'GROUP';
-        this.accessPermissions = this.accessPermissionType === 'Everyone' && [] ||  JSON.parse(JSON.stringify(object.pageAccessPermissions));
+        this.editPermission = this.navigationNode?.pageEditPermission?.group?.id;
+        this.accessPermissions = this.navigationNode?.pageAccessPermissions?.length && this.navigationNode.pageAccessPermissions.map(p => p.group?.id) || [];
       }
-
-      this.$nextTick()
-        .then(() => {
-          this.$refs.managePermissionsDrawer.open();
-        });
+      this.$refs.drawer.open();
     },
     close() {
-      this.resetEditPermission();
-      this.accessPermissions = [];
-      this.$refs.managePermissionsDrawer.close();
-      this.editPermissionChanged = false;
-      this.accessPermissionChanged = false;
+      this.$refs.drawer.close();
     },
-    resetEditPermission() {
-      this.editPermissionChanged = true;
-      this.editPermission = {
-        membershipType: '*'
-      };
-    },
-    updateEditPermissionMembershipType(membershipType) {
-      this.editPermissionChanged = true;
-      this.editPermission.membershipType = membershipType;
-    },
-    addAccessPermission(accessPermission) {
-      this.accessPermissionChanged = true;
-      this.accessPermissions.push(accessPermission);
-    },
-    removeAccessPermission(index) {
-      this.accessPermissionChanged = true;
-      this.accessPermissions.splice(index, 1);
-    },
-    updateAccessPermissionMembership(accessPermission) {
-      this.accessPermissionChanged = true;
-      this.accessPermissions[accessPermission.index].membershipType = accessPermission.membershipType;
-    },
-    changeAccessPermissionType(accessPermissionType) {
-      this.accessPermissionChanged = true;
-      this.accessPermissionType = accessPermissionType;
-      if (accessPermissionType === 'Everyone') {
-        this.accessPermissions = ['Everyone'];
-      } else if (accessPermissionType === 'GROUP') {
-        if (this.isSite) {
-          this.accessPermissions =  this.site?.accessPermissions[0]?.membershipType === 'Everyone' && [] || this.site.accessPermissions;
-        } else {
-          this.accessPermissions =  this.navigationNode?.pageAccessPermissions[0]?.membershipType === 'Everyone' && [] || this.navigationNode.pageAccessPermissions;
-        }
-      }
-    },
-    save() {
+    async save() {
       if (this.isSite) {
-        this.saveSitePermission();
+        await this.saveSitePermission();
       } else {
-        this.saveNavigationNodePermission();
+        await this.saveNavigationNodePermission();
       }
     },
     saveNavigationNodePermission() {
       this.loading = true;
-      this.$refs.managePermissionsDrawer.startLoading();
-      const pageEditPermission = this.convertPermission(this.editPermission);
-      let pageAccessPermissions = ['Everyone'];
-      if (this.accessPermissions[0] !== 'Everyone' && this.accessPermissionType !== 'Everyone') {
-        pageAccessPermissions = [];
-        this.accessPermissions.forEach(permission => {
-          if (permission.group?.id) {
-            const accessPermission = this.convertPermission(permission);
-            pageAccessPermissions.push(accessPermission);
-          }
-        });
-      }
       const pageRef = this.navigationNode.pageKey.ref ||`${ this.navigationNode.pageKey.site.typeName}::${ this.navigationNode.pageKey.site.name}::${this.navigationNode.pageKey.name}`;
-      return this.$pageLayoutService.updatePagePermissions(pageRef, pageEditPermission, pageAccessPermissions)
+      return this.$pageLayoutService.updatePagePermissions(pageRef, this.editPermission, this.accessPermissions)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteNavigation.label.updatePermission.success'), 'success');
           this.$root.$emit('refresh-navigation-nodes');
@@ -191,26 +122,11 @@ export default {
           const message = e.message ==='401' &&  this.$t('siteNavigation.label.updatePermission.unauthorized') || this.$t('siteNavigation.label.updatePermission.error');
           this.$root.$emit('alert-message', message, 'error');
         })
-        .finally(() => {
-          this.loading = false;
-          this.$refs.managePermissionsDrawer.endLoading();
-        });
+        .finally(() => this.loading = false);
     },
     saveSitePermission() {
       this.loading = true;
-      this.$refs.managePermissionsDrawer.startLoading();
-      const siteEditPermission = this.convertPermission(this.editPermission);
-      let siteAccessPermissions = ['Everyone'];
-      if (this.accessPermissions[0] !== 'Everyone') {
-        siteAccessPermissions = [];
-        this.accessPermissions.forEach(permission => {
-          if (permission.group?.id) {
-            const accessPermission = this.convertPermission(permission);
-            siteAccessPermissions.push(accessPermission);
-          }
-        });
-      }
-      return this.$siteLayoutService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermissionChanged && siteEditPermission || null, this.accessPermissionChanged && siteAccessPermissions || null)
+      return this.$siteLayoutService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermission, this.accessPermissions)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteManagement.label.updatePermission.success'), 'success');
           this.$root.$emit('site-updated');
@@ -219,18 +135,8 @@ export default {
           const message = e.message ==='401' &&  this.$t('siteManagement.label.updatePermission.unauthorized') || this.$t('siteManagement.label.updatePermission.error');
           this.$root.$emit('alert-message', message, 'error');
         })
-        .finally(() => {
-          this.loading = false;
-          this.$refs.managePermissionsDrawer.endLoading();
-        });
+        .finally(() => this.loading = false);
     },
-    convertPermission(permission) {
-      if (permission.group.providerId === 'space') {
-        return `${permission.membershipType}:/spaces/${permission.group.remoteId}`;
-      } else {
-        return `${permission.membershipType}:${permission.group.spaceId || permission.group.id}`;
-      }
-    }
   }
 };
 </script>
