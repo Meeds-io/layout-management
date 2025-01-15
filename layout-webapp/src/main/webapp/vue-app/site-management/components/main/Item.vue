@@ -22,15 +22,13 @@
 <template>
   <tr>
     <!-- Illustration -->
-    <td
-      align="center"
-      width="35px">
-      <v-icon size="28">{{ site.icon || 'fa-globe' }}</v-icon>
-    </td>
     <!-- name -->
-    <td
-      align="left"
-      v-sanitized-html="name"></td>
+    <td colspan="2" align="left">
+      <div class="d-flex">
+        <v-icon size="28" class="me-4">{{ site.icon || 'fa-globe' }}</v-icon>
+        <div v-sanitized-html="name"></div>
+      </div>
+    </td>
     <!-- description -->
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
