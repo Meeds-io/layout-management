@@ -170,7 +170,7 @@ export default {
     this.isGuestPermissions = permissions?.find?.(p => p === this.externalsPermission) && true || false;
     this.specificGroupEntries = [];
 
-    const specificGroupEntries = permissions?.filter?.(p => {
+    const specificGroupEntries = permissions?.filter?.(p => p)?.filter?.(p => {
       const g = p.includes(':') ? p.split(':')[1] : p;
       return g !== this.administratorsPermission
         && g !== this.usersPermission
