@@ -25,10 +25,10 @@
     eager
     allow-expand
     @closed="close">
-    <template slot="title">
+    <template #title>
       <span>{{ $t('siteNavigation.drawer.title') }}</span>
     </template>
-    <template slot="content">
+    <template v-if="drawer" #content>
       <div :class="$refs.drawer?.expand ? 'singlePageApplication' : ' ' ">
         <v-alert
           v-if="information"

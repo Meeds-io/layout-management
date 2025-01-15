@@ -25,10 +25,11 @@ import SiteList from './components/main/List.vue';
 import SiteItem from './components/main/Item.vue';
 import SiteItemMenu from './components/main/Menu.vue';
 
-import SitePropertiesDrawer from './components/drawer/SitePropertiesDrawer.vue';
+import SiteFormDrawer from './components/drawer/SiteFormDrawer.vue';
 import SiteTemplateDrawer from './components/drawer/SiteTemplateDrawer.vue';
 
-import SiteBannerSelector from './components/form/SiteBannerSelector.vue';
+import SiteBanner from './components/form/SiteBanner.vue';
+import SiteTemplate from './components/form/SiteTemplate.vue';
 
 const components = {
   'site-management': SiteManagement,
@@ -39,10 +40,11 @@ const components = {
   'site-management-item': SiteItem,
   'site-management-item-menu': SiteItemMenu,
 
-  'site-properties-drawer': SitePropertiesDrawer,
+  'site-form-drawer': SiteFormDrawer,
   'site-template-drawer': SiteTemplateDrawer,
 
-  'site-management-banner-selector': SiteBannerSelector ,
+  'site-management-banner': SiteBanner,
+  'site-management-template': SiteTemplate,
 };
 
 for (const key in components) {
