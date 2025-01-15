@@ -25,7 +25,13 @@
     <!-- name -->
     <td colspan="2" align="left">
       <div class="d-flex">
-        <v-icon size="28" class="me-4">{{ site.icon || 'fa-globe' }}</v-icon>
+        <v-card
+          color="transparent"
+          min-width="35"
+          class="me-4"
+          flat>
+          <v-icon size="28" >{{ site.icon || 'fa-globe' }}</v-icon>
+        </v-card>
         <div v-sanitized-html="name"></div>
       </div>
     </td>
