@@ -18,10 +18,6 @@
  */
 
 import ManagePermissionsDrawer from './components/manage-permissions/ManagePermissionsDrawer.vue';
-import ManageEditPermission from './components/manage-permissions/ManageEditPermission.vue';
-import ManageAccessPermission from './components/manage-permissions/ManageAccessPermission.vue';
-import ManagePermissionItem from './components/manage-permissions/ManagePermissionItem.vue';
-import PermissionTypeSelector from './components/manage-permissions/PermissionTypeSelector.vue';
 import SiteNavigationDrawer from './components/site-navigation/SiteNavigationDrawer.vue';
 import SiteNavigationNodesList from './components/site-navigation/NodesList.vue';
 import SiteNavigationNodeItem from './components/site-navigation/NodeItem.vue';
@@ -43,10 +39,6 @@ import SiteEditPermission from './components/manage-permissions/SiteEditPermissi
 
 const components = {
   'manage-permissions-drawer': ManagePermissionsDrawer,
-  'manage-edit-permission': ManageEditPermission,
-  'manage-access-permission': ManageAccessPermission,
-  'manage-permission-item': ManagePermissionItem,
-  'permission-type-selector': PermissionTypeSelector,
   'site-navigation-drawer': SiteNavigationDrawer,
   'site-navigation-nodes-list': SiteNavigationNodesList,
   'site-navigation-node-item': SiteNavigationNodeItem,

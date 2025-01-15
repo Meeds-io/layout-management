@@ -21,7 +21,7 @@
 <template>
   <div class="d-flex flex-column">
     <div class="font-weight-bold mb-2">
-      {{ $t('siteManagement.label.whoCanEdit') }}
+      {{ $t('sites.permission.whoCanEdit') }}
     </div>
     <v-radio-group v-model="isAdministrationPermissions" class="mt-0">
       <v-radio
@@ -104,7 +104,7 @@ export default {
     if (this.isAdministrationPermissions) {
       this.specificGroupEntry = null;
     } else if (permission) {
-      this.specificGroupEntry = await this.retrieveObject(permission);
+      await this.retrieveObject(permission);
     } else {
       this.isAdministrationPermissions = true;
       this.specificGroupEntry = null;
@@ -116,7 +116,7 @@ export default {
       if (groupId.indexOf('/spaces/') === 0) {
         const space = await this.$spaceService.getSpaceByGroupId(groupId);
         if (space) {
-          this.specificGroupEntries.push({
+          this.specificGroupEntry = {
             id: `space:${space.prettyName}`,
             remoteId: space.prettyName,
             spaceId: space.id,
@@ -128,12 +128,12 @@ export default {
               originalName: space.shortName,
               avatarUrl: space.avatarUrl ? space.avatarUrl : `/portal/rest/v1/social/spaces/${space.prettyName}/avatar`,
             },
-          });
+          };
         }
       } else {
         const group = await this.$identityService.getIdentityByProviderIdAndRemoteId('group', groupId);
         if (group) {
-          this.specificGroupEntries.push({
+          this.specificGroupEntry = {
             id: `group:${group.remoteId}`,
             remoteId: group.remoteId,
             spaceId: groupId,
@@ -144,7 +144,7 @@ export default {
               fullName: group.profile?.fullname,
               originalName: group.profile?.fullname,
             },
-          });
+          };
         }
       }
     },
