@@ -97,13 +97,13 @@ export default {
   },
   methods: {
     openSiteNavigationDrawer() {
-      const params = {
+      this.$root.$emit('open-site-navigation-drawer', {
         siteName: this.site.name,
         siteType: this.site.siteType,
         siteId: this.site.siteId,
+        siteLabel: this.site.displayName,
         includeGlobal: this.site.name.toLowerCase() === eXo.env.portal.globalPortalName.toLowerCase()
-      };
-      this.$root.$emit('open-site-navigation-drawer', params);
+      });
     },
   },
 };

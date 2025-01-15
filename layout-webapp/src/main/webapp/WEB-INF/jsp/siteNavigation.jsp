@@ -1,3 +1,4 @@
+<%@page import="org.exoplatform.portal.application.PortalRequestContext"%>
 <%@page import="io.meeds.layout.service.LayoutAclService"%>
 <%@page import="org.exoplatform.container.ExoContainerContext"%>
 <%@page import="org.exoplatform.portal.webui.util.Util"%>
@@ -8,6 +9,7 @@
   boolean isAdministrator = aclService.isAdministrator(request.getRemoteUser());
   boolean canManageSiteNavigation = aclService.canEditNavigation(siteKey, request.getRemoteUser());
   if (canManageSiteNavigation) {
+    PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
 %>
 <div class="VuetifyApp">
   <div data-app="true"
@@ -30,6 +32,7 @@
   <div id="siteNavigation">
     <script type="text/javascript">
       eXo.env.portal.isAdministrator = <%=isAdministrator%>;
+      eXo.env.portal.siteLabel = '<%=rcontext.getSiteLabel()%>';
     </script>
   </div>
 </div>
