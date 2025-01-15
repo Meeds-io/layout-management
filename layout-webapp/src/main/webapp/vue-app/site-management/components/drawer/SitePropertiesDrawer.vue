@@ -106,6 +106,9 @@
           </translation-text-field>
         </v-card-text>
         <v-card-text class="mt-3 py-4 px-3">
+          <font-icon-input
+            v-model="siteIcon"
+            class="mb-4" />
           <p class="mb-2 px-1"> {{ $t('siteManagement.label.banner') }}</p>
           <p class="text-subtitle px-1"> {{ $t('siteManagement.label.caption') }}</p>
           <site-management-banner-selector
@@ -155,6 +158,7 @@ export default {
       siteName: '',
       siteLabel: '',
       siteDescription: '',
+      siteIcon: '',
       maxDescriptionLength: 1300,
       siteTitleTranslations: {},
       siteDescriptionTranslations: {},
@@ -215,6 +219,7 @@ export default {
         this.siteTitleTranslations = {};
         this.siteDescriptionTranslations = {};
       }
+      this.siteIcon = site?.icon || 'fa-globe';
       await this.$nextTick().then(() => this.$refs.drawer.open());
       this.loading = false;
     },
@@ -275,7 +280,7 @@ export default {
     },
     updateSite() {
       this.loading = true;
-      return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.site.displayed, this.site.displayed && this.site.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0')
+      return this.$siteLayoutService.updateSite(this.site.name, this.site.siteType, this.siteLabel, this.siteDescription, this.site.metaSite || this.site.displayed, this.site.displayed && this.site.displayOrder || 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, !this.hasDefaultBanner && this.bannerUploadId === '0', this.siteIcon)
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'label', this.siteTitleTranslations))
         .then(() => this.$translationService.saveTranslations('site', this.siteId, 'description', this.siteDescriptionTranslations))
         .then(() => {
@@ -297,7 +302,7 @@ export default {
       }
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
-      return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null,)
+      return this.$siteLayoutService.createSite(this.siteName, template, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, this.siteIcon)
         .then((site) =>{
           this.siteId = site.siteId;
           if (this.siteTitleTranslations.length) {
