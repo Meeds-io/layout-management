@@ -33,12 +33,16 @@ export default {
     };
   },
   created() {
-    document.addEventListener('open-site-navigation-drawer', event => this.openSiteNavigationDrawer(event.detail));
+    document.addEventListener('open-site-navigation-drawer', this.openSiteNavigationDrawer);
+  },
+  beforeDestroy() {
+    document.removeEventListener('open-site-navigation-drawer', this.openSiteNavigationDrawer);
   },
   methods: {
-    openSiteNavigationDrawer(data) {
+    async openSiteNavigationDrawer(event) {
       this.siteNavigationDrawerOpened = true;
-      this.$nextTick().then(() => this.$root.$emit('open-site-navigation-drawer', data));
+      await this.$nextTick();
+      this.$root.$emit('open-site-navigation-drawer', event?.detail);
     }
   }
 };
