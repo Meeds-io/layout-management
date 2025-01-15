@@ -20,15 +20,16 @@
   <exo-drawer
     ref="managePermissionsDrawer"
     id="managePermissionsDrawer"
+    v-model="drawer"
     :right="!$vuetify.rtl"
     :allow-expand="isSite"
     :go-back-button="goBackButton"
     eager
     @closed="close">
-    <template slot="title">
+    <template #title>
       {{ drawerTitle }}
     </template>
-    <template slot="content">
+    <template v-if="drawer" #content>
       <v-card class="mx-4 my-4 px-2 py-2 elevation-0">
         <manage-edit-permission
           :permission="editPermission"
@@ -63,6 +64,7 @@ export default {
 
   data() {
     return {
+      drawer: false,
       loading: false,
       navigationNode: null,
       editPermission: {
@@ -211,7 +213,7 @@ export default {
       return this.$siteLayoutService.updateSitePermissions(this.site.siteType, this.site.name, this.editPermissionChanged && siteEditPermission || null, this.accessPermissionChanged && siteAccessPermissions || null)
         .then(() => {
           this.$root.$emit('alert-message', this.$t('siteManagement.label.updatePermission.success'), 'success');
-          this.$root.$emit('refresh-sites');
+          this.$root.$emit('site-updated');
           this.close();
         }).catch((e) => {
           const message = e.message ==='401' &&  this.$t('siteManagement.label.updatePermission.unauthorized') || this.$t('siteManagement.label.updatePermission.error');
