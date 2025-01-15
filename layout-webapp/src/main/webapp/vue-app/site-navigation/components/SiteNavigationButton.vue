@@ -35,9 +35,6 @@ export default {
   methods: {
     openSiteNavigationDrawer() {
       document.dispatchEvent(new CustomEvent('open-site-navigation-drawer',{detail: {
-        siteName: this.siteName,
-        siteType: this.siteType,
-        siteId: this.siteId,
         includeGlobal: eXo.env.portal.metaPortalName === eXo.env.portal.siteKeyName && eXo.env.portal.siteKeyType === 'portal',
       }}));
     }
