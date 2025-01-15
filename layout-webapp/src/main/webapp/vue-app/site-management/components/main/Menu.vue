@@ -18,6 +18,7 @@
 -->
 <template>
   <v-menu
+    v-if="canEditSite"
     v-model="displayActionMenu"
     transition="slide-x-reverse-transition"
     :right="!$vuetify.rtl"
@@ -26,11 +27,14 @@
     class="px-0 pt-0 mx-2 overflow-visible">
     <template #activator="{ on, attrs }">
       <v-btn
-        v-bind="attrs"
+        :aria-label="$t('sites.menu.open')"
+        :loading="loading"
         icon
-        v-on="on"
-        v-if="canEditSite">
-        <v-icon>mdi-dots-vertical</v-icon>
+        small
+        class="mx-auto"
+        v-bind="attrs"
+        v-on="on">
+        <v-icon size="16" class="icon-default-color">fas fa-ellipsis-v</v-icon>
       </v-btn>
     </template>
     <v-list class="pa-0" dense>
@@ -40,12 +44,15 @@
         role="button"
         class="subtitle-2 px-3"
         @click="openSitePropertiesDrawer">
-        <v-icon
-          size="16"
-          class="me-2 ms-0"
-          color="primary">
-          fa fa-cog
-        </v-icon>
+        <v-card
+          color="transparent"
+          min-width="15"
+          class="me-2"
+          flat>
+          <v-icon size="13">
+            fa fa-cog
+          </v-icon>
+        </v-card>
         <v-list-item-title
           class="subtitle-2">
           <span class="ps-1">{{ $t('siteManagement.label.properties') }}</span>
@@ -56,51 +63,70 @@
         role="button"
         class="subtitle-2 px-3"
         @click="openSiteNavigationDrawer">
-        <v-icon
-          size="13"
-          class="me-2 ms-0"
-          color="primary">
-          fas fa-sitemap
-        </v-icon>
+        <v-card
+          color="transparent"
+          min-width="15"
+          class="me-2"
+          flat>
+          <v-icon size="13">
+            fas fa-sitemap
+          </v-icon>
+        </v-card>
         <v-list-item-title
           class="subtitle-2">
           <span class="ps-1">{{ $t('siteManagement.label.navigation') }}</span>
         </v-list-item-title>
       </v-list-item>
       <v-list-item
-        v-if="!isGroupSite && !isGlobalSite"
+        v-if="!isGlobalSite"
         :aria-label="$t('siteManagement.label.manageAccess')"
         role="button"
         class="subtitle-2 px-3"
         @click="$root.$emit('open-manage-permissions-drawer', site, true, true)">
-        <v-icon
-          size="13"
-          class="me-2 ms-0"
-          color="primary">
-          fas fa-shield-alt
-        </v-icon>
+        <v-card
+          color="transparent"
+          min-width="15"
+          class="me-2"
+          flat>
+          <v-icon size="13">
+            fas fa-shield-alt
+          </v-icon>
+        </v-card>
         <v-list-item-title
           class="subtitle-2">
           <span class="ps-1">{{ $t('siteManagement.label.manageAccess') }}</span>
         </v-list-item-title>
       </v-list-item>
-      <v-list-item
-        v-if="canDelete"
-        :aria-label="$t('siteManagement.label.delete')"
-        role="button"
-        class="subtitle-2 px-3"
-        @click="$root.$emit('delete-site', site)">
-        <v-icon
-          size="13"
-          class="me-2 ms-0"
-          color="primary">
-          fas fa-trash
-        </v-icon>
-        <v-list-item-title
-          class="subtitle-2">
-          <span class="ps-1">{{ $t('siteManagement.label.delete') }}</span>
-        </v-list-item-title>
-      </v-list-item>
+      <v-tooltip
+        v-if="canEditSite"
+        :disabled="canDelete"
+        bottom>
+        <template #activator="{ on, attrs }">
+          <div
+            v-on="on"
+            v-bind="attrs">
+            <v-list-item
+              :disabled="!canDelete"
+              dense
+              @click="$root.$emit('delete-site', site)">
+              <v-card
+                color="transparent"
+                min-width="15"
+                flat>
+                <v-icon
+                  :class="canDelete && 'error--text' || 'disabled--text'"
+                  size="13">
+                  fa-trash
+                </v-icon>
+              </v-card>
+              <v-list-item-title class="ps-2">
+                <span :class="canDelete && 'error--text' || 'disabled--text'">{{ $t('siteManagement.label.delete') }}</span>
+              </v-list-item-title>
+            </v-list-item>
+          </div>
+        </template>
+        <span>{{ $t('sites.label.system.noDelete') }}</span>
+      </v-tooltip>
     </v-list>
   </v-menu>
 </template>
@@ -122,17 +148,14 @@ export default {
     isGlobalSite() {
       return this.site.name === 'global';
     },
-    isGroupSite() {
-      return this.site.siteType === 'GROUP';
-    },
     isPortalSite() {
       return this.site.siteType === 'PORTAL';
     },
-    canDelete() {
-      return !this.isMetaSite && !this.isGlobalSite && !this.isGroupSite;
-    },
     canEditSite() {
       return this.site.canEdit;
+    },
+    canDelete() {
+      return this.canEditSite && this.site?.properties?.removable !== 'false';
     },
   },
   watch: {

@@ -22,16 +22,13 @@
 <template>
   <tr>
     <!-- Illustration -->
-    <td
-      v-if="!$root.isMobile"
-      align="center"
-      width="35px">
-      <v-icon size="28">{{ siteTemplate.icon }}</v-icon>
-    </td>
     <!-- name -->
-    <td
-      align="left"
-      v-sanitized-html="name"></td>
+    <td colspan="2" align="left">
+      <div class="d-flex">
+        <v-icon size="28" class="me-4">{{ siteTemplate.icon || 'fa-globe' }}</v-icon>
+        <div v-sanitized-html="name"></div>
+      </div>
+    </td>
     <!-- description -->
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
