@@ -20,7 +20,7 @@
   <exo-drawer
     ref="siteNavigationAddElementDrawer"
     id="siteNavigationAddElementDrawer"
-    v-moel="drawer"
+    v-model="drawer"
     :loading="loading"
     right
     eager
@@ -66,21 +66,19 @@
     </template>
   </exo-drawer>
 </template>
-
 <script>
 export default {
-
   data() {
     return {
       elementType: 'PAGE',
       target: 'SAME_TAB',
       drawer: false,
+      loading: false,
       navigationNode: null,
       elementName: null,
       elementTitle: null,
       pageTempalateId: null,
       selectedPage: null,
-      loading: false,
       resetDrawer: true,
       isValidForm: true,
       pageTemplates: null,

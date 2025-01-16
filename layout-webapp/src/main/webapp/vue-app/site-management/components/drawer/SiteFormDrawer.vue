@@ -24,16 +24,16 @@
     :loading="loading"
     :right="!$vuetify.rtl"
     :allow-expand="!$root.isMobile"
-    :go-back-button="isNew && stepper"
+    :go-back-button="isNew && step && !initialStep"
     @expand-updated="expanded = $event"
     @closed="close"
-    @go-back="stepper = 0">
+    @go-back="step = 0">
     <template #title>
       <span>{{ isNew && $t('siteManagement.drawer.addSite.title') || $t('siteManagement.drawer.properties.title') }}</span>
     </template>
     <template v-if="drawer" #content>
       <v-expand-transition>
-        <div v-if="!stepper" class="my-4 ms-4">
+        <div v-if="!step" class="my-4 ms-4">
           <div class="text-header me-4">
             {{ $t('sites.selectTemplate') }}
           </div>
@@ -50,7 +50,7 @@
             <v-btn
               :disabled="!templateId"
               class="btn btn-primary"
-              @click="stepper = 1">
+              @click="step = 1">
               {{ $t('sites.stepper.start') }}
             </v-btn>
           </div>
@@ -58,7 +58,7 @@
         </div>
         <v-stepper
           v-else
-          v-model="stepper"
+          v-model="step"
           :class="{
             'pe-3' : $root.isMobile,
             'mt-5' : !isNew,
@@ -75,7 +75,7 @@
           </v-stepper-step>
           <v-stepper-content :step="1" class="pa-0 ma-0 no-border">
             <form
-              v-if="stepper === 1"
+              v-if="step === 1"
               ref="form1"
               class="px-4 pb-4"
               @submit.stop.prevent="0">
@@ -164,7 +164,8 @@
               <site-management-banner
                 ref="siteBanner"
                 v-model="bannerUploadId"
-                :banner-url="siteBannerUrl" />
+                :banner-url="siteBannerUrl"
+                :banner-data="bannerData" />
             </form>
           </v-stepper-content>
           <template v-if="isNew">
@@ -176,7 +177,7 @@
             </v-stepper-step>
             <v-stepper-content :step="2" class="pa-0 ma-0 no-border">
               <form
-                v-if="stepper === 2"
+                v-if="step === 2"
                 class="px-4"
                 @submit.stop.prevent="0">
                 <site-edit-permission
@@ -192,12 +193,12 @@
         </v-stepper>
       </v-expand-transition>
     </template>
-    <template v-if="stepper > 0" slot="footer">
+    <template v-if="step > 0" slot="footer">
       <div class="d-flex">
         <v-btn
-          v-if="isNew && stepper > 0"
+          v-if="isNew && step > initialStep"
           class="btn me-2"
-          @click="stepper--">
+          @click="step--">
           {{ $t('siteManagement.label.btn.previous') }}
         </v-btn>
         <v-spacer />
@@ -207,10 +208,10 @@
           {{ $t('siteManagement.label.btn.cancel') }}
         </v-btn>
         <v-btn
-          v-if="isNew && stepper < 2"
+          v-if="isNew && step < 2"
           :disabled="saveDisabled"
           :loading="loading"
-          @click="stepper++"
+          @click="step++"
           class="btn btn-primary ms-2">
           {{ $t('siteManagement.label.btn.next') }}
         </v-btn>
@@ -239,7 +240,8 @@ export default {
     loading: false,
     templates: null,
     templateId: null,
-    stepper: 0,
+    step: 0,
+    initialStep: 0,
     site: null,
     siteId: null,
     siteName: '',
@@ -252,11 +254,12 @@ export default {
     siteTitleTranslations: {},
     siteDescriptionTranslations: {},
     defaultLanguage: eXo.env.portal.defaultLanguage,
-    supportedLanguages: {},
+    supportedLanguages: null,
     isNew: false,
     customSiteName: false,
     expanded: false,
     siteBannerUrl: null,
+    bannerData: null,
     bannerUploadId: null,
     accessPermissions: null,
     editPermission: null,
@@ -282,13 +285,10 @@ export default {
     siteTemplate() {
       return this.templates?.find?.(t => t.id === this.templateId);
     },
-    siteTemplateLayout() {
-      return this.siteTemplate?.layout;
-    },
   },
   watch: {
     siteDescription() {
-      if (this.$refs.siteDescriptionTranslation && this.drawer && this.stepper) {
+      if (this.$refs.siteDescriptionTranslation && this.drawer && this.step) {
         this.$refs.siteDescriptionTranslation.setValue(this.siteDescription);
       }
     },
@@ -305,47 +305,53 @@ export default {
     this.$root.$off('open-site-properties-drawer', this.open);
   },
   methods: {
-    async open(site) {
-      this.isNew = !site;
-      if (site) {
-        this.site = site;
-        this.siteName = site.name;
-        this.siteId = site.siteId;
-        this.siteLabel = site.displayName || site.name ;
-        this.siteDescription = site.description || '';
-        this.siteBannerUrl = site.bannerUrl;
-        this.bannerUploadId = null;
-        this.templateId = null;
-        this.stepper = 1;
-        await this.getSiteLabels();
-        await this.getSiteDescriptions();
-      } else {
-        if (!this.templates?.length) {
-          this.templates = await this.$siteTemplateService.getSiteTemplates();
-        }
-        this.siteDescriptionTranslations = {en: null};
-        this.siteTitleTranslations = {en: null};
-        this.accessPermissions = null;
-        this.customSiteName = false;
-        this.editPermission = null;
-        this.bannerUploadId = null;
-        this.templateId = null;
-        this.stepper = 0;
+    async open(site, templateId) {
+      this.isNew = !site?.siteId;
+      this.templateId = templateId;
+      this.site = site || null;
+      this.siteName = !this.isNew && site?.name || null;
+      this.siteId = site?.siteId;
+      this.siteIcon = site?.icon || 'fa-globe';
+      this.siteLabel = site?.displayName || site?.name ;
+      this.siteDescription = site?.description || '';
+      this.siteBannerUrl = !this.isNew && site?.bannerUrl || null;
+      this.accessPermissions = site?.accessPermissions;
+      this.editPermission = site?.editPermission;
+      this.step = (!this.isNew || templateId) ? 1 : 0;
+      this.initialStep = this.step;
+      this.customSiteName = !this.isNew;
+      await this.getSiteLabels(site?.siteId || templateId);
+      await this.getSiteDescriptions(site?.siteId || templateId);
+      if (this.isNew && !this.templates?.length) {
+        this.templates = await this.$siteTemplateService.getSiteTemplates();
       }
-      if (this.supportedLanguages) {
+      this.bannerUploadId = null;
+      this.bannerData = null;
+      if (this.isNew && site?.bannerUrl) {
+        const bannerBlob = await fetch(site.bannerUrl, {
+          credentials: 'include',
+          method: 'GET',
+        }).then(resp => resp?.ok && resp.blob()).catch();
+        if (bannerBlob) {
+          this.bannerData = bannerBlob && await this.$utils.blobToBase64(bannerBlob);
+          this.bannerUploadId = bannerBlob && await this.$uploadService.upload(bannerBlob);
+        }
+      }
+      if (!this.supportedLanguages) {
         const translationConfiguration = await this.$translationService.getTranslationConfiguration();
         this.supportedLanguages = translationConfiguration?.supportedLanguages;
       }
-      this.siteIcon = site?.icon || 'fa-globe';
       this.$refs.drawer.open();
     },
-    getSiteLabels() {
-      return this.$siteLayoutService.getSiteLabels(this.site.siteId)
-        .then(data => this.siteTitleTranslations = data?.labels || {'en': null});
+    getSiteLabels(siteId) {
+      return this.$siteLayoutService.getSiteLabels(siteId)
+        .then(data => this.siteTitleTranslations = data?.labels || {'en': null})
+        .catch(() => this.siteTitleTranslations = {en: null});
     },
-    getSiteDescriptions() {
-      return this.$siteLayoutService.getSiteDescriptions(this.site.siteId)
-        .then(data => this.siteDescriptionTranslations = data?.labels || {'en': null});
+    getSiteDescriptions(siteId) {
+      return this.$siteLayoutService.getSiteDescriptions(siteId)
+        .then(data => this.siteDescriptionTranslations = data?.labels || {'en': null})
+        .catch(() => this.siteDescriptionTranslations = {en: null});
     },
     close() {
       this.site = null;
@@ -377,7 +383,7 @@ export default {
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
       try {
-        const site = await this.$siteLayoutService.createSite(this.siteName, this.siteTemplateLayout, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, this.siteIcon, this.accessPermissions, this.editPermission);
+        const site = await this.$siteLayoutService.createSite(this.siteName, this.templateId, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, this.siteIcon, this.accessPermissions, this.editPermission);
         await this.$translationService.saveTranslations('site',  site.siteId, 'label', this.siteTitleTranslations);
         await this.$translationService.saveTranslations('site', site.siteId, 'description', this.siteDescriptionTranslations);
         this.$root.$emit('alert-message', this.$t('siteManagement.label.createSite.success'), 'success');

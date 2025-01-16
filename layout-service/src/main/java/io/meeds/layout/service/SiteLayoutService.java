@@ -103,6 +103,11 @@ public class SiteLayoutService {
       throw new ObjectAlreadyExistsException(String.format("Site with name %s already exists",
                                                            createModel.getPortalConfig().getName()));
     }
+    PortalConfig templatePortalConfig = layoutService.getPortalConfig(createModel.getSiteId());
+    if (templatePortalConfig == null) {
+      throw new ObjectNotFoundException(String.format("Site with id %s doesn't exist",
+                                                      createModel.getSiteId()));
+    }
 
     String[] accessPermissions = portalConfig.getAccessPermissions() == null ?
                                                                              new String[] {
@@ -112,7 +117,7 @@ public class SiteLayoutService {
                                                                      getAdministratorsPermission() :
                                                                      portalConfig.getEditPermission();
 
-    portalConfigService.createSiteFromTemplate(SiteKey.portalTemplate(createModel.getSiteTemplate()),
+    portalConfigService.createSiteFromTemplate(new SiteKey(templatePortalConfig.getType(), templatePortalConfig.getName()),
                                                siteKey);
 
     PortalConfig createdPortalConfig = layoutService.getPortalConfig(siteKey);

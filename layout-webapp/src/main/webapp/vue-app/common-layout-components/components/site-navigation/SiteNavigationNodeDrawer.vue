@@ -547,15 +547,12 @@ export default {
     openAddElementDrawer() {
       this.$root.$emit('open-add-element-drawer', this.nodeId, this.valuesPerLanguage['en'] || this.nodeLabel,  this.navigationNode, this.navigationNode?.pageKey && this.editMode || false);
     },
-    conversionRules() {
-      return this.nodeLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]/g, '').replace(/\s+/g, '').toLowerCase();
-    },
     changeSelectedPage(selectedPage) {
       this.selectedPage = selectedPage;
     },
     blurOnNodeLabel() {
       if (this.nodeId == null) {
-        this.nodeId = this.conversionRules();
+        this.nodeId = this.nodeLabel && this.nodeLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]/g, '').replace(/\s+/g, '').toLowerCase();
       }
     },
     openTranslationDrawer() {

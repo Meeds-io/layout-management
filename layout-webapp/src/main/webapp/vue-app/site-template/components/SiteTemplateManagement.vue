@@ -31,10 +31,9 @@
       <site-template-list
         :keyword="keyword" />
     </v-main>
-    <site-template-add-drawer />
     <site-template-drawer />
-    <layout-image-illustration-preview />
     <site-template-navigation-handler />
+    <layout-image-illustration-preview />
     <layout-analytics application-name="siteTemplateManagement" />
   </v-app>
 </template>
