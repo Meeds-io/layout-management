@@ -60,17 +60,27 @@ export default {
     };
   },
   created() {
-    this.$root.$on('site-created', this.refreshSites);
+    this.$root.$on('site-created', this.handleSiteCreation);
     this.$root.$on('site-updated', this.refreshSites);
     this.$root.$on('delete-site', this.confirmDelete);
     this.refreshSites();
   },
   beforDestroy() {
-    this.$root.$off('site-created', this.refreshSites);
+    this.$root.$off('site-created', this.handleSiteCreation);
     this.$root.$off('site-updated', this.refreshSites);
     this.$root.$on('delete-site', this.confirmDelete);
   },
   methods: {
+    handleSiteCreation(site) {
+      this.refreshSites();
+      this.$root.$emit('open-site-navigation-drawer', {
+        siteName: site.name,
+        siteType: site.siteType,
+        siteId: site.siteId,
+        siteLabel: site.displayName,
+        information: 'sites.created.information',
+      });
+    },
     refreshSites() {
       this.loading++;
       return this.$siteService.getSites('PORTAL', null, 'public', true, true, false, false, false, null, true)

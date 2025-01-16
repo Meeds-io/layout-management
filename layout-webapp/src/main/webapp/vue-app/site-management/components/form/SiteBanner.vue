@@ -67,7 +67,7 @@ export default {
       type: String,
       default: null,
     },
-    previewImage: {
+    bannerData: {
       type: String,
       default: null,
     },
@@ -89,8 +89,8 @@ export default {
     sendingImage() {
       this.$emit('sending', this.sendingImage);
     },
-    previewImage() {
-      this.avatarData = this.previewImage;
+    bannerData() {
+      this.avatarData = this.bannerData;
     },
   },
   created() {
@@ -98,8 +98,8 @@ export default {
   },
   methods: {
     init() {
-      if (this.previewImage) {
-        this.avatarData = this.previewImage;
+      if (this.bannerData) {
+        this.avatarData = this.bannerData;
       } else {
         this.avatarData = null;
       }
