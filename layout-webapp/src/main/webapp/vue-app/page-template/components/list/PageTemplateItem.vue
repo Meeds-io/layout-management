@@ -17,15 +17,16 @@
       align="left">
       <v-card
         v-sanitized-html="name"
-        class="transparent"
+        class="transparent text-break"
         flat
         @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
     <!-- description -->
     <td
       v-if="!$root.isMobile"
-      align="left"
-      v-sanitized-html="description"></td>
+      align="left">
+      <div v-sanitized-html="description" class="text-break"></div>
+    </td>
     <td
       v-if="!$root.isMobile"
       align="left"
