@@ -30,7 +30,7 @@
     :must-sort="!$root.isMobile"
     disable-pagination
     hide-default-footer
-    class="application-body sitesTable px-5 pb-5">
+    class="application-body sitesTable px-5">
     <template slot="item" slot-scope="props">
       <site-management-item
         :key="props.item.id"
