@@ -84,7 +84,7 @@ export default {
     deleteSite() {
       this.loading++;
       return this.$siteLayoutService.deleteSite(this.siteToDelete.siteType, this.siteToDelete.name)
-        .then(() => this.refreshSites)
+        .then(() => this.refreshSites())
         .finally(() => this.loading--);
     },
   }

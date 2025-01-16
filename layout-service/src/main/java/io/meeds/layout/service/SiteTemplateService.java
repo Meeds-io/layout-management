@@ -20,8 +20,6 @@
 package io.meeds.layout.service;
 
 import static io.meeds.layout.util.EntityMapper.SITE_ENABLED_PROP;
-import static io.meeds.layout.util.EntityMapper.SITE_TEMPLATE_ICON_PROP;
-import static io.meeds.layout.util.EntityMapper.SITE_TEMPLATE_SYSTEM_PROP;
 import static io.meeds.layout.util.EntityMapper.toSiteTemplate;
 
 import java.util.List;
@@ -196,10 +194,10 @@ public class SiteTemplateService {
   private SiteTemplate updateSiteTemplate(SiteTemplate siteTemplate, PortalConfig portalConfig) {
     portalConfig.setLabel(siteTemplate.getName());
     portalConfig.setDescription(siteTemplate.getDescription());
+    portalConfig.setRemovable(!siteTemplate.isSystem());
+    portalConfig.setIcon(siteTemplate.getIcon());
     portalConfig.setAccessPermissions(new String[] { UserACL.EVERYONE });
     portalConfig.setEditPermission(getAdministratorsPermission());
-    portalConfig.setProperty(SITE_TEMPLATE_ICON_PROP, siteTemplate.getIcon());
-    portalConfig.setProperty(SITE_TEMPLATE_SYSTEM_PROP, String.valueOf(siteTemplate.isSystem()));
     portalConfig.setProperty(SITE_ENABLED_PROP, String.valueOf(!siteTemplate.isDisabled()));
     layoutService.save(portalConfig);
     return toSiteTemplateDetails(portalConfig, null);

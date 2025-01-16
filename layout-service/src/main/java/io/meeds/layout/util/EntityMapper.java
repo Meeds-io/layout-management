@@ -43,11 +43,7 @@ import lombok.NoArgsConstructor;
 
 public class EntityMapper {
 
-  public static final String SITE_ENABLED_PROP         = "SITE_ENABLED";
-
-  public static final String SITE_TEMPLATE_SYSTEM_PROP = "SITE_TEMPLATE_SYSTEM";
-
-  public static final String SITE_TEMPLATE_ICON_PROP   = "SITE_TEMPLATE_ICON";
+  public static final String SITE_ENABLED_PROP = "SITE_ENABLED";
 
   private EntityMapper() {
     // Utils Class
@@ -121,8 +117,8 @@ public class EntityMapper {
     SiteTemplate siteTemplate = new SiteTemplate();
     siteTemplate.setId(portalConfig.getId());
     siteTemplate.setLayout(portalConfig.getName());
-    siteTemplate.setIcon(portalConfig.getProperty(SITE_TEMPLATE_ICON_PROP));
-    siteTemplate.setSystem(StringUtils.equals(portalConfig.getProperty(SITE_TEMPLATE_SYSTEM_PROP), "true"));
+    siteTemplate.setIcon(portalConfig.getIcon());
+    siteTemplate.setSystem(!portalConfig.isRemovable());
     siteTemplate.setDisabled(StringUtils.equals(portalConfig.getProperty(SITE_ENABLED_PROP), "false"));
     return siteTemplate;
   }

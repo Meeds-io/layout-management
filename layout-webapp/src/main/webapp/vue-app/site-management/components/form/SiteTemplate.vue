@@ -36,7 +36,7 @@
         flat
         @click="$root.$emit('layout-illustration-preview', illustrationSrc, illustrationAction, title, description)">
         <div class="d-flex flex-column flex-grow-1 align-center justify-center">
-          <v-icon size="32" class="py-4">{{ siteTemplate.icon }}</v-icon>
+          <v-icon size="32" class="py-4">{{ siteTemplate.icon || 'fa-globe' }}</v-icon>
           <p
             v-if="title"
             v-sanitized-html="title"
