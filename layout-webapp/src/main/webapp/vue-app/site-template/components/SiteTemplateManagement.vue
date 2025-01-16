@@ -21,13 +21,16 @@
 -->
 <template>
   <v-app>
-    <main class="application-body">
+    <v-main class="application-body pb-5">
+      <h4 class="text-title px-5 pt-5 ma-0">
+        {{ $t('siteTemplates.title') }}
+      </h4>
       <site-template-toolbar
         ref="toolbar"
         @site-template-filter="keyword = $event" />
       <site-template-list
         :keyword="keyword" />
-    </main>
+    </v-main>
     <site-template-add-drawer />
     <site-template-drawer />
     <layout-image-illustration-preview />
