@@ -24,16 +24,16 @@
     :loading="loading"
     :right="!$vuetify.rtl"
     :allow-expand="!$root.isMobile"
-    :go-back-button="isNew && stepper"
+    :go-back-button="isNew && step && !initialStep"
     @expand-updated="expanded = $event"
     @closed="close"
-    @go-back="stepper = 0">
+    @go-back="step = 0">
     <template #title>
       <span>{{ isNew && $t('siteManagement.drawer.addSite.title') || $t('siteManagement.drawer.properties.title') }}</span>
     </template>
     <template v-if="drawer" #content>
       <v-expand-transition>
-        <div v-if="!stepper" class="my-4 ms-4">
+        <div v-if="!step" class="my-4 ms-4">
           <div class="text-header me-4">
             {{ $t('sites.selectTemplate') }}
           </div>
@@ -50,7 +50,7 @@
             <v-btn
               :disabled="!templateId"
               class="btn btn-primary"
-              @click="stepper = 1">
+              @click="step = 1">
               {{ $t('sites.stepper.start') }}
             </v-btn>
           </div>
@@ -58,7 +58,7 @@
         </div>
         <v-stepper
           v-else
-          v-model="stepper"
+          v-model="step"
           :class="{
             'pe-3' : $root.isMobile,
             'mt-5' : !isNew,
@@ -75,7 +75,7 @@
           </v-stepper-step>
           <v-stepper-content :step="1" class="pa-0 ma-0 no-border">
             <form
-              v-if="stepper === 1"
+              v-if="step === 1"
               ref="form1"
               class="px-4 pb-4"
               @submit.stop.prevent="0">
@@ -176,7 +176,7 @@
             </v-stepper-step>
             <v-stepper-content :step="2" class="pa-0 ma-0 no-border">
               <form
-                v-if="stepper === 2"
+                v-if="step === 2"
                 class="px-4"
                 @submit.stop.prevent="0">
                 <site-edit-permission
@@ -192,12 +192,12 @@
         </v-stepper>
       </v-expand-transition>
     </template>
-    <template v-if="stepper > 0" slot="footer">
+    <template v-if="step > 0" slot="footer">
       <div class="d-flex">
         <v-btn
-          v-if="isNew && stepper > 0"
+          v-if="isNew && step > initialStep"
           class="btn me-2"
-          @click="stepper--">
+          @click="step--">
           {{ $t('siteManagement.label.btn.previous') }}
         </v-btn>
         <v-spacer />
@@ -207,10 +207,10 @@
           {{ $t('siteManagement.label.btn.cancel') }}
         </v-btn>
         <v-btn
-          v-if="isNew && stepper < 2"
+          v-if="isNew && step < 2"
           :disabled="saveDisabled"
           :loading="loading"
-          @click="stepper++"
+          @click="step++"
           class="btn btn-primary ms-2">
           {{ $t('siteManagement.label.btn.next') }}
         </v-btn>
@@ -239,7 +239,8 @@ export default {
     loading: false,
     templates: null,
     templateId: null,
-    stepper: 0,
+    step: 0,
+    initialStep: 0,
     site: null,
     siteId: null,
     siteName: '',
@@ -282,13 +283,10 @@ export default {
     siteTemplate() {
       return this.templates?.find?.(t => t.id === this.templateId);
     },
-    siteTemplateLayout() {
-      return this.siteTemplate?.layout;
-    },
   },
   watch: {
     siteDescription() {
-      if (this.$refs.siteDescriptionTranslation && this.drawer && this.stepper) {
+      if (this.$refs.siteDescriptionTranslation && this.drawer && this.step) {
         this.$refs.siteDescriptionTranslation.setValue(this.siteDescription);
       }
     },
@@ -305,7 +303,7 @@ export default {
     this.$root.$off('open-site-properties-drawer', this.open);
   },
   methods: {
-    async open(site) {
+    async open(site, templateId) {
       this.isNew = !site;
       if (site) {
         this.site = site;
@@ -316,7 +314,7 @@ export default {
         this.siteBannerUrl = site.bannerUrl;
         this.bannerUploadId = null;
         this.templateId = null;
-        this.stepper = 1;
+        this.step = 1;
         await this.getSiteLabels();
         await this.getSiteDescriptions();
       } else {
@@ -329,8 +327,9 @@ export default {
         this.customSiteName = false;
         this.editPermission = null;
         this.bannerUploadId = null;
-        this.templateId = null;
-        this.stepper = 0;
+        this.templateId = templateId;
+        this.step = templateId ? 1 : 0;
+        this.initialStep = this.step;
       }
       if (this.supportedLanguages) {
         const translationConfiguration = await this.$translationService.getTranslationConfiguration();
@@ -377,7 +376,7 @@ export default {
       this.siteName = this.normalizeText(this.siteName);
       this.loading = true;
       try {
-        const site = await this.$siteLayoutService.createSite(this.siteName, this.siteTemplateLayout, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, this.siteIcon, this.accessPermissions, this.editPermission);
+        const site = await this.$siteLayoutService.createSite(this.siteName, this.templateId, this.siteLabel, this.siteDescription, false, 0, this.bannerUploadId !== '0' && this.bannerUploadId || null, this.siteIcon, this.accessPermissions, this.editPermission);
         await this.$translationService.saveTranslations('site',  site.siteId, 'label', this.siteTitleTranslations);
         await this.$translationService.saveTranslations('site', site.siteId, 'description', this.siteDescriptionTranslations);
         this.$root.$emit('alert-message', this.$t('siteManagement.label.createSite.success'), 'success');
