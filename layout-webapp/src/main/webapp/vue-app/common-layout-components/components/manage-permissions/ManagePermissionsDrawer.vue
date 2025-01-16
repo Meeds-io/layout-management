@@ -91,12 +91,12 @@ export default {
       this.goBackButton = !noGoBackButton;
       if (this.isSite) {
         this.site = JSON.parse(JSON.stringify(object));
-        this.editPermission = this.site?.editPermission?.group?.id;
-        this.accessPermissions = this.site?.accessPermissions?.length && this.site?.accessPermissions.map(p => p.group?.id) || [];
+        this.editPermission = this.site?.editPermission;
+        this.accessPermissions = this.site?.accessPermissions || [];
       } else {
         this.navigationNode = JSON.parse(JSON.stringify(object));
-        this.editPermission = this.navigationNode?.pageEditPermission?.group?.id;
-        this.accessPermissions = this.navigationNode?.pageAccessPermissions?.length && this.navigationNode.pageAccessPermissions.map(p => p.group?.id) || [];
+        this.editPermission = this.navigationNode?.pageEditPermission;
+        this.accessPermissions = this.navigationNode?.pageAccessPermissions || [];
       }
       this.$refs.drawer.open();
     },

@@ -131,7 +131,7 @@ export default {
           permissions.push(`*:${this.usersPermission}`);
         }
         if (this.isGuestPermissions) {
-          permissions.push(`*:${this.guestsPermission}`);
+          permissions.push(`*:${this.externalsPermission}`);
         }
         if (this.specificGroupEntries?.length) {
           const specificGroupEntries = this.specificGroupEntries?.map?.(g => g.groupId)?.filter?.(g => g) || [];
@@ -166,8 +166,8 @@ export default {
   created() {
     const permissions = this.value?.slice?.();
     this.isAnyPermissions = permissions?.find?.(p => p === this.everyonePermission) && true || false;
-    this.isUserPermissions = permissions?.find?.(p => p === this.usersPermission) && true || false;
-    this.isGuestPermissions = permissions?.find?.(p => p === this.externalsPermission) && true || false;
+    this.isUserPermissions = permissions?.find?.(p => (p.includes(':') ? p.split(':')[1] : p) === this.usersPermission) && true || false;
+    this.isGuestPermissions = permissions?.find?.(p => (p.includes(':') ? p.split(':')[1] : p) === this.externalsPermission) && true || false;
     this.specificGroupEntries = [];
 
     const specificGroupEntries = permissions?.filter?.(p => p)?.filter?.(p => {
@@ -184,40 +184,44 @@ export default {
   },
   methods: {
     async retrieveObject(groupId) {
-      groupId = groupId.includes(':') ? groupId.split(':')[1] : groupId;
-      if (groupId.indexOf('/spaces/') === 0) {
-        const space = await this.$spaceService.getSpaceByGroupId(groupId);
-        if (space) {
-          this.specificGroupEntries.push({
-            id: `space:${space.prettyName}`,
-            remoteId: space.prettyName,
-            spaceId: space.id,
-            groupId: space.groupId,
-            providerId: 'space',
-            displayName: space.displayName,
-            profile: {
-              fullName: space.displayName,
-              originalName: space.shortName,
-              avatarUrl: space.avatarUrl ? space.avatarUrl : `/portal/rest/v1/social/spaces/${space.prettyName}/avatar`,
-            },
-          });
+      try {
+        groupId = groupId.includes(':') ? groupId.split(':')[1] : groupId;
+        if (groupId.indexOf('/spaces/') === 0) {
+          const space = await this.$spaceService.getSpaceByGroupId(groupId);
+          if (space) {
+            this.specificGroupEntries.push({
+              id: `space:${space.prettyName}`,
+              remoteId: space.prettyName,
+              spaceId: space.id,
+              groupId: space.groupId,
+              providerId: 'space',
+              displayName: space.displayName,
+              profile: {
+                fullName: space.displayName,
+                originalName: space.shortName,
+                avatarUrl: space.avatarUrl ? space.avatarUrl : `/portal/rest/v1/social/spaces/${space.prettyName}/avatar`,
+              },
+            });
+          }
+        } else {
+          const group = await this.$identityService.getIdentityByProviderIdAndRemoteId('group', groupId);
+          if (group) {
+            this.specificGroupEntries.push({
+              id: `group:${group.remoteId}`,
+              remoteId: group.remoteId,
+              spaceId: groupId,
+              groupId: groupId,
+              providerId: 'group',
+              displayName: group.profile?.fullname,
+              profile: {
+                fullName: group.profile?.fullname,
+                originalName: group.profile?.fullname,
+              },
+            });
+          }
         }
-      } else {
-        const group = await this.$identityService.getIdentityByProviderIdAndRemoteId('group', groupId);
-        if (group) {
-          this.specificGroupEntries.push({
-            id: `group:${group.remoteId}`,
-            remoteId: group.remoteId,
-            spaceId: groupId,
-            groupId: groupId,
-            providerId: 'group',
-            displayName: group.profile?.fullname,
-            profile: {
-              fullName: group.profile?.fullname,
-              originalName: group.profile?.fullname,
-            },
-          });
-        }
+      } catch (e) {
+        console.error('Error retrieving group details with id', groupId, e);
       }
     },
   },
