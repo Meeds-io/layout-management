@@ -23,7 +23,7 @@
   <tr>
     <!-- Illustration -->
     <!-- name -->
-    <td colspan="2" align="left">
+    <td colspan="2" align="left" class="pe-0">
       <div class="d-flex">
         <v-card
           color="transparent"
@@ -32,14 +32,16 @@
           flat>
           <v-icon size="28">{{ siteTemplate.icon || 'fa-globe' }}</v-icon>
         </v-card>
-        <div v-sanitized-html="name"></div>
+        <div v-sanitized-html="name" class="text-break"></div>
       </div>
     </td>
     <!-- description -->
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
       align="left"
-      v-sanitized-html="description"></td>
+      width="50%">
+      <div v-sanitized-html="description" class="text-break"></div>
+    </td>
     <td
       v-if="!$root.isMobile"
       align="center">
