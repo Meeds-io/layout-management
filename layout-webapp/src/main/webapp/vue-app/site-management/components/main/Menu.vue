@@ -42,7 +42,7 @@
         v-if="isPortalSite && !isGlobalSite"
         :aria-label="$t('siteManagement.label.properties')"
         role="button"
-        class="subtitle-2 px-3"
+        class="px-3"
         @click="openSitePropertiesDrawer">
         <v-card
           color="transparent"
@@ -61,7 +61,7 @@
       <v-list-item
         :aria-label="$t('siteManagement.label.navigation')"
         role="button"
-        class="subtitle-2 px-3"
+        class="px-3"
         @click="openSiteNavigationDrawer">
         <v-card
           color="transparent"
@@ -81,7 +81,7 @@
         v-if="!isGlobalSite"
         :aria-label="$t('siteManagement.label.manageAccess')"
         role="button"
-        class="subtitle-2 px-3"
+        class="px-3"
         @click="$root.$emit('open-manage-permissions-drawer', site, true, true)">
         <v-card
           color="transparent"
@@ -95,6 +95,21 @@
         <v-list-item-title
           class="subtitle-2">
           <span class="ps-1">{{ $t('siteManagement.label.manageAccess') }}</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        dense
+        @click="saveAsTemplate">
+        <v-card
+          color="transparent"
+          min-width="15"
+          flat>
+          <v-icon size="13">
+            fa-columns
+          </v-icon>
+        </v-card>
+        <v-list-item-title class="ps-2">
+          {{ $t('sites.saveAsSiteTemplate') }}
         </v-list-item-title>
       </v-list-item>
       <v-tooltip
@@ -187,6 +202,9 @@ export default {
     },
     openSitePropertiesDrawer() {
       this.$root.$emit('open-site-properties-drawer', this.site);
+    },
+    saveAsTemplate() {
+      this.$root.$emit('site-template-add', null, this.site.siteId);
     },
   }
 };
