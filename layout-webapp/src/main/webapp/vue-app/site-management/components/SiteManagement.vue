@@ -18,7 +18,10 @@
 -->
 <template>
   <v-app class="siteManagementApplication">
-    <v-main class="application-body">
+    <v-main class="application-body pb-5">
+      <h4 class="text-title px-5 pt-5 ma-0">
+        {{ $t('siteManagement.title') }}
+      </h4>
       <site-management-toolbar
         ref="toolbar"
         @site-filter="keyword = $event" />
