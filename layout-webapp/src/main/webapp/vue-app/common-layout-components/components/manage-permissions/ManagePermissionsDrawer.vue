@@ -33,10 +33,12 @@
     <template v-if="drawer" #content>
       <v-card class="mx-4 my-4 px-2 py-2 elevation-0">
         <site-edit-permission
-          v-model="editPermission" />
+          v-model="editPermission"
+          :is-site="isSite" />
         <site-access-permissions
           v-model="accessPermissions"
-          class="mt-4" />
+          class="mt-4"
+          :is-site="isSite" />
       </v-card>
     </template>
     <template #footer>
@@ -91,12 +93,12 @@ export default {
       this.goBackButton = !noGoBackButton;
       if (this.isSite) {
         this.site = JSON.parse(JSON.stringify(object));
-        this.editPermission = this.site?.editPermission?.group?.id;
-        this.accessPermissions = this.site?.accessPermissions?.length && this.site?.accessPermissions.map(p => p.group?.id) || [];
+        this.editPermission = this.site?.editPermission;
+        this.accessPermissions = this.site?.accessPermissions || [];
       } else {
         this.navigationNode = JSON.parse(JSON.stringify(object));
-        this.editPermission = this.navigationNode?.pageEditPermission?.group?.id;
-        this.accessPermissions = this.navigationNode?.pageAccessPermissions?.length && this.navigationNode.pageAccessPermissions.map(p => p.group?.id) || [];
+        this.editPermission = this.navigationNode?.pageEditPermission;
+        this.accessPermissions = this.navigationNode?.pageAccessPermissions || [];
       }
       this.$refs.drawer.open();
     },
