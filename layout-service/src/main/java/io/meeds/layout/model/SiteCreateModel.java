@@ -25,7 +25,7 @@ import lombok.Data;
 @Data
 public class SiteCreateModel {
 
-  private String       siteTemplate;
+  private long         siteId;
 
   private PortalConfig portalConfig;
 
