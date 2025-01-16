@@ -34,12 +34,14 @@
     </td>
     <!-- name -->
     <td
+      class="text-break"
       v-sanitized-html="name"
       align="left">
     </td>
     <!-- description -->
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
+      class="text-break"
       align="left"
       v-sanitized-html="description"></td>
     <td align="center">
