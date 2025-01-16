@@ -43,6 +43,7 @@
     <site-navigation-node-drawer />
     <site-navigation-element-drawer />
     <manage-permissions-drawer />
+    <site-template-drawer />
     <layout-analytics application-name="siteManagement" />
   </v-app>
 </template>

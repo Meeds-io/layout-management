@@ -23,7 +23,10 @@
   <tr>
     <!-- Illustration -->
     <!-- name -->
-    <td colspan="2" align="left" class="pe-0">
+    <td
+      colspan="2"
+      align="left"
+      class="pe-0">
       <div class="d-flex align-center text-start">
         <v-card
           color="transparent"
