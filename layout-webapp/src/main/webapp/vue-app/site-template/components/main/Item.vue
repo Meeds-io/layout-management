@@ -24,11 +24,11 @@
     <!-- Illustration -->
     <!-- name -->
     <td colspan="2" align="left" class="pe-0">
-      <div class="d-flex">
+      <div class="d-flex align-center text-start">
         <v-card
           color="transparent"
           min-width="35"
-          class="me-4"
+          class="me-4 d-flex align-center"
           flat>
           <v-icon size="28">{{ siteTemplate.icon || 'fa-globe' }}</v-icon>
         </v-card>

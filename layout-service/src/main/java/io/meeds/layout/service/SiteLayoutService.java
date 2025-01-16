@@ -123,6 +123,7 @@ public class SiteLayoutService {
     createdPortalConfig.setDisplayOrder(portalConfig.isDisplayed() ? portalConfig.getDisplayOrder() : 0);
     createdPortalConfig.setAccessPermissions(accessPermissions);
     createdPortalConfig.setEditPermission(editPermission);
+    createdPortalConfig.setRemovable(true);
     if (StringUtils.isNotBlank(portalConfig.getBannerUploadId())) {
       createdPortalConfig.setBannerUploadId(portalConfig.getBannerUploadId());
     }
