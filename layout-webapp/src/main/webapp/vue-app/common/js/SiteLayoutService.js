@@ -17,9 +17,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function createSite(siteName, siteTemplate, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, icon, accessPermissions, editPermission) {
+export function createSite(siteName, siteId, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, icon, accessPermissions, editPermission) {
   const createModel = {
-    siteTemplate,
+    siteId,
     portalConfig: {
       name: siteName,
       label: siteLabel,
@@ -89,6 +89,9 @@ export function getSite(siteType, siteName, lang) {
 }
 
 export function getSiteLabels(siteId) {
+  if (!siteId) {
+    return Promise.resolve({en: null});
+  }
   return fetch(`/layout/rest/sites/${siteId}/labels`, {
     credentials: 'include',
     method: 'GET'
@@ -102,6 +105,9 @@ export function getSiteLabels(siteId) {
 }
 
 export function getSiteDescriptions(siteId) {
+  if (!siteId) {
+    return Promise.resolve({en: null});
+  }
   return fetch(`/layout/rest/sites/${siteId}/descriptions`, {
     credentials: 'include',
     method: 'GET'

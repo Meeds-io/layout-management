@@ -140,8 +140,13 @@ public class SiteLayoutServiceTest {
 
     when(aclService.canAddSite(TEST_USER)).thenReturn(true);
 
+    long siteTemplateId = 7l;
     String siteTemplate = "siteTemplate";
-    when(createModel.getSiteTemplate()).thenReturn(siteTemplate);
+    when(createModel.getSiteId()).thenReturn(siteTemplateId);
+    PortalConfig templatePortalConfig = mock(PortalConfig.class);
+    when(layoutService.getPortalConfig(siteTemplateId)).thenReturn(templatePortalConfig);
+    when(templatePortalConfig.getType()).thenReturn(PortalConfig.PORTAL_TEMPLATE);
+    when(templatePortalConfig.getName()).thenReturn(siteTemplate);
 
     String description = "description";
     String uploadId = "56632";

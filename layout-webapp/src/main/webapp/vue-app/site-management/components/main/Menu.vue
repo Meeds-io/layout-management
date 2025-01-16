@@ -99,6 +99,21 @@
       </v-list-item>
       <v-list-item
         dense
+        @click="duplicate">
+        <v-card
+          color="transparent"
+          min-width="15"
+          flat>
+          <v-icon size="13">
+            fa-copy
+          </v-icon>
+        </v-card>
+        <v-list-item-title class="ps-2">
+          {{ $t('sites.duplicate') }}
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        dense
         @click="saveAsTemplate">
         <v-card
           color="transparent"
@@ -205,6 +220,13 @@ export default {
     },
     saveAsTemplate() {
       this.$root.$emit('site-template-add', null, this.site.siteId);
+    },
+    duplicate() {
+      this.$root.$emit('open-site-properties-drawer', {
+        ...this.site,
+        siteId: null,
+        name: null,
+      }, this.site.siteId);
     },
   }
 };
