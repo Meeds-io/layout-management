@@ -75,6 +75,7 @@
             :max-length="maxDescriptionLength"
             :tag-enabled="false"
             ck-editor-type="siteTemplateDescription"
+            disable-suggester
             @ready="checkCKEdtiorDisplay" />
         </translation-text-field>
         <site-template-preview
