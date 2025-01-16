@@ -155,6 +155,7 @@
                   :placeholder="$t('siteManagement.label.siteDescription.placeholder')"
                   :max-length="maxDescriptionLength"
                   :tag-enabled="false"
+                  disable-suggester
                   ck-editor-type="site" />
               </translation-text-field>
               <font-icon-input

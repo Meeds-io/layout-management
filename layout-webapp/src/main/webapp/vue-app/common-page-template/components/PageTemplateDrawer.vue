@@ -80,7 +80,8 @@
               :placeholder="$t('layout.templateDescriptionPlaceholder')"
               :max-length="maxDescriptionLength"
               :tag-enabled="false"
-              ck-editor-type="pageTemplateDescription" />
+              ck-editor-type="pageTemplateDescription"
+              disable-suggester />
           </translation-text-field>
         </div>
         <layout-editor-page-template-preview

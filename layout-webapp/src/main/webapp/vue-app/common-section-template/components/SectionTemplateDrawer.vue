@@ -78,6 +78,7 @@
             :max-length="maxDescriptionLength"
             :tag-enabled="false"
             ck-editor-type="sectionTemplateDescription"
+            disable-suggester
             @ready="checkCKEdtiorDisplay" />
         </translation-text-field>
         <section-template-preview
