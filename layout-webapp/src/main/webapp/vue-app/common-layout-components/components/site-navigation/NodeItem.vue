@@ -226,7 +226,7 @@ export default {
       }
     },
     accessIcon() {
-      if (!this.navigationNode.pageAccessPermissions || this.navigationNode.pageAccessPermissions[0].membershipType === 'Everyone') {
+      if (this.navigationNode?.pageAccessPermissions?.[0] === 'Everyone') {
         return {
           icon: 'fas fa-layer-group',
           title: this.$t('siteNavigation.label.access.all'),

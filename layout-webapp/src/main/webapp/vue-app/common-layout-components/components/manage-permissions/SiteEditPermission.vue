@@ -20,8 +20,11 @@
 -->
 <template>
   <div class="d-flex flex-column">
-    <div class="font-weight-bold mb-2">
+    <div v-if="isSite" class="font-weight-bold mb-2">
       {{ $t('sites.permission.whoCanEdit') }}
+    </div>
+    <div v-else class="font-weight-bold mb-2">
+      {{ $t('pages.permission.whoCanEdit') }}
     </div>
     <v-radio-group v-model="isAdministrationPermissions" class="mt-0">
       <v-radio
@@ -63,6 +66,10 @@ export default {
     value: {
       type: String,
       default: null,
+    },
+    isSite: {
+      type: Boolean,
+      default: false,
     },
   },
   data: () => ({

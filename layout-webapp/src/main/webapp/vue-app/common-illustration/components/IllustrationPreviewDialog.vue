@@ -74,7 +74,7 @@
               :class="title && 'elevation-2'"
               class="full-height width-auto"
               height="100%"
-              width="100%" />
+              width="100%">
           </div>
         </v-card>
       </div>
