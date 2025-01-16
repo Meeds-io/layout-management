@@ -19,8 +19,6 @@
 package io.meeds.layout.service;
 
 import static io.meeds.layout.util.EntityMapper.SITE_ENABLED_PROP;
-import static io.meeds.layout.util.EntityMapper.SITE_TEMPLATE_ICON_PROP;
-import static io.meeds.layout.util.EntityMapper.SITE_TEMPLATE_SYSTEM_PROP;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -119,8 +117,8 @@ public class SiteTemplateServiceTest {
     lenient().when(portalConfig.getId()).thenReturn(ID);
     lenient().when(portalConfig.getName()).thenReturn("layout");
     lenient().when(portalConfig.getType()).thenReturn(PortalConfig.PORTAL_TEMPLATE);
-    lenient().when(portalConfig.getProperty(SITE_TEMPLATE_ICON_PROP)).thenReturn(siteTemplate.getIcon());
-    lenient().when(portalConfig.getProperty(SITE_TEMPLATE_SYSTEM_PROP)).thenReturn(String.valueOf(siteTemplate.isSystem()));
+    lenient().when(portalConfig.getIcon()).thenReturn(siteTemplate.getIcon());
+    lenient().when(portalConfig.isRemovable()).thenReturn(!siteTemplate.isSystem());
     lenient().when(portalConfig.getProperty(SITE_ENABLED_PROP)).thenReturn(String.valueOf(!siteTemplate.isDisabled()));
   }
 
@@ -242,7 +240,7 @@ public class SiteTemplateServiceTest {
   void testDeleteSiteTemplateWhenSystem() {
     when(aclService.isAdministrator(testuser)).thenReturn(true);
     when(layoutService.getPortalConfig(ID)).thenReturn(portalConfig);
-    when(portalConfig.getProperty(SITE_TEMPLATE_SYSTEM_PROP)).thenReturn("true");
+    when(portalConfig.isRemovable()).thenReturn(false);
     assertThrows(IllegalAccessException.class, () -> siteTemplateService.deleteSiteTemplate(ID, testuser));
   }
 
