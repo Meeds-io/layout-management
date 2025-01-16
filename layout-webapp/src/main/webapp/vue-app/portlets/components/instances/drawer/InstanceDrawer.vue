@@ -77,6 +77,7 @@
             :max-length="maxDescriptionLength"
             :tag-enabled="false"
             ck-editor-type="portletInstanceDescription"
+            disable-suggester
             @ready="checkCKEdtiorDisplay" />
         </translation-text-field>
         <portlets-instance-category-input
