@@ -42,7 +42,7 @@
           :key="application.id"
           dense>
           <v-list-item-content>
-            <v-list-item-title class="subtitle-2 text-color">
+            <v-list-item-title>
               <v-card
                 v-on="application.illustrationId && {
                   click: () => openIllustration(application)
