@@ -34,7 +34,7 @@
     <td align="left">
       <v-card
         v-sanitized-html="name"
-        class="transparent"
+        class="transparent text-break"
         flat
         @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
@@ -42,6 +42,7 @@
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
       align="left"
+      class="text-break"
       v-sanitized-html="description"></td>
     <td
       v-if="!$root.isMobile"
