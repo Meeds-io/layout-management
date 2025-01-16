@@ -34,13 +34,14 @@
     <td align="left">
       <v-card
         v-sanitized-html="name"
-        class="transparent"
+        class="transparent text-break"
         flat
         @click="$root.$emit('layout-illustration-preview', illustrationSrc)" />
     </td>
     <!-- description -->
     <td
       v-if="!$vuetify.breakpoint.lgAndDown"
+      class="text-break"
       align="left"
       v-sanitized-html="description"></td>
     <td

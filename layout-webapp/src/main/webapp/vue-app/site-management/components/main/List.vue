@@ -88,7 +88,7 @@ export default {
           align: 'left',
           sortable: false,
           class: 'site-icon-header',
-          width: '75px'
+          width: '35px'
         },
         {
           text: this.$t('sites.label.name'),
@@ -104,7 +104,7 @@ export default {
           align: 'left',
           sortable: false,
           class: 'site-description-header',
-          width: 'auto'
+          width: '50%'
         },
         {
           text: this.$t('sites.label.actions'),
@@ -120,8 +120,8 @@ export default {
           value: 'icon',
           align: 'left',
           sortable: false,
-          class: 'site-icon-header',
-          width: '75px'
+          class: 'site-icon-header ps-0',
+          width: '35px'
         },
         {
           text: this.$t('sites.label.name'),
@@ -137,7 +137,7 @@ export default {
           align: 'left',
           sortable: false,
           class: 'site-description-header',
-          width: 'auto'
+          width: '50%'
         },
         {
           text: this.$t('sites.label.navigation'),
