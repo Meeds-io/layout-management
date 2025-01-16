@@ -21,7 +21,10 @@
 -->
 <template>
   <v-app>
-    <main class="application-body">
+    <main class="application-body pb-5">
+      <h4 class="text-title px-5 pt-5 ma-0">
+        {{ $t('sectionTemplates.title') }}
+      </h4>
       <section-template-toolbar
         ref="toolbar"
         :tab-name="tabName"
