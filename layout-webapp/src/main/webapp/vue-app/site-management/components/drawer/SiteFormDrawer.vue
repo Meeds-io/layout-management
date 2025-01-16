@@ -180,10 +180,12 @@
                 class="px-4"
                 @submit.stop.prevent="0">
                 <site-edit-permission
-                  v-model="editPermission" />
+                  v-model="editPermission"
+                  is-site />
                 <site-access-permissions
                   v-model="accessPermissions"
-                  class="mt-4" />
+                  class="mt-4"
+                  is-site />
               </form>
             </v-stepper-content>
           </template>
