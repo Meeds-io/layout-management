@@ -88,14 +88,14 @@ export default {
           align: 'left',
           sortable: false,
           class: 'site-template-illustration-header',
-          width: '75px'
+          width: '35px'
         },
         {
           text: this.$t('siteTemplates.label.name'),
           value: 'name',
           align: 'left',
           sortable: true,
-          class: 'site-template-name-header',
+          class: 'site-template-name-header ps-0',
           width: 'auto'
         },
         {
@@ -121,14 +121,14 @@ export default {
           align: 'center',
           sortable: false,
           class: 'site-template-illustration-header',
-          width: '75px'
+          width: '35px'
         },
         {
           text: this.$t('siteTemplates.label.name'),
           value: 'name',
           align: 'left',
           sortable: true,
-          class: 'site-template-name-header',
+          class: 'site-template-name-header ps-0',
           width: 'auto'
         },
         {
@@ -137,7 +137,7 @@ export default {
           align: 'left',
           sortable: false,
           class: 'site-template-description-header',
-          width: 'auto'
+          width: '50%'
         },
         {
           text: this.$t('siteTemplates.label.status'),
