@@ -154,8 +154,19 @@ export function getPage(pageRef) {
   });
 }
 
-export function getPageLayout(pageRef, expand) {
-  return fetch(`/layout/rest/pages/layout?pageRef=${pageRef}&expand=${expand || ''}`, {
+export function getPageLayout(pageRef, expand, impersonate) {
+  const formData = new FormData();
+  if (pageRef) {
+    formData.append('pageRef', pageRef);
+  }
+  if (impersonate) {
+    formData.append('impersonate', !!impersonate);
+  }
+  if (expand) {
+    formData.append('expand', expand);
+  }
+  const params = new URLSearchParams(formData).toString();
+  return fetch(`/layout/rest/pages/layout?${params}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {

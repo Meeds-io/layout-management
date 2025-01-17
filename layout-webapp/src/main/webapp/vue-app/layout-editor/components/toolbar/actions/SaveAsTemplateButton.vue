@@ -55,11 +55,34 @@ export default {
       window.setTimeout(() => this.openPageTemplateDrawer(), 10);
     },
     openPageTemplateDrawer() {
-      document.addEventListener('drawerOpened', this.endLoading);
-      const pageLayout = this.$layoutUtils.cleanAttributes(this.$root.layout, true, true);
-      this.$root.$emit('layout-page-template-drawer-open', {
-        content: JSON.stringify(pageLayout),
-      }, false, true);
+      this.$root.$on('layout-draft-saved', this.handleDraftSavedSuccess);
+      this.$root.$on('layout-draft-save-error', this.handleDraftSavedError);
+      this.$root.$emit('layout-save-draft');
+    },
+    handleDraftSavedSuccess() {
+      this.handleDraftSaved(true);
+    },
+    handleDraftSavedError() {
+      this.handleDraftSaved();
+    },
+    async handleDraftSaved(success) {
+      this.$root.$off('layout-draft-saved', this.handleDraftSavedSuccess);
+      this.$root.$off('layout-draft-save-error', this.handleDraftSavedError);
+      if (success) {
+        try {
+          document.addEventListener('drawerOpened', this.endLoading);
+          const draftPageLayout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, null, true);
+          this.$layoutUtils.parseSections(draftPageLayout);
+          const pageLayout = this.$layoutUtils.cleanAttributes(draftPageLayout, true, true);
+          this.$root.$emit('layout-page-template-drawer-open', {
+            content: JSON.stringify(pageLayout),
+          }, false, true);
+        } finally {
+          window.setTimeout(() => this.loading = false, 2000);
+        }
+      } else {
+        this.loading = false;
+      }
     },
     endLoading() {
       window.setTimeout(() => this.loading = false, 200);
