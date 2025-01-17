@@ -43,21 +43,35 @@ export default {
       this.loading = true;
       window.setTimeout(() => this.openPageTemplateDrawer(), 10);
     },
-    async openPageTemplateDrawer() {
-      document.addEventListener('drawerOpened', this.endLoading);
-      let pageLayout = JSON.parse(JSON.stringify(this.$root.layout));
-      await this.attachPortletsPreferences(pageLayout);
-      pageLayout = this.$layoutUtils.cleanAttributes(pageLayout, true, true);
-      this.$root.$emit('layout-page-template-drawer-open', {
-        content: JSON.stringify(pageLayout),
-      }, false, true);
+    openPageTemplateDrawer() {
+      this.$root.$on('layout-draft-saved', this.handleDraftSavedSuccess);
+      this.$root.$on('layout-draft-save-error', this.handleDraftSavedError);
+      this.$root.$emit('layout-save-draft');
     },
-    async attachPortletsPreferences(layoutModel) {
-      if (layoutModel.children?.length) {
-        await Promise.all(layoutModel.children.map(c => this.attachPortletsPreferences(c)));
-      } else if (layoutModel.contentId) {
-        const application = await this.$pageLayoutService.getPageApplicationLayout(this.$root.draftPageRef, layoutModel.storageId);
-        layoutModel.preferences = application?.preferences;
+    handleDraftSavedSuccess() {
+      this.handleDraftSaved(true);
+    },
+    handleDraftSavedError() {
+      this.handleDraftSaved();
+    },
+    async handleDraftSaved(success) {
+      this.$root.$off('layout-draft-saved', this.handleDraftSavedSuccess);
+      this.$root.$off('layout-draft-save-error', this.handleDraftSavedError);
+      if (success) {
+        try {
+          document.addEventListener('drawerOpened', this.endLoading);
+          const draftPageLayout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, null, true);
+          this.$layoutUtils.parseSections(draftPageLayout);
+          const pageLayout = this.$layoutUtils.cleanAttributes(draftPageLayout, true, true);
+          this.$root.$emit('layout-page-template-drawer-open', {
+            ...this.$root.pageTemplate,
+            content: JSON.stringify(pageLayout),
+          }, false, true);
+        } finally {
+          window.setTimeout(() => this.loading = false, 2000);
+        }
+      } else {
+        this.loading = false;
       }
     },
     endLoading() {

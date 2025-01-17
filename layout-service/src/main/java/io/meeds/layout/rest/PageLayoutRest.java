@@ -108,14 +108,18 @@ public class PageLayoutRest {
                                    @Parameter(description = "Application Storage Id", required = false)
                                    @RequestParam(name = "applicationId", required = false, defaultValue = "0")
                                    long applicationId,
+                                   @Parameter(description = "Generate Page Data And Preferences to allow cloning the page", required = false)
+                                   @RequestParam(name = "impersonate", required = false, defaultValue = "false")
+                                   boolean impersonate,
                                    @Parameter(description = "expand options", required = true)
-                                   @RequestParam("expand")
+                                   @RequestParam(name = "expand", required = false)
                                    String expand) {
     try {
       ModelObject modelObject = applicationId > 0 ? pageLayoutService.getPageApplicationLayout(PageKey.parse(pageRef),
                                                                                                applicationId,
                                                                                                request.getRemoteUser()) :
                                                   pageLayoutService.getPageLayout(PageKey.parse(pageRef),
+                                                                                  impersonate,
                                                                                   request.getRemoteUser());
       return RestEntityBuilder.toLayoutModel(modelObject, layoutService, expand);
     } catch (ObjectNotFoundException e) {
@@ -194,7 +198,7 @@ public class PageLayoutRest {
                                          RestEntityBuilder.fromLayoutModel(layoutModel),
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
-      return getPageLayout(request, pageRef, 0, expand);
+      return getPageLayout(request, pageRef, 0, false, expand);
     } catch (IllegalArgumentException | IllegalStateException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ObjectNotFoundException e) {
