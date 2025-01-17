@@ -41,7 +41,7 @@
                   v-bind="attrs">
                   <v-btn
                     v-if="!$root.noSectionAdd"
-                    class="white text-color border-color"
+                    class="white text-color border-color elevation-2"
                     height="32"
                     width="32"
                     icon
@@ -54,13 +54,13 @@
             </v-tooltip>
           </div>
         </v-hover>
-        <div class="position-sticky t-20 b-20 z-index-one d-flex align-center mx-n5">
-          <v-hover
-            v-if="displayMoveButton"
-            v-model="hoverButton2">
-            <div
-              :style="leftButtonStyle"
-              class="position-absolute">
+        <v-hover
+          v-if="displayMoveButton"
+          v-model="hoverButton2">
+          <div
+            :style="leftButtonStyle"
+            class="position-absolute t-10 z-index-one full-height">
+            <div class="position-sticky t-20 z-index-one">
               <v-tooltip :disabled="moving" bottom>
                 <template #activator="{on, attrs}">
                   <div
@@ -68,7 +68,7 @@
                     v-bind="attrs">
                     <v-btn
                       v-if="!$root.noSectionAdd"
-                      class="white text-color border-color draggable"
+                      class="white text-color border-color elevation-2 draggable"
                       height="32"
                       width="32"
                       icon
@@ -83,12 +83,12 @@
                 {{ $t('layout.moveSection') }}
               </v-tooltip>
             </div>
-          </v-hover>
-        </div>
+          </div>
+        </v-hover>
         <v-hover v-model="hoverButton3">
           <div
             :style="rightButtonStyle"
-            class="position-absolute t-0 z-index-one full-height">
+            class="position-absolute t-10 z-index-one full-height">
             <div class="position-sticky t-20 z-index-one">
               <v-tooltip bottom>
                 <template #activator="{on, attrs}">
@@ -155,7 +155,7 @@
                   v-bind="attrs">
                   <v-btn
                     v-if="!$root.noSectionAdd"
-                    class="white text-color border-color"
+                    class="white text-color border-color elevation-2"
                     height="32"
                     width="32"
                     icon
@@ -223,7 +223,7 @@ export default {
     },
     leftButtonStyle() {
       return {
-        left: this.$root.pageFullWindow && '20px' || 0,
+        left: this.$root.pageFullWindow && '0' || '-20px',
       };
     },
     rightButtonStyle() {
