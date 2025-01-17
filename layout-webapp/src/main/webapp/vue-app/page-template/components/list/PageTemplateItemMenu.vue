@@ -53,14 +53,18 @@
                   target="_blank"
                   rel="opener"
                   dense>
-                  <v-icon
-                    :class="pageTemplate.system && 'disabled--text'"
-                    size="13">
-                    fa-columns
-                  </v-icon>
-                  <v-list-item-title
-                    :class="pageTemplate.system && 'disabled--text'"
-                    class="ps-2">
+                  <v-card
+                    color="transparent"
+                    min-width="15"
+                    class="me-2"
+                    flat>
+                    <v-icon
+                      :class="pageTemplate.system && 'disabled--text'"
+                      size="13">
+                      fa-columns
+                    </v-icon>
+                  </v-card>
+                  <v-list-item-title :class="pageTemplate.system && 'disabled--text'">
                     {{ $t('pageTemplate.label.editLayout') }}
                   </v-list-item-title>
                 </v-list-item>
@@ -71,20 +75,32 @@
           <v-list-item
             dense
             @click="$root.$emit('layout-page-template-drawer-open', pageTemplate)">
-            <v-icon size="13">
-              fa-edit
-            </v-icon>
-            <v-list-item-title class="ps-2">
+            <v-card
+              color="transparent"
+              min-width="15"
+              class="me-2"
+              flat>
+              <v-icon size="13">
+                fa-edit
+              </v-icon>
+            </v-card>
+            <v-list-item-title>
               {{ $t('pageTemplate.label.editProperties') }}
             </v-list-item-title>
           </v-list-item>
           <v-list-item
             dense
             @click="$root.$emit('layout-page-template-drawer-open', pageTemplate, true)">
-            <v-icon size="13">
-              fa-copy
-            </v-icon>
-            <v-list-item-title class="ps-2">
+            <v-card
+              color="transparent"
+              min-width="15"
+              class="me-2"
+              flat>
+              <v-icon size="13">
+                fa-copy
+              </v-icon>
+            </v-card>
+            <v-list-item-title>
               {{ $t('pageTemplate.label.duplicate') }}
             </v-list-item-title>
           </v-list-item>
@@ -97,15 +113,19 @@
                   :disabled="pageTemplate.system"
                   dense
                   @click="$root.$emit('page-templates-delete', pageTemplate)">
-                  <v-icon
-                    :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
-                    size="13">
-                    fa-trash
-                  </v-icon>
-                  <v-list-item-title
-                    :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
-                    class="ps-2">
-                    {{ $t('pageTemplate.label.delete') }}
+                  <v-card
+                    color="transparent"
+                    min-width="15"
+                    class="me-2"
+                    flat>
+                    <v-icon
+                      :class="!pageTemplate.system && 'error--text' || 'disabled--text'"
+                      size="13">
+                      fa-trash
+                    </v-icon>
+                  </v-card>
+                  <v-list-item-title>
+                    <span :class="!pageTemplate.system && 'error--text' || 'disabled--text'">{{ $t('pageTemplate.label.delete') }}</span>
                   </v-list-item-title>
                 </v-list-item>
               </div>

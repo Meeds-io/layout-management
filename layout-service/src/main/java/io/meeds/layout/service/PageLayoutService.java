@@ -157,11 +157,19 @@ public class PageLayoutService {
   }
 
   public Page getPageLayout(PageKey pageKey, String username) throws ObjectNotFoundException, IllegalAccessException {
+    return getPageLayout(pageKey, false, username);
+  }
+
+  public Page getPageLayout(PageKey pageKey, boolean impersonate, String username) throws ObjectNotFoundException,
+                                                                                   IllegalAccessException {
     Page page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     } else if (!aclService.canViewPage(pageKey, username)) {
       throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
+    }
+    if (impersonate) {
+      impersonateModel(page);
     }
     return page;
   }
@@ -503,6 +511,18 @@ public class PageLayoutService {
       if (preferences != null) {
         layoutService.save(application.getState(), preferences);
       }
+    }
+  }
+
+  private void impersonateModel(ModelObject object) {
+    if (object instanceof Container container) {
+      ArrayList<ModelObject> children = container.getChildren();
+      if (CollectionUtils.isNotEmpty(children)) {
+        children.forEach(this::impersonateModel);
+      }
+    } else if (object instanceof Application application) {
+      Portlet preferences = portletInstanceService.getApplicationPortletPreferences(application);
+      application.setState(new TransientApplicationState(layoutService.getId(application.getState()), preferences));
     }
   }
 
