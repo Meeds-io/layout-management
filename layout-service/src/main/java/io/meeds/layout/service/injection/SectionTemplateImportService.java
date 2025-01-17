@@ -102,7 +102,7 @@ public class SectionTemplateImportService {
   @Value("${meeds.sections.import.override:false}")
   private boolean                        forceReimport;
 
-  @Value("${meeds.sections.import.version:4}")
+  @Value("${meeds.sections.import.version:1}")
   private long                           sectionTemplateImportVersion;
 
   @PostConstruct

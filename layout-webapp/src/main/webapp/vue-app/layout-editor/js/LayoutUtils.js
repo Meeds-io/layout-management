@@ -392,9 +392,10 @@ export function getCell(container, storageId) {
 }
 
 export function newSection(parentContainer, index, rows, cols, sectionType) {
+  const defaultSectionStyle = sectionType === flexTemplate ? 'd-flex flex-column d-md-grid layout-sticky-application' : 'd-flex flex-column d-md-grid';
   const section = newContainer(
     sectionType,
-    'd-flex flex-column d-md-grid',
+    defaultSectionStyle,
     parentContainer,
     index || 0);
   applyBreakpointValues(section,
