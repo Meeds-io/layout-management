@@ -322,14 +322,9 @@ public class PageLayoutService {
     if (pageType != PageType.LINK) {
       throw new IllegalStateException(String.format("Page %s isn't of type 'LINK'", pageKey));
     }
-    pageContext.setState(new PageState(pageState.getDisplayName(),
-                                       pageState.getDescription(),
-                                       pageState.getShowMaxWindow(),
-                                       pageState.getFactoryId(),
-                                       pageState.getAccessPermissions(),
-                                       pageState.getEditPermission(),
-                                       pageState.getType(),
-                                       link));
+    pageState.setType(pageState.getType());
+    pageState.setLink(link);
+    pageContext.setState(pageState);
     layoutService.save(pageContext);
   }
 
@@ -344,17 +339,8 @@ public class PageLayoutService {
       throw new IllegalAccessException();
     }
     PageState pageState = pageContext.getState();
-    List<String> accessPermissionsList = permissionUpdateModel.getAccessPermissions();
-    String editPermission = permissionUpdateModel.getEditPermission();
-
-    pageContext.setState(new PageState(pageState.getDisplayName(),
-                                       pageState.getDescription(),
-                                       pageState.getShowMaxWindow(),
-                                       pageState.getFactoryId(),
-                                       accessPermissionsList,
-                                       editPermission,
-                                       pageState.getType(),
-                                       pageState.getLink()));
+    pageState.setAccessPermissions(permissionUpdateModel.getAccessPermissions());
+    pageState.setEditPermission(permissionUpdateModel.getEditPermission());
     layoutService.save(pageContext);
   }
 

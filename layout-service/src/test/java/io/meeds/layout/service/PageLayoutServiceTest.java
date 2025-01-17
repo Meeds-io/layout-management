@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -380,7 +379,7 @@ public class PageLayoutServiceTest {
     when(pageState.getType()).thenReturn(PageType.LINK.name());
     pageLayoutService.updatePageLink(PAGE_KEY, link, TEST_USER);
     verify(layoutService).save(pageContext);
-    verify(pageContext).setState(argThat(s -> StringUtils.equals(link, s.getLink())));
+    verify(pageState).setLink(link);
   }
 
   @Test
@@ -397,11 +396,8 @@ public class PageLayoutServiceTest {
     when(pageContext.getState()).thenReturn(pageState);
     pageLayoutService.updatePagePermissions(PAGE_KEY, permissionModel, TEST_USER);
     verify(layoutService).save(pageContext);
-    verify(pageContext).setState(argThat(s -> {
-      assertEquals(editPermission, s.getEditPermission());
-      assertEquals(Arrays.asList("access", "permissions"), s.getAccessPermissions());
-      return true;
-    }));
+    verify(pageState).setEditPermission(permissionModel.getEditPermission());
+    verify(pageState).setAccessPermissions(permissionModel.getAccessPermissions());
   }
 
 }
