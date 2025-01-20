@@ -25,10 +25,10 @@
     eager
     allow-expand
     @closed="close">
-    <template slot="title">
+    <template #title>
       <span>{{ $t('siteNavigation.drawer.title') }}</span>
     </template>
-    <template slot="content">
+    <template v-if="drawer" #content>
       <div :class="$refs.drawer?.expand ? 'singlePageApplication' : ' ' ">
         <v-alert
           v-if="information"
@@ -89,22 +89,21 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      navigationNodes: [],
-      navigationNodesToDisplay: [],
-      displayCloseFooter: false,
-      drawer: false,
-      siteType: null,
-      siteId: null,
-      siteLabel: null,
-      information: null,
-      includeGlobal: false,
-      loading: false,
-      filter: 'ALL',
-      site: null,
-    };
-  },
+  data: () => ({
+    navigationNodes: [],
+    navigationNodesToDisplay: [],
+    displayCloseFooter: false,
+    drawer: false,
+    siteType: null,
+    siteId: null,
+    siteName: null,
+    siteLabel: null,
+    information: null,
+    includeGlobal: false,
+    loading: false,
+    filter: 'ALL',
+    site: null,
+  }),
   computed: {
     navigationsFilter() {
       return [{
@@ -144,10 +143,10 @@ export default {
   },
   methods: {
     open(event) {
-      this.siteName = event?.siteName || eXo.env.portal.spaceDisplayName || eXo.env.portal.siteKeyName;
-      this.siteType = event?.siteType || eXo.env.portal.siteKeyType;
-      this.siteLabel = event?.siteLabel;
-      this.siteId = event?.siteId || eXo.env.portal.siteId;
+      this.siteName = event?.siteName || event?.name || eXo.env.portal.spaceDisplayName || eXo.env.portal.siteKeyName;
+      this.siteType = event?.siteType || event?.type || eXo.env.portal.siteKeyType;
+      this.siteLabel = event?.siteLabel || event?.displayName || eXo.env.portal.siteLabel;
+      this.siteId = event?.siteId || event?.id || eXo.env.portal.siteId;
       this.information = event?.information;
       this.includeGlobal = event?.includeGlobal || false;
       this.displayCloseFooter = event?.displayCloseFooter || false;

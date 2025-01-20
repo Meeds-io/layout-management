@@ -96,8 +96,6 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}/skin/css</outputDirectory>
               <compress>false</compress>
               <includes>
-                <include>siteNavigation.less</include>
-                <include>siteManagement.less</include>
                 <include>editor.less</include>
               </includes>
             </configuration>

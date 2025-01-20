@@ -17,9 +17,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function createSite(siteName, siteTemplate, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId) {
+export function createSite(siteName, siteId, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, icon, accessPermissions, editPermission) {
   const createModel = {
-    siteTemplate,
+    siteId,
     portalConfig: {
       name: siteName,
       label: siteLabel,
@@ -27,6 +27,11 @@ export function createSite(siteName, siteTemplate, siteLabel, siteDescription, d
       displayed: displayed,
       displayOrder: displayOrder,
       bannerUploadId: bannerUploadId,
+      accessPermissions,
+      editPermission,
+      properties: {
+        icon: icon || 'fa-globe',
+      },
     },
   };
   return fetch('/layout/rest/sites', {
@@ -84,6 +89,9 @@ export function getSite(siteType, siteName, lang) {
 }
 
 export function getSiteLabels(siteId) {
+  if (!siteId) {
+    return Promise.resolve({en: null});
+  }
   return fetch(`/layout/rest/sites/${siteId}/labels`, {
     credentials: 'include',
     method: 'GET'
@@ -97,6 +105,9 @@ export function getSiteLabels(siteId) {
 }
 
 export function getSiteDescriptions(siteId) {
+  if (!siteId) {
+    return Promise.resolve({en: null});
+  }
   return fetch(`/layout/rest/sites/${siteId}/descriptions`, {
     credentials: 'include',
     method: 'GET'
@@ -109,12 +120,13 @@ export function getSiteDescriptions(siteId) {
   });
 }
 
-export function updateSite(siteName, siteType, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, bannerRemoved) {
+export function updateSite(siteName, siteType, siteLabel, siteDescription, displayed, displayOrder, bannerUploadId, bannerRemoved, siteIcon) {
   const updateModel = {
     siteType,
     siteName,
     siteLabel,
     siteDescription,
+    siteIcon: siteIcon || 'fa-globe',
     displayed,
     displayOrder,
     bannerRemoved: bannerRemoved || false,

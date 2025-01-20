@@ -95,32 +95,42 @@ public class SiteLayoutService {
   @SneakyThrows
   public PortalConfig createSite(SiteCreateModel createModel, String username) throws IllegalAccessException,
                                                                                ObjectAlreadyExistsException {
+    PortalConfig portalConfig = createModel.getPortalConfig();
+    SiteKey siteKey = SiteKey.portal(portalConfig.getName());
     if (!aclService.canAddSite(username)) {
       throw new IllegalAccessException();
-    } else if (layoutService.getPortalConfig(createModel.getPortalConfig().getName()) != null) {
+    } else if (layoutService.getPortalConfig(siteKey) != null) {
       throw new ObjectAlreadyExistsException(String.format("Site with name %s already exists",
                                                            createModel.getPortalConfig().getName()));
     }
-    PortalConfig portalConfigToCreate = createModel.getPortalConfig();
-    String siteTemplate = createModel.getSiteTemplate();
-    portalConfigService.createUserPortalConfig(PortalConfig.PORTAL_TYPE, portalConfigToCreate.getName(), siteTemplate);
+    PortalConfig templatePortalConfig = layoutService.getPortalConfig(createModel.getSiteId());
+    if (templatePortalConfig == null) {
+      throw new ObjectNotFoundException(String.format("Site with id %s doesn't exist",
+                                                      createModel.getSiteId()));
+    }
 
-    String[] accessPermissions = portalConfigToCreate.getAccessPermissions() == null ?
-                                                                                     new String[] { getAdministratorsPermission() } :
-                                                                                     portalConfigToCreate.getAccessPermissions();
-    String editPermission = portalConfigToCreate.getEditPermission() == null ?
-                                                                             getAdministratorsPermission() :
-                                                                             portalConfigToCreate.getEditPermission();
+    String[] accessPermissions = portalConfig.getAccessPermissions() == null ?
+                                                                             new String[] {
+                                                                               getAdministratorsPermission() } :
+                                                                             portalConfig.getAccessPermissions();
+    String editPermission = portalConfig.getEditPermission() == null ?
+                                                                     getAdministratorsPermission() :
+                                                                     portalConfig.getEditPermission();
 
-    PortalConfig createdPortalConfig = layoutService.getPortalConfig(portalConfigToCreate.getName());
-    createdPortalConfig.setDescription(portalConfigToCreate.getDescription());
-    createdPortalConfig.setLabel(portalConfigToCreate.getLabel());
-    createdPortalConfig.setDisplayed(portalConfigToCreate.isDisplayed());
-    createdPortalConfig.setDisplayOrder(portalConfigToCreate.isDisplayed() ? portalConfigToCreate.getDisplayOrder() : 0);
+    portalConfigService.createSiteFromTemplate(new SiteKey(templatePortalConfig.getType(), templatePortalConfig.getName()),
+                                               siteKey);
+
+    PortalConfig createdPortalConfig = layoutService.getPortalConfig(siteKey);
+    createdPortalConfig.setDescription(portalConfig.getDescription());
+    createdPortalConfig.setLabel(portalConfig.getLabel());
+    createdPortalConfig.setDisplayed(portalConfig.isDisplayed());
+    createdPortalConfig.setIcon(portalConfig.getIcon());
+    createdPortalConfig.setDisplayOrder(portalConfig.isDisplayed() ? portalConfig.getDisplayOrder() : 0);
     createdPortalConfig.setAccessPermissions(accessPermissions);
     createdPortalConfig.setEditPermission(editPermission);
-    if (StringUtils.isNotBlank(portalConfigToCreate.getBannerUploadId())) {
-      createdPortalConfig.setBannerUploadId(portalConfigToCreate.getBannerUploadId());
+    createdPortalConfig.setRemovable(true);
+    if (StringUtils.isNotBlank(portalConfig.getBannerUploadId())) {
+      createdPortalConfig.setBannerUploadId(portalConfig.getBannerUploadId());
     }
     layoutService.save(createdPortalConfig);
     return createdPortalConfig;
@@ -137,6 +147,7 @@ public class SiteLayoutService {
     }
     portalConfig.setDescription(updateModel.getSiteDescription());
     portalConfig.setLabel(updateModel.getSiteLabel());
+    portalConfig.setIcon(updateModel.getSiteIcon());
     portalConfig.setDisplayed(updateModel.isDisplayed());
     portalConfig.setDisplayOrder(updateModel.isDisplayed() ? updateModel.getDisplayOrder() : 0);
     if (updateModel.isBannerRemoved() && portalConfig.getBannerFileId() != 0) {

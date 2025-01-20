@@ -71,6 +71,7 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
   public boolean hasAccessPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
     PageKey pageKey = getPageKey(entityId);
     return pageKey.getSite().getType() == SiteType.GROUP_TEMPLATE
+           || pageKey.getSite().getType() == SiteType.PORTAL_TEMPLATE
            || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
   }
 

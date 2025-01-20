@@ -64,7 +64,7 @@ import io.meeds.layout.model.SiteUpdateModel;
 import lombok.SneakyThrows;
 
 @SpringBootTest(classes = {
-                            SiteLayoutService.class,
+  SiteLayoutService.class,
 })
 @ExtendWith(MockitoExtension.class)
 public class SiteLayoutServiceTest {
@@ -118,19 +118,35 @@ public class SiteLayoutServiceTest {
 
   @Test
   @SneakyThrows
-  public void createSite() {
+  public void createSiteWhenAlreadyExists() {
     SiteCreateModel createModel = mock(SiteCreateModel.class);
+    when(createModel.getPortalConfig()).thenReturn(portalConfig);
+    when(portalConfig.getName()).thenReturn(SITE_KEY.getName());
     assertThrows(IllegalAccessException.class, () -> siteLayoutService.createSite(createModel, TEST_USER));
 
     when(aclService.canAddSite(TEST_USER)).thenReturn(true);
 
-    String siteTemplate = "siteTemplate";
-    when(createModel.getSiteTemplate()).thenReturn(siteTemplate);
+    when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
+    assertThrows(ObjectAlreadyExistsException.class, () -> siteLayoutService.createSite(createModel, TEST_USER));
+  }
+
+  @Test
+  @SneakyThrows
+  public void createSite() {
+    SiteCreateModel createModel = mock(SiteCreateModel.class);
     when(createModel.getPortalConfig()).thenReturn(portalConfig);
     when(portalConfig.getName()).thenReturn(SITE_KEY.getName());
-    when(layoutService.getPortalConfig(SITE_KEY.getName())).thenReturn(portalConfig);
-    assertThrows(ObjectAlreadyExistsException.class, () -> siteLayoutService.createSite(createModel, TEST_USER));
-    when(layoutService.getPortalConfig(SITE_KEY.getName())).thenReturn(null);
+    assertThrows(IllegalAccessException.class, () -> siteLayoutService.createSite(createModel, TEST_USER));
+
+    when(aclService.canAddSite(TEST_USER)).thenReturn(true);
+
+    long siteTemplateId = 7l;
+    String siteTemplate = "siteTemplate";
+    when(createModel.getSiteId()).thenReturn(siteTemplateId);
+    PortalConfig templatePortalConfig = mock(PortalConfig.class);
+    when(layoutService.getPortalConfig(siteTemplateId)).thenReturn(templatePortalConfig);
+    when(templatePortalConfig.getType()).thenReturn(PortalConfig.PORTAL_TEMPLATE);
+    when(templatePortalConfig.getName()).thenReturn(siteTemplate);
 
     String description = "description";
     String uploadId = "56632";
@@ -141,10 +157,10 @@ public class SiteLayoutServiceTest {
     when(portalConfig.getBannerUploadId()).thenReturn(uploadId);
     when(aclService.getAdministratorsGroup()).thenReturn("administrators");
     doAnswer(invocation -> {
-      when(layoutService.getPortalConfig(invocation.getArgument(1, String.class))).thenReturn(portalConfig);
+      when(layoutService.getPortalConfig(invocation.getArgument(1, SiteKey.class))).thenReturn(portalConfig);
       return null;
     }).when(portalConfigService)
-      .createUserPortalConfig(PortalConfig.PORTAL_TYPE, SITE_KEY.getName(), siteTemplate);
+      .createSiteFromTemplate(SiteKey.portalTemplate(siteTemplate), SITE_KEY);
 
     siteLayoutService.createSite(createModel, TEST_USER);
     verify(layoutService).save(portalConfig);
@@ -159,13 +175,15 @@ public class SiteLayoutServiceTest {
     when(portalConfig.getBannerUploadId()).thenReturn(null);
     when(portalConfig.getAccessPermissions()).thenReturn(new String[] { "accessPermission" });
     when(portalConfig.getEditPermission()).thenReturn("editPermission");
-    when(layoutService.getPortalConfig(SITE_KEY.getName())).thenReturn(null);
+
+    when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(null);
     doAnswer(invocation -> {
-      when(layoutService.getPortalConfig(invocation.getArgument(1, String.class))).thenReturn(portalConfig);
+      when(layoutService.getPortalConfig(invocation.getArgument(1, SiteKey.class))).thenReturn(portalConfig);
       return null;
     }).when(portalConfigService)
-      .createUserPortalConfig(PortalConfig.PORTAL_TYPE, SITE_KEY.getName(), siteTemplate);
+      .createSiteFromTemplate(SiteKey.portalTemplate(siteTemplate), SITE_KEY);
     siteLayoutService.createSite(createModel, TEST_USER);
+
     verify(portalConfig).setAccessPermissions(argThat(p -> p[0].equals("accessPermission")));
     verify(portalConfig).setEditPermission("editPermission");
     verify(portalConfig).setDisplayed(false);

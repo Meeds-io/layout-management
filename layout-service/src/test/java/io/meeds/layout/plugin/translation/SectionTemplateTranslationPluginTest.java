@@ -57,14 +57,14 @@ public class SectionTemplateTranslationPluginTest {
   private String                           username = "test";
 
   @Test
-  public void getObjectType() {
+  void getObjectType() {
     assertEquals("sectionTemplate", translationPlugin.getObjectType());
     assertEquals(SectionTemplateTranslationPlugin.OBJECT_TYPE, translationPlugin.getObjectType());
   }
 
   @Test
   @SneakyThrows
-  public void hasEditPermission() {
+  void hasEditPermission() {
     assertFalse(translationPlugin.hasEditPermission(0l, null));
     assertFalse(translationPlugin.hasEditPermission(0l, username));
     when(layoutAclService.isAdministrator(username)).thenReturn(true);
@@ -73,19 +73,19 @@ public class SectionTemplateTranslationPluginTest {
 
   @Test
   @SneakyThrows
-  public void hasAccessPermission() {
+  void hasAccessPermission() {
     assertTrue(translationPlugin.hasAccessPermission(1, username));
   }
 
   @Test
   @SneakyThrows
-  public void getAudienceId() {
+  void getAudienceId() {
     assertEquals(0l, translationPlugin.getAudienceId(0l));
   }
 
   @Test
   @SneakyThrows
-  public void getSpaceId() {
+  void getSpaceId() {
     assertEquals(0l, translationPlugin.getSpaceId(0l));
   }
 

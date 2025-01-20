@@ -25,6 +25,8 @@ import java.util.Objects;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import org.exoplatform.portal.config.model.PortalConfig;
+
 import io.meeds.layout.entity.PortletInstanceCategoryEntity;
 import io.meeds.layout.entity.PortletInstanceEntity;
 import io.meeds.layout.entity.SectionTemplateEntity;
@@ -33,12 +35,16 @@ import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.model.PortletInstanceCategory;
 import io.meeds.layout.model.PortletInstancePreference;
 import io.meeds.layout.model.SectionTemplate;
+import io.meeds.layout.model.SiteTemplate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class EntityMapper {
+
+  public static final String SITE_ENABLED_PROP = "SITE_ENABLED";
+
   private EntityMapper() {
     // Utils Class
   }
@@ -105,6 +111,16 @@ public class EntityMapper {
                                entity.getContent(),
                                entity.isSystem(),
                                entity.isDisabled());
+  }
+
+  public static SiteTemplate toSiteTemplate(PortalConfig portalConfig) {
+    SiteTemplate siteTemplate = new SiteTemplate();
+    siteTemplate.setId(portalConfig.getId());
+    siteTemplate.setLayout(portalConfig.getName());
+    siteTemplate.setIcon(portalConfig.getIcon());
+    siteTemplate.setSystem(!portalConfig.isRemovable());
+    siteTemplate.setDisabled(StringUtils.equals(portalConfig.getProperty(SITE_ENABLED_PROP), "false"));
+    return siteTemplate;
   }
 
   private static String getPreferencesString(PortletInstance instance) {

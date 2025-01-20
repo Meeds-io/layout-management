@@ -20,13 +20,14 @@
   <exo-drawer
     ref="siteNavigationAddElementDrawer"
     id="siteNavigationAddElementDrawer"
+    v-model="drawer"
     :loading="loading"
     right
     eager
     allow-expand
     @closed="close"
     @expand-updated="$root.$emit('toggle-expand',$event)">
-    <template slot="title">
+    <template #title>
       <div class="d-flex">
         <v-icon
           size="16"
@@ -37,7 +38,7 @@
         <span class="ms-2"> {{ drawerTitle }}</span>
       </div>
     </template>
-    <template slot="content">
+    <template v-if="drawer" #content>
       <v-card class="mx-4 my-4 px-2 py-2 elevation-0">
         <v-form
           v-model="isValidForm">
@@ -65,20 +66,19 @@
     </template>
   </exo-drawer>
 </template>
-
 <script>
 export default {
-
   data() {
     return {
       elementType: 'PAGE',
       target: 'SAME_TAB',
+      drawer: false,
+      loading: false,
       navigationNode: null,
       elementName: null,
       elementTitle: null,
       pageTempalateId: null,
       selectedPage: null,
-      loading: false,
       resetDrawer: true,
       isValidForm: true,
       pageTemplates: null,

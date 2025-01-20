@@ -20,22 +20,16 @@
   <exo-drawer
     ref="nodeIconPickerDrawer"
     id="nodeIconPickerDrawer"
+    v-model="drawer"
     :right="!$vuetify.rtl"
-    eager
     :allow-expand="expanded"
+    go-back-button
+    eager
     @closed="close">
-    <template slot="title">
-      <div class="d-flex">
-        <v-icon
-          size="16"
-          class="clickable"
-          @click="close">
-          fas fa-arrow-left
-        </v-icon>
-        <span class="ms-2"> {{ $t('siteNavigation.nodeIconPickerDrawer.title') }}</span>
-      </div>
+    <template #title>
+      {{ $t('siteNavigation.nodeIconPickerDrawer.title') }}
     </template>
-    <template slot="content">
+    <template v-if="drawer" #content>
       <v-card-text class="d-flex pb-2">
         <v-text-field
           v-model="keyword"
@@ -127,8 +121,6 @@
     </template>
   </exo-drawer>
 </template>
-
-
 <script>
 export default {
   props: {
@@ -139,6 +131,7 @@ export default {
   },
   data() {
     return {
+      drawer: false,
       allIcons: {},
       iconsNumber: 16,
       showMore: false,

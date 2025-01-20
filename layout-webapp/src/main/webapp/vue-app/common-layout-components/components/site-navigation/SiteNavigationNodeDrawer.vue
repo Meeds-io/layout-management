@@ -21,23 +21,17 @@
     <exo-drawer
       id="siteNavigationAddNodeDrawer"
       ref="siteNavigationAddNodeDrawer"
+      v-model="drawer"
       :loading="loading"
-      right
+      go-back-button
       allow-expand
+      right
       @expand-updated="expanded = $event"
       @closed="close">
-      <template slot="title">
-        <div class="d-flex">
-          <v-icon
-            size="16"
-            class="clickable"
-            @click="close()">
-            fas fa-arrow-left
-          </v-icon>
-          <span> {{ title }} </span>
-        </div>
+      <template #title>
+        {{ title }}
       </template>
-      <template slot="content">
+      <template v-if="drawer" #content>
         <v-form
           v-model="isValidInputs">
           <v-card-text class="d-flex pb-2">
@@ -270,6 +264,7 @@ export default {
       startScheduleTime: new Date(new Date().getTime() + 900000),
       endScheduleTime: new Date(new Date().getTime() + 1800000),
       navigationNode: null,
+      drawer: false,
       loading: false,
       nodeLabel: null,
       nodeId: null,
@@ -552,15 +547,12 @@ export default {
     openAddElementDrawer() {
       this.$root.$emit('open-add-element-drawer', this.nodeId, this.valuesPerLanguage['en'] || this.nodeLabel,  this.navigationNode, this.navigationNode?.pageKey && this.editMode || false);
     },
-    conversionRules() {
-      return this.nodeLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]/g, '').replace(/\s+/g, '').toLowerCase();
-    },
     changeSelectedPage(selectedPage) {
       this.selectedPage = selectedPage;
     },
     blurOnNodeLabel() {
       if (this.nodeId == null) {
-        this.nodeId = this.conversionRules();
+        this.nodeId = this.nodeLabel && this.nodeLabel.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]/g, '').replace(/\s+/g, '').toLowerCase();
       }
     },
     openTranslationDrawer() {

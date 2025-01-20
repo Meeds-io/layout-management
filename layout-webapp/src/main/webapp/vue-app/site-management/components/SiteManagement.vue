@@ -18,9 +18,17 @@
 -->
 <template>
   <v-app class="siteManagementApplication">
-    <v-main class="pa-5 application-body">
-      <site-management-toolbar />
-      <site-management-sites-list :sites="sites" />
+    <v-main class="application-body pb-5">
+      <h4 class="text-title px-5 pt-5 ma-0">
+        {{ $t('siteManagement.title') }}
+      </h4>
+      <site-management-toolbar
+        ref="toolbar"
+        @site-filter="keyword = $event" />
+      <site-management-list
+        :sites="sites"
+        :loading="loading > 0"
+        :keyword="keyword" />
     </v-main>
     <exo-confirm-dialog
       ref="deleteSiteConfirmDialog"
@@ -29,12 +37,13 @@
       :ok-label="$t('siteManagement.label.confirm')"
       :cancel-label="$t('siteManagement.label.cancel')"
       @ok="deleteSite" />
-    <site-properties-drawer />
-    <site-template-drawer />
+    <site-form-drawer
+      :sites="sites" />
     <site-navigation-drawer />
     <site-navigation-node-drawer />
     <site-navigation-element-drawer />
     <manage-permissions-drawer />
+    <site-template-drawer />
     <layout-analytics application-name="siteManagement" />
   </v-app>
 </template>
@@ -46,16 +55,33 @@ export default {
       sites: [],
       loading: 0,
       siteToDelete: null,
+      keyword: null,
       deleteConfirmMessage: '',
     };
   },
   created() {
+    this.$root.$on('site-created', this.handleSiteCreation);
+    this.$root.$on('site-updated', this.refreshSites);
     this.$root.$on('delete-site', this.confirmDelete);
-    this.$root.$on('refresh-sites', this.getSites);
-    this.getSites();
+    this.refreshSites();
+  },
+  beforDestroy() {
+    this.$root.$off('site-created', this.handleSiteCreation);
+    this.$root.$off('site-updated', this.refreshSites);
+    this.$root.$on('delete-site', this.confirmDelete);
   },
   methods: {
-    getSites() {
+    handleSiteCreation(site) {
+      this.refreshSites();
+      this.$root.$emit('open-site-navigation-drawer', {
+        siteName: site.name,
+        siteType: site.siteType,
+        siteId: site.siteId,
+        siteLabel: site.displayName,
+        information: 'sites.created.information',
+      });
+    },
+    refreshSites() {
       this.loading++;
       return this.$siteService.getSites('PORTAL', null, 'public', true, true, false, false, false, null, true)
         .then(sites => this.sites = sites?.filter(s => !s?.properties?.IS_SPACE_PUBLIC_SITE) || [])
@@ -69,7 +95,7 @@ export default {
     deleteSite() {
       this.loading++;
       return this.$siteLayoutService.deleteSite(this.siteToDelete.siteType, this.siteToDelete.name)
-        .then(() => this.$root.$emit('refresh-sites'))
+        .then(() => this.refreshSites())
         .finally(() => this.loading--);
     },
   }
