@@ -46,8 +46,6 @@ public class SpaceBannerHomePageUpgradePlugin extends LayoutApplicationReference
 
   private final EntityManagerService entityManagerService;
 
-  private final PageStorage pageStorage;
-
   private final PageDAO     pageDAO;
 
   private final WindowDAO   windowDAO;
@@ -55,12 +53,10 @@ public class SpaceBannerHomePageUpgradePlugin extends LayoutApplicationReference
   public SpaceBannerHomePageUpgradePlugin(SettingService settingService,
                                           InitParams initParams,
                                           EntityManagerService entityManagerService,
-                                          PageStorage pageStorage,
                                           PageDAO pageDAO,
                                           WindowDAO windowDAO, CacheService cacheService, PortletInstanceService portletInstanceService) {
     super(cacheService, settingService,portletInstanceService,windowDAO, initParams);
     this.entityManagerService = entityManagerService;
-    this.pageStorage = pageStorage;
     this.pageDAO = pageDAO;
     this.windowDAO = windowDAO;
   }

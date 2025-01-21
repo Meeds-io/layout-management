@@ -36,7 +36,6 @@ import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.storage.cache.CacheLayoutStorage;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,14 +45,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,9 +67,6 @@ public class SpaceBannerHomePageUpgradePluginTest {
   private EntityManagerService entityManagerService;
 
   @Mock
-  private PageStorage pageStorage;
-
-  @Mock
   private WindowDAO                      windowDAO;
 
   @Mock
@@ -89,20 +79,10 @@ public class SpaceBannerHomePageUpgradePluginTest {
   private EntityManager entityManager;
 
   @Mock
-  private ApplicationReferenceUpgrade    applicationModification;
-
-  @Mock
-  private PortletInstance                portletInstance;
-
-  @Mock
   private ExoCache<Serializable, Object> portletPreferencesCache;
 
   @Mock
   private Query query;
-
-  private String                         oldContentId = "oldApp/oldContentId";
-
-  private String                         newContentId = "newApp/newContentId";
 
   @BeforeEach
   public void before() {
@@ -145,7 +125,6 @@ public class SpaceBannerHomePageUpgradePluginTest {
     SpaceBannerHomePageUpgradePlugin spaceBannerHomePageUpgradePlugin = new SpaceBannerHomePageUpgradePlugin(settingService,
                                                                                                              initParams,
                                                                                                              entityManagerService,
-                                                                                                             pageStorage,
                                                                                                              pageDAO,
                                                                                                              windowDAO,
                                                                                                              cacheService,
