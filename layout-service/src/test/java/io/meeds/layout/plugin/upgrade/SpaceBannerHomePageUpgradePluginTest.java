@@ -18,8 +18,6 @@
  */
 package io.meeds.layout.plugin.upgrade;
 
-import io.meeds.layout.model.ApplicationReferenceUpgrade;
-import io.meeds.layout.model.PortletInstance;
 import io.meeds.layout.service.PortletInstanceService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -32,7 +30,6 @@ import org.exoplatform.portal.jdbc.entity.PageEntity;
 import org.exoplatform.portal.jdbc.entity.WindowEntity;
 import org.exoplatform.portal.mop.dao.PageDAO;
 import org.exoplatform.portal.mop.dao.WindowDAO;
-import org.exoplatform.portal.mop.storage.PageStorage;
 import org.exoplatform.portal.mop.storage.cache.CacheLayoutStorage;
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -94,7 +91,7 @@ public class SpaceBannerHomePageUpgradePluginTest {
   @SneakyThrows
   public void processUpgrade() {
 
-    ArrayList pageIdList = new ArrayList();
+    ArrayList<Long> pageIdList = new ArrayList<>();
     pageIdList.add(1L);
     pageIdList.add(2L);
     when(query.getResultList()).thenReturn(pageIdList);
