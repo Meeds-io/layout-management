@@ -90,7 +90,7 @@
             :height="hasApplication && 50 || '50%'"
             max-height="200"
             color="transparent"
-            class="full-width d-flex flex-wrap align-center justify-center px-2"
+            class="full-width d-flex flex-wrap align-center justify-center"
             flat>
             <div class="d-flex flex-wrap align-center justify-center">
               <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
