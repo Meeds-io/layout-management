@@ -85,7 +85,7 @@ public class SpaceBannerHomePageUpgradePlugin extends LayoutApplicationReference
     String type = element.getString("type");
     if (type.equals("WINDOW")) {
       WindowEntity windowEntity = windowDAO.find(id);
-      if (windowEntity.getContentId().equals("social-portlet/SpaceMenuPortlet")) {
+      if (windowEntity != null && windowEntity.getContentId().equals("social-portlet/SpaceMenuPortlet")) {
         updateWindow(id);
       }
     } else {
