@@ -40,7 +40,9 @@ import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PersistentApplicationState;
+import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
@@ -56,6 +58,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(value = Include.NON_EMPTY)
 public class LayoutModel {
+
+  private static final String             PAGE_BODY_TEMPLATE   = "PageBody";
 
   protected String                        id;
 
@@ -240,7 +244,11 @@ public class LayoutModel {
       this.textSubtitleFontStyle = cssStyle.getTextSubtitleFontStyle();
     }
 
-    if (model instanceof Container container) {
+    if (model instanceof PageBody pageBody) {
+      this.storageId = pageBody.getStorageId();
+      this.storageName = pageBody.getStorageName();
+      this.template = PAGE_BODY_TEMPLATE;
+    } else if (model instanceof Container container) {
       this.id = container.getId();
       this.storageId = container.getStorageId();
       this.storageName = container.getStorageName();
@@ -328,10 +336,32 @@ public class LayoutModel {
     return page;
   }
 
+  public PortalConfig toSite() {
+    PortalConfig site = new PortalConfig(storageId);
+    ModelObject modelObject = this.children == null ? new PageBody() :
+                                                    this.children.stream()
+                                                                 .map(LayoutModel::toModelObject)
+                                                                 .findFirst()
+                                                                 .orElse(null);
+    if (modelObject instanceof Container container) {
+      site.setPortalLayout(container);
+    } else {
+      Container container = new Container();
+      container.setChildren(new ArrayList<>());
+      container.getChildren().add(modelObject);
+      site.setPortalLayout(container);
+    }
+    return site;
+  }
+
   public static ModelObject toModelObject(LayoutModel layoutModel) { // NOSONAR
     ModelStyle cssStyle = mapToStyle(layoutModel);
 
-    if (StringUtils.isNotBlank(layoutModel.template)) {
+    if (StringUtils.equals(layoutModel.template, PAGE_BODY_TEMPLATE)) {
+      PageBody pageBody = new PageBody(layoutModel.getStorageId());
+      pageBody.setStorageName(layoutModel.getStorageName());
+      return pageBody;
+    } else if (StringUtils.isNotBlank(layoutModel.template)) {
       Container container = new Container(layoutModel.getStorageId());
       container.setId(layoutModel.getId());
       container.setStorageName(layoutModel.getStorageName());

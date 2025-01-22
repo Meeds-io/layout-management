@@ -19,16 +19,13 @@
  */
 
 import './initComponents.js';
-import '../layout-editor/initComponents.js';
 
 import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 import '../common-section-template/main.js';
 import '../common-illustration/main.js';
-
-import '../layout-editor/extensions.js';
-import '../layout-editor/services.js';
+import '../common-layout/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {

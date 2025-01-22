@@ -98,9 +98,6 @@ export default {
     applicationId() {
       return this.container?.children?.[0]?.storageId || this.container?.storageId;
     },
-    nodeId() {
-      return this.$root.draftNodeId;
-    },
     nodeUri() {
       return this.$root.draftNodeUri;
     },
