@@ -18,7 +18,7 @@
  */
 
 import './initComponents.js';
-import '../common-layout-components/initComponents.js';
+import '../common-sites/main.js';
 import '../common-site-template/main.js';
 
 // get overridden components if exists

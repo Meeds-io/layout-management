@@ -38,6 +38,13 @@
 
   <portlet-skin>
     <application-name>layout</application-name>
+    <portlet-name>SiteLayoutEditor</portlet-name>
+    <skin-name>Enterprise</skin-name>
+    <additional-module>LayoutEditor</additional-module>
+  </portlet-skin>
+
+  <portlet-skin>
+    <application-name>layout</application-name>
     <portlet-name>SectionEditor</portlet-name>
     <skin-name>Enterprise</skin-name>
     <additional-module>LayoutEditor</additional-module>
@@ -178,6 +185,46 @@
   </portlet>
 
   <portlet>
+    <name>SiteLayoutEditor</name>
+    <module>
+      <script>
+        <minify>false</minify>
+        <path>/js/siteLayoutEditor.bundle.js</path>
+      </script>
+      <depends>
+        <module>extensionRegistry</module>
+      </depends>
+      <depends>
+        <module>commonVueComponents</module>
+      </depends>
+      <depends>
+        <module>commonLayoutComponents</module>
+      </depends>
+      <depends>
+        <module>vueDraggable</module>
+      </depends>
+      <depends>
+        <module>translationField</module>
+      </depends>
+      <depends>
+        <module>attachImage</module>
+      </depends>
+      <depends>
+        <module>html2canvas</module>
+      </depends>
+      <depends>
+        <module>vue</module>
+      </depends>
+      <depends>
+        <module>vuetify</module>
+      </depends>
+      <depends>
+        <module>eXoVueI18n</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <portlet>
     <name>LayoutEditor</name>
     <module>
       <load-group>layout-editor-group</load-group>
@@ -224,7 +271,7 @@
       <load-group>layout-editor-group</load-group>
       <script>
         <minify>false</minify>
-        <path>/js/sectionEditor.bundle.js</path>
+        <path>/js/siteLayoutEditor.bundle.js</path>
       </script>
       <depends>
         <module>extensionRegistry</module>

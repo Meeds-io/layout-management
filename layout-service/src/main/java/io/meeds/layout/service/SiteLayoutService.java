@@ -33,6 +33,7 @@ import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
@@ -52,6 +53,8 @@ import lombok.SneakyThrows;
 
 @Service
 public class SiteLayoutService {
+
+  private static final String     SITE_DOESNT_EXIST_MSG = "Site %s doesn't exist";
 
   @Autowired
   private LayoutService           layoutService;
@@ -80,6 +83,11 @@ public class SiteLayoutService {
       throw new IllegalAccessException();
     }
     return portalConfig;
+  }
+
+  public ModelObject getSiteLayout(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
+    PortalConfig site = getSite(siteKey, username);
+    return site.getPortalLayout();
   }
 
   public PortalConfig getSite(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
@@ -136,6 +144,26 @@ public class SiteLayoutService {
     return createdPortalConfig;
   }
 
+  public SiteKey createDraftSite(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
+    if (!aclService.canEditSite(siteKey, username)) {
+      throw new IllegalAccessException(String.format("Not allowed to edit site %s", siteKey));
+    }
+    PortalConfig site = getSite(siteKey, username);
+
+    String clonedSiteName = site.getType() + "_" + site.getName() + "_draft_" + username;
+
+    PortalConfig draftPortalConfig = site.clone();
+    draftPortalConfig.setType(PortalConfig.DRAFT);
+    draftPortalConfig.setName(clonedSiteName);
+    draftPortalConfig.resetStorage();
+    SiteKey draftSiteKey = new SiteKey(draftPortalConfig.getType(), draftPortalConfig.getName());
+    if (layoutService.getPortalConfig(draftSiteKey) != null) {
+      layoutService.remove(draftPortalConfig);
+    }
+    layoutService.create(draftPortalConfig);
+    return draftSiteKey;
+  }
+
   public void updateSite(SiteUpdateModel updateModel, String username) throws IllegalAccessException,
                                                                        ObjectNotFoundException {
     SiteKey siteKey = new SiteKey(updateModel.getSiteType(), updateModel.getSiteName());
@@ -176,7 +204,7 @@ public class SiteLayoutService {
     SiteKey siteKey = new SiteKey(permissionUpdateModel.getSiteType(), permissionUpdateModel.getSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
-      throw new ObjectNotFoundException(String.format("Site %s doesn't exist", siteKey));
+      throw new ObjectNotFoundException(String.format(SITE_DOESNT_EXIST_MSG, siteKey));
     } else if (!aclService.canEditSite(siteKey, username)) {
       throw new IllegalAccessException(String.format("Site permissions with key %s can't be edited by user %s",
                                                      siteKey,
@@ -188,6 +216,21 @@ public class SiteLayoutService {
     if (permissionUpdateModel.getAccessPermissions() != null) {
       portalConfig.setAccessPermissions(permissionUpdateModel.getAccessPermissions().toArray(new String[0]));
     }
+    layoutService.save(portalConfig);
+  }
+
+  public void updateSiteLayout(SiteKey siteKey,
+                               PortalConfig site,
+                               String username) throws IllegalAccessException, ObjectNotFoundException {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException(String.format(SITE_DOESNT_EXIST_MSG, siteKey));
+    } else if (!aclService.canEditSite(siteKey, username)) {
+      throw new IllegalAccessException(String.format("Site layout with key %s can't be edited by user %s",
+                                                     siteKey,
+                                                     username));
+    }
+    portalConfig.setPortalLayout(site.getPortalLayout());
     layoutService.save(portalConfig);
   }
 
