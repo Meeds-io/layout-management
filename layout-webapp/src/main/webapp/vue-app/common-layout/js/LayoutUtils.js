@@ -25,6 +25,13 @@ export const simpleTemplate = 'system:/groovy/portal/webui/container/UIContainer
 export const gridTemplate = 'GridContainer';
 export const flexTemplate = 'FlexContainer';
 export const cellTemplate = 'CellContainer';
+export const siteTemplate = 'Site';
+export const siteBodyMiddleTemplate = 'SiteMiddleBody';
+export const pageBodyTemplate = 'PageBody';
+export const sidebarTemplate = 'Sidebar';
+export const sidebarCellTemplate = 'SidebarCell';
+export const bannerTemplate = 'Banner';
+export const bannerCellTemplate = 'BannerCell';
 
 export const defaultMarginTop = 20;
 export const defaultMarginRight = 20;
@@ -218,6 +225,9 @@ export function newParentContainer(layout) {
 }
 
 export function getApplications(container, applications) {
+  if (!container) {
+    return;
+  }
   if (!applications) {
     applications = [];
   }
@@ -331,6 +341,55 @@ export function applyContainerStyle(container, containerStyle) {
   Vue.set(container, 'textSubtitleFontSize', containerStyle.textSubtitleFontSize || null);
   Vue.set(container, 'textSubtitleFontWeight', containerStyle.textSubtitleFontWeight || null);
   Vue.set(container, 'textSubtitleFontStyle', containerStyle.textSubtitleFontStyle || null);
+}
+
+export function parseSite(layout) {
+  const compatible = layout.children
+    && layout.template === siteTemplate
+    && layout.children.every(c => c.template === sidebarTemplate || c.template === siteBodyMiddleTemplate)
+    && layout?.children?.[0]?.template === sidebarTemplate
+    && layout?.children?.[1]?.template === siteBodyMiddleTemplate
+    && layout?.children?.[2]?.template === sidebarTemplate;
+  if (!compatible) {
+    const applications = getApplications(layout);
+    layout.template = siteTemplate;
+    layout.children = [
+      {
+        ...newContainer(sidebarTemplate),
+        children: [
+          newContainer(sidebarCellTemplate),
+        ]
+      },
+      {
+        ...newContainer(siteBodyMiddleTemplate),
+        children: [
+          {
+            ...newContainer(bannerTemplate),
+            children: [
+              newContainer(bannerCellTemplate),
+              newContainer(bannerCellTemplate),
+              newContainer(bannerCellTemplate),
+            ]
+          },
+          newContainer(pageBodyTemplate),
+          {
+            ...newContainer(bannerTemplate),
+            children: [
+              newContainer(bannerCellTemplate),
+            ]
+          }
+        ]
+      },
+      {
+        ...newContainer(sidebarTemplate),
+        children: [
+          newContainer(sidebarCellTemplate),
+        ]
+      }
+    ];
+    return !applications?.length;
+  }
+  return true;
 }
 
 export function parseSections(layout) {
@@ -707,7 +766,10 @@ function newContainer(template, cssClass, parentContainer, index) {
 }
 
 function parseSection(section) {
-  if ((section.template !== gridTemplate && section.template !== flexTemplate)
+  if ((section.template !== gridTemplate
+       && section.template !== flexTemplate
+       && section.template !== sidebarTemplate
+       && section.template !== bannerTemplate)
     || !section.children.length) {
     return;
   }
@@ -723,8 +785,10 @@ function parseSection(section) {
   section.gap = parseGapClasses(section, 'grid-gap');
   section.colsCount = section.colBreakpoints[currentBreakpoint];
   section.rowsCount = section.rowBreakpoints[currentBreakpoint];
-  // Compute cell indexes
-  parseMatrix(section);
+  if (section.template !== gridTemplate && section.template !== flexTemplate) {
+    // Compute cell indexes
+    parseMatrix(section);
+  }
 }
 
 export function parseContainerStyle(container) {

@@ -50,6 +50,51 @@ export function createSite(siteName, siteId, siteLabel, siteDescription, display
   });
 }
 
+export function createDraftSite(siteType, siteName) {
+  const formData = new FormData();
+  if (siteType) {
+    formData.append('siteType', siteType);
+  }
+  if (siteName) {
+    formData.append('siteName', siteName);
+  }
+  const params = new URLSearchParams(formData).toString();
+  return fetch(`/layout/rest/sites/draft?${params}`, {
+    credentials: 'include',
+    method: 'POST',
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when creating site');
+    }
+  });
+}
+
+export function getSiteLayout(siteType, siteName, expand) {
+  const formData = new FormData();
+  if (siteType) {
+    formData.append('siteType', siteType);
+  }
+  if (siteName) {
+    formData.append('siteName', siteName);
+  }
+  if (expand) {
+    formData.append('expand', expand);
+  }
+  const params = new URLSearchParams(formData).toString();
+  return fetch(`/layout/rest/sites/layout?${params}`, {
+    credentials: 'include',
+    method: 'GET',
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else {
+      throw new Error('Error when creating site');
+    }
+  });
+}
+
 export function getSiteById(siteId, lang) {
   const formData = new FormData();
   if (lang) {
@@ -144,6 +189,30 @@ export function updateSite(siteName, siteType, siteLabel, siteDescription, displ
   }).then((resp) => {
     if (!resp?.ok) {
       throw new Error('Error when updating site');
+    }
+  });
+}
+
+export function updateSiteLayout(siteType, siteName, layout, expand) {
+  return fetch(`/layout/rest/sites/layout?siteType=${siteType}&siteName=${siteName}&expand=${expand || ''}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      children: layout.children,
+    }),
+  }).then((resp) => {
+    if (resp?.ok) {
+      return resp.json();
+    } else if (resp.status === 400) {
+      return resp.json()
+        .then(e => {
+          throw new Error(e?.message);
+        });
+    } else {
+      throw new Error(resp.status);
     }
   });
 }
