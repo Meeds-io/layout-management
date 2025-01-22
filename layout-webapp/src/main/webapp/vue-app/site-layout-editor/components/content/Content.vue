@@ -25,7 +25,7 @@
     class="transparent layout-sections-parent full-width mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="layoutToEdit"
+      :container="$root.draftLayout"
       class="layout-page-body d-flex no-border-radius" />
     <layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
@@ -49,7 +49,6 @@
 <script>
 export default {
   data: () => ({
-    layoutToEdit: null,
     isCompatible: true,
     changesReminderOpened: false,
     loading: 1,
@@ -106,25 +105,13 @@ export default {
     },
   },
   created() {
-    this.$root.$on('layout-add-section-drawer', this.addSection);
-    this.$root.$on('layout-edit-section-drawer', this.editSection);
     this.$root.$on('layout-add-application-category-drawer', this.openApplicationCategoryDrawer);
-    this.$root.$on('layout-add-section', this.handleAddSection);
-    this.$root.$on('layout-remove-section', this.handleRemoveSection);
-    this.$root.$on('layout-replace-section', this.handleReplaceSection);
-    this.$root.$on('layout-children-size-updated', this.handleSectionUpdated);
-    this.$root.$on('layout-cell-resize', this.handleCellResize);
-    this.$root.$on('layout-cell-drag', this.handleCellMove);
-    this.$root.$on('layout-cells-select', this.addApplicationOnCells);
-    this.$root.$on('layout-add-application', this.handleAddApplication);
-    this.$root.$on('layout-edit-application', this.handleEditApplication);
-    this.$root.$on('layout-delete-application', this.handleDeleteApplication);
-    this.$root.$on('layout-application-category-drawer-closed', this.resetCellsSelection);
-    this.$root.$on('layout-section-history-add', this.addSectionVersion);
+    this.$root.$on('layout-section-history-add', this.addHistory);
+    this.$root.$on('layout-section-history-undo', this.undoFromHistory);
+    this.$root.$on('layout-section-history-redo', this.redoFromHistory);
     this.$root.$on('layout-site-saved', this.handleSiteSaved);
-    this.$root.$on('layout-apply-grid-style', this.handleApplyGridStyle);
     this.$root.$on('layout-save-draft', this.saveDraft);
-    document.addEventListener('keydown', this.restoreSectionVersion);
+    document.addEventListener('keydown', this.restoreHistory);
   },
   mounted() {
     this.openChangesReminder();
@@ -135,22 +122,22 @@ export default {
         this.$refs.changesReminder.open();
       }
     },
+    switchDisplayMode() {
+      if (this.$root.displayMode === 'mobile') {
+        this.$layoutUtils.applyMobileStyle(this.$root.draftLayout);
+      } else {
+        this.$layoutUtils.applyDesktopStyle(this.$root.draftLayout);
+      }
+    },
     setLayout(layout) {
       this.initContainer(layout);
       const compatible = this.$layoutUtils.parseSite(layout);
-      if (this.layoutToEdit) {
-        Object.assign(this.layoutToEdit, layout);
+      if (this.$root.draftLayout) {
+        Object.assign(this.$root.draftLayout, layout);
       } else {
-        this.layoutToEdit = layout;
+        this.$root.draftLayout = layout;
       }
       this.isCompatible = compatible;
-    },
-    switchDisplayMode() {
-      if (this.$root.displayMode === 'mobile') {
-        this.$layoutUtils.applyMobileStyle(this.layoutToEdit);
-      } else {
-        this.$layoutUtils.applyDesktopStyle(this.layoutToEdit);
-      }
     },
     initContainer(container) {
       if (container.children) {
@@ -159,41 +146,9 @@ export default {
         container.children = [];
       }
     },
-    addSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        this.$refs.sectionAddDrawer.open(parentContainer, index);
-      }
-    },
-    editSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      if (parentContainer) {
-        this.$refs.sectionEditDrawer.open(parentContainer.children[index], index, parentContainer.children.length);
-      }
-    },
-    openApplicationCategoryDrawer(sectionId, container) {
+    openApplicationCategoryDrawer(sectionId) {
       this.$root.selectedSectionId = sectionId;
-      this.$root.selectedCells = [container];
       this.$refs.applicationCategoryDrawer.open();
-    },
-    resetCellsSelection() {
-      window.setTimeout(() => {
-        this.$root.resetMoving();
-        this.$root.initCellsSelection();
-      }, 300);
-    },
-    addApplicationOnCells(selection) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === this.$root.selectedSectionId);
-      if (section) {
-        this.$root.selectedCells = section.children?.filter?.(c =>
-          this.$layoutUtils.isBetween(c.colIndex, selection.fromColIndex, selection.toColIndex)
-          && this.$layoutUtils.isBetween(c.rowIndex, selection.fromRowIndex, selection.toRowIndex)
-        ) || [];
-        this.$refs.applicationCategoryDrawer.open();
-      } else {
-        console.warn(`Can't find section with id ${this.$root.selectedSectionId}`); // eslint-disable-line no-console
-      }
     },
     handleSiteSaved() {
       document.dispatchEvent(new CustomEvent('alert-message', {detail: {
@@ -204,165 +159,46 @@ export default {
         alertType: 'success',
       }}));
     },
-    handleApplyGridStyle() {
-      this.$layoutUtils.applyGridStyle(this.layoutToEdit);
-    },
-    handleAddApplication(application) {
-      const selectedCells = this.$root.selectedCells.slice();
-      const selectedSectionId = this.$root.selectedSectionId;
-      const firstCellRowIndex = Math.min(...selectedCells.map(c => c.rowIndex));
-      const firstCellColIndex = Math.min(...selectedCells.map(c => c.colIndex));
-      const lastCellRowIndex = Math.max(...selectedCells.map(c => c.rowIndex));
-      const lastCellColIndex = Math.max(...selectedCells.map(c => c.colIndex));
-
-      const singleCell = selectedCells?.length === 1;
-      const section = this.$layoutUtils.getSection(this.layoutToEdit, selectedSectionId);
-      try {
-        const firstCell = singleCell && selectedCells[0] || selectedCells.find(c => c.rowIndex === firstCellRowIndex && c.colIndex === firstCellColIndex);
-        const lastCell = singleCell && selectedCells[0] || selectedCells.find(c => c.rowIndex === lastCellRowIndex && c.colIndex === lastCellColIndex);
-        if (!firstCell) {
-          console.error('Can not find the first cell to add an application into it', selectedCells, firstCellRowIndex, firstCellColIndex); // eslint-lint-disable no-console
-          return;
-        } else if (!lastCell) {
-          console.error('Can not find the last cell to add an application into it', selectedCells, lastCellRowIndex, lastCellColIndex); // eslint-lint-disable no-console
-          return;
-        } else {
-          this.addSectionVersion(section.storageId);
-          if (selectedCells.length > 1) {
-            this.mergeCell(selectedSectionId, firstCell, lastCell.rowIndex, lastCell.colIndex);
-          }
-        }
-        const cell = this.$layoutUtils.getCell(this.layoutToEdit, firstCell.storageId);
-        this.$layoutUtils.newApplication(cell, application, true);
-        this.saveDraft();
-      } finally {
-        this.$root.initCellsSelection();
-      }
-    },
-    handleCellResize(event) {
-      this.mergeCell(
-        event.sectionId,
-        event.cell,
-        event.rowIndex + event.rowsCount - 1,
-        event.colIndex + event.colsCount - 1
-      );
-    },
-    handleCellMove(event) {
-      this.moveCell(
-        event.sectionId,
-        event.cell,
-        event.rowIndex,
-        event.colIndex);
-    },
-    handleCellMerge(sectionId, container, targetCellRowIndex, targetCellColIndex) {
-      this.mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex);
-    },
-    handleDeleteApplication(sectionId, container) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === sectionId);
-      if (section) {
-        this.addSectionVersion(sectionId);
-        this.$layoutUtils.deleteCell(section, container);
+    addHistory() {
+      if (!this.$root.sectionHistory) {
+        this.$root.sectionHistory = [JSON.parse(JSON.stringify(this.$root.draftLayout))];
       } else {
-        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
+        this.$root.sectionHistory.push(JSON.parse(JSON.stringify(this.$root.draftLayout)));
       }
+      this.$root.sectionRedo = [];
     },
-    handleEditApplication(sectionId, container, applicationCategoryTitle, applicationTitle) {
-      const section = this.$layoutUtils.getSection(this.layoutToEdit, sectionId);
-      const containerToEdit = this.$layoutUtils.getContainerById(this.layoutToEdit, container.id);
-      this.$refs.applicationPropertiesDrawer.open(section, containerToEdit, applicationCategoryTitle, applicationTitle);
-    },
-    mergeCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === sectionId);
-      if (section) {
-        this.addSectionVersion(sectionId);
-        this.$layoutUtils.resizeCell(section, container, targetCellRowIndex, targetCellColIndex);
-      } else {
-        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
-      }
-    },
-    moveCell(sectionId, container, targetCellRowIndex, targetCellColIndex) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === sectionId);
-      if (section) {
-        this.addSectionVersion(sectionId);
-        this.$layoutUtils.moveCell(section, container, targetCellRowIndex, targetCellColIndex);
-      } else {
-        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
-      }
-    },
-    handleSectionUpdated(container, children, index, type) {
-      container.children = children?.filter(c => !!c) || [];
-      if (type === 'section' && !container.children?.length) {
-        window.setTimeout(() => this.handleRemoveSection(index), 500);
-      }
-    },
-    handleAddSection(section, index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      this.addSectionVersion(section.storageId);
-      parentContainer.children.splice(index || 0, 0, section);
-      this.$layoutUtils.parseSections(this.layoutToEdit);
-      this.saveDraft();
-    },
-    handleRemoveSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children[index];
-      this.addSectionVersion(section.storageId);
-      parentContainer.children.splice(index, 1);
-    },
-    handleReplaceSection(index, section) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      this.addSectionVersion(section.storageId);
-      parentContainer.children.splice(index, 1, section);
-      this.setLayout(this.layoutToEdit);
-    },
-    addSectionVersion(sectionId) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children.find(c => c.storageId === sectionId);
-      if (section) {
-        if (!this.$root.sectionHistory) {
-          this.$root.sectionHistory = [JSON.parse(JSON.stringify(section))];
-        } else {
-          this.$root.sectionHistory.push(JSON.parse(JSON.stringify(section)));
-        }
-        this.$root.sectionRedo = [];
-      }
-    },
-    restoreSectionVersion(event) {
+    restoreHistory(event) {
       if (event.ctrlKey) {
         if (event.keyCode === 90) {
-          if (this.$root.sectionHistory?.length) {
-            const section = this.$root.sectionHistory.pop();
-            const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-            const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
-            if (index >= 0) {
-              this.$root.sectionRedo.push(parentContainer.children[index]);
-              parentContainer.children.splice(index, 1, section);
-            }
-          }
+          this.undoFromHistory();
         } else if (event.keyCode === 89) {
-          if (this.$root.sectionRedo?.length) {
-            const section = this.$root.sectionRedo.pop();
-            const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-            const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
-            if (index >= 0) {
-              this.$root.sectionHistory.push(parentContainer.children[index]);
-              parentContainer.children.splice(index, 1, section);
-            }
-          }
+          this.redoFromHistory();
         }
       }
     },
-    resetSectionHistory() {
+    undoFromHistory() {
+      if (this.$root.sectionHistory?.length) {
+        const draftLayout = this.$root.sectionHistory.pop();
+        this.$root.sectionRedo.push(JSON.parse(JSON.stringify(this.$root.draftLayout)));
+        this.$root.draftLayout = draftLayout;
+      }
+    },
+    redoFromHistory() {
+      if (this.$root.sectionRedo?.length) {
+        const draftLayout = this.$root.sectionRedo.pop();
+        this.$root.sectionHistory.push(JSON.parse(JSON.stringify(this.$root.draftLayout)));
+        this.$root.draftLayout = draftLayout;
+      }
+    },
+    resetHistory() {
       this.$root.sectionHistory = [];
       this.$root.sectionRedo = [];
     },
     saveDraft(layout) {
-      this.resetSectionHistory();
+      this.resetHistory();
 
       this.loading++;
-      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || this.layoutToEdit, false, true);
+      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || JSON.parse(JSON.stringify(this.$root.draftLayout)), false, true);
       return this.$siteLayoutService.updateSiteLayout(this.$root.siteType, this.$root.siteName, layoutToUpdate, 'contentId')
         .then(layout => {
           this.setLayout(layout);

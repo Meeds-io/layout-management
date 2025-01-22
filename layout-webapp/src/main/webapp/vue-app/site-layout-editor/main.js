@@ -63,6 +63,7 @@ export function init() {
           branding: null,
           displayMode: 'desktop',
           layout: null,
+          draftLayout: null,
           site: null,
           draftSite: null,
           draftSiteId: null,
