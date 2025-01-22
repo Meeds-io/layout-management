@@ -18,7 +18,7 @@
  */
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 1000,
+  rank: 1500,
   type: 'default',
   isValid: container => container?.template === 'Container',
   containerType: 'layout-editor-container',
@@ -32,14 +32,63 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 500,
+  rank: 400,
   type: 'cell',
   isValid: container => container?.template === 'CellContainer',
   containerType: 'layout-editor-container-cell',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 500,
+  type: 'Site',
+  isValid: container => container?.template === 'Site',
+  containerType: 'layout-editor-container-site',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 500,
+  type: 'PageBody',
+  isValid: container => container?.template === 'PageBody',
+  containerType: 'layout-editor-container-page-body',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 600,
+  type: 'Sibebar',
+  isValid: container => container?.template === 'Sidebar',
+  containerType: 'layout-editor-container-site-sidebar-section',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 700,
+  type: 'SidebarCell',
+  isValid: container => container?.template === 'SidebarCell',
+  containerType: 'layout-editor-container-site-sidebar-cell',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 800,
+  type: 'Banner',
+  isValid: container => container?.template === 'Banner',
+  containerType: 'layout-editor-container-site-banner-section',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 900,
+  type: 'BannerCell',
+  isValid: container => container?.template === 'BannerCell',
+  containerType: 'layout-editor-container-site-banner-cell',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 1000,
+  type: 'SiteMiddleBody',
+  isValid: container => container?.template === 'SiteMiddleBody',
+  containerType: 'layout-editor-container-site-middle-section',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 1500,
   type: 'application',
   isValid: container => !container.type && !container.template,
   containerType: 'layout-editor-container-application',
