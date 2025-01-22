@@ -28,7 +28,7 @@
             :aria-label="$t('layout.undoChanges')"
             :disabled="!canUndo"
             icon
-            @click="undo">
+            @click="$root.$emit('layout-section-history-undo')">
             <v-icon size="20" class="icon-default-color">fa-undo</v-icon>
           </v-btn>
         </div>
@@ -42,7 +42,7 @@
             :aria-label="$t('layout.redoChanges')"
             :disabled="!canRedo"
             icon
-            @click="redo">
+            @click="$root.$emit('layout-section-history-redo')">
             <v-icon size="20" class="icon-default-color">fa-redo</v-icon>
           </v-btn>
         </div>
@@ -62,26 +62,6 @@ export default {
     },
     canRedo() {
       return !!this.$root.sectionRedo?.length;
-    },
-  },
-  methods: {
-    undo() {
-      const section = this.$root.sectionHistory.pop();
-      const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
-      const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
-      if (index >= 0) {
-        this.$root.sectionRedo.push(parentContainer.children[index]);
-        parentContainer.children.splice(index, 1, section);
-      }
-    },
-    redo() {
-      const section = this.$root.sectionRedo.pop();
-      const parentContainer = this.$layoutUtils.getParentContainer(this.$root.layout);
-      const index = parentContainer.children.findIndex(c => c.storageId === section.storageId);
-      if (index >= 0) {
-        this.$root.sectionHistory.push(parentContainer.children[index]);
-        parentContainer.children.splice(index, 1, section);
-      }
     },
   },
 };
