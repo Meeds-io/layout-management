@@ -747,7 +747,7 @@ export function newCell(section, index, rows, cols) {
   return container;
 }
 
-function newContainer(template, cssClass, parentContainer, index) {
+export function newContainer(template, cssClass, parentContainer, index) {
   const container = JSON.parse(JSON.stringify(containerModel));
   container.template = template;
   container.cssClass = cssClass;

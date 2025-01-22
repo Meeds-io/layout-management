@@ -50,6 +50,7 @@
       </coediting>
       <layout-editor-cells-selection-box />
     </main>
+    <site-layout-editor-edit-sections-drawer />
     <layout-analytics application-name="siteLayoutEditor" />
   </v-app>
 </template>
