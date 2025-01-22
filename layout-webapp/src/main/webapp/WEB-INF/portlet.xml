@@ -64,6 +64,29 @@
   </portlet>
 
   <portlet>
+    <portlet-name>SiteLayoutEditor</portlet-name>
+    <display-name>Site Layout Editor Portlet</display-name>
+    <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
+    <init-param>
+      <name>portlet-view-dispatched-file-path</name>
+      <value>/WEB-INF/jsp/siteLayoutEditor.jsp</value>
+    </init-param>
+    <init-param>
+      <name>layout-css-class</name>
+      <value>no-layout-style</value>
+    </init-param>
+    <supports>
+      <mime-type>text/html</mime-type>
+    </supports>
+    <supported-locale>en</supported-locale>
+    <resource-bundle>locale.portlet.LayoutEditor</resource-bundle>
+    <portlet-info>
+      <title>Site Layout Editor</title>
+      <keywords>Site Layout Editor Management</keywords>
+    </portlet-info>
+  </portlet>
+
+  <portlet>
     <portlet-name>LayoutEditor</portlet-name>
     <display-name>Layout Editor Portlet</display-name>
     <portlet-class>org.exoplatform.commons.api.portlet.GenericDispatchedViewPortlet</portlet-class>
