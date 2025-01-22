@@ -183,10 +183,9 @@ public class PageLayoutService {
   }
 
   @SneakyThrows
-  public PageContext createPage(PageCreateModel pageModel,
-                                String username) throws ObjectNotFoundException,
-                                                 IllegalAccessException,
-                                                 IllegalArgumentException {
+  public PageContext createPage(PageCreateModel pageModel, String username) throws ObjectNotFoundException,
+                                                                            IllegalAccessException,
+                                                                            IllegalArgumentException {
     SiteKey siteKey = new SiteKey(pageModel.getPageSiteType(), pageModel.getPageSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {

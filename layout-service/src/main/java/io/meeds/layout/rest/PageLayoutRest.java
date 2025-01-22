@@ -195,7 +195,7 @@ public class PageLayoutRest {
                                       LayoutModel layoutModel) {
     try {
       pageLayoutService.updatePageLayout(pageRef,
-                                         RestEntityBuilder.fromLayoutModel(layoutModel),
+                                         layoutModel.toPage(),
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
       return getPageLayout(request, pageRef, 0, false, expand);
