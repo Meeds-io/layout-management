@@ -98,7 +98,7 @@ export default {
       return !!this.lockHolders?.length;
     },
     hasDraft() {
-      return this.revision && this.revision !== this.value;
+      return this.revision && String(this.revision) !== String(this.value);
     },
     display() {
       return this.disabled || (this.initialized && !this.locked && !this.hasDraft);
@@ -206,7 +206,7 @@ export default {
       if (revision) {
         return this.$coeditingService.getRevision(this.objectType, this.objectId)
           .then(data => {
-            if (!data?.revision || revision === data.revision) {
+            if (!data?.revision || String(revision) === String(data.revision)) {
               return this.$coeditingService.setLock(this.objectType, this.objectId, `${revision}`)
                 .then(() => this.draft = {revision});
             } else {
