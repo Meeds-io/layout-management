@@ -28,36 +28,31 @@
       :class="cssClass"
       :style="cssStyle"
       :options="dragOptions"
-      item-key="storageId"
       class="position-relative"
       @start="startMoving"
       @end="endMoving">
-      <slot name="header"></slot>
       <slot v-if="$slots.content" name="content"></slot>
       <template v-else-if="hasChildren">
-        <template v-for="(child, i) in children">
-          <layout-editor-container-extension
-            v-if="child"
-            :key="child.storageId"
-            :container="child"
-            :parent-id="storageId"
-            :index="i"
-            :length="childrenSize"
-            :class="hideChildren && 'invisible'"
-            class="draggable-container-flex"
-            @initialized="$emit('initialized', child)"
-            @move-start="moveStart"
-            @move-end="moveEnd" />
-        </template>
+        <layout-editor-container-extension
+          v-for="(child, i) in children"
+          :key="child.storageId"
+          :container="child"
+          :parent-id="storageId"
+          :index="i"
+          :length="childrenSize"
+          :class="hideChildren && 'invisible'"
+          class="draggable-container-flex"
+          @initialized="$emit('initialized', child)"
+          @move-start="moveStart"
+          @move-end="moveEnd" />
       </template>
-      <slot name="footer"></slot>
+      <slot v-if="$slots.footer" name="footer"></slot>
     </draggable>
     <div
       v-else
       :id="id"
       :class="cssClass"
       :style="cssStyle">
-      <slot name="header"></slot>
       <slot v-if="$slots.content" name="content"></slot>
       <template v-else-if="hasChildren">
         <layout-editor-container-extension
@@ -74,7 +69,7 @@
           @move-start="moveStart"
           @move-end="moveEnd" />
       </template>
-      <slot name="footer"></slot>
+      <slot v-if="$slots.footer" name="footer"></slot>
     </div>
   </v-hover>
 </template>
@@ -116,10 +111,19 @@ export default {
   },
   data: () => ({
     hover: false,
-    children: [],
     dragged: false,
   }),
   computed: {
+    children: {
+      get() {
+        return this.container.children?.slice?.() || [];
+      },
+      set(value) {
+        if (!this.isCell && JSON.stringify(this.container.children) !== JSON.stringify(value)) {
+          this.$set(this.container, 'children', value?.filter?.(c => c));
+        }
+      }
+    },
     storageId() {
       return this.container.storageId;
     },
@@ -157,18 +161,20 @@ export default {
       return `${this.containerCssClass?.replace?.('layout-sticky-application', '') || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     isCell() {
-      return this.container.template === this.$layoutUtils.cellTemplate;
+      return this.container.template === this.$layoutUtils.cellTemplate
+        || this.container.template === this.$layoutUtils.bannerCellTemplate
+        || this.container.template === this.$layoutUtils.sidebarCellTemplate;
     },
     dragOptions() {
-      const dragOptions = {
+      return {
         group: `${this.container.template}`,
         draggable: '.draggable-container-flex',
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
         chosenClass: 'layout-moving-chosen-container',
         handle: this.isCell && '.draggable-cell' || '.draggable',
+        dataIdAttr: 'data-storage-id',
       };
-      return dragOptions;
     },
   },
   watch: {
