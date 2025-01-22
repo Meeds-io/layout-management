@@ -27,68 +27,14 @@
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <div
         v-if="open"
-        class="position-relative full-width full-height d-flex flex-column"
+        class="position-relative full-width d-flex flex-column"
         @focusin="hoverArea = true"
         @mouseover="hoverArea = true"
         @focusout="hoverArea = false"
         @mouseout="hoverArea = false">
-        <v-hover v-if="index > 0" v-model="hoverButton1">
-          <div :class="!hoveredApplication && 'z-index-two'" class="position-sticky d-flex justify-center mb-auto mt-n4">
-            <v-tooltip bottom>
-              <template #activator="{on, attrs}">
-                <div
-                  v-on="on"
-                  v-bind="attrs">
-                  <v-btn
-                    v-if="!$root.noSectionAdd"
-                    class="white text-color border-color elevation-2"
-                    height="32"
-                    width="32"
-                    icon
-                    @click="$root.$emit('layout-add-section-drawer', index)">
-                    <v-icon class="icon-default-color" size="20">fa-plus</v-icon>
-                  </v-btn>
-                </div>
-              </template>
-              {{ $t('layout.addSectionBefore') }}
-            </v-tooltip>
-          </div>
-        </v-hover>
-        <v-hover
-          v-if="displayMoveButton"
-          v-model="hoverButton2">
+        <v-hover v-model="hoverButton">
           <div
-            :style="leftButtonStyle"
-            class="position-absolute t-10 z-index-one full-height">
-            <div class="position-sticky t-10 z-index-one">
-              <v-tooltip :disabled="moving" bottom>
-                <template #activator="{on, attrs}">
-                  <div
-                    v-on="on"
-                    v-bind="attrs">
-                    <v-btn
-                      v-if="!$root.noSectionAdd"
-                      class="white text-color border-color elevation-2 draggable"
-                      height="32"
-                      width="32"
-                      icon
-                      @mousedown="$emit('move-start')"
-                      @mouseup="$emit('move-end')"
-                      @mouseout="$emit('move-end')"
-                      @focusout="$emit('move-end')">
-                      <v-icon class="icon-default-color" size="20">fa-arrows-alt</v-icon>
-                    </v-btn>
-                  </div>
-                </template>
-                {{ $t('layout.moveSection') }}
-              </v-tooltip>
-            </div>
-          </div>
-        </v-hover>
-        <v-hover v-model="hoverButton3">
-          <div
-            :style="rightButtonStyle"
-            class="position-absolute t-10 z-index-one full-height">
+            class="position-absolute t-10 r-0 z-index-one full-height">
             <div class="position-sticky t-10 z-index-one">
               <v-tooltip bottom>
                 <template #activator="{on, attrs}">
@@ -108,28 +54,6 @@
                 {{ $t('layout.editSection') }}
               </v-tooltip>
             </div>
-          </div>
-        </v-hover>
-        <v-hover v-if="index < (length - 1)" v-model="hoverButton4">
-          <div class="position-sticky z-index-two d-flex justify-center mb-n4 mt-auto">
-            <v-tooltip top>
-              <template #activator="{on, attrs}">
-                <div
-                  v-on="on"
-                  v-bind="attrs">
-                  <v-btn
-                    v-if="!$root.noSectionAdd"
-                    class="white text-color border-color elevation-2"
-                    height="32"
-                    width="32"
-                    icon
-                    @click="$root.$emit('layout-add-section-drawer', index + 1)">
-                    <v-icon class="icon-default-color" size="20">fa-plus</v-icon>
-                  </v-btn>
-                </div>
-              </template>
-              {{ $t('layout.addSectionAfter') }}
-            </v-tooltip>
           </div>
         </v-hover>
       </div>
@@ -163,16 +87,10 @@ export default {
   data: () => ({
     open: false,
     savingAsTemplate: false,
-    hoverButton1: false,
-    hoverButton2: false,
-    hoverButton3: false,
-    hoverButton4: false,
+    hoverButton: false,
     hoverArea: false,
   }),
   computed: {
-    hoverButton() {
-      return this.hoverButton1 || this.hoverButton2 || this.hoverButton3 || this.hoverButton4;
-    },
     displayMoveButton() {
       return this.length > 1;
     },
@@ -184,16 +102,6 @@ export default {
     },
     hoveredApplication() {
       return this.$root.hoveredApplication;
-    },
-    leftButtonStyle() {
-      return {
-        left: this.$root.pageFullWindow && '0' || '-20px',
-      };
-    },
-    rightButtonStyle() {
-      return {
-        right: this.$root.pageFullWindow && '0' || '-20px',
-      };
     },
   },
   watch: {
