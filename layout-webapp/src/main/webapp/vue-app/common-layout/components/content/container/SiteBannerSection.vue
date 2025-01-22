@@ -31,21 +31,15 @@
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
-        :class="{
-          'z-index-two': hoverSectionMenuButton,
-        }"
-        class="absolute-full-size">
-        <div class="position-relative full-height full-width">
-          <site-layout-editor-banner-section-menu
-            :container="container"
-            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
-            :index="index"
-            :length="length"
-            :moving="movingSection"
-            @hover-button="hoverSectionMenuButton = $event"
-            @move-start="movingSection = true"
-            @move-end="movingSection = false" />
-        </div>
+        class="full-width">
+        <site-layout-editor-banner-section-menu
+          :container="container"
+          :hover="!drawerOpened && (hover || hoverSection || movingSection)"
+          :index="index"
+          :length="length"
+          :moving="movingSection"
+          @move-start="movingSection = true"
+          @move-end="movingSection = false" />
       </div>
     </v-hover>
     <layout-editor-container-base
@@ -81,7 +75,6 @@ export default {
   },
   data: () => ({
     hoverSection: false,
-    hoverSectionMenuButton: false,
     movingSection: false,
     sectionWidth: 0,
   }),

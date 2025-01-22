@@ -27,8 +27,10 @@ import SitePropertiesButton from './components/toolbar/actions/SitePropertiesBut
 import SiteEditSectionsButton from './components/toolbar/actions/SiteEditSectionsButton.vue';
 
 import Content from './components/content/Content.vue';
-import SidebarSectionMenu from './components/content/common/SidebarSectionMenu.vue';
-import BannerSectionMenu from './components/content/common/BannerSectionMenu.vue';
+import SidebarSectionMenu from './components/content/menu/SidebarSectionMenu.vue';
+import BannerSectionMenu from './components/content/menu/BannerSectionMenu.vue';
+
+import EditSiteSectionsDrawer from './components/drawer/EditSiteSectionsDrawer.vue';
 
 const components = {
   'site-layout-editor': SiteLayoutEditor,
@@ -43,6 +45,8 @@ const components = {
   'site-layout-editor-content': Content,
   'site-layout-editor-sidebar-section-menu': SidebarSectionMenu,
   'site-layout-editor-banner-section-menu': BannerSectionMenu,
+
+  'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
 };
 
 for (const key in components) {
