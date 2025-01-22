@@ -1,7 +1,7 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
  * 
- * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ * Copyright (C) 2020 - 2025 Meeds Association contact@meeds.io
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,10 @@ import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 import '../common-illustration/main.js';
-import '../common-section-template/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
-  const components = extensionRegistry.loadComponents('LayoutEditor');
+  const components = extensionRegistry.loadComponents('SiteLayoutEditor');
   if (components && components.length > 0) {
     components.forEach(cmp => {
       Vue.component(cmp.componentName, cmp.componentOptions);
@@ -35,7 +34,7 @@ if (extensionRegistry) {
   }
 }
 
-const appId = 'layoutEditor';
+const appId = 'siteLayoutEditor';
 
 //getting language of the PLF
 const lang = eXo?.env.portal.language || 'en';
@@ -48,7 +47,7 @@ export function init() {
     .then(i18n => {
       // init Vue app when locale ressources are ready
       Vue.createApp({
-        template: `<layout-editor id="${appId}"/>`,
+        template: `<site-layout-editor id="${appId}"/>`,
         vuetify: Vue.prototype.vuetifyOptions,
         i18n,
         data: () => ({
@@ -64,15 +63,9 @@ export function init() {
           branding: null,
           displayMode: 'desktop',
           layout: null,
-          page: null,
-          pageRef: null,
-          pageTemplate: null,
-          pageTemplateId: null,
-          pageFullWindow: false,
-          draftPageRef: null,
-          draftNode: null,
-          draftNodeId: null,
-          draftNodeUri: null,
+          site: null,
+          draftSite: null,
+          draftSiteId: null,
           movingParentId: null,
           movingParentDynamic: false,
           drawerOpened: 0,
@@ -92,9 +85,6 @@ export function init() {
           diffScrollX: 0,
           diffScrollY: 0,
           gap: 20,
-          nodeUri: null,
-          originalUri: `/portal/${window.location.href.split('/portal/')[1]}`,
-          originalHref: window.location.href,
           isAdministrator: eXo.env.portal.isAdministrator,
         }),
         computed: {
@@ -128,11 +118,20 @@ export function init() {
           desktopDisplayMode() {
             return this.$root.displayMode === 'desktop';
           },
-          pageId() {
-            return this.$root.page?.state?.storageId?.replace?.('page_', '');
+          siteId() {
+            return this.$layoutUtils.getQueryParam('siteId');
           },
-          isSpaceSiteTemplate() {
-            return this.pageRef?.toLowerCase?.()?.indexOf('group_template::') === 0;
+          siteType() {
+            return this.site?.siteType;
+          },
+          siteName() {
+            return this.site?.name;
+          },
+          draftSiteType() {
+            return this.draftSite?.siteType;
+          },
+          draftSiteName() {
+            return this.draftSite?.name;
           },
         },
         watch: {
@@ -143,30 +142,15 @@ export function init() {
               this.$root.$emit('layout-editor-moving-end', this.movingParentId);
             }
           },
-          nodeUri() {
-            if (window.opener) {
-              eXo.env.portal.webPageUrl = window.opener.location.pathname;
-            } else {
-              eXo.env.portal.webPageUrl = `/portal${this.nodeUri}`;
-            }
-          },
-          layout(newVal, oldVal) {
-            if (!oldVal) {
-              window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
-            }
-            const parentContainer = this.$layoutUtils.getParentContainer(newVal);
-            this.pageFullWindow = parentContainer?.width !== 'singlePageApplication' && (parentContainer?.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth'));
-          },
         },
         created() {
-          // Some applications will change the window location state when displayed
-          // This will ensure to preserve the original Page location URI
-          new MutationObserver(this.setOriginalUri).observe(document, { subtree: true, childList: true });
           document.addEventListener('extension-layout-editor-container-updated', this.refreshContainerTypes);
           this.$on('layout-editor-portlet-instances-refresh', this.refreshPortletInstances);
           document.addEventListener('drawerOpened', this.setDrawerOpened);
           document.addEventListener('drawerClosed', this.setDrawerClosed);
           this.refreshPortletInstances();
+          this.$siteLayoutService.getSiteById(this.siteId)
+            .then(site => this.site = site);
           this.$brandingService.getBrandingInformation()
             .then(data => this.branding = data);
         },
@@ -174,11 +158,6 @@ export function init() {
           this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
         },
         methods: {
-          setOriginalUri() {
-            if (window.location.href !== this.originalHref) {
-              window.history.replaceState('', window.document.title, this.originalUri);
-            }
-          },
           setDrawerOpened() {
             this.drawerOpened++;
           },
@@ -197,7 +176,7 @@ export function init() {
             this.containerTypes = extensionRegistry.loadExtensions('layout-editor', 'container');
           },
           updateParentAppDimensions() {
-            this.parentAppDimensions = document.querySelector('#layoutEditor').getBoundingClientRect();
+            this.parentAppDimensions = document.querySelector('#siteLayoutEditor').getBoundingClientRect();
           },
           initScrollPosition() {
             this.updateParentAppDimensions();
@@ -223,7 +202,7 @@ export function init() {
             this.multiCellsSelect = false;
           },
         },
-      }, `#${appId}`, 'Layout Editor');
+      }, `#${appId}`, 'Site Layout Editor');
     })
     .finally(() => {
       Vue.prototype.$utils.includeExtensions('LayoutEditorExtension');
