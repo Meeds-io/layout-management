@@ -1,7 +1,7 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
  * 
- * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ * Copyright (C) 2020 - 2025 Meeds Association contact@meeds.io
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,19 +30,3 @@ if (!Vue.prototype.$coeditingService) {
     value: coeditingService,
   });
 }
-
-Vue.prototype.$updateApplicationVisibility = function(visible, element) {
-  if (!element) {
-    element = this?.$root?.$el;
-  }
-  if (!element?.className?.includes?.('PORTLET-FRAGMENT')) {
-    element = element?.parentElement;
-  }
-  if (element?.parentElement) {
-    if (visible) {
-      element.closest?.('.PORTLET-FRAGMENT')?.parentElement?.classList?.remove?.('hidden-sm-and-down');
-    } else {
-      element.closest?.('.PORTLET-FRAGMENT')?.parentElement?.classList?.add?.('hidden-sm-and-down');
-    }
-  }
-};
