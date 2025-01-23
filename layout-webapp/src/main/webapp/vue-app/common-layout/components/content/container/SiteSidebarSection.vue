@@ -92,6 +92,10 @@ export default {
     },
     cssStyle() {
       return {
+        ...this.$applicationUtils.getStyle(this.container, {
+          onlyBackgroundStyle: true,
+          sectionStyle: true,
+        }),
         'min-width': `${this.container?.width || 310}px`,
       };
     },
