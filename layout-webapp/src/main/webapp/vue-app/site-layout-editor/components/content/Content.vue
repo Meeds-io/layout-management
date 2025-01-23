@@ -82,20 +82,17 @@ export default {
         document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
       }
     },
-    layout: {
-      immediate: true,
-      handler(oldVal, newVal) {
-        if (this.layout) {
-          const layout = JSON.parse(JSON.stringify(this.layout));
-          this.setLayout(layout);
+    layout(oldVal, newVal) {
+      if (this.layout) {
+        const layout = JSON.parse(JSON.stringify(this.layout));
+        this.setLayout(layout);
+      }
+      if (!oldVal) {
+        window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
+        if (newVal) {
+          this.$root.$applicationLoaded();
         }
-        if (!oldVal) {
-          window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
-          if (newVal) {
-            this.$root.$applicationLoaded();
-          }
-        }
-      },
+      }
     },
     mobileDisplayMode() {
       this.switchDisplayMode();
@@ -112,6 +109,7 @@ export default {
     this.$root.$on('layout-site-saved', this.handleSiteSaved);
     this.$root.$on('layout-save-draft', this.saveDraft);
     document.addEventListener('keydown', this.restoreHistory);
+    this.resetHistory();
   },
   mounted() {
     this.openChangesReminder();

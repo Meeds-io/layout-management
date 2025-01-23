@@ -51,6 +51,7 @@
       <layout-editor-cells-selection-box />
     </main>
     <site-layout-editor-edit-sections-drawer />
+    <site-layout-editor-sidebar-section-drawer />
     <layout-analytics application-name="siteLayoutEditor" />
   </v-app>
 </template>

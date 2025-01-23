@@ -31,6 +31,7 @@ import SidebarSectionMenu from './components/content/menu/SidebarSectionMenu.vue
 import BannerSectionMenu from './components/content/menu/BannerSectionMenu.vue';
 
 import EditSiteSectionsDrawer from './components/drawer/EditSiteSectionsDrawer.vue';
+import EditSiteSidebarDrawer from './components/drawer/EditSiteSidebarDrawer.vue';
 
 const components = {
   'site-layout-editor': SiteLayoutEditor,
@@ -47,6 +48,7 @@ const components = {
   'site-layout-editor-banner-section-menu': BannerSectionMenu,
 
   'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
+  'site-layout-editor-sidebar-section-drawer': EditSiteSidebarDrawer,
 };
 
 for (const key in components) {
