@@ -344,21 +344,20 @@ export function applyContainerStyle(container, containerStyle) {
 }
 
 export function parseSite(layout) {
-  const compatible = layout.children
-    && layout.template === siteTemplate
+  const compatible = layout.template === siteTemplate
+    && layout.children?.length
     && layout.children.every(c => c.template === sidebarTemplate || c.template === siteBodyMiddleTemplate)
-    && layout?.children?.[0]?.template === sidebarTemplate
-    && layout?.children?.[1]?.template === siteBodyMiddleTemplate
-    && layout?.children?.[2]?.template === sidebarTemplate;
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate);
   if (!compatible) {
     const applications = getApplications(layout);
     layout.template = siteTemplate;
     layout.children = [
       {
         ...newContainer(sidebarTemplate),
-        children: [
-          newContainer(sidebarCellTemplate),
-        ]
+        children: [{
+          ...newContainer(sidebarCellTemplate),
+          children: applications,
+        }]
       },
       {
         ...newContainer(siteBodyMiddleTemplate),
@@ -750,7 +749,7 @@ export function newCell(section, index, rows, cols) {
 export function newContainer(template, cssClass, parentContainer, index) {
   const container = JSON.parse(JSON.stringify(containerModel));
   container.template = template;
-  container.cssClass = cssClass;
+  container.cssClass = cssClass || '';
   container.storageId = `${parseInt(Math.random() * 65536)}`;
   container.randomId = true;
   container.name = container.storageId;

@@ -82,15 +82,17 @@ export default {
         document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
       }
     },
-    layout(oldVal, newVal) {
-      if (this.layout) {
-        const layout = JSON.parse(JSON.stringify(this.layout));
-        this.setLayout(layout);
-      }
-      if (!oldVal) {
-        window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
+    layout: {
+      immediate: true,
+      handler(newVal, oldVal) {
         if (newVal) {
-          this.$root.$applicationLoaded();
+          this.setLayout(JSON.parse(JSON.stringify(newVal)));
+        }
+        if (!oldVal) {
+          window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
+          if (newVal) {
+            this.$root.$applicationLoaded();
+          }
         }
       }
     },
