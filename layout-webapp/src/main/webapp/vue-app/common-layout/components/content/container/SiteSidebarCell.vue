@@ -34,15 +34,14 @@
     @hovered="hover = $event"
     @move-start="moveStart">
     <template #footer>
-      <v-hover v-if="$root.desktopDisplayMode">
+      <v-hover v-if="$root.desktopDisplayMode" v-model="hoverAddApplication">
         <v-card
-          slot-scope="hoverScope"
           v-show="!movingChildren"
           :class="{
             'full-height': !hasApplication,
             'mt-n5': hasApplication,
-            'grey-background': !isSelectedCell && !hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
-            'light-grey-background': !isSelectedCell && hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
+            'grey-background': opaqueBackground,
+            'light-grey-background': !opaqueBackground,
             'transparent': $root.movingCell && $root.selectedSectionId === parentId && !isSelectedCell,
             'grey': isSelectedCell,
             'invisible': moving,
@@ -54,19 +53,19 @@
           }">
           <v-card
             :class="{
-              'invisible': !hoverScope.hover,
+              'invisible': !hoverAddApplication,
             }"
             :aria-label="$t('layout.addApplicationButton')"
             :title="$t('layout.addApplicationButton')"
             :height="hasApplication && 50 || '50%'"
-            max-height="200"
             color="transparent"
+            max-height="200"
             class="full-width d-flex flex-wrap align-center justify-center"
             flat>
-            <div class="d-flex flex-wrap align-center justify-center">
+            <v-btn class="btn white">
               <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
               <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
-            </div>
+            </v-btn>
           </v-card>
         </v-card>
       </v-hover>
@@ -95,6 +94,7 @@ export default {
   },
   data: () => ({
     hover: false,
+    hoverAddApplication: false,
     hasContent: true,
   }),
   computed: {
@@ -133,10 +133,23 @@ export default {
     isNextCellOfMovedCell() {
       return this.$root.movingCell && this.storageId === this.$root.nextCellStorageId || false;
     },
+    opaqueBackground() {
+      return !this.isSelectedCell
+        && !this.hoverAddApplication
+        && !this.container.backgroundImage
+        && !this.container.backgroundColor
+        && !this.container.backgroundGradientFrom
+        && (!this.$root.movingCell || this.$root.selectedSectionId !== this.parentId);
+    },
     cssStyle() {
-      const cssStyle = {};
-      if (this.$root.desktopDisplayMode) {
-        cssStyle['min-height'] = this.hasApplication && '100px' || '150px';
+      const cssStyle = this.$applicationUtils.getStyle(this.container, {
+        onlyBackgroundStyle: true,
+        sectionStyle: true,
+      });
+      if (this.container.width) {
+        cssStyle['min-width'] = `${this.container.width}px`;
+        cssStyle['width'] = `${this.container.width}px`;
+        cssStyle['max-width'] = `${this.container.width}px`;
       }
       if (this.isNextCellOfMovedCell) {
         if (this.$vuetify.$rtl) {
