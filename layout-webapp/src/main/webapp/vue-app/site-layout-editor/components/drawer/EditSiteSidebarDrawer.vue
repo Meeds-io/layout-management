@@ -68,11 +68,13 @@
           <layout-editor-background-input
             ref="backgroundInput"
             v-model="container"
-            class="mb-4" />
+            class="mb-4"
+            text-bold />
           <layout-editor-text-input
             ref="textInput"
             v-model="container"
-            class="mb-4" />
+            class="mb-4"
+            text-bold />
         </template>
       </v-card>
     </template>
@@ -106,6 +108,23 @@ export default {
     width: null,
     container: null,
   }),
+  computed: {
+    isLeftBar() {
+      return this.$root.draftLayout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
+    },
+    isRightBar() {
+      return this.$root.draftLayout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
+    },
+    sidebarContainer() {
+      if (this.isLeftBar) {
+        return this.$root.draftLayout?.children?.[0];
+      } else if (this.isRightBar) {
+        return this.$root.draftLayout?.children?.[2];
+      } else {
+        return null;
+      }
+    },
+  },
   created() {
     this.$root.$on('layout-site-sidebar-section-open', this.open);
   },
@@ -126,12 +145,7 @@ export default {
       try {
         this.$root.$emit('layout-section-history-add');
         if (!this.show) {
-          if (this.leftSidebar) {
-            this.$root.draftLayout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
-          }
-          if (this.rightSidebar) {
-            this.$root.draftLayout.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
-          }
+          this.sidebarContainer.children = [];
         } else {
           this.container.width = this.width;
           await this.$refs.backgroundInput.apply();

@@ -26,8 +26,9 @@
     ref="section"
     :id="id"
     :data-storage-id="storageId"
+    :class="cssClass"
     :style="cssStyle"
-    class="position-relative flex-grow-1 flex-shrink-1">
+    class="position-relative z-index-one layout-banner-section flex-grow-1 flex-shrink-1">
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
@@ -88,19 +89,54 @@ export default {
     drawerOpened() {
       return this.$root.drawerOpened;
     },
+    childrenSize() {
+      return this.container?.children?.length;
+    },
+    isTopContainer() {
+      return this.index < this.$root.pageBodyIndex;
+    },
+    defaultHeight() {
+      return this.isTopContainer ? 57 : 150;
+    },
+    cssClass() {
+      return `${this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section'}${this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : ''}`;
+    },
     cssStyle() {
       return {
         ...this.$applicationUtils.getStyle(this.container, {
           onlyBackgroundStyle: true,
           sectionStyle: true,
         }),
-        'height': `${this.container?.height || 57}px`,
-        'max-height': `${this.container?.height || 57}px`,
+        'height': `${this.container?.height || this.defaultHeight}px`,
+        'max-height': `${this.container?.height || this.defaultHeight}px`,
       };
     },
-    childrenSize() {
-      return this.container?.children?.length;
-    },
+  },
+  watch: {
+    isTopContainer: {
+      immediate: true,
+      handler() {
+        const container = this.$layoutUtils.getContainerById(this.$root.draftLayout, this.container.storageId);
+        if (this.isTopContainer) {
+          if (!container.cssClass?.includes?.('layout-banner-top-section')) {
+            container.cssClass = container.cssClass ? `${container.cssClass.trim()} layout-banner-top-section` : 'layout-banner-top-section';
+          }
+          if (container.cssClass?.includes?.('layout-banner-bottom-section')) {
+            container.cssClass = container.cssClass.replace('layout-banner-bottom-section', '');
+          }
+        } else {
+          if (!container.cssClass?.includes?.('layout-banner-bottom-section')) {
+            container.cssClass = container.cssClass ? `${container.cssClass.trim()} layout-banner-bottom-section` : 'layout-banner-bottom-section';
+          }
+          if (container.cssClass?.includes?.('layout-banner-top-section')) {
+            container.cssClass = container.cssClass.replace('layout-banner-top-section', '');
+          }
+        }
+        if (!container.height) {
+          container.height = this.defaultHeight;
+        }
+      },
+    }
   },
 };
 </script>

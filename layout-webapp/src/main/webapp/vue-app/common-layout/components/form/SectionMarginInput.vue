@@ -22,7 +22,8 @@
   <div>
     <div class="d-flex align-center mb-2">
       <div
-        class="text-header me-auto">
+        :class="textBold && 'font-weight-bold' || 'text-header'"
+        class="me-auto">
         {{ $t('layout.margins') }}
       </div>
       <v-switch
@@ -38,8 +39,22 @@
         </v-list-item-content>
         <number-input
           v-model="marginTop"
-          :max="48"
-          class="my-auto me-n3" />
+          :max="max"
+          class="my-auto"
+          editable />
+      </v-list-item>
+      <v-list-item
+        v-if="right"
+        class="pa-0"
+        dense>
+        <v-list-item-content class="my-auto">
+          {{ $t('layout.right') }}
+        </v-list-item-content>
+        <number-input
+          v-model="marginRight"
+          :max="max"
+          class="my-auto"
+          editable />
       </v-list-item>
       <v-list-item class="pa-0" dense>
         <v-list-item-content class="my-auto">
@@ -47,8 +62,22 @@
         </v-list-item-content>
         <number-input
           v-model="marginBottom"
-          :max="48"
-          class="my-auto me-n3" />
+          :max="max"
+          class="my-auto"
+          editable />
+      </v-list-item>
+      <v-list-item
+        v-if="left"
+        class="pa-0"
+        dense>
+        <v-list-item-content class="my-auto">
+          {{ $t('layout.left') }}
+        </v-list-item-content>
+        <number-input
+          v-model="marginLeft"
+          :max="max"
+          class="my-auto"
+          editable />
       </v-list-item>
     </div>
   </div>
@@ -60,18 +89,42 @@ export default {
       type: Object,
       default: null,
     },
+    max: {
+      type: Number,
+      default: () => 48,
+    },
+    left: {
+      type: Boolean,
+      default: false,
+    },
+    right: {
+      type: Boolean,
+      default: false,
+    },
+    textBold: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     container: null,
     initialized: false,
     enabled: true,
     marginTop: null,
+    marginRight: null,
     marginBottom: null,
+    marginLeft: null,
   }),
   watch: {
     marginTop() {
       if (this.initialized) {
         this.$set(this.container, 'marginTop', this.enabled ? this.marginTop || 0 : null);
+        this.$emit('refresh');
+      }
+    },
+    marginRight() {
+      if (this.initialized && this.right) {
+        this.$set(this.container, 'marginRight', this.enabled ? this.marginRight || 0 : null);
         this.$emit('refresh');
       }
     },
@@ -81,17 +134,27 @@ export default {
         this.$emit('refresh');
       }
     },
+    marginLeft() {
+      if (this.initialized && this.left) {
+        this.$set(this.container, 'marginLeft', this.enabled ? this.marginLeft || 0 : null);
+        this.$emit('refresh');
+      }
+    },
     enabled() {
       if (this.initialized) {
         this.marginTop = this.enabled ? 0 : null;
+        this.marginRight = this.enabled ? 0 : null;
         this.marginBottom = this.enabled ? 0 : null;
+        this.marginLeft = this.enabled ? 0 : null;
       }
     },
   },
   created() {
     this.container = this.value;
     this.marginTop = this.container.marginTop;
+    this.marginRight = this.right && this.container.marginRight || 0;
     this.marginBottom = this.container.marginBottom;
+    this.marginLeft = this.left && this.container.marginLeft || 0;
     this.enabled = (this.marginTop || this.marginTop === 0) && (this.marginBottom || this.marginBottom === 0) ? true : false;
     this.$nextTick().then(() => this.initialized = true);
   },
