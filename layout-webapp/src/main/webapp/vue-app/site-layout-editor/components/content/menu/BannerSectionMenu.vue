@@ -49,7 +49,7 @@
                     height="32"
                     width="32"
                     icon
-                    @click="$root.$emit('layout-add-section-drawer', index)">
+                    @click="addSectionBefore">
                     <v-icon class="icon-default-color" size="20">fa-plus</v-icon>
                   </v-btn>
                 </div>
@@ -109,7 +109,7 @@
                     height="32"
                     width="32"
                     icon
-                    @click="$root.$emit('layout-edit-section-drawer', index, length)">
+                    @click="$root.$emit('layout-site-banner-section-open', container)">
                     <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
                   </v-btn>
                 </div>
@@ -131,7 +131,7 @@
                     height="32"
                     width="32"
                     icon
-                    @click="$root.$emit('layout-add-section-drawer', index + 1)">
+                    @click="addSectionAfter">
                     <v-icon class="icon-default-color" size="20">fa-plus</v-icon>
                   </v-btn>
                 </div>
@@ -231,20 +231,20 @@ export default {
     },
   },
   methods: {
-    async saveAsTemplate() {
-      this.savingAsTemplate = true;
-      await this.$nextTick();
-      window.setTimeout(() => {
-        this.savingAsTemplate = false;
-        this.open = false;
-        try {
-          this.$root.$emit('layout-section-save-as-template', this.container);
-        } finally {
-          window.setTimeout(() => {
-            this.savingAsTemplate = false;
-          }, 2000);
-        }
-      }, 200);
+    addSectionAfter() {
+      this.addSection(this.index + 1);
+    },
+    addSectionBefore() {
+      this.addSection(this.index);
+    },
+    addSection(index) {
+      this.$root.$emit('layout-section-history-add');
+      this.$root.middleContainer.children.splice(index, 0, {
+        ...this.$layoutUtils.newContainer(this.$layoutUtils.bannerTemplate),
+        children: [
+          this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate),
+        ]
+      });
     },
   },
 };

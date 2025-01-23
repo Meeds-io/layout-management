@@ -146,16 +146,17 @@ export default {
   },
   methods: {
     open() {
-      this.leftSidebar = !!this.$root.draftLayout?.children?.[0]?.children?.length;
-      this.topBanner = !!this.$root.draftLayout?.children?.[1]?.children?.[0]?.children?.length;
-      this.bottomBanner = !!this.$root.draftLayout?.children?.[1]?.children?.[2]?.children?.length;
-      this.rightSidebar = !!this.$root.draftLayout?.children?.[2]?.children?.length;
+      const options = this.getCurrentOptions();
+      this.leftSidebar = options.left;
+      this.rightSidebar = options.right;
+      this.topBanner = options.top;
+      this.bottomBanner = options.bottom;
       this.$refs.drawer.open();
     },
     apply() {
       this.$root.$emit('layout-section-history-add');
-      const leftSidebar = !!this.$root.draftLayout?.children?.[0]?.children?.length;
-      if (leftSidebar !== this.leftSidebar) {
+      const options = this.getCurrentOptions();
+      if (options.left !== this.leftSidebar) {
         if (this.leftSidebar) {
           this.$root.draftLayout.children[0] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
@@ -167,8 +168,7 @@ export default {
           this.$root.draftLayout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
-      const rightSidebar = !!this.$root.draftLayout?.children?.[2]?.children?.length;
-      if (rightSidebar !== this.rightSidebar) {
+      if (options.right !== this.rightSidebar) {
         if (this.rightSidebar) {
           this.$root.draftLayout.children[2] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
@@ -180,35 +180,41 @@ export default {
           this.$root.draftLayout.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
-      const topBanner = !!this.$root.draftLayout?.children?.[1]?.children?.[0]?.children?.length;
-      if (topBanner !== this.topBanner) {
+      if (options.top !== this.topBanner) {
         if (this.topBanner) {
-          this.$root.draftLayout.children[1].children[0] = {
-            ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
+          this.$root.middleContainer.children.unshift({
+            ...this.$layoutUtils.newContainer(this.$layoutUtils.bannerTemplate),
             children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate),
             ]
-          };
+          });
         } else {
-          this.$root.draftLayout.children[1].children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+          this.$root.middleContainer.children.splice(0, this.$root.pageBodyIndex);
         }
       }
-      const bottomBanner = !!this.$root.draftLayout?.children?.[1]?.children?.[2]?.children?.length;
-      if (bottomBanner !== this.bottomBanner) {
+      if (options.bottom !== this.bottomBanner) {
         if (this.bottomBanner) {
-          this.$root.draftLayout.children[1].children[2] = {
-            ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
+          this.$root.middleContainer.children.push({
+            ...this.$layoutUtils.newContainer(this.$layoutUtils.bannerTemplate),
             children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate),
             ]
-          };
+          });
         } else {
-          this.$root.draftLayout.children[1].children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+          this.$root.middleContainer.children.splice(this.$root.pageBodyIndex + 1, this.$root.middleContainer.children.length - this.$root.pageBodyIndex);
         }
       }
       this.$root.draftLayout.children = this.$root.draftLayout.children.slice();
       this.$root.draftLayout.children[1].children = this.$root.draftLayout.children[1].children.slice();
       this.close();
+    },
+    getCurrentOptions() {
+      return {
+        top: !!this.$root.middleContainer?.children?.[0]?.children?.length && this.$root.middleContainer?.children?.[0].template === this.$layoutUtils.bannerTemplate,
+        right: !!this.$root.rightContainer?.children?.length,
+        left: !!this.$root.leftContainer?.children?.length,
+        bottom: !!this.$root.middleContainer?.children?.find?.((c, index) => index > this.$root.pageBodyIndex && c?.children?.length && c.template === this.$layoutUtils.bannerTemplate),
+      };
     },
     close() {
       this.$refs.drawer.close();
