@@ -52,6 +52,7 @@
     </main>
     <site-layout-editor-edit-sections-drawer />
     <site-layout-editor-sidebar-section-drawer />
+    <site-layout-editor-banner-section-drawer />
     <layout-analytics application-name="siteLayoutEditor" />
   </v-app>
 </template>

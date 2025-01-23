@@ -43,25 +43,21 @@
           dynamic-section
           @move-start="moveStart" />
       </div>
-      <v-hover v-if="$root.desktopDisplayMode && !hasApplication">
+      <v-hover v-if="$root.desktopDisplayMode" v-model="hoverAddApplication">
         <v-card
-          slot-scope="hoverScope"
           v-show="!movingChildren"
           :class="{
-            'grey-background': !isSelectedCell && !hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
-            'light-grey-background': !isSelectedCell && hoverScope.hover && (!$root.movingCell || $root.selectedSectionId !== parentId),
-            'transparent': $root.movingCell && $root.selectedSectionId === parentId && !isSelectedCell,
-            'grey': isSelectedCell,
+            'grey-background': opaqueBackground,
+            'light-grey-background': !opaqueBackground,
+            'transparent': $root.movingCell && $root.selectedSectionId === parentId,
             'invisible': moving,
           }"
           class="full-width full-height layout-add-application-button"
           flat
-          v-on="!multiSelectEnabled && {
-            click: () => $root.$emit('layout-add-application-category-drawer', parentId, container)
-          }">
+          @click="$root.$emit('layout-add-application-category-drawer', parentId, container)">
           <v-card
             :class="{
-              'invisible': !hoverScope.hover,
+              'invisible': !hoverAddApplication,
             }"
             :aria-label="$t('layout.addApplicationButton')"
             :title="$t('layout.addApplicationButton')"
@@ -70,10 +66,16 @@
             color="transparent"
             class="full-width full-height d-flex flex-wrap align-center justify-center"
             flat>
-            <div class="d-flex flex-wrap align-center justify-center">
+            <component
+              :is="hasBackground && 'v-btn' || 'div'"
+              :class="{
+                'btn white': hasBackground,
+                'd-flex flex-wrap align-center justify-center': !hasBackground,
+              }"
+              class="position-absolute">
               <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
               <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
-            </div>
+            </component>
           </v-card>
         </v-card>
       </v-hover>
@@ -102,6 +104,7 @@ export default {
   },
   data: () => ({
     hover: false,
+    hoverAddApplication: false,
     hasContent: true,
   }),
   computed: {
@@ -115,10 +118,6 @@ export default {
     },
     sectionType() {
       return this.$layoutUtils.getSection(this.$root.layout, this.parentId)?.template;
-    },
-    multiSelectEnabled() {
-      return this.$root.isMultiSelect
-        && this.$root.multiCellsSelect;
     },
     children() {
       return this.container.children;
@@ -141,27 +140,21 @@ export default {
     applicationCategoryTitle() {
       return this.applicationCategory?.name || '';
     },
-    isSelectedCell() {
-      return this.$root.isMultiSelect
-        && this.$root.selectedSectionId === this.parentId
-        && !!this.$root.selectedCellCoordinates.find(c => c.rowIndex === this.container.rowIndex && c.colIndex === this.container.colIndex);
-    },
-    isNextCellOfMovedCell() {
-      return this.$root.movingCell && this.storageId === this.$root.nextCellStorageId || false;
-    },
     displayResizeButton() {
       return this.index < (this.length - 1);
     },
-    cssStyle() {
-      const cssStyle = {};
-      if (this.isNextCellOfMovedCell) {
-        if (this.$vuetify.$rtl) {
-          cssStyle['margin-right'] = `${this.$root.nextCellDiffWidth}px`;
-        } else {
-          cssStyle['margin-left'] = `${this.$root.nextCellDiffWidth}px`;
-        }
-      }
-      return cssStyle;
+    parentContainer() {
+      return this.$layoutUtils.getContainerById(this.$root.draftLayout, this.parentId);
+    },
+    hasBackground() {
+      return this.parentContainer.backgroundImage
+        || this.parentContainer.backgroundColor
+        || this.parentContainer.backgroundGradientFrom;
+    },
+    opaqueBackground() {
+      return !this.hoverAddApplication
+        && !this.hasBackground
+        && (!this.$root.movingCell || this.$root.selectedSectionId !== this.parentId);
     },
   },
   watch: {

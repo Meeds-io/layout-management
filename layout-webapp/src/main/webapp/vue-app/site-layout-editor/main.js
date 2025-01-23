@@ -134,6 +134,21 @@ export function init() {
           draftSiteName() {
             return this.draftSite?.name;
           },
+          leftContainer() {
+            return this.draftLayout?.children?.[0];
+          },
+          middleContainer() {
+            return this.draftLayout?.children?.[1];
+          },
+          rightContainer() {
+            return this.draftLayout?.children?.[2];
+          },
+          pageBodyContainer() {
+            return this.middleContainer?.children?.find?.(c => c.template === this.$layoutUtils.pageBodyTemplate);
+          },
+          pageBodyIndex() {
+            return this.middleContainer?.children?.findIndex?.(c => c.template === this.$layoutUtils.pageBodyTemplate);
+          },
         },
         watch: {
           movingParentId() {
