@@ -25,11 +25,18 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 export function getStyle(container, options) {
   const style = {};
   if (options.sectionStyle && (container.marginTop || container.marginBottom)) {
+    const diff = container.template === 'Banner' ? 0 : 10;
     if (container.marginTop) {
-      style['--sectionMarginTop'] = `${container.marginTop + 10}px`;
+      style['--sectionMarginTop'] = `${container.marginTop + diff}px`;
     }
     if (container.marginBottom) {
-      style['--sectionMarginBottom'] = `${container.marginBottom + 10}px`;
+      style['--sectionMarginBottom'] = `${container.marginBottom + diff}px`;
+    }
+    if (container.marginRight) {
+      style['--sectionMarginRight'] = `${container.marginRight + diff}px`;
+    }
+    if (container.marginLeft) {
+      style['--sectionMarginLeft'] = `${container.marginLeft + diff}px`;
     }
   }
   if (container.textTitleColor) {
