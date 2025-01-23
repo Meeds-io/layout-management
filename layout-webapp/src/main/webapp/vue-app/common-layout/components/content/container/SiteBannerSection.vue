@@ -27,7 +27,7 @@
     :id="id"
     :data-storage-id="storageId"
     :style="cssStyle"
-    class="position-relative flex-grow-1 flex-shrink-1">
+    class="position-relative layout-banner-section flex-grow-1 flex-shrink-1">
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
@@ -94,13 +94,24 @@ export default {
           onlyBackgroundStyle: true,
           sectionStyle: true,
         }),
-        'height': `${this.container?.height || 57}px`,
-        'max-height': `${this.container?.height || 57}px`,
+        'height': `${this.container?.height || 150}px`,
+        'max-height': `${this.container?.height || 150}px`,
       };
     },
     childrenSize() {
       return this.container?.children?.length;
     },
+    isTopContainer() {
+      return this.index < this.$root.pageBodyIndex;
+    },
+  },
+  watch: {
+    isTopContainer: {
+      immediate: true,
+      handler() {
+        
+      },
+    }
   },
 };
 </script>
