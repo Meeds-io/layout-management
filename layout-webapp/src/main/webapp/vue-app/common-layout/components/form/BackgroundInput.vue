@@ -87,7 +87,7 @@
         <layout-editor-background-image-attachment
           v-model="container.backgroundImage"
           ref="backgroundImage"
-          :storage-id="`${$root.pageId}_${container.storageId}`"
+          :storage-id="objectId"
           :immediate-save="immediateSave"
           class="my-auto" />
       </v-list-item-action>
@@ -191,6 +191,11 @@ export default {
     backgroundGradientTo: null,
     initialized: false,
   }),
+  computed: {
+    objectId() {
+      return this.$root.pageId ? `page_${this.$root.pageId}_${this.container.storageId}` : `site_${this.$root.siteId}_${this.container.storageId}`;
+    },
+  },
   watch: {
     container: {
       deep: true,
