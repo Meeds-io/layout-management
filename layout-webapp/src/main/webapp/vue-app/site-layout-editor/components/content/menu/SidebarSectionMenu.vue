@@ -33,9 +33,8 @@
         @focusout="hoverArea = false"
         @mouseout="hoverArea = false">
         <v-hover v-model="hoverButton">
-          <div
-            class="position-absolute t-10 r-0 z-index-one full-height">
-            <div class="position-sticky t-10 z-index-one">
+          <div class="position-absolute t-10 r-0 z-index-one full-height">
+            <div class="position-sticky t-10 z-index-one me-3">
               <v-tooltip bottom>
                 <template #activator="{on, attrs}">
                   <div
@@ -46,7 +45,7 @@
                       height="32"
                       width="32"
                       icon
-                      @click="$root.$emit('layout-edit-section-drawer', index, length)">
+                      @click="$root.$emit('layout-site-sidebar-section-open', cellContainer)">
                       <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
                     </v-btn>
                   </div>
@@ -103,6 +102,9 @@ export default {
     hoveredApplication() {
       return this.$root.hoveredApplication;
     },
+    cellContainer() {
+      return this.container?.children?.[0];
+    },
   },
   watch: {
     hover() {
@@ -128,23 +130,6 @@ export default {
       } else if (!newVal && this.$root.hoveredSectionId === this.container.storageId) {
         this.$root.hoveredSectionId = null;
       }
-    },
-  },
-  methods: {
-    async saveAsTemplate() {
-      this.savingAsTemplate = true;
-      await this.$nextTick();
-      window.setTimeout(() => {
-        this.savingAsTemplate = false;
-        this.open = false;
-        try {
-          this.$root.$emit('layout-section-save-as-template', this.container);
-        } finally {
-          window.setTimeout(() => {
-            this.savingAsTemplate = false;
-          }, 2000);
-        }
-      }, 200);
     },
   },
 };
