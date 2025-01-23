@@ -39,18 +39,14 @@
           v-show="!movingChildren"
           :class="{
             'full-height': !hasApplication,
-            'mt-n5': hasApplication,
             'grey-background': opaqueBackground,
             'light-grey-background': !opaqueBackground,
-            'transparent': $root.movingCell && $root.selectedSectionId === parentId && !isSelectedCell,
-            'grey': isSelectedCell,
+            'transparent': $root.movingCell && $root.selectedSectionId === parentId,
             'invisible': moving,
           }"
           class="full-width layout-add-application-button"
           flat
-          v-on="!multiSelectEnabled && {
-            click: () => $root.$emit('layout-add-application-category-drawer', parentId, container)
-          }">
+          @click="$root.$emit('layout-add-application-category-drawer', parentId, container)">
           <v-card
             :class="{
               'invisible': !hoverAddApplication,
@@ -62,10 +58,15 @@
             max-height="200"
             class="full-width d-flex flex-wrap align-center justify-center"
             flat>
-            <v-btn class="btn white">
+            <component
+              :is="hasBackground && 'v-btn' || 'div'"
+              :class="{
+                'btn white': hasBackground,
+                'd-flex flex-wrap align-center justify-center': !hasBackground,
+              }">
               <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
               <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
-            </v-btn>
+            </component>
           </v-card>
         </v-card>
       </v-hover>
@@ -109,10 +110,6 @@ export default {
     sectionType() {
       return this.$layoutUtils.getSection(this.$root.layout, this.parentId)?.template;
     },
-    multiSelectEnabled() {
-      return this.$root.isMultiSelect
-        && this.$root.multiCellsSelect;
-    },
     children() {
       return this.container.children;
     },
@@ -125,20 +122,14 @@ export default {
     storageId() {
       return this.container?.storageId;
     },
-    isSelectedCell() {
-      return this.$root.isMultiSelect
-        && this.$root.selectedSectionId === this.parentId
-        && !!this.$root.selectedCellCoordinates.find(c => c.rowIndex === this.container.rowIndex && c.colIndex === this.container.colIndex);
-    },
-    isNextCellOfMovedCell() {
-      return this.$root.movingCell && this.storageId === this.$root.nextCellStorageId || false;
+    hasBackground() {
+      return this.container.backgroundImage
+        || this.container.backgroundColor
+        || this.container.backgroundGradientFrom;
     },
     opaqueBackground() {
-      return !this.isSelectedCell
-        && !this.hoverAddApplication
-        && !this.container.backgroundImage
-        && !this.container.backgroundColor
-        && !this.container.backgroundGradientFrom
+      return !this.hoverAddApplication
+        && !this.hasBackground
         && (!this.$root.movingCell || this.$root.selectedSectionId !== this.parentId);
     },
     cssStyle() {
@@ -150,13 +141,6 @@ export default {
         cssStyle['min-width'] = `${this.container.width}px`;
         cssStyle['width'] = `${this.container.width}px`;
         cssStyle['max-width'] = `${this.container.width}px`;
-      }
-      if (this.isNextCellOfMovedCell) {
-        if (this.$vuetify.$rtl) {
-          cssStyle['margin-right'] = `${this.$root.nextCellDiffWidth}px`;
-        } else {
-          cssStyle['margin-left'] = `${this.$root.nextCellDiffWidth}px`;
-        }
       }
       return cssStyle;
     },

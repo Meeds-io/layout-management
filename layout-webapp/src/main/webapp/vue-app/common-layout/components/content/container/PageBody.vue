@@ -23,7 +23,7 @@
   <v-card
     :id="id"
     :data-storage-id="storageId"
-    class="position-relative overflow-hidden d-flex flex-column flex-grow-1 my-5 mx-auto"
+    class="position-relative overflow-hidden d-flex flex-column flex-grow-1 my-5 mx-auto z-index-zero"
     color="transparent"
     max-width="1280px"
     min-width="calc(100% - 40px)"

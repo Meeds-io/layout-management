@@ -24,7 +24,8 @@
       <slot v-if="$slots.title" name="title"></slot>
       <div
         v-else
-        class="text-header me-auto">
+        :class="textBold && 'font-weight-bold' || 'text-header'"
+        class="me-auto">
         {{ $t('layout.background') }}
       </div>
       <v-switch
@@ -178,6 +179,10 @@ export default {
       default: false,
     },
     pageStyle: {
+      type: Boolean,
+      default: false,
+    },
+    textBold: {
       type: Boolean,
       default: false,
     },
