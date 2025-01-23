@@ -22,7 +22,8 @@
   <div>
     <div class="d-flex align-center mb-2">
       <div
-        class="text-header me-auto">
+        :class="textBold && 'font-weight-bold' || 'text-header'"
+        class="me-auto">
         {{ $t('layout.margins') }}
       </div>
       <v-switch
@@ -100,6 +101,14 @@ export default {
     value: {
       type: Object,
       default: null,
+    },
+    max: {
+      type: Number,
+      default: () => 48,
+    },
+    textBold: {
+      type: Boolean,
+      default: false,
     },
   },
   data: () => ({

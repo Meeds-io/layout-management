@@ -22,7 +22,8 @@
   <div>
     <div class="d-flex align-center">
       <div
-        class="text-header me-auto">
+        :class="textBold && 'font-weight-bold' || 'text-header'"
+        class="me-auto">
         {{ $t('layout.textStyle') }}
       </div>
       <v-switch
@@ -180,6 +181,10 @@ export default {
       default: null,
     },
     pageStyle: {
+      type: Boolean,
+      default: false,
+    },
+    textBold: {
       type: Boolean,
       default: false,
     },
