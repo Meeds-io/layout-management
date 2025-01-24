@@ -62,8 +62,8 @@ export default {
       }
       this.loading = true;
       const layoutToUpdate = this.$layoutUtils.cleanAttributes(this.$root.layout, false, true);
-      return this.$pageLayoutService.updatePageLayout(this.$root.pageRef, layoutToUpdate, 'contentId', true)
-        .then(() => this.$root.$emit('layout-page-saved'))
+      return this.$siteLayoutService.updateSiteLayout(this.$root.draftSiteType, this.$root.draftSiteName, layoutToUpdate, 'contentId')
+        .then(() => this.$root.$emit('layout-site-saved'))
         .catch(e => this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error'))
         .finally(() => window.setTimeout(() => this.loading = false));
     },
