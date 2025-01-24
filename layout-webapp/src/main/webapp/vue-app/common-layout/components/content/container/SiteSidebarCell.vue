@@ -27,10 +27,10 @@
     :hide-children="moving"
     :class="{
       'z-index-two': hover && !$root.drawerOpened,
-      'full-height': !hasApplication,
     }"
     :style="cssStyle"
-    class="position-relative d-flex flex-column"
+    class="position-relative d-flex flex-column full-height"
+    draggable
     @hovered="hover = $event"
     @move-start="moveStart">
     <template #footer>
@@ -46,7 +46,7 @@
           }"
           class="full-width layout-add-application-button"
           flat
-          @click="$root.$emit('layout-add-application-category-drawer', storageId)">
+          @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
           <v-card
             :class="{
               'invisible': !hoverAddApplication,
@@ -132,16 +132,17 @@ export default {
         && !this.hasBackground
         && (!this.$root.movingCell || this.$root.selectedSectionId !== this.parentId);
     },
+    width() {
+      return this.container.width;
+    },
     cssStyle() {
       const cssStyle = this.$applicationUtils.getStyle(this.container, {
         onlyBackgroundStyle: true,
         sectionStyle: true,
       });
-      if (this.container.width) {
-        cssStyle['min-width'] = `${this.container.width}px`;
-        cssStyle['width'] = `${this.container.width}px`;
-        cssStyle['max-width'] = `${this.container.width}px`;
-      }
+      cssStyle['min-width'] = `${this.width || 310}px`;
+      cssStyle['width'] = `${this.width || 310}px`;
+      cssStyle['max-width'] = `${this.width || 310}px`;
       return cssStyle;
     },
   },
