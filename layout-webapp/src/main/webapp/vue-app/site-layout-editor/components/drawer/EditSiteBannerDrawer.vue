@@ -228,7 +228,7 @@ export default {
           } else if (this.container.children.length > this.cols) {
             this.container.children.splice(this.cols - 1, this.container.children.length - this.cols);
           }
-          const container = this.$layoutUtils.getContainerById(this.$root.draftLayout, this.container.storageId);
+          const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
           Object.assign(container, this.container);
         }
       } finally {
