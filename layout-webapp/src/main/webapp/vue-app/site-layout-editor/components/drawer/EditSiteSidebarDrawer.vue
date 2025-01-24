@@ -80,6 +80,14 @@
     </template>
     <template #footer>
       <div class="d-flex">
+        <v-btn
+          :disabled="saving"
+          :title="$t('layout.deleteSection')"
+          color="error"
+          outlined
+          @click="removeSection">
+          {{ $t('layout.delete') }}
+        </v-btn>
         <v-spacer />
         <v-btn
           :disabled="saving"
@@ -140,22 +148,28 @@ export default {
       this.rightSidebar = this.$root.layout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
       this.$refs.drawer.open();
     },
+    removeSection() {
+      this.$root.$emit('layout-section-history-add');
+      this.sidebarContainer.children = [];
+      this.close();
+    },
     async apply() {
       this.saving = true;
       try {
-        this.$root.$emit('layout-section-history-add');
         if (!this.show) {
-          this.sidebarContainer.children = [];
+          this.removeSection();
         } else {
+          this.$root.$emit('layout-section-history-add');
           this.container.width = this.width;
           await this.$refs.backgroundInput.apply();
           const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
           Object.assign(container, this.container);
+          this.$layoutUtils.applyContainerStyle(container, this.container);
+          this.close();
         }
       } finally {
         this.saving = false;
       }
-      this.close();
     },
     close() {
       this.$refs.drawer.close();

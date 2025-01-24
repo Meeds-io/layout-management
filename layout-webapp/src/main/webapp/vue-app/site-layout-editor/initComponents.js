@@ -21,6 +21,7 @@ import SiteLayoutEditor from './components/SiteLayoutEditor.vue';
 
 import Toolbar from './components/toolbar/Toolbar.vue';
 import SaveButton from './components/toolbar/actions/SaveButton.vue';
+import SaveDraftButton from './components/toolbar/actions/SaveDraftButton.vue';
 import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButton.vue';
 import SitePropertiesButton from './components/toolbar/actions/SitePropertiesButton.vue';
@@ -33,12 +34,14 @@ import BannerSectionMenu from './components/content/menu/BannerSectionMenu.vue';
 import EditSiteSectionsDrawer from './components/drawer/EditSiteSectionsDrawer.vue';
 import EditSiteSidebarDrawer from './components/drawer/EditSiteSidebarDrawer.vue';
 import EditSiteBannerDrawer from './components/drawer/EditSiteBannerDrawer.vue';
+import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
 
 const components = {
   'site-layout-editor': SiteLayoutEditor,
 
   'site-layout-editor-toolbar': Toolbar,
   'site-layout-editor-toolbar-save-button': SaveButton,
+  'site-layout-editor-toolbar-save-draft-button': SaveDraftButton,
   'site-layout-editor-toolbar-history-buttons': HistoryButtons,
   'site-layout-editor-toolbar-properties-button': SitePropertiesButton,
   'site-layout-editor-toolbar-edit-sections-button': SiteEditSectionsButton,
@@ -51,6 +54,7 @@ const components = {
   'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
   'site-layout-editor-sidebar-section-drawer': EditSiteSidebarDrawer,
   'site-layout-editor-banner-section-drawer': EditSiteBannerDrawer,
+  'site-layout-editor-application-edit-drawer': EditApplicationDrawer,
 };
 
 for (const key in components) {
