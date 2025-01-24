@@ -200,9 +200,7 @@ export function updateSiteLayout(siteType, siteName, layout, expand) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      children: layout.children,
-    }),
+    body: JSON.stringify(layout),
   }).then((resp) => {
     if (resp?.ok) {
       return resp.json();

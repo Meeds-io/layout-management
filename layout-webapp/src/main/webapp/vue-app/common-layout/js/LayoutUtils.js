@@ -418,9 +418,13 @@ export function getSection(layout, id) {
   return parentContainer?.children?.find?.(c => c?.storageId === id);
 }
 
-export function getSectionByContainer(layout, id) {
-  const parentContainer = getParentContainer(layout);
-  return parentContainer?.children?.find?.(c => hasChild(c, id));
+export function getSectionByContainer(layout, id, isSiteLayout) {
+  if (isSiteLayout) {
+    return getContainerById(layout, id);
+  } else {
+    const parentContainer = getParentContainer(layout);
+    return parentContainer?.children?.find?.(c => hasChild(c, id));
+  }
 }
 
 export function getContainerById(container, id) {

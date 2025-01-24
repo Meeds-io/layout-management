@@ -110,16 +110,16 @@ export default {
   }),
   computed: {
     isLeftBar() {
-      return this.$root.draftLayout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
+      return this.$root.layout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
     },
     isRightBar() {
-      return this.$root.draftLayout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
+      return this.$root.layout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
     },
     sidebarContainer() {
       if (this.isLeftBar) {
-        return this.$root.draftLayout?.children?.[0];
+        return this.$root.layout?.children?.[0];
       } else if (this.isRightBar) {
-        return this.$root.draftLayout?.children?.[2];
+        return this.$root.layout?.children?.[2];
       } else {
         return null;
       }
@@ -136,8 +136,8 @@ export default {
       this.container = JSON.parse(JSON.stringify(container));
       this.width = this.container.width || 310;
       this.show = true;
-      this.leftSidebar = this.$root.draftLayout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
-      this.rightSidebar = this.$root.draftLayout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
+      this.leftSidebar = this.$root.layout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
+      this.rightSidebar = this.$root.layout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
       this.$refs.drawer.open();
     },
     async apply() {
@@ -149,7 +149,7 @@ export default {
         } else {
           this.container.width = this.width;
           await this.$refs.backgroundInput.apply();
-          const container = this.$layoutUtils.getContainerById(this.$root.draftLayout, this.container.storageId);
+          const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
           Object.assign(container, this.container);
         }
       } finally {
