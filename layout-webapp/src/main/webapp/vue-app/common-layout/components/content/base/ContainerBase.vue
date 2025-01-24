@@ -151,6 +151,8 @@ export default {
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
         isApplicationStyle: true,
+        isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
+        isSectionStyle: this.container.template === this.$layoutUtils.bannerCellTemplate,
         noBackgroundStyle: this.noBackgroundStyle
       });
     },
@@ -161,8 +163,11 @@ export default {
       return `${this.containerCssClass?.replace?.('layout-sticky-application', '')?.replace?.('layout-sticky-section', '') || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
     },
     isCell() {
+      return this.container.template === this.$layoutUtils.cellTemplate;
+    },
+    isDraggableCell() {
       return this.container.template === this.$layoutUtils.cellTemplate
-        || this.container.template === this.$layoutUtils.bannerCellTemplate
+        || this.container.template === this.$layoutUtils.bannerTemplate
         || this.container.template === this.$layoutUtils.sidebarCellTemplate;
     },
     dragOptions() {
@@ -172,7 +177,7 @@ export default {
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
         chosenClass: 'layout-moving-chosen-container',
-        handle: this.isCell && '.draggable-cell' || '.draggable',
+        handle: this.isDraggableCell && '.draggable-cell' || '.draggable',
         dataIdAttr: 'data-storage-id',
       };
     },

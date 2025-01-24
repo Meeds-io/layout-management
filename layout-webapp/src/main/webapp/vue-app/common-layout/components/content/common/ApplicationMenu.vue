@@ -8,6 +8,7 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -21,40 +22,64 @@
 <template>
   <v-fade-transition>
     <div
-      ref="menu"
       v-show="menu"
-      class="layout-no-multi-select absolute-horizontal-center z-index-drawer t-0 mt-n4">
-      <v-chip color="white" class="elevation-2 no-border">
-        <v-btn
-          v-show="$root.desktopDisplayMode"
-          :title="$t('layout.moveCell')"
-          :width="iconSize"
-          :height="iconSize"
-          class="ms-2 draggable-cell"
-          icon
-          @mousedown="dragStart"
-          @mouseup="dragEnd">
-          <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
-        </v-btn>
-        <v-btn
-          :title="$t('layout.editApplication')"
-          :width="iconSize"
-          :height="iconSize"
-          class="mx-4"
-          icon
-          @click.prevent.stop="$root.$emit('layout-edit-application', sectionId, container, applicationCategoryTitle, applicationTitle)">
-          <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
-        </v-btn>
-        <v-btn
-          :title="$t('layout.deleteApplication')"
-          :width="iconSize"
-          :height="iconSize"
-          class="me-2"
-          icon
-          @click.prevent.stop="$root.$emit('layout-delete-application', sectionId, container)">
-          <v-icon :size="iconSize" class="icon-default-color">fa-trash</v-icon>
-        </v-btn>
-      </v-chip>
+      class="position-sticky t-20 z-index-drawer">
+      <div
+        ref="menu"
+        class="layout-no-multi-select absolute-horizontal-center z-index-drawer t-0 mt-n4">
+        <v-chip color="white" class="elevation-2 no-border">
+          <v-tooltip bottom>
+            <template #activator="{on, attrs}">
+              <v-btn
+                v-show="$root.desktopDisplayMode"
+                v-on="on"
+                v-bind="attrs"
+                :aria-label="$t('layout.moveCell')"
+                :width="iconSize"
+                :height="iconSize"
+                class="draggable-cell ms-2"
+                icon
+                @mousedown="dragStart"
+                @mouseup="dragEnd">
+                <v-icon :size="iconSize" class="icon-default-color">fa-arrows-alt</v-icon>
+              </v-btn>
+            </template>
+            {{ $t('layout.moveCell') }}
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{on, attrs}">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                :aria-label="$t('layout.editApplication')"
+                :width="iconSize"
+                :height="iconSize"
+                class="mx-4"
+                icon
+                @click.prevent.stop="$root.$emit('layout-edit-application', sectionId, container, applicationCategoryTitle, applicationTitle)">
+                <v-icon :size="iconSize" class="icon-default-color">fa-edit</v-icon>
+              </v-btn>
+            </template>
+            {{ $t('layout.editApplication') }}
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{on, attrs}">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                :aria-label="$t('layout.deleteApplication')"
+                :width="iconSize"
+                :height="iconSize"
+                class="me-2"
+                icon
+                @click.prevent.stop="$root.$emit('layout-delete-application', sectionId, container)">
+                <v-icon :size="iconSize" class="icon-default-color">fa-trash</v-icon>
+              </v-btn>
+            </template>
+            {{ $t('layout.deleteApplication') }}
+          </v-tooltip>
+        </v-chip>
+      </div>
     </div>
   </v-fade-transition>
 </template>
@@ -91,7 +116,9 @@ export default {
       return this.section?.storageId;
     },
     isDynamicSection() {
-      return this.section?.template === this.$layoutUtils.flexTemplate;
+      return this.section?.template === this.$layoutUtils.flexTemplate
+        || this.section?.template === this.$layoutUtils.bannerCellTemplate
+        || this.section?.template === this.$layoutUtils.sidebarCellTemplate;
     },
     drawerOpened() {
       return this.$root.drawerOpened;
