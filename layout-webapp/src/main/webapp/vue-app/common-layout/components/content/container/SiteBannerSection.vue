@@ -48,9 +48,10 @@
       :container="container"
       :parent-id="parentId"
       :index="index"
-      class="position-relative overflow-initial layout-section-content full-height d-flex flex-row me-n5"
+      class="position-relative overflow-initial layout-section-content full-height full-width d-flex flex-row"
       type="section"
       no-background-style
+      draggable
       @hovered="hoverSection = $event && !drawerOpened" />
   </div>
 </template>

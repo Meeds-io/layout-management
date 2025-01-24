@@ -28,22 +28,22 @@
     :class="{
       'z-index-two': hover && !$root.drawerOpened,
     }"
-    :style="cssStyle"
-    class="d-flex flex-column full-height flex-grow-1 flex-shrink-1 me-5"
+    class="full-height flex-grow-1 flex-shrink-1"
     @hovered="hover = $event"
     @initialized="computeHasContent"
     @move-start="moveStart">
     <template #footer>
-      <div v-if="$root.desktopDisplayMode && displayResizeButton">
+      <div v-if="$root.desktopDisplayMode && displayResizeButton" class="position-absolute full-height t-0">
         <layout-editor-cell-resize-button
           :container="container"
           :parent-id="parentId"
           :hover="hover"
           :moving="moving"
+          class="layout-column-resize"
           dynamic-section
           @move-start="moveStart" />
       </div>
-      <v-hover v-if="$root.desktopDisplayMode" v-model="hoverAddApplication">
+      <v-hover v-if="$root.desktopDisplayMode && !hasApplication" v-model="hoverAddApplication">
         <v-card
           v-show="!movingChildren"
           :class="{
@@ -54,7 +54,7 @@
           }"
           class="full-width full-height layout-add-application-button"
           flat
-          @click="$root.$emit('layout-add-application-category-drawer', storageId)">
+          @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
           <v-card
             :class="{
               'invisible': !hoverAddApplication,
@@ -141,7 +141,7 @@ export default {
       return this.applicationCategory?.name || '';
     },
     displayResizeButton() {
-      return this.index < (this.length - 1);
+      return this.index > 0;
     },
     parentContainer() {
       return this.$layoutUtils.getContainerById(this.$root.layout, this.parentId);

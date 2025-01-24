@@ -76,6 +76,8 @@ export default {
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
         isApplicationStyle: true,
+        isApplicationBackground: this.container.template === 'BannerCell',
+        isSectionStyle: this.container.template === 'BannerCell',
         noBackgroundStyle: this.noBackgroundStyle
       });
     },

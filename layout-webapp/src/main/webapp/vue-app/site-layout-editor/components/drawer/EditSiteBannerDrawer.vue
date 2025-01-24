@@ -151,6 +151,14 @@
     </template>
     <template #footer>
       <div class="d-flex">
+        <v-btn
+          :disabled="saving"
+          :title="$t('layout.deleteSection')"
+          color="error"
+          outlined
+          @click="removeSection">
+          {{ $t('layout.delete') }}
+        </v-btn>
         <v-spacer />
         <v-btn
           :disabled="saving"
@@ -207,13 +215,18 @@ export default {
       this.stickySection = this.container.cssClass?.includes?.('layout-sticky-section');
       this.$refs.drawer.open();
     },
+    removeSection() {
+      this.$root.$emit('layout-section-history-add');
+      this.$root.middleContainer.children.splice(this.index, 1);
+      this.close();
+    },
     async apply() {
       this.saving = true;
       try {
-        this.$root.$emit('layout-section-history-add');
         if (!this.show) {
-          this.$root.middleContainer.children.splice(this.index, 1);
+          this.removeSection();
         } else {
+          this.$root.$emit('layout-section-history-add');
           this.container.height = this.height;
           await this.$refs.backgroundInput.apply();
           if (this.stickySection && !this.container.cssClass?.includes?.('layout-sticky-section')) {
@@ -229,12 +242,12 @@ export default {
             this.container.children.splice(this.cols - 1, this.container.children.length - this.cols);
           }
           const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
-          Object.assign(container, this.container);
+          this.$layoutUtils.applyContainerStyle(container, this.container);
+          this.close();
         }
       } finally {
         this.saving = false;
       }
-      this.close();
     },
     close() {
       this.$refs.drawer.close();
