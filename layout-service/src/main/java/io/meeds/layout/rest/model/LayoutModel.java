@@ -339,10 +339,7 @@ public class LayoutModel {
   public PortalConfig toSite() {
     PortalConfig site = new PortalConfig(storageId);
     ModelObject modelObject = this.children == null ? new PageBody() :
-                                                    this.children.stream()
-                                                                 .map(LayoutModel::toModelObject)
-                                                                 .findFirst()
-                                                                 .orElse(null);
+                                                    toModelObject(this);
     if (modelObject instanceof Container container) {
       site.setPortalLayout(container);
     } else {
