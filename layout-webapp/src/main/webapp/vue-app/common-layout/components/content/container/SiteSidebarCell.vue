@@ -46,7 +46,7 @@
           }"
           class="full-width layout-add-application-button"
           flat
-          @click="$root.$emit('layout-add-application-category-drawer', parentId, container)">
+          @click="$root.$emit('layout-add-application-category-drawer', storageId)">
           <v-card
             :class="{
               'invisible': !hoverAddApplication,
