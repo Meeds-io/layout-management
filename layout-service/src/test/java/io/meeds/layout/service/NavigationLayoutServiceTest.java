@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
+import org.exoplatform.portal.mop.Visibility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -221,6 +222,10 @@ public class NavigationLayoutServiceTest {
 
     assertDoesNotThrow(() -> navigationLayoutService.deleteNode(2, 0l, TEST_USER));
     verify(navigationService, atLeast(1)).deleteNode(2l);
+
+    when(nodeState.getVisibility()).thenReturn(Visibility.SYSTEM);
+    when(nodeData.getState()).thenReturn(nodeState);
+    assertThrows(IllegalAccessException.class, () -> navigationLayoutService.deleteNode(2, 0, TEST_USER));
   }
 
   @Test
