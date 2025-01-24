@@ -54,7 +54,7 @@
           }"
           class="full-width full-height layout-add-application-button"
           flat
-          @click="$root.$emit('layout-add-application-category-drawer', parentId, container)">
+          @click="$root.$emit('layout-add-application-category-drawer', storageId)">
           <v-card
             :class="{
               'invisible': !hoverAddApplication,
@@ -144,7 +144,7 @@ export default {
       return this.index < (this.length - 1);
     },
     parentContainer() {
-      return this.$layoutUtils.getContainerById(this.$root.draftLayout, this.parentId);
+      return this.$layoutUtils.getContainerById(this.$root.layout, this.parentId);
     },
     hasBackground() {
       return this.parentContainer.backgroundImage

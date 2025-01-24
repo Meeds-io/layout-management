@@ -17,8 +17,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode) {
-  return getApplicationContent(navUri, applicationStorageId, applicationMode)
+export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode, showSite) {
+  return getApplicationContent(navUri, applicationStorageId, applicationMode, showSite)
     .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
 }
 
@@ -185,9 +185,9 @@ export function getStyle(container, options) {
   return style;
 }
 
-export function getApplicationContent(navUri, applicationStorageId, applicationMode) {
+export function getApplicationContent(navUri, applicationStorageId, applicationMode, showSite) {
   const options = eXo.env.portal.previewSpaceId && `&previewSpaceId=${eXo.env.portal.previewSpaceId}` || '';
-  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${options}`, {
+  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=${!showSite}&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${options}`, {
     credentials: 'include',
     method: 'GET',
     redirect: 'manual'
