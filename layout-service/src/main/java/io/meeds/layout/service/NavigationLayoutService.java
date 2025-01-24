@@ -466,10 +466,7 @@ public class NavigationLayoutService {
   }
   
   private boolean isSystemVisibility(NodeData nodeData) {
-    if (nodeData.getState() != null) {
-      return Visibility.SYSTEM.equals(nodeData.getState().getVisibility());
-    }
-    return false;
+    return nodeData.getState() != null && Visibility.SYSTEM.equals(nodeData.getState().getVisibility());
   }
 
 }
