@@ -28,7 +28,7 @@
     <layout-editor-container-extension
       :container="$root.layout"
       class="layout-page-body d-flex no-border-radius" />
-    <layout-editor-application-edit-drawer
+    <site-layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
     <layout-editor-application-category-select-drawer
       ref="applicationCategoryDrawer" />
@@ -113,6 +113,8 @@ export default {
   created() {
     this.$root.$on('layout-add-application-category-drawer', this.openApplicationCategoryDrawer);
     this.$root.$on('layout-add-application', this.handleAddApplication);
+    this.$root.$on('layout-edit-application', this.handleEditApplication);
+    this.$root.$on('layout-delete-application', this.handleDeleteApplication);
     this.$root.$on('layout-section-history-add', this.addHistory);
     this.$root.$on('layout-section-history-undo', this.undoFromHistory);
     this.$root.$on('layout-section-history-redo', this.redoFromHistory);
@@ -174,6 +176,23 @@ export default {
       } finally {
         this.$root.initCellsSelection();
       }
+    },
+    handleDeleteApplication(sectionId, container) {
+      const section = this.$layoutUtils.getContainerById(this.$root.layout, sectionId);
+      if (section) {
+        this.addHistory();
+        const index = section.children.findIndex(c => c.storageId === container.storageId);
+        if (index >= 0) {
+          section.children.splice(index, 1);
+        }
+      } else {
+        console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
+      }
+    },
+    handleEditApplication(sectionId, container, applicationCategoryTitle, applicationTitle) {
+      const section = this.$layoutUtils.getContainerById(this.$root.layout, sectionId);
+      const containerToEdit = section.template === this.$layoutUtils.bannerCellTemplate ? section : container;
+      this.$refs.applicationPropertiesDrawer.open(section, containerToEdit, applicationCategoryTitle, applicationTitle);
     },
     handleSiteSaved() {
       document.dispatchEvent(new CustomEvent('alert-message', {detail: {
