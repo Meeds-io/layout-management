@@ -105,7 +105,9 @@ export default {
       return `UIPortlet-${this.container?.id || this.storageId || parseInt(Math.random() * 10000)}`;
     },
     isDynamicSection() {
-      return this.section?.template === this.$layoutUtils.flexTemplate;
+      return this.section?.template === this.$layoutUtils.flexTemplate
+        || this.section?.template === this.$layoutUtils.bannerCellTemplate
+        || this.section?.template === this.$layoutUtils.sidebarCellTemplate;
     },
     applicationTitle() {
       return this.$root.portletInstances?.find?.(a => a?.contentId === this.container?.contentId)?.name || this.container?.title || '';
@@ -164,7 +166,7 @@ export default {
     this.$root.$on('layout-section-application-update-style', this.updateStyle);
     this.$root.$on('layout-editor-portlet-properties-updated', this.updateApplication);
     this.initStyle();
-    this.section = this.$layoutUtils.getSectionByContainer(this.$root.layout, this.parentId);
+    this.section = this.$layoutUtils.getSectionByContainer(this.$root.layout, this.parentId, this.$root.isSiteLayout);
   },
   mounted() {
     this.installApplication();
@@ -190,7 +192,7 @@ export default {
           && this.$refs.content
           && this.nodeUri
           && this.storageId) {
-        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs.content)
+        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs.content, null, this.$root.isSiteLayout)
           .then(() => window.setTimeout(() => this.applicationInstalled = true, 200));
       }
     },

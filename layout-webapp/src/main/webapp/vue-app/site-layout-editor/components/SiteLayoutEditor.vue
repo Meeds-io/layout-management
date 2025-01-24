@@ -46,7 +46,7 @@
         @locked="stopLoading"
         @draft-detected="stopLoading"
         @canceled="cancelEditSite">
-        <site-layout-editor-content />
+        <site-layout-editor-content :layout="layout" />
       </coediting>
       <layout-editor-cells-selection-box />
     </main>
@@ -58,17 +58,18 @@
 </template>
 <script>
 export default {
+  data: () => ({
+    layout: null,
+  }),
   computed: {
     siteId() {
       return this.$root.siteId;
     },
   },
   created() {
-    this.$root.$on('layout-draft-refresh', this.setDraftLayout);
     this.$root.$on('layout-site-saved', this.deleteDraft);
   },
   beforeDestroy() {
-    this.$root.$off('layout-draft-refresh', this.setDraftLayout);
     this.$root.$off('layout-site-saved', this.deleteDraft);
   },
   methods: {
@@ -79,8 +80,7 @@ export default {
         this.$root.draftSite = await this.$siteLayoutService.createDraftSite(this.$root.siteType, this.$root.siteName);
       }
       this.$root.draftSiteId = this.$root.draftSite.siteId;
-      const draftLayout = await this.$siteLayoutService.getSiteLayout(this.$root.draftSiteType, this.$root.draftSiteName, 'contentId');
-      this.setDraftLayout(draftLayout);
+      this.layout = await this.$siteLayoutService.getSiteLayout(this.$root.draftSiteType, this.$root.draftSiteName, 'contentId');
     },
     cancelEditSite() {
       this.stopLoading();
@@ -88,9 +88,6 @@ export default {
     },
     stopLoading() {
       document.dispatchEvent(new CustomEvent('hideTopBarLoading'));
-    },
-    setDraftLayout(draftLayout) {
-      this.$root.layout = draftLayout;
     },
     deleteDraft() {
       this.$root.$emit('coediting-remove-revision');

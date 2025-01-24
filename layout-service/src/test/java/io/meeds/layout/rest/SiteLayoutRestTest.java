@@ -55,6 +55,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
@@ -311,10 +312,12 @@ public class SiteLayoutRestTest {
   @Test
   @SneakyThrows
   void createDraftSite() {
-    PortalConfig site = mock(PortalConfig.class);
-    when(siteLayoutService.getSite(SITE_KEY, SIMPLE_USER)).thenReturn(site);
-    when(site.getId()).thenReturn(2l);
-    when(siteLayoutService.getSite(2l, SIMPLE_USER)).thenReturn(site);
+    SiteKey draftSiteKey = new SiteKey(SiteType.DRAFT, "draftTest");
+    PortalConfig draftSite = mock(PortalConfig.class);
+    when(draftSite.getId()).thenReturn(3l);
+    when(siteLayoutService.getSite(3l, SIMPLE_USER)).thenReturn(draftSite);
+    when(siteLayoutService.getSite(draftSiteKey, SIMPLE_USER)).thenReturn(draftSite);
+    when(siteLayoutService.createDraftSite(SITE_KEY, SIMPLE_USER)).thenReturn(draftSiteKey);
     try (MockedStatic<RestEntityBuilder> restEntityBuilder = mockStatic(RestEntityBuilder.class)) {
       restEntityBuilder.when(() -> RestEntityBuilder.toSiteEntity(any(), any(), any())).thenReturn(mock(SiteEntity.class));
       ResultActions response = mockMvc.perform(post(CREATE_DRAFT_LAYOUT_REST_PATH).with(testSimpleUser()));

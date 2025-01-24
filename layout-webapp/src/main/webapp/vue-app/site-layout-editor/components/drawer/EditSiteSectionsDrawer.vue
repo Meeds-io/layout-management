@@ -158,26 +158,26 @@ export default {
       const options = this.getCurrentOptions();
       if (options.left !== this.leftSidebar) {
         if (this.leftSidebar) {
-          this.$root.draftLayout.children[0] = {
+          this.$root.layout.children[0] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
             children: [
               this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
             ]
           };
         } else {
-          this.$root.draftLayout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+          this.$root.layout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
       if (options.right !== this.rightSidebar) {
         if (this.rightSidebar) {
-          this.$root.draftLayout.children[2] = {
+          this.$root.layout.children[2] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
             children: [
               this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
             ]
           };
         } else {
-          this.$root.draftLayout.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+          this.$root.layout.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
       if (options.top !== this.topBanner) {
@@ -204,8 +204,8 @@ export default {
           this.$root.middleContainer.children.splice(this.$root.pageBodyIndex + 1, this.$root.middleContainer.children.length - this.$root.pageBodyIndex);
         }
       }
-      this.$root.draftLayout.children = this.$root.draftLayout.children.slice();
-      this.$root.draftLayout.children[1].children = this.$root.draftLayout.children[1].children.slice();
+      this.$root.layout.children = this.$root.layout.children.slice();
+      this.$root.layout.children[1].children = this.$root.layout.children[1].children.slice();
       this.close();
     },
     getCurrentOptions() {
