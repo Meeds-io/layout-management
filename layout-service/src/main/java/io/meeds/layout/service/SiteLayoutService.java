@@ -152,15 +152,16 @@ public class SiteLayoutService {
 
     String clonedSiteName = site.getType() + "_" + site.getName() + "_draft_" + username;
 
-    PortalConfig draftPortalConfig = site.clone();
-    draftPortalConfig.setType(PortalConfig.DRAFT);
-    draftPortalConfig.setName(clonedSiteName);
-    draftPortalConfig.resetStorage();
-    SiteKey draftSiteKey = new SiteKey(draftPortalConfig.getType(), draftPortalConfig.getName());
-    if (layoutService.getPortalConfig(draftSiteKey) != null) {
-      layoutService.remove(draftPortalConfig);
+    PortalConfig draftSite = site.clone();
+    draftSite.setType(PortalConfig.DRAFT);
+    draftSite.setName(clonedSiteName);
+    draftSite.resetStorage();
+    SiteKey draftSiteKey = new SiteKey(draftSite.getType(), draftSite.getName());
+    PortalConfig existingDraftSite = layoutService.getPortalConfig(draftSiteKey);
+    if (existingDraftSite != null) {
+      layoutService.remove(existingDraftSite);
     }
-    layoutService.create(draftPortalConfig);
+    layoutService.create(draftSite);
     return draftSiteKey;
   }
 
