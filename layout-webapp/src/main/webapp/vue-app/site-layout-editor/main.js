@@ -59,11 +59,11 @@ export function init() {
           hoveredApplication: null,
           portletInstanceCategories: null,
           portletInstances: null,
+          isSiteLayout: true,
           loadingPortletInstances: false,
           branding: null,
           displayMode: 'desktop',
           layout: null,
-          draftLayout: null,
           site: null,
           draftSite: null,
           draftSiteId: null,
@@ -71,12 +71,9 @@ export function init() {
           movingParentDynamic: false,
           drawerOpened: 0,
           selectedSectionId: null,
-          selectedCellCoordinates: [],
-          selectedCells: [],
           nextCellStorageId: null,
           nextCellDiffWidth: null,
           parentAppDimensions: false,
-          multiCellsSelect: false,
           sectionHistory: null,
           sectionRedo: null,
           movingCell: null,
@@ -104,15 +101,6 @@ export function init() {
           isMove() {
             return this.moveType === 'drag';
           },
-          isMultiSelect() {
-            return this.moveType === 'multiSelect';
-          },
-          selectedFirstRowIndex() {
-            return Math.min(...this.selectedCellCoordinates.map(c => c.rowIndex));
-          },
-          selectedFirstColIndex() {
-            return Math.min(...this.selectedCellCoordinates.map(c => c.colIndex));
-          },
           mobileDisplayMode() {
             return this.$root.displayMode === 'mobile';
           },
@@ -134,14 +122,17 @@ export function init() {
           draftSiteName() {
             return this.draftSite?.name;
           },
+          draftNodeUri() {
+            return `/d/${this.draftSiteId}/`;
+          },
           leftContainer() {
-            return this.draftLayout?.children?.[0];
+            return this.layout?.children?.[0];
           },
           middleContainer() {
-            return this.draftLayout?.children?.[1];
+            return this.layout?.children?.[1];
           },
           rightContainer() {
-            return this.draftLayout?.children?.[2];
+            return this.layout?.children?.[2];
           },
           pageBodyContainer() {
             return this.middleContainer?.children?.find?.(c => c.template === this.$layoutUtils.pageBodyTemplate);
@@ -209,13 +200,10 @@ export function init() {
           initCellsSelection() {
             this.selectedSectionId = null;
             this.moveType = null;
-            this.selectedCells = [];
-            this.selectedCellCoordinates = [];
           },
           resetMoving() {
             this.parentAppDimensions = null;
             this.moveType = null;
-            this.multiCellsSelect = false;
           },
         },
       }, `#${appId}`, 'Site Layout Editor');
