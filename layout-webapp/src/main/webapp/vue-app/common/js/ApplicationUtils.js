@@ -100,7 +100,16 @@ export function getStyle(container, options) {
     } else if (container.width === 'singlePageApplication') {
       style['--allPagesWidth'] = '1320px';
     } else if (container.width) {
-      style[options.isApplicationStyle && '--appWidth' || 'width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+      if (options.isApplicationStyle) {
+        if (options.isSectionStyle) {
+          style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+          style['min-width'] = style['width'];
+          style['max-width'] = style['width'];
+        }
+        style['--appWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+      } else {
+        style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+      }
       if (options.isApplicationScroll) {
         style['--appWidthScroll'] = 'auto';
       }
