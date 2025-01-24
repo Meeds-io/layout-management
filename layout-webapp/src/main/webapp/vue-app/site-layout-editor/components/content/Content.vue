@@ -20,12 +20,13 @@
 -->
 <template>
   <v-card
+    v-if="initialized"
     :max-width="maxWidth"
     :class="parentClass"
     class="transparent layout-sections-parent full-width mx-auto"
     flat>
     <layout-editor-container-extension
-      :container="$root.draftLayout"
+      :container="$root.layout"
       class="layout-page-body d-flex no-border-radius" />
     <layout-editor-application-edit-drawer
       ref="applicationPropertiesDrawer" />
@@ -48,8 +49,15 @@
 </template>
 <script>
 export default {
+  props: {
+    layout: {
+      type: Object,
+      default: null,
+    },
+  },
   data: () => ({
     isCompatible: true,
+    initialized: true,
     changesReminderOpened: false,
     loading: 1,
   }),
@@ -62,9 +70,6 @@ export default {
     },
     parentClass() {
       return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
-    },
-    layout() {
-      return this.$root.layout;
     },
     reminder() {
       return {
@@ -85,7 +90,7 @@ export default {
     layout: {
       immediate: true,
       handler(newVal, oldVal) {
-        if (newVal) {
+        if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
           this.setLayout(JSON.parse(JSON.stringify(newVal)));
         }
         if (!oldVal) {
@@ -100,11 +105,14 @@ export default {
       this.switchDisplayMode();
     },
     isCompatible() {
-      this.openChangesReminder();
+      if (!this.isCompatible) {
+        this.openChangesReminder();
+      }
     },
   },
   created() {
     this.$root.$on('layout-add-application-category-drawer', this.openApplicationCategoryDrawer);
+    this.$root.$on('layout-add-application', this.handleAddApplication);
     this.$root.$on('layout-section-history-add', this.addHistory);
     this.$root.$on('layout-section-history-undo', this.undoFromHistory);
     this.$root.$on('layout-section-history-redo', this.redoFromHistory);
@@ -124,20 +132,27 @@ export default {
     },
     switchDisplayMode() {
       if (this.$root.displayMode === 'mobile') {
-        this.$layoutUtils.applyMobileStyle(this.$root.draftLayout);
+        this.$layoutUtils.applyMobileStyle(this.$root.layout);
       } else {
-        this.$layoutUtils.applyDesktopStyle(this.$root.draftLayout);
+        this.$layoutUtils.applyDesktopStyle(this.$root.layout);
       }
     },
-    setLayout(layout) {
+    async setLayout(layout) {
+      if (!layout) {
+        return;
+      }
       this.initContainer(layout);
       const compatible = this.$layoutUtils.parseSite(layout);
-      if (this.$root.draftLayout) {
-        Object.assign(this.$root.draftLayout, layout);
+      if (this.$root.layout) {
+        Object.assign(this.$root.layout, layout);
       } else {
-        this.$root.draftLayout = layout;
+        this.$root.layout = layout;
       }
-      this.isCompatible = compatible;
+      if (!this.initialized) {
+        this.initialized = true;
+        await this.$nextTick();
+        this.isCompatible = compatible;
+      }
     },
     initContainer(container) {
       if (container.children) {
@@ -150,6 +165,16 @@ export default {
       this.$root.selectedSectionId = sectionId;
       this.$refs.applicationCategoryDrawer.open();
     },
+    handleAddApplication(application) {
+      try {
+        this.addHistory();
+        const container = this.$layoutUtils.getContainerById(this.$root.layout, this.$root.selectedSectionId);
+        this.$layoutUtils.newApplication(container, application, true);
+        this.saveDraft();
+      } finally {
+        this.$root.initCellsSelection();
+      }
+    },
     handleSiteSaved() {
       document.dispatchEvent(new CustomEvent('alert-message', {detail: {
         alertLink: `/portal/${this.$root.siteName}`,
@@ -161,9 +186,9 @@ export default {
     },
     addHistory() {
       if (!this.$root.sectionHistory) {
-        this.$root.sectionHistory = [JSON.parse(JSON.stringify(this.$root.draftLayout))];
+        this.$root.sectionHistory = [JSON.parse(JSON.stringify(this.$root.layout))];
       } else {
-        this.$root.sectionHistory.push(JSON.parse(JSON.stringify(this.$root.draftLayout)));
+        this.$root.sectionHistory.push(JSON.parse(JSON.stringify(this.$root.layout)));
       }
       this.$root.sectionRedo = [];
     },
@@ -178,16 +203,16 @@ export default {
     },
     undoFromHistory() {
       if (this.$root.sectionHistory?.length) {
-        const draftLayout = this.$root.sectionHistory.pop();
-        this.$root.sectionRedo.push(JSON.parse(JSON.stringify(this.$root.draftLayout)));
-        this.$root.draftLayout = draftLayout;
+        const layout = this.$root.sectionHistory.pop();
+        this.$root.sectionRedo.push(JSON.parse(JSON.stringify(this.$root.layout)));
+        this.$root.layout = layout;
       }
     },
     redoFromHistory() {
       if (this.$root.sectionRedo?.length) {
-        const draftLayout = this.$root.sectionRedo.pop();
-        this.$root.sectionHistory.push(JSON.parse(JSON.stringify(this.$root.draftLayout)));
-        this.$root.draftLayout = draftLayout;
+        const layout = this.$root.sectionRedo.pop();
+        this.$root.sectionHistory.push(JSON.parse(JSON.stringify(this.$root.layout)));
+        this.$root.layout = layout;
       }
     },
     resetHistory() {
@@ -198,8 +223,8 @@ export default {
       this.resetHistory();
 
       this.loading++;
-      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || JSON.parse(JSON.stringify(this.$root.draftLayout)), false, true);
-      return this.$siteLayoutService.updateSiteLayout(this.$root.siteType, this.$root.siteName, layoutToUpdate, 'contentId')
+      const layoutToUpdate = this.$layoutUtils.cleanAttributes(layout || JSON.parse(JSON.stringify(this.$root.layout)), false, true);
+      return this.$siteLayoutService.updateSiteLayout(this.$root.draftSiteType, this.$root.draftSiteName, layoutToUpdate, 'contentId')
         .then(layout => {
           this.setLayout(layout);
           this.$root.$emit('layout-draft-saved');

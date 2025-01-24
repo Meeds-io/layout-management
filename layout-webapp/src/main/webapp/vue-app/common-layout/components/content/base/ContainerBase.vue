@@ -229,7 +229,7 @@ export default {
 
       if (fromCell && toCell && application) {
         if (this.isCell) {
-          const section = this.$layoutUtils.getSectionByContainer(this.$root.layout, event.item.getAttribute('data-storage-id'));
+          const section = this.$layoutUtils.getSectionByContainer(this.$root.layout, event.item.getAttribute('data-storage-id'), this.$root.isSiteLayout);
           this.$root.$emit('layout-section-history-add', section?.storageId);
         }
 

@@ -302,9 +302,8 @@ public class SiteLayoutRest {
                                                     @RequestParam("siteName")
                                                     String siteName) throws Exception {
     try {
-      siteLayoutService.createDraftSite(new SiteKey(siteType, siteName),
-                                        request.getRemoteUser());
-      return getSite(webRequest, request, siteType, siteName, null);
+      SiteKey draftSiteKey = siteLayoutService.createDraftSite(new SiteKey(siteType, siteName), request.getRemoteUser());
+      return getSite(webRequest, request, draftSiteKey.getTypeName(), draftSiteKey.getName(), null);
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {

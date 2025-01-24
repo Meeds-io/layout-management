@@ -116,7 +116,7 @@ export default {
     isTopContainer: {
       immediate: true,
       handler() {
-        const container = this.$layoutUtils.getContainerById(this.$root.draftLayout, this.container.storageId);
+        const container = this.$layoutUtils.getContainerById(this.$root.layout, this.storageId);
         if (this.isTopContainer) {
           if (!container.cssClass?.includes?.('layout-banner-top-section')) {
             container.cssClass = container.cssClass ? `${container.cssClass.trim()} layout-banner-top-section` : 'layout-banner-top-section';
