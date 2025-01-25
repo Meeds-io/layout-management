@@ -22,11 +22,11 @@
   <v-hover v-model="hover" :disabled="$root.mobileDisplayMode">
     <component
       :is="draggable && 'draggable' || 'div'"
+      v-model="children"
       :id="id"
       :class="cssClass"
       :style="cssStyle"
       v-bind="draggable && {
-        'v-model': children,
         'data-storage-id': storageId,
         'options': dragOptions,
         'class': 'position-relative'
