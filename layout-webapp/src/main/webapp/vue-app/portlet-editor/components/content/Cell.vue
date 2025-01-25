@@ -31,7 +31,7 @@
       <div
         v-else-if="readOnly"
         v-show="hover && !hoverResizeButton"
-        class="full-width full-height position-absolute z-index-two">
+        class="full-width full-height overflow-hidden position-absolute z-index-two">
         <v-expand-transition>
           <v-card
             v-if="hover && !hoverResizeButton"
