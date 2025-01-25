@@ -29,15 +29,15 @@
     }"
     :is="dynamicSection && 'div' || 'v-btn'"
     :title="dynamicSection && $t('layout.updateWidth') || $t('layout.resizeCell')"
-    :class="{
+    :class="[{
       'l-0': $vuetify.rtl,
       'r-0': !$vuetify.rtl,
       'b-0 mb-n2 me-n2': !dynamicSection,
-      'absolute-vertical-center full-height me-n5': dynamicSection,
+      'absolute-vertical-center full-height': dynamicSection,
       'fa-rotate-90': !dynamicSection && !$vuetify.rtl,
       'col-resize-cursor grid-gap-width': dynamicSection,
       'layout-column-resize': dynamicSection && hoverSeparator,
-    }"
+    }, spacingClass]"
     class="position-absolute z-index-two"
     @mousedown.prevent.stop="resizeStart"
     @mouseover="hoverSeparator = true"
@@ -74,6 +74,10 @@ export default {
     moving: {
       type: Boolean,
       default: null,
+    },
+    spacingClass: {
+      type: String,
+      default: () => 'me-n5',
     },
   },
   data: () => ({

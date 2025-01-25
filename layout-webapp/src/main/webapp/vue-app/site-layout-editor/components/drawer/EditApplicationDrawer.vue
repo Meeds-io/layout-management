@@ -195,7 +195,7 @@
             }) }}</span>
           </div>
         </template>
-        <div class="d-flex align-center ms-n1">
+        <div class="d-flex align-center ms-n1 mb-4">
           <v-checkbox
             v-model="hiddenOnMobile"
             :label="$t('layout.hiddenOnMobile')"
@@ -203,6 +203,63 @@
             off-icon="far fa-square"
             class="my-0 ml-n2px" />
         </div>
+        <template v-if="!isDynamicSection">
+          <div class="text-header mb-2">
+            {{ $t('layout.alignApp') }}
+          </div>
+          <div class="d-flex">
+            <div class="col-6 pa-0">
+              <v-radio-group v-model="hAlign">
+                <v-radio
+                  value="START"
+                  class="ma-0 pa-0">
+                  <template #label>
+                    <span class="text-body">{{ $t('layout.alignLeft') }}</span>
+                  </template>
+                </v-radio>
+                <v-radio
+                  value="CENTER"
+                  class="ma-0 pa-0">
+                  <template #label>
+                    <span class="text-body">{{ $t('layout.alignCenter') }}</span>
+                  </template>
+                </v-radio>
+                <v-radio
+                  value="END"
+                  class="ma-0 pa-0">
+                  <template #label>
+                    <span class="text-body">{{ $t('layout.alignRight') }}</span>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+            </div>
+            <div class="col-6 pa-0">
+              <v-radio-group v-model="vAlign">
+                <v-radio
+                  value="START"
+                  class="ma-0 pa-0">
+                  <template #label>
+                    <span class="text-body">{{ $t('layout.alignTop') }}</span>
+                  </template>
+                </v-radio>
+                <v-radio
+                  value="CENTER"
+                  class="ma-0 pa-0">
+                  <template #label>
+                    <span class="text-body">{{ $t('layout.alignMiddle') }}</span>
+                  </template>
+                </v-radio>
+                <v-radio
+                  value="END"
+                  class="ma-0 pa-0">
+                  <template #label>
+                    <span class="text-body">{{ $t('layout.alignBottom') }}</span>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+            </div>
+          </div>
+        </template>
       </v-card>
     </template>
   </exo-drawer>
@@ -216,6 +273,8 @@ export default {
     fixedWidth: false,
     customHeightValue: false,
     customWidthValue: false,
+    hAlign: 'CENTER',
+    vAlign: 'CENTER',
     height: null,
     minHeight: 100,
     maxHeight: 1000,
@@ -382,6 +441,32 @@ export default {
         this.refresh++;
       }
     },
+    vAlign() {
+      if (this.drawer && this.vAlign) {
+        this.container.cssClass = this.container.cssClass?.replace?.('application-align-v-end', '') || '';
+        this.container.cssClass = this.container.cssClass.replace('application-align-v-center', '');
+        this.$set(this.container, 'cssClass', this.container.cssClass.trim());
+        if (this.vAlign === 'END') {
+          this.$set(this.container, 'cssClass', `${this.container.cssClass} application-align-v-end`);
+        } else if (this.vAlign === 'CENTER') {
+          this.$set(this.container, 'cssClass', `${this.container.cssClass} application-align-v-center`);
+        }
+        this.refresh++;
+      }
+    },
+    hAlign() {
+      if (this.drawer && this.hAlign) {
+        this.container.cssClass = this.container.cssClass?.replace?.('application-align-h-end', '') || '';
+        this.container.cssClass = this.container.cssClass.replace('application-align-h-center', '');
+        this.$set(this.container, 'cssClass', this.container.cssClass.trim());
+        if (this.hAlign === 'END') {
+          this.$set(this.container, 'cssClass', `${this.container.cssClass} application-align-h-end`);
+        } else if (this.hAlign === 'CENTER') {
+          this.$set(this.container, 'cssClass', `${this.container.cssClass} application-align-h-center`);
+        }
+        this.refresh++;
+      }
+    },
   },
   methods: {
     open(section, container, applicationCategoryTitle, applicationTitle) {
@@ -392,7 +477,22 @@ export default {
       this.section = section;
       this.height = container.height;
       this.width = container.width;
+      this.$set(container, 'cssClass', container?.cssClass?.trim?.() || '');
       this.hiddenOnMobile = container.cssClass?.includes?.('hidden-sm-and-down') || false;
+      if (this.container.cssClass?.includes?.('application-align-v-end')) {
+        this.vAlign = 'END';
+      } else if (this.container.cssClass?.includes?.('application-align-v-center')) {
+        this.vAlign = 'CENTER';
+      } else {
+        this.vAlign = 'START';
+      }
+      if (this.container.cssClass?.includes?.('application-align-h-end')) {
+        this.hAlign = 'END';
+      } else if (this.container.cssClass?.includes?.('application-align-h-center')) {
+        this.hAlign = 'CENTER';
+      } else {
+        this.hAlign = 'START';
+      }
       this.fixedHeight = !!this.height;
       this.fixedWidth = !!this.width;
       this.applicationCategoryTitle = applicationCategoryTitle;

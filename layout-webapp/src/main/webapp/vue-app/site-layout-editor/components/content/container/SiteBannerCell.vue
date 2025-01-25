@@ -40,6 +40,7 @@
           :hover="hover"
           :moving="moving"
           class="layout-column-resize"
+          spacing-class="me-n3"
           dynamic-section
           @move-start="moveStart" />
       </div>
