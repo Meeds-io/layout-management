@@ -33,49 +33,34 @@
         max-width="100%"
         class="ma-4 d-flex flex-column"
         flat>
-        <div class="d-flex mb-4">
-          <div class="me-auto">
-            <div class="font-weight-bold mb-2">
-              {{ $t('layout.editSiteSidebarSection.label.showSection') }}
-            </div>
-            <div class="text-subtitle">
-              {{ $t('layout.editSiteSidebarSection.subtitle.showSection') }}
-            </div>
-          </div>
-          <v-switch
-            v-model="show"
-            class="ms-auto my-auto me-n2" />
+        <div class="text-header mb-2">
+          {{ $t('layout.editSiteSidebarSection.label.setDisplay') }}
         </div>
-        <template v-if="show">
-          <div class="text-header mb-2">
-            {{ $t('layout.editSiteSidebarSection.label.setDisplay') }}
+        <div class="d-flex align-center mb-4">
+          <div class="me-auto mb-2">
+            {{ $t('layout.editSiteSidebarSection.label.sectionMaxWidth') }}
           </div>
-          <div class="d-flex align-center mb-4">
-            <div class="me-auto mb-2">
-              {{ $t('layout.editSiteSidebarSection.label.sectionMaxWidth') }}
-            </div>
-            <number-input
-              v-model="width"
-              :min="50"
-              :max="1000"
-              :step="10"
-              class="ms-auto my-n2"
-              editable />
-          </div>
-          <div class="text-header mb-4">
-            {{ $t('layout.editSiteSidebarSection.label.updateStyle') }}
-          </div>
-          <layout-editor-background-input
-            ref="backgroundInput"
-            v-model="container"
-            class="mb-4"
-            text-bold />
-          <layout-editor-text-input
-            ref="textInput"
-            v-model="container"
-            class="mb-4"
-            text-bold />
-        </template>
+          <number-input
+            v-model="width"
+            :min="50"
+            :max="1000"
+            :step="10"
+            class="ms-auto my-n2"
+            editable />
+        </div>
+        <div class="text-header mb-4">
+          {{ $t('layout.editSiteSidebarSection.label.updateStyle') }}
+        </div>
+        <layout-editor-background-input
+          ref="backgroundInput"
+          v-model="container"
+          class="mb-4"
+          text-bold />
+        <layout-editor-text-input
+          ref="textInput"
+          v-model="container"
+          class="mb-4"
+          text-bold />
       </v-card>
     </template>
     <template #footer>
@@ -111,7 +96,6 @@ export default {
     drawer: false,
     leftSidebar: false,
     rightSidebar: false,
-    show: true,
     saving: false,
     width: null,
     container: null,
@@ -143,7 +127,6 @@ export default {
     open(container) {
       this.container = JSON.parse(JSON.stringify(container));
       this.width = this.container.width || 310;
-      this.show = true;
       this.leftSidebar = this.$root.layout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
       this.rightSidebar = this.$root.layout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
       this.$refs.drawer.open();
@@ -156,17 +139,13 @@ export default {
     async apply() {
       this.saving = true;
       try {
-        if (!this.show) {
-          this.removeSection();
-        } else {
-          this.$root.$emit('layout-section-history-add');
-          this.container.width = this.width;
-          await this.$refs.backgroundInput.apply();
-          const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
-          Object.assign(container, this.container);
-          this.$layoutUtils.applyContainerStyle(container, this.container);
-          this.close();
-        }
+        this.$root.$emit('layout-section-history-add');
+        this.container.width = this.width;
+        await this.$refs.backgroundInput.apply();
+        const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
+        Object.assign(container, this.container);
+        this.$layoutUtils.applyContainerStyle(container, this.container);
+        this.close();
       } finally {
         this.saving = false;
       }
