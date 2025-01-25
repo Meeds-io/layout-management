@@ -36,8 +36,8 @@
         <div class="text-header mb-2">
           {{ $t('layout.editSiteSidebarSection.label.setDisplay') }}
         </div>
-        <div class="d-flex align-center mb-4">
-          <div class="me-auto mb-2">
+        <div class="d-flex align-center mb-2">
+          <div class="me-auto">
             {{ $t('layout.editSiteSidebarSection.label.sectionMaxWidth') }}
           </div>
           <number-input
@@ -47,6 +47,14 @@
             :step="10"
             class="ms-auto my-n2"
             editable />
+        </div>
+        <div class="d-flex align-center ms-n1 mb-4">
+          <v-checkbox
+            v-model="hiddenOnMobile"
+            :label="$t('layout.sectionHiddenOnMobile')"
+            on-icon="fa-check-square"
+            off-icon="far fa-square"
+            class="my-0 ml-n2px" />
         </div>
         <div class="text-header mb-4">
           {{ $t('layout.editSiteSidebarSection.label.updateStyle') }}
@@ -96,6 +104,7 @@ export default {
     drawer: false,
     leftSidebar: false,
     rightSidebar: false,
+    hiddenOnMobile: false,
     saving: false,
     width: null,
     container: null,
@@ -129,6 +138,7 @@ export default {
       this.width = this.container.width || 310;
       this.leftSidebar = this.$root.layout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
       this.rightSidebar = this.$root.layout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
+      this.hiddenOnMobile = this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down');
       this.$refs.drawer.open();
     },
     removeSection() {
@@ -145,6 +155,11 @@ export default {
         const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
         Object.assign(container, this.container);
         this.$layoutUtils.applyContainerStyle(container, this.container);
+        if (this.hiddenOnMobile && !this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down')) {
+          this.sidebarContainer.cssClass = this.sidebarContainer.cssClass ? `${this.sidebarContainer.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down';
+        } else if (!this.hiddenOnMobile && this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down')) {
+          this.sidebarContainer.cssClass = this.sidebarContainer.cssClass.replace('hidden-sm-and-down', '');
+        }
         this.close();
       } finally {
         this.saving = false;
