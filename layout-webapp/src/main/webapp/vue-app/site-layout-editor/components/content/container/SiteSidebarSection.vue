@@ -24,6 +24,7 @@
   <div
     v-if="childrenSize"
     :data-storage-id="storageId"
+    :class="container.cssClass"
     :style="cssStyle"
     class="position-relative flex-grow-0 flex-shrink-0">
     <v-hover :disabled="$root.mobileDisplayMode">
