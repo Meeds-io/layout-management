@@ -78,6 +78,7 @@ export default {
   data: () => ({
     hoverSection: false,
     movingSection: false,
+    defaultHeight: 57,
     sectionWidth: 0,
   }),
   computed: {
@@ -95,9 +96,6 @@ export default {
     },
     isTopContainer() {
       return this.index < this.$root.pageBodyIndex;
-    },
-    defaultHeight() {
-      return this.isTopContainer ? 57 : 150;
     },
     cssClass() {
       return [this.container.cssClass || '', `${this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section'}${this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : ''}`];
