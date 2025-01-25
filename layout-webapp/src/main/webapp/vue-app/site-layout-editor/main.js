@@ -18,6 +18,8 @@
  */
 
 import './initComponents.js';
+import './extensions.js';
+
 import '../common-layout/main.js';
 import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
