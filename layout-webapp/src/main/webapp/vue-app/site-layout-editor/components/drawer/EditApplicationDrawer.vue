@@ -209,7 +209,7 @@
           </div>
           <div class="d-flex">
             <div class="col-6 pa-0">
-              <v-radio-group v-model="hAlign">
+              <v-radio-group v-model="hAlign" class="ma-0">
                 <v-radio
                   value="START"
                   class="ma-0 pa-0">
@@ -234,7 +234,7 @@
               </v-radio-group>
             </div>
             <div class="col-6 pa-0">
-              <v-radio-group v-model="vAlign">
+              <v-radio-group v-model="vAlign" class="ma-0">
                 <v-radio
                   value="START"
                   class="ma-0 pa-0">
