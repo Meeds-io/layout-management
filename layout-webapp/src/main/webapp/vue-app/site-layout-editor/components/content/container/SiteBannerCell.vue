@@ -20,68 +20,96 @@
 
 -->
 <template>
-  <layout-editor-container-base
-    ref="container"
-    :container="container"
-    :parent-id="parentId"
-    :hide-children="moving"
-    :class="{
-      'z-index-two': hover && !$root.drawerOpened,
-    }"
-    class="full-height flex-grow-1 flex-shrink-1"
-    @hovered="hover = $event"
-    @initialized="computeHasContent"
-    @move-start="moveStart">
-    <template #footer>
-      <div v-if="$root.desktopDisplayMode && displayResizeButton" class="position-absolute full-height t-0">
-        <layout-editor-cell-resize-button
-          :container="container"
-          :parent-id="parentId"
-          :hover="hover"
-          :moving="moving"
-          class="layout-column-resize"
-          spacing-class="me-n3"
-          dynamic-section
-          @move-start="moveStart" />
-      </div>
-      <v-hover v-if="$root.desktopDisplayMode && !hasApplication" v-model="hoverAddApplication">
-        <v-card
-          v-show="!movingChildren"
-          :class="{
-            'grey-background': opaqueBackground,
-            'light-grey-background': !opaqueBackground,
-            'transparent': $root.movingCell && $root.selectedSectionId === parentId,
-            'invisible': moving,
-          }"
-          class="full-width full-height layout-add-application-button"
-          flat
-          @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
+  <v-hover v-model="hover">
+    <layout-editor-container-base
+      ref="container"
+      :container="container"
+      :parent-id="parentId"
+      :hide-children="moving"
+      :class="{
+        'position-relative': hasApplication,
+        'z-index-two': hover && !$root.drawerOpened,
+      }"
+      class="full-height flex-grow-1 flex-shrink-1">
+      <template v-if="application" #header>
+        <v-hover v-model="hoverMenu">
+          <layout-editor-application-menu
+            ref="menu"
+            :container="application"
+            :section="container"
+            :parent-id="storageId"
+            :application-title="applicationTitle"
+            :application-category-title="applicationCategoryTitle"
+            @move-start="moveStart"
+            @move-end="moveEnd" />
+        </v-hover>
+        <div
+          v-if="!editablePortlet"
+          v-show="hover"
+          class="full-width full-height overflow-hidden position-absolute z-index-two">
+          <v-expand-transition>
+            <v-card
+              v-if="hover"
+              :class="isDynamicSection && 'mb-5'"
+              :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
+              class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
+              <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
+              <span>{{ $t('layout.readonlyPortletContent') }}</span>
+            </v-card>
+          </v-expand-transition>
+        </div>
+      </template>
+      <template #footer>
+        <div v-if="$root.desktopDisplayMode && displayResizeButton" class="position-absolute full-height t-0">
+          <layout-editor-cell-resize-button
+            :container="container"
+            :parent-id="parentId"
+            :hover="hover"
+            :moving="moving"
+            class="layout-column-resize"
+            spacing-class="me-n3"
+            dynamic-section
+            @move-start="moveStart" />
+        </div>
+        <v-hover v-if="$root.desktopDisplayMode && !hasApplication" v-model="hoverAddApplication">
           <v-card
+            v-show="!movingChildren"
             :class="{
-              'invisible': !hoverAddApplication,
+              'grey-background': opaqueBackground,
+              'light-grey-background': !opaqueBackground,
+              'transparent': $root.movingCell && $root.selectedSectionId === parentId,
+              'invisible': moving,
             }"
-            :aria-label="$t('layout.addApplicationButton')"
-            :title="$t('layout.addApplicationButton')"
-            min-height="100%"
-            height="100%"
-            color="transparent"
-            class="full-width full-height d-flex flex-wrap align-center justify-center"
-            flat>
-            <component
-              :is="hasBackground && 'v-btn' || 'div'"
+            class="full-width full-height layout-add-application-button"
+            flat
+            @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
+            <v-card
               :class="{
-                'btn white': hasBackground,
-                'd-flex flex-wrap align-center justify-center': !hasBackground,
+                'invisible': !hoverAddApplication,
               }"
-              class="position-absolute">
-              <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
-              <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
-            </component>
+              :aria-label="$t('layout.addApplicationButton')"
+              :title="$t('layout.addApplicationButton')"
+              min-height="100%"
+              height="100%"
+              color="transparent"
+              class="full-width full-height d-flex flex-wrap align-center justify-center"
+              flat>
+              <component
+                :is="hasBackground && 'v-btn' || 'div'"
+                :class="{
+                  'btn white': hasBackground,
+                  'd-flex flex-wrap align-center justify-center': !hasBackground,
+                }"
+                class="position-absolute">
+                <v-icon class="icon-default-color pe-2">fa-plus</v-icon>
+                <span class="text-no-wrap">{{ $t('layout.addApp') }}</span>
+              </component>
+            </v-card>
           </v-card>
-        </v-card>
-      </v-hover>
-    </template>
-  </layout-editor-container-base>
+        </v-hover>
+      </template>
+    </layout-editor-container-base>
+  </v-hover>
 </template>
 <script>
 export default {
@@ -105,8 +133,8 @@ export default {
   },
   data: () => ({
     hover: false,
+    hoverMenu: false,
     hoverAddApplication: false,
-    hasContent: true,
   }),
   computed: {
     moving() {
@@ -132,15 +160,6 @@ export default {
     storageId() {
       return this.container?.storageId;
     },
-    applicationTitle() {
-      return this.container?.children?.[0]?.title || '';
-    },
-    applicationCategory() {
-      return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
-    },
-    applicationCategoryTitle() {
-      return this.applicationCategory?.name || '';
-    },
     displayResizeButton() {
       return this.index > 0;
     },
@@ -157,6 +176,30 @@ export default {
         && !this.hasBackground
         && (!this.$root.movingCell || this.$root.selectedSectionId !== this.parentId);
     },
+    application() {
+      return this.children?.[0];
+    },
+    applicationId() {
+      return this.application?.storageId;
+    },
+    portletInstance() {
+      return this.$root.portletInstances?.find?.(p => p.contentId === this.application?.contentId);
+    },
+    applicationTitle() {
+      return this.portletInstance?.name || this.application?.title || '';
+    },
+    applicationCategory() {
+      return this.portletInstance?.id && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.id === this.portletInstance?.id));
+    },
+    applicationCategoryTitle() {
+      return this.applicationCategory?.name || '';
+    },
+    editablePortlet() {
+      return this.portletInstance?.editable || false;
+    },
+    hoverApp() {
+      return !!(this.hoverMenu || this.hover);
+    },
   },
   watch: {
     hover() {
@@ -166,14 +209,22 @@ export default {
         this.$root.hoveredParentId = null;
       }
     },
+    hoverApp() {
+      if (this.$refs?.menu) {
+        if (this.hoverApp) {
+          this.$refs.menu.displayMenu();
+        } else {
+          this.$refs.menu.hideMenu();
+        }
+      }
+    },
   },
   methods: {
     moveStart(event, moveType) {
       this.$root.moveType = moveType;
       if (moveType === 'resize') {
         this.$root.movingParentId = this.parentId;
-        const section = this.$layoutUtils.getContainerById(this.$root.layout, this.parentId);
-        this.$root.movingParentDynamic = section?.template === this.$layoutUtils.flexTemplate;
+        this.$root.movingParentDynamic = true;
         this.$nextTick().then(() => {
           this.$root.$emit('layout-cell-moving-start', {
             target: event.target,
@@ -186,6 +237,9 @@ export default {
           });
         });
       }
+    },
+    moveEnd() {
+      this.$emit('move-end');
     },
   },
 };

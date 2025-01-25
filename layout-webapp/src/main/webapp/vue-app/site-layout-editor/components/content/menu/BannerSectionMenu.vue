@@ -35,7 +35,7 @@
         <v-hover v-if="index > 0" v-model="hoverButton1">
           <div
             :class="{
-              'z-index-two': !hoveredApplication,
+              'z-index-floating-button': !hoveredApplication,
             }"
             class="absolute-horizontal-center d-flex t-0 justify-center mb-auto mt-n4">
             <v-tooltip bottom>
@@ -65,9 +65,10 @@
             :class="{
               'r-0': $vuetify.rtl,
               'l-0': !$vuetify.rtl,
+              'ms-n4': translateSideButtons,
             }"
             :style="leftButtonStyle"
-            class="position-absolute t-10 z-index-floating-button">
+            class="position-absolute t-10 z-index-two">
             <v-tooltip :disabled="moving" bottom>
               <template #activator="{on, attrs}">
                 <div
@@ -96,9 +97,9 @@
             :class="{
               'l-0': $vuetify.rtl,
               'r-0': !$vuetify.rtl,
+              'me-n4': translateSideButtons,
             }"
-            :style="rightButtonStyle"
-            class="position-absolute t-10 z-index-floating-button">
+            class="position-absolute t-10 z-index-two">
             <v-tooltip bottom>
               <template #activator="{on, attrs}">
                 <div
@@ -191,12 +192,10 @@ export default {
       return this.hoverButton || (!this.hoverArea && !this.hoveredApplication);
     },
     hoveredApplication() {
-      return this.$root.hoveredApplication;
+      return !!this.$root.hoveredApplication;
     },
-    leftButtonStyle() {
-      return {
-        left: this.$root.pageFullWindow && '0' || '-20px',
-      };
+    translateSideButtons() {
+      return !this.$root.pageFullWindow;
     },
     rightButtonStyle() {
       return {
