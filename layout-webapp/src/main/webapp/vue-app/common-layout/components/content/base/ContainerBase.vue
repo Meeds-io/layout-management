@@ -20,40 +20,29 @@
 -->
 <template>
   <v-hover v-model="hover" :disabled="$root.mobileDisplayMode">
-    <draggable
-      v-if="draggable"
-      v-model="children"
+    <component
+      :is="draggable && 'draggable' || 'div'"
       :id="id"
-      :data-storage-id="storageId"
       :class="cssClass"
       :style="cssStyle"
-      :options="dragOptions"
-      class="position-relative"
-      @start="startMoving"
-      @end="endMoving">
-      <slot v-if="$slots.content" name="content"></slot>
-      <template v-else-if="hasChildren">
-        <layout-editor-container-extension
-          v-for="(child, i) in children"
-          :key="child.storageId"
-          :container="child"
-          :parent-id="storageId"
-          :index="i"
-          :length="childrenSize"
-          :class="hideChildren && 'invisible'"
-          class="draggable-container-flex"
-          @initialized="$emit('initialized', child)"
-          @move-start="moveStart"
-          @move-end="moveEnd" />
+      v-bind="draggable && {
+        'v-model': children,
+        'data-storage-id': storageId,
+        'options': dragOptions,
+        'class': 'position-relative'
+      }"
+      v-on="draggable && {
+        start: startMoving,
+        end: endMoving,
+      }">
+      <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
+      <template v-if="$slots.header">
+        <slot name="header"></slot>
       </template>
-      <slot v-if="$slots.footer" name="footer"></slot>
-    </draggable>
-    <div
-      v-else
-      :id="id"
-      :class="cssClass"
-      :style="cssStyle">
-      <slot v-if="$slots.content" name="content"></slot>
+      <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
+      <template v-if="$slots.content">
+        <slot name="content"></slot>
+      </template>
       <template v-else-if="hasChildren">
         <layout-editor-container-extension
           v-for="(child, i) in children"
@@ -63,14 +52,18 @@
           :index="i"
           :length="childrenSize"
           :class="{
-            'invisible': hideChildren
+            'invisible': hideChildren,
+            'draggable-container-flex': draggable,
           }"
           @initialized="$emit('initialized', child)"
           @move-start="moveStart"
           @move-end="moveEnd" />
       </template>
-      <slot v-if="$slots.footer" name="footer"></slot>
-    </div>
+      <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
+      <template v-if="$slots.footer">
+        <slot name="footer"></slot>
+      </template>
+    </component>
   </v-hover>
 </template>
 <script>
