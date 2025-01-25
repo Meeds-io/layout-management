@@ -19,53 +19,57 @@
 
 -->
 <template>
-  <v-hover v-model="hover">
+  <v-hover v-model="hover" :disabled="ignoreMenu">
     <div
       ref="content"
       :id="id"
       :class="[cssClass, {
-        'position-relative': isDynamicSection && (hover || !hasContent),
-        'z-index-one': displayNoContent,
+        'position-relative': !ignoreMenu && isDynamicSection && (hover || !hasContent),
+        'z-index-one': !ignoreMenu && displayNoContent,
       }]"
       :style="cssStyle"
       :data-storage-id="storageId"
       class="layout-application"
-      @mouseover="hover = true"
-      @focusin="hover = true">
-      <v-hover v-model="hoverMenu">
-        <layout-editor-application-menu
-          ref="menu"
-          :container="container"
-          :section="section"
-          :parent-id="parentId"
-          :application-title="applicationTitle"
-          :application-category-title="applicationCategoryTitle"
-          @move-start="moveStart"
-          @move-end="moveEnd" />
-      </v-hover>
-      <div v-if="displayNoContent" class="full-width text-no-wrap border-color-grey-lighten ms-1">
-        <div class="layout-no-content absolute-vertical-center d-flex full-width ms-n1">
-          <div class="light-black-background white--text px-2">
-            {{ applicationTitle }}
+      v-on="!ignoreMenu && {
+        mouseover: () => hover = true,
+        focusin: () => hover = true,
+      }">
+      <template v-if="!ignoreMenu">
+        <v-hover v-model="hoverMenu">
+          <layout-editor-application-menu
+            ref="menu"
+            :container="container"
+            :section="section"
+            :parent-id="parentId"
+            :application-title="applicationTitle"
+            :application-category-title="applicationCategoryTitle"
+            @move-start="moveStart"
+            @move-end="moveEnd" />
+        </v-hover>
+        <div v-if="displayNoContent" class="full-width text-no-wrap border-color-grey-lighten ms-1">
+          <div class="layout-no-content absolute-vertical-center d-flex full-width ms-n1">
+            <div class="light-black-background white--text px-2">
+              {{ applicationTitle }}
+            </div>
+            <v-icon size="35" class="layout-no-content-caret icon-default-color my-n2">{{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}</v-icon>
           </div>
-          <v-icon size="35" class="layout-no-content-caret icon-default-color my-n2">{{ $vuetify.rtl && 'fa-caret-left' || 'fa-caret-right' }}</v-icon>
         </div>
-      </div>
-      <div
-        v-else-if="!editablePortlet && !hoverMenu"
-        v-show="hover"
-        class="full-width full-height position-absolute z-index-two">
-        <v-expand-transition>
-          <v-card
-            v-if="hover"
-            :class="isDynamicSection && 'mb-5'"
-            :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
-            class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
-            <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
-            <span>{{ $t('layout.readonlyPortletContent') }}</span>
-          </v-card>
-        </v-expand-transition>
-      </div>
+        <div
+          v-else-if="!editablePortlet && !hoverMenu"
+          v-show="hover"
+          class="full-width full-height overflow-hidden position-absolute z-index-two">
+          <v-expand-transition>
+            <v-card
+              v-if="hover"
+              :class="isDynamicSection && 'mb-5'"
+              :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
+              class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
+              <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
+              <span>{{ $t('layout.readonlyPortletContent') }}</span>
+            </v-card>
+          </v-expand-transition>
+        </div>
+      </template>
     </div>
   </v-hover>
 </template>
@@ -109,13 +113,18 @@ export default {
     id() {
       return `UIPortlet-${this.container?.id || this.storageId || parseInt(Math.random() * 10000)}`;
     },
+    ignoreMenu() {
+      return this.section?.template === this.$layoutUtils.bannerCellTemplate;
+    },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate
-        || this.section?.template === this.$layoutUtils.bannerCellTemplate
         || this.section?.template === this.$layoutUtils.sidebarCellTemplate;
     },
+    portletInstance() {
+      return this.$root.portletInstances?.find?.(p => p.contentId === this.container?.contentId);
+    },
     applicationTitle() {
-      return this.$root.portletInstances?.find?.(a => a?.contentId === this.container?.contentId)?.name || this.container?.title || '';
+      return this.portletInstance?.name || this.container?.title || '';
     },
     applicationCategory() {
       return this.applicationTitle && this.$root.portletInstanceCategories?.find?.(c => c?.applications?.find?.(a => a?.name === this.applicationTitle));
@@ -128,9 +137,6 @@ export default {
     },
     displayNoContent() {
       return this.isDynamicSection && !this.hasContent && this.$root.desktopDisplayMode;
-    },
-    portletInstance() {
-      return this.$root.portletInstances?.find?.(p => p.contentId === this.container?.contentId);
     },
     editablePortlet() {
       return this.portletInstance?.editable || false;
@@ -160,10 +166,12 @@ export default {
       }
     },
     hoverApp() {
-      if (this.hoverApp) {
-        this.$refs.menu.displayMenu();
-      } else {
-        this.$refs.menu.hideMenu();
+      if (this.$refs?.menu) {
+        if (this.hoverApp) {
+          this.$refs.menu.displayMenu();
+        } else {
+          this.$refs.menu.hideMenu();
+        }
       }
     },
   },
@@ -194,10 +202,10 @@ export default {
     installApplication() {
       if (!this.applicationInstalled
           && !this.installing
-          && this.$refs.content
+          && this.$refs?.content
           && this.nodeUri
           && this.storageId) {
-        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs.content, null, this.$root.isSiteLayout)
+        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs?.content, null, this.$root.isSiteLayout)
           .then(() => window.setTimeout(() => this.applicationInstalled = true, 200));
       }
     },
@@ -238,8 +246,8 @@ export default {
       }
       this.hasContentCheckCount++;
       window.setTimeout(() => {
-        if (this.$refs.content) {
-          this.hasContent = this.$refs.content.getBoundingClientRect().height > 30;
+        if (this.$refs?.content) {
+          this.hasContent = this.$refs?.content.getBoundingClientRect().height > 30;
           if (!this.hasContent) {
             this.computeHasContentAsync();
           }
