@@ -203,8 +203,11 @@ export default {
     navigationNodeType() {
       return !this.navigationNode.pageKey && 'group' || this.navigationNode.pageLink && 'link' ||  this.navigationNode.pageKey && 'page';
     },
+    isSystemVisibility() {
+      return this.navigationNode?.visibility === 'SYSTEM';
+    },
     canDelete() {
-      return Number(this.navigationNode.id) !== Number(this.rootNodeId);
+      return Number(this.navigationNode.id) !== Number(this.rootNodeId) && !this.isSystemVisibility;
     },
     visibilityIcon() {
       switch (this.navigationNode?.visibility) {
