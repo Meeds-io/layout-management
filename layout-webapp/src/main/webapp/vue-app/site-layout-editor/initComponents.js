@@ -27,6 +27,14 @@ import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButto
 import SitePropertiesButton from './components/toolbar/actions/SitePropertiesButton.vue';
 import SiteEditSectionsButton from './components/toolbar/actions/SiteEditSectionsButton.vue';
 
+import Site from './components/content/container/Site.vue';
+import SiteBannerSection from './components/content/container/SiteBannerSection.vue';
+import SiteBannerCell from './components/content/container/SiteBannerCell.vue';
+import SiteSidebarSection from './components/content/container/SiteSidebarSection.vue';
+import SiteSidebarCell from './components/content/container/SiteSidebarCell.vue';
+import SiteMiddleBody from './components/content/container/SiteMiddleBody.vue';
+import PageBody from './components/content/container/PageBody.vue';
+
 import Content from './components/content/Content.vue';
 import SidebarSectionMenu from './components/content/menu/SidebarSectionMenu.vue';
 import BannerSectionMenu from './components/content/menu/BannerSectionMenu.vue';
@@ -50,6 +58,14 @@ const components = {
   'site-layout-editor-content': Content,
   'site-layout-editor-sidebar-section-menu': SidebarSectionMenu,
   'site-layout-editor-banner-section-menu': BannerSectionMenu,
+
+  'site-layout-editor-container-page-body': PageBody,
+  'site-layout-editor-container-site': Site,
+  'site-layout-editor-container-site-banner-section': SiteBannerSection,
+  'site-layout-editor-container-site-banner-cell': SiteBannerCell,
+  'site-layout-editor-container-site-sidebar-section': SiteSidebarSection,
+  'site-layout-editor-container-site-sidebar-cell': SiteSidebarCell,
+  'site-layout-editor-container-site-middle-section': SiteMiddleBody,
 
   'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
   'site-layout-editor-sidebar-section-drawer': EditSiteSidebarDrawer,
