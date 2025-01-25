@@ -199,7 +199,7 @@
             </v-list-item>
           </div>
         </template>
-        <span>{{ $t('layout.rootNodeCantBeDeleted') }}</span>
+        <span>{{ cantBeDeletedLabel }}</span>
       </v-tooltip>
       <v-divider />
     </v-list>
@@ -264,12 +264,6 @@ export default {
     nodeId() {
       return this.navigationNode?.id;
     },
-    nodeSiteType() {
-      return this.navigationNode?.siteKey?.typeName;
-    },
-    nodeSiteName() {
-      return this.navigationNode?.siteKey?.name;
-    },
     canEditPage() {
       return this.navigationNode?.canEditPage && this.pageRef;
     },
@@ -279,6 +273,12 @@ export default {
     canEditPageLayout() {
       return this.canEditPage && !this.pageLink;
     },
+    isSystemVisibility() {
+      return this.navigationNode?.visibility === 'SYSTEM';
+    },
+    cantBeDeletedLabel() {
+      return this.isSystemVisibility && this.$t('layout.defaultNodeCantBeDeleted') || this.$t('layout.rootNodeCantBeDeleted');
+    }
   },
   watch: {
     displayActionMenu() {

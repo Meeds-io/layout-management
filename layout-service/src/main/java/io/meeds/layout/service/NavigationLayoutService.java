@@ -193,7 +193,7 @@ public class NavigationLayoutService {
     NodeData nodeData = navigationService.getNodeById(nodeId);
     if (nodeData == null) {
       throw new ObjectNotFoundException(String.format(NODE_DATA_WITH_NODE_ID_IS_NOT_FOUND, nodeId));
-    } else if (!aclService.canEditNavigation(nodeData.getSiteKey(), username)) {
+    } else if (!aclService.canEditNavigation(nodeData.getSiteKey(), username) || isSystemVisibility(nodeData)) {
       throw new IllegalAccessException();
     }
     if (delay > 0) {
@@ -463,6 +463,10 @@ public class NavigationLayoutService {
   private String getLocaleName(Locale locale) {
     return locale.toLanguageTag().replace("-", "_"); // Use same name as
                                                      // localeConfigService
+  }
+  
+  private boolean isSystemVisibility(NodeData nodeData) {
+    return nodeData.getState() != null && Visibility.SYSTEM.equals(nodeData.getState().getVisibility());
   }
 
 }
