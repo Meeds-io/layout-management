@@ -23,10 +23,15 @@
     <div
       ref="content"
       :id="id"
-      :class="`${cssClass}${isDynamicSection && (hover || !hasContent) && ' position-relative' || ''}${displayNoContent && ' z-index-one' || ''}`"
+      :class="[cssClass, {
+        'position-relative': isDynamicSection && (hover || !hasContent),
+        'z-index-one': displayNoContent,
+      }]"
       :style="cssStyle"
       :data-storage-id="storageId"
-      class="layout-application">
+      class="layout-application"
+      @mouseover="hover = true"
+      @focusin="hover = true">
       <v-hover v-model="hoverMenu">
         <layout-editor-application-menu
           ref="menu"
@@ -119,7 +124,7 @@ export default {
       return this.applicationCategory?.name || '';
     },
     hoverApp() {
-      return this.hoverMenu || this.hover || this.hoverGridCell;
+      return !!(this.hoverMenu || this.hover || this.hoverGridCell);
     },
     displayNoContent() {
       return this.isDynamicSection && !this.hasContent && this.$root.desktopDisplayMode;
