@@ -36,8 +36,8 @@
         <div class="text-header mb-2">
           {{ $t('layout.editSiteSidebarSection.label.setDisplay') }}
         </div>
-        <div class="d-flex align-center mb-4">
-          <div class="me-auto mb-2">
+        <div class="d-flex align-center mb-2">
+          <div class="me-auto">
             {{ $t('layout.editSiteSidebarSection.label.sectionHeight') }}
           </div>
           <number-input
@@ -47,6 +47,14 @@
             :step="10"
             class="ms-auto my-n2"
             editable />
+        </div>
+        <div class="d-flex align-center ms-n1 mb-4">
+          <v-checkbox
+            v-model="hiddenOnMobile"
+            :label="$t('layout.sectionHiddenOnMobile')"
+            on-icon="fa-check-square"
+            off-icon="far fa-square"
+            class="my-0 ml-n2px" />
         </div>
         <div class="d-flex align-center">
           <div class="flex-grow-0 flex-shrink-0 align-start pb-3">
@@ -170,6 +178,7 @@ export default {
     index: null,
     height: null,
     cols: null,
+    hiddenOnMobile: false,
     saving: false,
   }),
   computed: {
@@ -196,6 +205,7 @@ export default {
       this.height = this.container.height || this.defaultHeight;
       this.cols = this.container.children.length;
       this.stickySection = this.container.cssClass?.includes?.('layout-sticky-section');
+      this.hiddenOnMobile = this.container.cssClass?.includes?.('hidden-sm-and-down');
       this.$refs.drawer.open();
     },
     removeSection() {
@@ -224,6 +234,11 @@ export default {
         const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
         Object.assign(container, this.container);
         this.$layoutUtils.applyContainerStyle(container, this.container);
+        if (this.hiddenOnMobile && !container.cssClass?.includes?.('hidden-sm-and-down')) {
+          container.cssClass = container.cssClass ? `${container.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down';
+        } else if (!this.hiddenOnMobile && container.cssClass?.includes?.('hidden-sm-and-down')) {
+          container.cssClass = container.cssClass.replace('hidden-sm-and-down', '');
+        }
         this.close();
       } finally {
         this.saving = false;

@@ -48,7 +48,7 @@
       :container="container"
       :parent-id="parentId"
       :index="index"
-      class="position-relative overflow-initial layout-section-content full-height full-width d-flex flex-row"
+      class="position-relative overflow-initial layout-section-content full-height full-width display-flex flex-row"
       type="section"
       no-background-style
       draggable
@@ -100,7 +100,7 @@ export default {
       return this.isTopContainer ? 57 : 150;
     },
     cssClass() {
-      return `${this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section'}${this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : ''}`;
+      return [this.container.cssClass || '', `${this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section'}${this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : ''}`];
     },
     cssStyle() {
       return {
