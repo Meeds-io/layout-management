@@ -179,6 +179,7 @@ export default {
     height: null,
     cols: null,
     hiddenOnMobile: false,
+    defaultHeight: 57,
     saving: false,
   }),
   computed: {
@@ -187,9 +188,6 @@ export default {
     },
     title() {
       return this.isTopContainer ? this.$t('layout.editSiteBannerSection.label.editSiteTopbarSection') : this.$t('layout.editSiteBannerSection.label.editSiteBottomSection');
-    },
-    defaultHeight() {
-      return this.isTopContainer ? 57 : 150;
     },
   },
   created() {
