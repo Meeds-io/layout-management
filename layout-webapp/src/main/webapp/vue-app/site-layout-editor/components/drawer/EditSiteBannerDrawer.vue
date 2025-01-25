@@ -33,120 +33,105 @@
         max-width="100%"
         class="ma-4 d-flex flex-column"
         flat>
-        <div class="d-flex mb-4">
-          <div class="me-auto">
-            <div class="font-weight-bold mb-2">
-              {{ $t('layout.editSiteSidebarSection.label.showSection') }}
-            </div>
-            <div class="text-subtitle">
-              {{ $t('layout.editSiteSidebarSection.subtitle.showSection') }}
-            </div>
-          </div>
-          <v-switch
-            v-model="show"
-            class="ms-auto my-auto me-n2" />
+        <div class="text-header mb-2">
+          {{ $t('layout.editSiteSidebarSection.label.setDisplay') }}
         </div>
-        <template v-if="show">
-          <div class="text-header mb-2">
-            {{ $t('layout.editSiteSidebarSection.label.setDisplay') }}
+        <div class="d-flex align-center mb-4">
+          <div class="me-auto mb-2">
+            {{ $t('layout.editSiteSidebarSection.label.sectionHeight') }}
           </div>
-          <div class="d-flex align-center mb-4">
-            <div class="me-auto mb-2">
-              {{ $t('layout.editSiteSidebarSection.label.sectionHeight') }}
-            </div>
-            <number-input
-              v-model="height"
-              :min="0"
-              :max="1000"
-              :step="10"
-              class="ms-auto my-n2"
-              editable />
-          </div>
-          <div class="d-flex align-center">
-            <div class="flex-grow-0 flex-shrink-0 align-start pb-3">
-              <span class="subtitle-1 text-color">{{ $t('layout.columnsCount') }}</span>
-            </div>
-            <v-card
-              class="flex-grow-1 flex-shrink-1 align-end ms-auto"
-              max-width="80%"
-              flat>
-              <v-slider
-                v-model="cols"
-                :thumb-size="24"
-                :min="1"
-                :max="60"
-                thumb-label="always">
-                <template #prepend>
-                  <v-btn
-                    :disabled="cols <= 1"
-                    class="me-n2 mt-n1"
-                    icon
-                    fab
-                    x-small
-                    @click="cols--">
-                    <v-icon class="icon-default-color pt-2px">fa-minus</v-icon>
-                  </v-btn>
-                </template>
-                <template #append>
-                  <v-btn
-                    :disabled="cols >= 60"
-                    class="ms-n2 mt-n1"
-                    fab
-                    icon
-                    x-small
-                    @click="cols++">
-                    <v-icon class="icon-default-color pt-2px">fa-plus</v-icon>
-                  </v-btn>
-                </template>
-              </v-slider>
-            </v-card>
+          <number-input
+            v-model="height"
+            :min="0"
+            :max="1000"
+            :step="10"
+            class="ms-auto my-n2"
+            editable />
+        </div>
+        <div class="d-flex align-center">
+          <div class="flex-grow-0 flex-shrink-0 align-start pb-3">
+            <span class="subtitle-1 text-color">{{ $t('layout.columnsCount') }}</span>
           </div>
           <v-card
-            class="d-flex border-color elevation-2 mx-auto mb-4"
-            max-width="335px"
-            width="100%"
+            class="flex-grow-1 flex-shrink-1 align-end ms-auto"
+            max-width="80%"
             flat>
-            <div class="d-flex full-width ps-1 py-1">
-              <v-card
-                v-for="i in cols"
-                :key="i"
-                :height="height"
-                min-height="50"
-                max-height="150"
-                class="flex-grow-1 flex-shrink-1 grey-background no-border-radius me-1"
-                flat />
-            </div>
+            <v-slider
+              v-model="cols"
+              :thumb-size="24"
+              :min="1"
+              :max="60"
+              thumb-label="always">
+              <template #prepend>
+                <v-btn
+                  :disabled="cols <= 1"
+                  class="me-n2 mt-n1"
+                  icon
+                  fab
+                  x-small
+                  @click="cols--">
+                  <v-icon class="icon-default-color pt-2px">fa-minus</v-icon>
+                </v-btn>
+              </template>
+              <template #append>
+                <v-btn
+                  :disabled="cols >= 60"
+                  class="ms-n2 mt-n1"
+                  fab
+                  icon
+                  x-small
+                  @click="cols++">
+                  <v-icon class="icon-default-color pt-2px">fa-plus</v-icon>
+                </v-btn>
+              </template>
+            </v-slider>
           </v-card>
-          <div class="text-header mb-4">
-            {{ $t('layout.editSiteSidebarSection.label.updateStyle') }}
+        </div>
+        <v-card
+          class="d-flex border-color elevation-2 mx-auto mb-4"
+          max-width="335px"
+          width="100%"
+          flat>
+          <div class="d-flex full-width ps-1 py-1">
+            <v-card
+              v-for="i in cols"
+              :key="i"
+              :height="height"
+              min-height="50"
+              max-height="150"
+              class="flex-grow-1 flex-shrink-1 grey-background no-border-radius me-1"
+              flat />
           </div>
-          <div v-if="isTopContainer" class="d-flex align-center mb-2">
-            <div class="me-auto mb-2">
-              {{ $t('layout.fixPositionWhenScrolling') }}
-            </div>
-            <v-switch
-              v-model="stickySection"
-              class="ms-auto my-auto me-n2" />
+        </v-card>
+        <div class="text-header mb-4">
+          {{ $t('layout.editSiteSidebarSection.label.updateStyle') }}
+        </div>
+        <div v-if="isTopContainer" class="d-flex align-center mb-2">
+          <div class="me-auto mb-2">
+            {{ $t('layout.fixPositionWhenScrolling') }}
           </div>
-          <layout-editor-background-input
-            ref="backgroundInput"
-            v-model="container"
-            class="mb-2"
-            text-bold />
-          <layout-editor-text-input
-            ref="textInput"
-            v-model="container"
-            class="mb-2"
-            text-bold />
-          <layout-editor-section-margin-input
-            ref="marginInput"
-            v-model="container"
-            :max="60"
-            class="mb-2"
-            text-bold
-            right
-            left />
-        </template>
+          <v-switch
+            v-model="stickySection"
+            class="ms-auto my-auto me-n2" />
+        </div>
+        <layout-editor-background-input
+          ref="backgroundInput"
+          v-model="container"
+          class="mb-2"
+          text-bold />
+        <layout-editor-text-input
+          ref="textInput"
+          v-model="container"
+          class="mb-2"
+          text-bold />
+        <layout-editor-section-margin-input
+          ref="marginInput"
+          v-model="container"
+          :max="60"
+          class="mb-2"
+          text-bold
+          right
+          left />
       </v-card>
     </template>
     <template #footer>
@@ -181,7 +166,6 @@ export default {
   data: () => ({
     drawer: false,
     stickySection: false,
-    show: true,
     container: null,
     index: null,
     height: null,
@@ -210,7 +194,6 @@ export default {
       this.index = this.$root.middleContainer.children.findIndex(c => c.storageId === container.storageId);
       this.container = JSON.parse(JSON.stringify(container));
       this.height = this.container.height || this.defaultHeight;
-      this.show = true;
       this.cols = this.container.children.length;
       this.stickySection = this.container.cssClass?.includes?.('layout-sticky-section');
       this.$refs.drawer.open();
@@ -223,29 +206,25 @@ export default {
     async apply() {
       this.saving = true;
       try {
-        if (!this.show) {
-          this.removeSection();
-        } else {
-          this.$root.$emit('layout-section-history-add');
-          this.container.height = this.height;
-          await this.$refs.backgroundInput.apply();
-          if (this.stickySection && !this.container.cssClass?.includes?.('layout-sticky-section')) {
-            this.container.cssClass = this.container.cssClass ? `${this.container.cssClass} layout-sticky-section` : 'layout-sticky-section';
-          } else if (!this.stickySection && this.container.cssClass?.includes?.('layout-sticky-section')) {
-            this.container.cssClass = this.container.cssClass.replace('layout-sticky-section', '');
-          }
-          if (this.container.children.length < this.cols) {
-            for (let i = this.container.children.length; i < this.cols; i++) {
-              this.container.children.push(this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate));
-            }
-          } else if (this.container.children.length > this.cols) {
-            this.container.children.splice(this.cols - 1, this.container.children.length - this.cols);
-          }
-          const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
-          Object.assign(container, this.container);
-          this.$layoutUtils.applyContainerStyle(container, this.container);
-          this.close();
+        this.$root.$emit('layout-section-history-add');
+        this.container.height = this.height;
+        await this.$refs.backgroundInput.apply();
+        if (this.stickySection && !this.container.cssClass?.includes?.('layout-sticky-section')) {
+          this.container.cssClass = this.container.cssClass ? `${this.container.cssClass} layout-sticky-section` : 'layout-sticky-section';
+        } else if (!this.stickySection && this.container.cssClass?.includes?.('layout-sticky-section')) {
+          this.container.cssClass = this.container.cssClass.replace('layout-sticky-section', '');
         }
+        if (this.container.children.length < this.cols) {
+          for (let i = this.container.children.length; i < this.cols; i++) {
+            this.container.children.push(this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate));
+          }
+        } else if (this.container.children.length > this.cols) {
+          this.container.children.splice(this.cols - 1, this.container.children.length - this.cols);
+        }
+        const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
+        Object.assign(container, this.container);
+        this.$layoutUtils.applyContainerStyle(container, this.container);
+        this.close();
       } finally {
         this.saving = false;
       }
