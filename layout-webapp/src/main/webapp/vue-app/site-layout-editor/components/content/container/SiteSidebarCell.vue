@@ -29,7 +29,7 @@
       'z-index-two': hover && !$root.drawerOpened,
     }"
     :style="cssStyle"
-    class="position-relative d-flex flex-column full-height"
+    class="position-relative display-flex flex-column full-height"
     draggable
     @hovered="hover = $event"
     @move-start="moveStart">
