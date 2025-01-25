@@ -42,14 +42,6 @@ import ApplicationCard from './components/content/common/ApplicationCard.vue';
 import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
 import CellResizeButton from './components/content/common/CellResizeButton.vue';
 
-import Site from './components/content/container/Site.vue';
-import SiteBannerSection from './components/content/container/SiteBannerSection.vue';
-import SiteBannerCell from './components/content/container/SiteBannerCell.vue';
-import SiteSidebarSection from './components/content/container/SiteSidebarSection.vue';
-import SiteSidebarCell from './components/content/container/SiteSidebarCell.vue';
-import SiteMiddleBody from './components/content/container/SiteMiddleBody.vue';
-import PageBody from './components/content/container/PageBody.vue';
-
 import Container from './components/content/container/Container.vue';
 import Section from './components/content/container/Section.vue';
 import Cell from './components/content/container/Cell.vue';
@@ -73,13 +65,6 @@ const components = {
   'layout-editor-section-template': SectionTemplate,
   'layout-editor-container-cell': Cell,
   'layout-editor-container-application': Application,
-  'layout-editor-container-page-body': PageBody,
-  'layout-editor-container-site': Site,
-  'layout-editor-container-site-banner-section': SiteBannerSection,
-  'layout-editor-container-site-banner-cell': SiteBannerCell,
-  'layout-editor-container-site-sidebar-section': SiteSidebarSection,
-  'layout-editor-container-site-sidebar-cell': SiteSidebarCell,
-  'layout-editor-container-site-middle-section': SiteMiddleBody,
   'layout-editor-section-selection-grid': SectionSelectionGrid,
   'layout-editor-section-selection-grid-cell': SectionSelectionGridCell,
   'layout-editor-section-menu': SectionMenu,
