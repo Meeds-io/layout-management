@@ -20,7 +20,7 @@
 
 -->
 <template>
-  <v-hover v-model="hover">
+  <v-hover v-model="hoverContainer">
     <layout-editor-container-base
       ref="container"
       :container="container"
@@ -28,7 +28,7 @@
       :hide-children="moving"
       :class="{
         'position-relative': hasApplication,
-        'z-index-two': hover && !$root.drawerOpened,
+        'z-index-two': hoverContainer && !$root.drawerOpened,
       }"
       class="full-height flex-grow-1 flex-shrink-1">
       <template v-if="application" #header>
@@ -45,11 +45,11 @@
         </v-hover>
         <div
           v-if="!editablePortlet"
-          v-show="hover"
+          v-show="hoverContainer"
           class="full-width full-height overflow-hidden position-absolute z-index-two">
           <v-expand-transition>
             <v-card
-              v-if="hover"
+              v-if="hoverContainer"
               :class="isDynamicSection && 'mb-5'"
               :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
               class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
@@ -60,11 +60,14 @@
         </div>
       </template>
       <template #footer>
-        <div v-if="$root.desktopDisplayMode && displayResizeButton" class="position-absolute full-height t-0">
+        <div
+          v-if="$root.desktopDisplayMode && displayResizeButton"
+          :class="$vuetify.rtl && 'r-0' || 'l-0'"
+          class="position-absolute full-height t-0">
           <layout-editor-cell-resize-button
             :container="container"
             :parent-id="parentId"
-            :hover="hover"
+            :hover="hoverContainer"
             :moving="moving"
             class="layout-column-resize"
             spacing-class="me-n3"
@@ -132,7 +135,7 @@ export default {
     },
   },
   data: () => ({
-    hover: false,
+    hoverContainer: false,
     hoverMenu: false,
     hoverAddApplication: false,
   }),
@@ -197,25 +200,24 @@ export default {
     editablePortlet() {
       return this.portletInstance?.editable || false;
     },
-    hoverApp() {
-      return !!(this.hoverMenu || this.hover);
-    },
   },
   watch: {
-    hover() {
-      if (this.hover) {
+    hoverContainer() {
+      if (this.hoverContainer) {
         this.$root.hoveredParentId = this.storageId;
-      } else if (this.$root.hoveredParentId === this.storageId) {
+        this.$refs?.menu?.displayMenu?.();
+      } else if (!this.hoverMenu) {
+        this.$refs?.menu?.hideMenu?.();
+      }
+      if (!this.hoverContainer && this.$root.hoveredParentId === this.storageId) {
         this.$root.hoveredParentId = null;
       }
     },
-    hoverApp() {
-      if (this.$refs?.menu) {
-        if (this.hoverApp) {
-          this.$refs.menu.displayMenu();
-        } else {
-          this.$refs.menu.hideMenu();
-        }
+    hoverMenu() {
+      if (this.hoverMenu) {
+        this.$refs?.menu?.displayMenu?.();
+      } else if (!this.hoverContainer) {
+        this.$refs?.menu?.hideMenu?.();
       }
     },
   },
