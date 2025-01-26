@@ -48,6 +48,34 @@
             class="ms-auto my-n2"
             editable />
         </div>
+        <div class="font-weight-bold mb-2">
+          {{ $t('layout.alignSection') }}
+        </div>
+        <div class="d-flex">
+          <v-radio-group v-model="hAlign" class="ma-0">
+            <v-radio
+              value="START"
+              class="ma-0 pa-0">
+              <template #label>
+                <span class="text-body">{{ $t('layout.alignLeft') }}</span>
+              </template>
+            </v-radio>
+            <v-radio
+              value="CENTER"
+              class="ma-0 pa-0">
+              <template #label>
+                <span class="text-body">{{ $t('layout.alignCenter') }}</span>
+              </template>
+            </v-radio>
+            <v-radio
+              value="END"
+              class="ma-0 pa-0">
+              <template #label>
+                <span class="text-body">{{ $t('layout.alignRight') }}</span>
+              </template>
+            </v-radio>
+          </v-radio-group>
+        </div>
         <div class="d-flex align-center ms-n1 mb-4">
           <v-checkbox
             v-model="hiddenOnMobile"
@@ -108,6 +136,7 @@ export default {
     saving: false,
     width: null,
     container: null,
+    hAlign: 'START',
   }),
   computed: {
     isLeftBar() {
@@ -139,6 +168,13 @@ export default {
       this.leftSidebar = this.$root.layout?.children?.[0]?.children?.[0]?.storageId === this.container?.storageId;
       this.rightSidebar = this.$root.layout?.children?.[2]?.children?.[0]?.storageId === this.container?.storageId;
       this.hiddenOnMobile = this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down');
+      if (this.sidebarContainer.cssClass?.includes?.('application-align-h-end')) {
+        this.hAlign = 'END';
+      } else if (this.sidebarContainer.cssClass?.includes?.('application-align-h-center')) {
+        this.hAlign = 'CENTER';
+      } else {
+        this.hAlign = 'START';
+      }
       this.$refs.drawer.open();
     },
     removeSection() {
@@ -155,6 +191,19 @@ export default {
         const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
         Object.assign(container, this.container);
         this.$layoutUtils.applyContainerStyle(container, this.container);
+        this.sidebarContainer.cssClass = this.sidebarContainer.cssClass?.replace?.('application-align-h-end', '') || '';
+        this.sidebarContainer.cssClass = this.sidebarContainer.cssClass.replace('application-align-h-center', '');
+        this.$set(this.sidebarContainer, 'cssClass', this.sidebarContainer?.cssClass?.trim() || '');
+        if (this.hiddenOnMobile && !this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down')) {
+          this.sidebarContainer.cssClass = this.sidebarContainer.cssClass ? `${this.sidebarContainer.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down';
+        } else if (!this.hiddenOnMobile && this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down')) {
+          this.sidebarContainer.cssClass = this.sidebarContainer.cssClass.replace('hidden-sm-and-down', '');
+        }
+        if (this.hAlign === 'END') {
+          this.$set(this.sidebarContainer, 'cssClass', `${this.sidebarContainer.cssClass} application-align-h-end`);
+        } else if (this.hAlign === 'CENTER') {
+          this.$set(this.sidebarContainer, 'cssClass', `${this.sidebarContainer.cssClass} application-align-h-center`);
+        }
         if (this.hiddenOnMobile && !this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down')) {
           this.sidebarContainer.cssClass = this.sidebarContainer.cssClass ? `${this.sidebarContainer.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down';
         } else if (!this.hiddenOnMobile && this.sidebarContainer.cssClass?.includes?.('hidden-sm-and-down')) {
