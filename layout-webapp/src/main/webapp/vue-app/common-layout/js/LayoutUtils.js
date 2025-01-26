@@ -210,8 +210,8 @@ export function getParentContainer(layout) {
   if (!layout) {
     return null;
   }
-  if (!layout.children) {
-    layout.children = [];
+  if (!layout.children?.length) {
+    Vue.set(layout, 'children', []);
   }
   if (layout.children[0]?.template === sectionsParentTemplate) {
     return layout.children[0];
