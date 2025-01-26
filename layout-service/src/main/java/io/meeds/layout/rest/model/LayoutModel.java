@@ -247,6 +247,9 @@ public class LayoutModel {
     if (model instanceof PageBody pageBody) {
       this.storageId = pageBody.getStorageId();
       this.storageName = pageBody.getStorageName();
+      this.width = pageBody.getWidth();
+      this.height = pageBody.getHeight();
+      this.cssClass = pageBody.getCssClass();
       this.template = PAGE_BODY_TEMPLATE;
     } else if (model instanceof Container container) {
       this.id = container.getId();
@@ -355,8 +358,13 @@ public class LayoutModel {
     ModelStyle cssStyle = mapToStyle(layoutModel);
 
     if (StringUtils.equals(layoutModel.template, PAGE_BODY_TEMPLATE)) {
-      PageBody pageBody = new PageBody(layoutModel.getStorageId());
+      PageBody pageBody = new PageBody();
+      pageBody.setStorageId(layoutModel.getStorageId());
       pageBody.setStorageName(layoutModel.getStorageName());
+      pageBody.setWidth(layoutModel.getWidth());
+      pageBody.setHeight(layoutModel.getHeight());
+      pageBody.setCssClass(layoutModel.getCssClass());
+      pageBody.setCssStyle(cssStyle);
       return pageBody;
     } else if (StringUtils.isNotBlank(layoutModel.template)) {
       Container container = new Container(layoutModel.getStorageId());
