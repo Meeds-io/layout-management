@@ -43,6 +43,7 @@
             :parent-id="parentId"
             :application-title="applicationTitle"
             :application-category-title="applicationCategoryTitle"
+            class="mb-auto"
             @move-start="moveStart"
             @move-end="moveEnd" />
         </v-hover>
