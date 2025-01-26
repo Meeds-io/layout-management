@@ -25,9 +25,10 @@
     :data-storage-id="storageId"
     class="position-relative overflow-hidden d-flex flex-column flex-grow-1 my-5 mx-auto z-index-zero"
     color="transparent"
-    max-width="1280px"
+    :height="height"
+    :min-height="minHeight"
     min-width="calc(100% - 40px)"
-    min-height="225px"
+    max-width="1280px"
     flat>
     <v-card
       class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
@@ -39,7 +40,7 @@
       {{ $t('layout.editSite.portalPage') }}
     </v-card>
     <v-card
-      class="full-width full-height flex-grow-1"
+      class="full-width flex-grow-1"
       flat />
   </v-card>
 </template>
@@ -51,12 +52,21 @@ export default {
       default: null,
     },
   },
+  data: () => ({
+    height: 225,
+  }),
   computed: {
     id() {
       return this.container.id || this.storageId;
     },
     storageId() {
       return this.container?.storageId;
+    },
+    middleContainerMinHeight() {
+      return this.$root.middleContainer?.children?.map?.(c => c.height && Number(c.height) || 57)?.reduce?.((acc, v) => acc + v, 0) || 0;
+    },
+    minHeight() {
+      return `calc(100vh - ${40 + this.middleContainerMinHeight}px`;
     },
   },
 };
