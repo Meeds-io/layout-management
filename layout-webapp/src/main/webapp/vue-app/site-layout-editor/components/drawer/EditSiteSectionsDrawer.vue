@@ -76,6 +76,21 @@
           </div>
         </v-card>
         <div class="text-header mb-4">
+          {{ $t('layout.editSiteSidebarSection.label.adjustPortalPageWidth') }}
+        </div>
+        <div class="d-flex align-center mb-2">
+          <div class="font-weight-bold me-auto">
+            {{ $t('layout.editSiteSidebarSection.label.portalPageWidth') }}
+          </div>
+          <number-input
+            v-model="width"
+            :min="0"
+            :max="5000"
+            :step="10"
+            class="ms-auto my-n2"
+            editable />
+        </div>
+        <div class="text-header mb-4">
           {{ $t('layout.manageSiteSections.label.sectionsChoice') }}
         </div>
         <div class="d-flex align-center mb-2">
@@ -137,6 +152,7 @@ export default {
     topBanner: false,
     bottomBanner: false,
     rightSidebar: false,
+    width: 1320,
   }),
   created() {
     this.$root.$on('layout-site-sections-open', this.open);
@@ -151,6 +167,7 @@ export default {
       this.rightSidebar = options.right;
       this.topBanner = options.top;
       this.bottomBanner = options.bottom;
+      this.width = this.$root.pageBodyContainer.width || 1320;
       this.$refs.drawer.open();
     },
     apply() {
@@ -204,6 +221,7 @@ export default {
           this.$root.middleContainer.children.splice(this.$root.pageBodyIndex + 1, this.$root.middleContainer.children.length - this.$root.pageBodyIndex);
         }
       }
+      this.$root.pageBodyContainer.width = this.width;
       this.$root.layout.children = this.$root.layout.children.slice();
       this.$root.layout.children[1].children = this.$root.layout.children[1].children.slice();
       this.close();
