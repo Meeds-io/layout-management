@@ -23,25 +23,26 @@
   <v-card
     :id="id"
     :data-storage-id="storageId"
-    class="position-relative overflow-hidden d-flex flex-column flex-grow-1 my-5 mx-auto z-index-zero"
+    class="position-relative d-flex flex-column flex-grow-1 mx-auto z-index-zero"
     color="transparent"
     :height="height"
     :min-height="minHeight"
-    min-width="calc(100% - 40px)"
-    max-width="1280px"
+    :max-width="maxWidth"
+    width="100%"
     flat>
     <v-card
-      class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
-      color="primary"
-      min-height="30"
-      min-width="220"
-      dark
+      class="flex-grow-1 overflow-hidden ma-5"
       flat>
-      {{ $t('layout.editSite.portalPage') }}
+      <v-card
+        class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
+        color="primary"
+        min-height="30"
+        min-width="220"
+        dark
+        flat>
+        {{ $t('layout.editSite.portalPage') }}
+      </v-card>
     </v-card>
-    <v-card
-      class="full-width flex-grow-1"
-      flat />
   </v-card>
 </template>
 <script>
@@ -65,8 +66,25 @@ export default {
     middleContainerMinHeight() {
       return this.$root.middleContainer?.children?.map?.(c => c.height && Number(c.height) || 57)?.reduce?.((acc, v) => acc + v, 0) || 0;
     },
+    sidebarsContainerMinWidth() {
+      return this.$root.layout?.children
+        ?.filter?.(c => c.template === this.$layoutUtils.sidebarTemplate
+          && (
+            !this.$root.mobileDisplayMode
+            || !c.cssClass?.includes?.('hidden-sm-and-down')
+          )
+        )
+        ?.map?.(c => c.width
+          && Number(c.width)
+          || 310
+        )
+        ?.reduce?.((acc, v) => acc + v, 0) || 0;
+    },
     minHeight() {
-      return `calc(100vh - ${40 + this.middleContainerMinHeight}px`;
+      return `calc(100vh - ${this.middleContainerMinHeight}px`;
+    },
+    maxWidth() {
+      return `calc(min(100vw - ${this.sidebarsContainerMinWidth + 5}px, ${(this.$root.pageBodyContainer.width || 1320) - 40}px))`;
     },
   },
 };
