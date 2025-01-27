@@ -46,7 +46,7 @@
                       height="32"
                       width="32"
                       icon
-                      @click="$root.$emit('layout-site-sidebar-section-open', cellContainer)">
+                      @click="$root.$emit('layout-site-sidebar-section-open', cellContainer, container.storageId)">
                       <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
                     </v-btn>
                   </div>
@@ -65,6 +65,10 @@ export default {
   props: {
     container: {
       type: Object,
+      default: null,
+    },
+    parentId: {
+      type: String,
       default: null,
     },
     hover: {

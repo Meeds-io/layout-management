@@ -27,6 +27,7 @@ export const flexTemplate = 'FlexContainer';
 export const cellTemplate = 'CellContainer';
 export const siteTemplate = 'Site';
 export const siteBodyMiddleTemplate = 'SiteMiddleBody';
+export const siteBodyMiddleCenterTemplate = 'SiteMiddleCenterBody';
 export const pageBodyTemplate = 'PageBody';
 export const sidebarTemplate = 'Sidebar';
 export const sidebarCellTemplate = 'SidebarCell';
@@ -344,25 +345,22 @@ export function applyContainerStyle(container, containerStyle) {
 }
 
 export function parseSite(layout) {
-  const compatible = layout.template === siteTemplate
-    && layout.children?.length
-    && layout.children.every(c => c.template === sidebarTemplate || c.template === siteBodyMiddleTemplate)
-    && layout.children.find(c => c.template === siteBodyMiddleTemplate);
+  const compatible = isSiteLayoutCompatible(layout);
   if (!compatible) {
     const applications = getApplications(layout);
     layout.template = siteTemplate;
     layout.children = [
-      {
+      { // Left
         ...newContainer(sidebarTemplate),
         children: [{
           ...newContainer(sidebarCellTemplate),
           children: applications,
         }]
       },
-      {
+      { // Middle
         ...newContainer(siteBodyMiddleTemplate),
         children: [
-          {
+          { // Top Banner
             ...newContainer(bannerTemplate),
             children: [
               newContainer(bannerCellTemplate),
@@ -370,8 +368,26 @@ export function parseSite(layout) {
               newContainer(bannerCellTemplate),
             ]
           },
-          newContainer(pageBodyTemplate),
-          {
+          { // Middle - Center
+            ...newContainer(siteBodyMiddleCenterTemplate),
+            children: [
+              { // Internal Left
+                ...newContainer(sidebarTemplate),
+                children: [
+                  newContainer(sidebarCellTemplate),
+                ]
+              },
+              // Page Body
+              newContainer(pageBodyTemplate),
+              { // Internal Right
+                ...newContainer(sidebarTemplate),
+                children: [
+                  newContainer(sidebarCellTemplate),
+                ]
+              },
+            ]
+          },
+          { // Bottom Banner
             ...newContainer(bannerTemplate),
             children: [
               newContainer(bannerCellTemplate),
@@ -379,7 +395,7 @@ export function parseSite(layout) {
           }
         ]
       },
-      {
+      { // Right
         ...newContainer(sidebarTemplate),
         children: [
           newContainer(sidebarCellTemplate),
@@ -389,6 +405,20 @@ export function parseSite(layout) {
     return !applications?.length;
   }
   return true;
+}
+
+export function isSiteLayoutCompatible(layout) {
+  return layout.template === siteTemplate
+    && layout.children?.length
+    && layout.children.every(c => c.template === sidebarTemplate || c.template === siteBodyMiddleTemplate)
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate)
+    && layout.children[0]?.template === sidebarTemplate
+    && layout.children[1]?.template === siteBodyMiddleTemplate
+    && layout.children[2]?.template === sidebarTemplate
+    && layout.children[1].children?.find?.(c => c.template === siteBodyMiddleCenterTemplate)
+    && layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate)?.children[0]?.template === sidebarTemplate
+    && layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate)?.children[1]?.template === pageBodyTemplate
+    && layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate)?.children[2]?.template === sidebarTemplate;
 }
 
 export function parseSections(layout) {

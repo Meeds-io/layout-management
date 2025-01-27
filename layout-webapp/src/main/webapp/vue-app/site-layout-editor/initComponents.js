@@ -32,7 +32,8 @@ import SiteBannerSection from './components/content/container/SiteBannerSection.
 import SiteBannerCell from './components/content/container/SiteBannerCell.vue';
 import SiteSidebarSection from './components/content/container/SiteSidebarSection.vue';
 import SiteSidebarCell from './components/content/container/SiteSidebarCell.vue';
-import SiteMiddleBody from './components/content/container/SiteMiddleBody.vue';
+import SiteMiddle from './components/content/container/SiteMiddle.vue';
+import SiteMiddleCenter from './components/content/container/SiteMiddleCenter.vue';
 import PageBody from './components/content/container/PageBody.vue';
 
 import Content from './components/content/Content.vue';
@@ -65,7 +66,8 @@ const components = {
   'site-layout-editor-container-site-banner-cell': SiteBannerCell,
   'site-layout-editor-container-site-sidebar-section': SiteSidebarSection,
   'site-layout-editor-container-site-sidebar-cell': SiteSidebarCell,
-  'site-layout-editor-container-site-middle-section': SiteMiddleBody,
+  'site-layout-editor-container-site-middle': SiteMiddle,
+  'site-layout-editor-container-site-middle-center': SiteMiddleCenter,
 
   'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
   'site-layout-editor-sidebar-section-drawer': EditSiteSidebarDrawer,

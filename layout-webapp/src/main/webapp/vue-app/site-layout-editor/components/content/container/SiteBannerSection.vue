@@ -25,7 +25,6 @@
     v-if="childrenSize"
     ref="section"
     :id="id"
-    :data-storage-id="storageId"
     :class="cssClass"
     :style="cssStyle"
     class="position-relative z-index-one layout-banner-section flex-grow-1 flex-shrink-1">
@@ -95,7 +94,7 @@ export default {
       return this.container?.children?.length;
     },
     isTopContainer() {
-      return this.index < this.$root.pageBodyIndex;
+      return this.index < this.$root.middleCenterContainerIndex;
     },
     cssClass() {
       return [this.container.cssClass || '', `${this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section'}${this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : ''}`];

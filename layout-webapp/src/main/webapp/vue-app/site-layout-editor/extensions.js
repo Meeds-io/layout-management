@@ -63,5 +63,12 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
   rank: 1000,
   type: 'SiteMiddleBody',
   isValid: container => container?.template === 'SiteMiddleBody',
-  containerType: 'site-layout-editor-container-site-middle-section',
+  containerType: 'site-layout-editor-container-site-middle',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 1100,
+  type: 'SiteMiddleCenterBody',
+  isValid: container => container?.template === 'SiteMiddleCenterBody',
+  containerType: 'site-layout-editor-container-site-middle-center',
 });

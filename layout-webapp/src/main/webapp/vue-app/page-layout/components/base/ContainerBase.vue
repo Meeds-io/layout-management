@@ -50,6 +50,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    noApplicationStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     id() {
@@ -75,7 +79,7 @@ export default {
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
-        isApplicationStyle: true,
+        isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === 'BannerCell',
         isSectionStyle: this.container.template === 'BannerCell',
         noBackgroundStyle: this.noBackgroundStyle
