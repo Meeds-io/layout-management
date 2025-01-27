@@ -27,8 +27,8 @@
       :parent-id="parentId"
       :index="index"
       :length="length"
-      class="d-flex flex-column layout-site-middle-section"
-      type="site-middle-section"
+      class="d-flex flex-column layout-site-middle-container"
+      type="site-middle-container"
       no-background-style
       draggable />
   </div>
@@ -53,21 +53,6 @@ export default {
       default: null,
     },
   },
-  data: () => ({
-    myArray: [{
-      storageId: '1225',
-      name: 'Test1',
-      color: 'red',
-    }, {
-      storageId: '2225',
-      name: 'Test2',
-      color: 'blue',
-    }, {
-      storageId: '3698',
-      name: 'Test3',
-      color: 'green',
-    }],
-  }),
   computed: {
     storageId() {
       return this.container?.storageId;

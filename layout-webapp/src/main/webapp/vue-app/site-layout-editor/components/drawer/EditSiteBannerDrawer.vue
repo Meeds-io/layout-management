@@ -233,9 +233,9 @@ export default {
         Object.assign(container, this.container);
         this.$layoutUtils.applyContainerStyle(container, this.container);
         if (this.hiddenOnMobile && !container.cssClass?.includes?.('hidden-sm-and-down')) {
-          container.cssClass = container.cssClass ? `${container.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down';
+          this.$set(container, 'cssClass', container.cssClass ? `${container.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down');
         } else if (!this.hiddenOnMobile && container.cssClass?.includes?.('hidden-sm-and-down')) {
-          container.cssClass = container.cssClass.replace('hidden-sm-and-down', '');
+          this.$set(container, 'cssClass', container.cssClass.replace('hidden-sm-and-down', ''));
         }
         this.close();
       } finally {
