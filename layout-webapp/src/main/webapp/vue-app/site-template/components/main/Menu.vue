@@ -46,6 +46,17 @@
         @focusout="menu = false">
         <v-list-item-group v-model="listItem">
           <v-list-item
+            :href="editSiteLayoutLink"
+            target="_blank"
+            dense>
+            <v-icon size="13">
+              fa-window-maximize
+            </v-icon>
+            <v-list-item-title class="ps-2">
+              {{ $t('siteManagement.label.editLayout') }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
             dense
             @click="$root.$emit('site-template-navigation-open', siteTemplate)">
             <v-icon size="13">
@@ -141,6 +152,9 @@ export default {
     },
     hasEditMode() {
       return this.siteTemplate?.supportedModes?.find?.(mode => mode === 'edit');
+    },
+    editSiteLayoutLink() {
+      return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/site-layout-editor?siteId=${this.siteTemplateId}`;
     },
   },
   watch: {
