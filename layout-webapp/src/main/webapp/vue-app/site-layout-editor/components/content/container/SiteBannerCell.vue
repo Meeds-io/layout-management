@@ -25,7 +25,6 @@
       ref="container"
       :container="container"
       :parent-id="parentId"
-      :hide-children="moving"
       :class="{
         'position-relative': hasApplication,
         'z-index-two': hoverContainer && !$root.drawerOpened,
@@ -44,7 +43,7 @@
             @move-end="moveEnd" />
         </v-hover>
         <div
-          v-if="!editablePortlet"
+          v-if="!editablePortlet && !moving"
           v-show="hoverContainer"
           class="full-width full-height overflow-hidden position-absolute z-index-two">
           <v-expand-transition>
@@ -61,22 +60,21 @@
       </template>
       <template #footer>
         <div
-          v-if="$root.desktopDisplayMode && displayResizeButton"
-          :class="$vuetify.rtl && 'r-0' || 'l-0'"
+          v-if="$root.desktopDisplayMode"
+          :class="$vuetify.rtl && 'l-0' || 'r-0'"
           class="position-absolute full-height t-0">
           <layout-editor-cell-resize-button
             :container="container"
             :parent-id="parentId"
             :hover="hoverContainer"
             :moving="moving"
-            class="layout-column-resize"
             spacing-class="me-n3"
             dynamic-section
             @move-start="moveStart" />
         </div>
         <v-hover v-if="$root.desktopDisplayMode && !hasApplication" v-model="hoverAddApplication">
           <v-card
-            v-show="!movingChildren"
+            v-show="!moving"
             :class="{
               'grey-background': opaqueBackground,
               'light-grey-background': !opaqueBackground,
@@ -138,19 +136,12 @@ export default {
     hoverContainer: false,
     hoverMenu: false,
     hoverAddApplication: false,
+    initialWidth: 0,
+    movingStartX: 0,
+    movingX: 0,
+    moving: false,
   }),
   computed: {
-    moving() {
-      return this.storageId && this.$root.movingCell?.storageId === this.storageId;
-    },
-    movingChildren() {
-      return this.storageId
-        && this.$root.movingParentId
-        && this.$root.movingParentDynamic;
-    },
-    sectionType() {
-      return this.$layoutUtils.getSection(this.$root.layout, this.parentId)?.template;
-    },
     children() {
       return this.container.children;
     },
@@ -162,9 +153,6 @@ export default {
     },
     storageId() {
       return this.container?.storageId;
-    },
-    displayResizeButton() {
-      return this.index > 0;
     },
     parentContainer() {
       return this.$layoutUtils.getContainerById(this.$root.layout, this.parentId);
@@ -200,6 +188,9 @@ export default {
     editablePortlet() {
       return this.portletInstance?.editable || false;
     },
+    width() {
+      return this.moving && this.movingStartX && (this.initialWidth + this.movingX - this.movingStartX) || null;
+    },
   },
   watch: {
     hoverContainer() {
@@ -222,22 +213,33 @@ export default {
     },
   },
   methods: {
-    moveStart(event, moveType) {
+    moveStart(_event, moveType) {
       this.$root.moveType = moveType;
       if (moveType === 'resize') {
-        this.$root.movingParentId = this.parentId;
-        this.$root.movingParentDynamic = true;
-        this.$nextTick().then(() => {
-          this.$root.$emit('layout-cell-moving-start', {
-            target: event.target,
-            x: event.x,
-            y: event.y,
-            sectionId: this.parentId,
-            cell: this.container,
-            containerElement: this.$refs.container.$el,
-            moveType,
-          });
-        });
+        this.$root.$emit('layout-section-history-add');
+        this.$root.hoveredSectionId = this.parentId;
+        this.movingStartX = 0;
+        this.movingX = 0;
+        this.initialWidth = this.$refs.container.$el.offsetWidth;
+        document.addEventListener('mousemove', this.updateSize);
+        document.addEventListener('mouseup', this.endResizing);
+        this.moving = true;
+      }
+    },
+    updateSize(event) {
+      this.movingX = event.x;
+      if (!this.movingStartX) {
+        this.movingStartX = event.x;
+      }
+      window.setTimeout(() => this.$set(this.container, 'width', this.width), 50);
+    },
+    endResizing() {
+      if (this.moving) {
+        document.removeEventListener('mousemove', this.updateSize);
+        document.removeEventListener('mouseup', this.endResizing);
+        this.moving = false;
+        this.movingStartX = 0;
+        this.movingX = 0;
       }
     },
     moveEnd() {
