@@ -20,29 +20,16 @@
 
 -->
 <template>
-  <v-card
-    :id="id"
-    :data-storage-id="storageId"
-    class="position-relative d-flex flex-column flex-grow-1 flex-shrink-1 z-index-zero"
-    color="transparent"
-    :height="height"
-    :min-height="minHeight"
-    width="100%"
-    flat>
-    <v-card
-      class="flex-grow-1 overflow-hidden ma-5"
-      flat>
-      <v-card
-        class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
-        color="primary"
-        min-height="30"
-        min-width="220"
-        dark
-        flat>
-        {{ $t('layout.editSite.portalPage') }}
-      </v-card>
-    </v-card>
-  </v-card>
+  <layout-editor-container-base
+    ref="container"
+    :container="container"
+    :index="index"
+    :length="length"
+    :style="cssStyle"
+    class="d-flex flex-row mx-auto z-index-one site-middle-center-container"
+    type="site-middle-center-container"
+    no-application-style
+    no-background-style />
 </template>
 <script>
 export default {
@@ -57,11 +44,11 @@ export default {
     },
     index: {
       type: Number,
-      default: () => 0,
+      default: null,
     },
     length: {
       type: Number,
-      default: () => 0,
+      default: null,
     },
   },
   data: () => ({
@@ -77,8 +64,37 @@ export default {
     middleContainerMinHeight() {
       return this.$root.middleContainer?.children?.map?.(c => c.height && Number(c.height) || 57)?.reduce?.((acc, v) => acc + v, 0) || 0;
     },
+    sidebarsContainerMinWidth() {
+      return this.$root.layout?.children
+        ?.filter?.(c => c.template === this.$layoutUtils.sidebarTemplate
+          && c.children?.length
+          && (
+            !this.$root.mobileDisplayMode
+            || !c?.children?.[0].cssClass?.includes?.('hidden-sm-and-down')
+          )
+        )
+        ?.map?.(c => c.width
+          && Number(c.width)
+          || 310
+        )
+        ?.reduce?.((acc, v) => acc + v, 0) || 0;
+    },
     minHeight() {
       return `calc(100vh - ${this.middleContainerMinHeight}px`;
+    },
+    width() {
+      return this.container.width || 1320;
+    },
+    maxWidth() {
+      return `calc(min(100vw - ${this.sidebarsContainerMinWidth}px, ${this.width}px))`;
+    },
+    cssStyle() {
+      return {
+        'height': `${this.height}px`,
+        'min-height': this.minHeight,
+        'width': `${this.width}px`,
+        'max-width': this.maxWidth,
+      };
     },
   },
 };
