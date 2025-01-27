@@ -34,11 +34,15 @@ if (extensionRegistry) {
 }
 
 const lang = eXo?.env.portal.language || 'en';
-const url = `/layout/i18n/locale.portlet.LayoutEditor?lang=${lang}`;
+const urls = [
+  `/layout/i18n/locale.portlet.SiteManagement?lang=${lang}`,
+  `/layout/i18n/locale.portlet.SiteNavigation?lang=${lang}`,
+  `/layout/i18n/locale.portlet.LayoutEditor?lang=${lang}`
+];
 
 const appId = 'siteTemplateManagement';
 export function init() {
-  exoi18n.loadLanguageAsync(lang, url)
+  exoi18n.loadLanguageAsync(lang, urls)
     .then(i18n =>
       Vue.createApp({
         template: `<site-template-management id="${appId}"/>`,
