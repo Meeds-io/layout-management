@@ -33,7 +33,10 @@
     <div
       v-if="enabled"
       class="d-flex flex-column">
-      <v-list-item class="pa-0" dense>
+      <v-list-item
+        v-if="top"
+        class="pa-0"
+        dense>
         <v-list-item-content class="my-auto">
           {{ $t('layout.top') }}
         </v-list-item-content>
@@ -56,7 +59,10 @@
           class="my-auto"
           editable />
       </v-list-item>
-      <v-list-item class="pa-0" dense>
+      <v-list-item
+        v-if="bottom"
+        class="pa-0"
+        dense>
         <v-list-item-content class="my-auto">
           {{ $t('layout.bottom') }}
         </v-list-item-content>
@@ -93,11 +99,19 @@ export default {
       type: Number,
       default: () => 48,
     },
-    left: {
+    top: {
+      type: Boolean,
+      default: true,
+    },
+    right: {
       type: Boolean,
       default: false,
     },
-    right: {
+    bottom: {
+      type: Boolean,
+      default: true,
+    },
+    left: {
       type: Boolean,
       default: false,
     },
