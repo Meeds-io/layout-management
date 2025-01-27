@@ -23,7 +23,6 @@
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     v-if="childrenSize"
-    :data-storage-id="storageId"
     :class="container.cssClass"
     :style="cssStyle"
     class="position-relative flex-grow-0 flex-shrink-0">
@@ -34,6 +33,7 @@
         <div class="position-relative full-width">
           <site-layout-editor-sidebar-section-menu
             :container="container"
+            :parent-id="parentId"
             :hover="!drawerOpened && (hover || hoverSection || movingSection)"
             :index="index"
             :length="length"
@@ -92,13 +92,10 @@ export default {
       return this.$root.drawerOpened;
     },
     cssStyle() {
-      return {
-        ...this.$applicationUtils.getStyle(this.container, {
-          onlyBackgroundStyle: true,
-          sectionStyle: true,
-        }),
-        'min-width': `${this.container?.width || 310}px`,
-      };
+      return this.$applicationUtils.getStyle(this.container, {
+        onlyBackgroundStyle: true,
+        sectionStyle: true,
+      });
     },
     childrenSize() {
       return this.container?.children?.length;
