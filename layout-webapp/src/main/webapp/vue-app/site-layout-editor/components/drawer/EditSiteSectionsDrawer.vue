@@ -238,7 +238,7 @@ export default {
   }),
   computed: {
     minWidth() {
-      return (this.$root.internalLeftContainer?.children?.[0] ? (this.$root.internalRightContainer?.children?.[0]?.width || 310) : 0) + (this.$root.internalRightContainer?.children?.[0]?.width || 310);
+      return (this.$root.internalLeftContainer?.children?.[0] ? (this.$root.internalRightContainer?.children?.[0]?.width || 310) : 0) + (this.$root.internalRightContainer?.children?.[0]?.width || 310) + 200;
     },
   },
   created() {
