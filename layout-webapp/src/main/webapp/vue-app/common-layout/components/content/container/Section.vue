@@ -22,7 +22,6 @@
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     ref="section"
-    :data-storage-id="storageId"
     :style="cssStyle"
     :class="mobileInColumns && 'layout-section-mobile-pages' || ''"
     class="position-relative layout-section"
