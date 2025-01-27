@@ -44,6 +44,7 @@ import EditSiteSectionsDrawer from './components/drawer/EditSiteSectionsDrawer.v
 import EditSiteSidebarDrawer from './components/drawer/EditSiteSidebarDrawer.vue';
 import EditSiteBannerDrawer from './components/drawer/EditSiteBannerDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
+import EditSitePagesDrawer from './components/drawer/EditSitePagesDrawer.vue';
 
 const components = {
   'site-layout-editor': SiteLayoutEditor,
@@ -69,10 +70,11 @@ const components = {
   'site-layout-editor-container-site-middle': SiteMiddle,
   'site-layout-editor-container-site-middle-center': SiteMiddleCenter,
 
-  'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
   'site-layout-editor-sidebar-section-drawer': EditSiteSidebarDrawer,
   'site-layout-editor-banner-section-drawer': EditSiteBannerDrawer,
   'site-layout-editor-application-edit-drawer': EditApplicationDrawer,
+  'site-layout-editor-edit-sections-drawer': EditSiteSectionsDrawer,
+  'site-layout-editor-edit-site-pages-drawer': EditSitePagesDrawer,
 };
 
 for (const key in components) {
