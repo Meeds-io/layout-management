@@ -18,6 +18,7 @@
  */
 
 import './initComponents.js';
+import '../common-layout/main.js';
 import '../common-illustration/main.js';
 import '../common-section-template/main.js';
 

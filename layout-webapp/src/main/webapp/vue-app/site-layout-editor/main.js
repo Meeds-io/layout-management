@@ -131,16 +131,25 @@ export function init() {
             return this.layout?.children?.[0];
           },
           middleContainer() {
-            return this.layout?.children?.[1];
+            return this.layout?.children?.find(c => c.template === this.$layoutUtils.siteBodyMiddleTemplate);
           },
           rightContainer() {
             return this.layout?.children?.[2];
           },
-          pageBodyContainer() {
-            return this.middleContainer?.children?.find?.(c => c.template === this.$layoutUtils.pageBodyTemplate);
+          middleCenterContainer() {
+            return this.middleContainer?.children?.find(c => c.template === this.$layoutUtils.siteBodyMiddleCenterTemplate);
           },
-          pageBodyIndex() {
-            return this.middleContainer?.children?.findIndex?.(c => c.template === this.$layoutUtils.pageBodyTemplate);
+          middleCenterContainerIndex() {
+            return this.middleContainer?.children?.findIndex(c => c.template === this.$layoutUtils.siteBodyMiddleCenterTemplate);
+          },
+          internalLeftContainer() {
+            return this.middleCenterContainer?.children?.[0];
+          },
+          pageBodyContainer() {
+            return this.middleCenterContainer?.children?.[1];
+          },
+          internalRightContainer() {
+            return this.middleCenterContainer?.children?.[2];
           },
         },
         watch: {
