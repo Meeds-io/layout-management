@@ -20,7 +20,7 @@
 -->
 <template>
   <component
-    v-if="((!dynamicSection && hover) || (dynamicSection && sectionHovered)) && !moving && !$root.drawerOpened"
+    v-if="show"
     ref="resizeButton"
     v-bind="!dynamicSection && {
       width: iconSize,
@@ -87,6 +87,9 @@ export default {
   computed: {
     sectionHovered() {
       return this.$root.hoveredSectionId === this.parentId;
+    },
+    show() {
+      return ((!this.dynamicSection && this.hover) || (this.dynamicSection && this.sectionHovered)) && !this.moving && !this.$root.drawerOpened;
     },
   },
   methods: {
