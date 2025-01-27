@@ -26,8 +26,8 @@
       :id="id"
       :class="cssClass"
       :style="cssStyle"
+      :data-storage-id="storageId"
       v-bind="draggable && {
-        'data-storage-id': storageId,
         'options': dragOptions,
         'class': 'position-relative'
       }"
@@ -101,6 +101,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    noApplicationStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     hover: false,
@@ -143,7 +147,7 @@ export default {
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
-        isApplicationStyle: true,
+        isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
         isSectionStyle: this.container.template === this.$layoutUtils.bannerCellTemplate,
         noBackgroundStyle: this.noBackgroundStyle
