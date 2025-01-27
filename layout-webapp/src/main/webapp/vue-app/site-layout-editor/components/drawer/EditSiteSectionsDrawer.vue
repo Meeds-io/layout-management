@@ -43,36 +43,68 @@
           {{ $t('layout.manageSiteSections.label.preview') }}
         </div>
         <v-card
-          class="d-flex border-color elevation-2 mx-auto mb-4"
+          class="d-flex border-color elevation-2 mx-auto mb-4 pa-1"
           max-width="335px"
           width="100%"
           flat>
-          <div class="d-flex full-width pa-1">
+          <div class="d-flex full-width light-grey-background-color">
             <v-card
-              :width="leftSidebar && 75"
-              class="flex-grow-0 flex-shrink-0 grey-background no-border-radius"
+              :width="leftSidebar && 50"
+              class="flex-grow-0 flex-shrink-0 grey-lighten1-background opacity-7 no-border-radius"
               flat />
             <v-card
               class="d-flex flex-column flex-grow-1 flex-shrink-1 no-border-radius"
+              color="transparent"
               flat>
               <v-card
-                :class="topBanner && 'grey-background'"
-                class="no-border-radius"
-                height="20px"
-                flat />
+                :height="topBanner && 20 || 0"
+                class="no-border-radius grey-lighten1-background opacity-8"
+                flat
+                @click="topBanner = !topBanner" />
+              <div class="d-flex">
+                <v-card
+                  :width="internalLeftSidebar && 50 || 0"
+                  class="flex-grow-0 flex-shrink-0 no-border-radius grey-lighten1-background opacity-9 me-auto"
+                  flat
+                  @click="internalLeftSidebar = !internalLeftSidebar" />
+                <v-card
+                  class="position-relative d-flex flex-column flex-grow-1 flex-shrink-1"
+                  style="zoom: 30%"
+                  color="transparent"
+                  width="100%"
+                  height="500px"
+                  flat>
+                  <v-card
+                    class="flex-grow-1 overflow-hidden ma-5"
+                    flat>
+                    <v-card
+                      class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
+                      color="primary"
+                      min-height="30"
+                      min-width="220"
+                      dark
+                      flat>
+                      {{ $t('layout.editSite.portalPage') }}
+                    </v-card>
+                  </v-card>
+                </v-card>
+                <v-card
+                  :width="internalRightSidebar && 50 || 0"
+                  class="flex-grow-0 flex-shrink-0 no-border-radius grey-lighten1-background opacity-9 ms-auto"
+                  flat
+                  @click="internalRightSidebar = !internalRightSidebar" />
+              </div>
               <v-card
-                height="100px"
-                flat />
-              <v-card
-                :class="bottomBanner && 'grey-background'"
-                class="no-border-radius"
-                height="20px"
-                flat />
+                :height="bottomBanner && 20 || 0"
+                class="no-border-radius grey-lighten1-background opacity-8"
+                flat
+                @click="bottomBanner = !bottomBanner" />
             </v-card>
             <v-card
-              :width="rightSidebar && 75"
-              class="flex-grow-0 flex-shrink-0 grey-background no-border-radius"
-              flat />
+              :width="rightSidebar && 50"
+              class="flex-grow-0 flex-shrink-0 grey-lighten1-background opacity-7 no-border-radius"
+              flat
+              @click="rightSidebar = !rightSidebar" />
           </div>
         </v-card>
         <div class="text-header mb-4">
@@ -84,7 +116,7 @@
           </div>
           <number-input
             v-model="width"
-            :min="0"
+            :min="minWidth"
             :max="5000"
             :step="10"
             class="ms-auto my-n2"
@@ -94,6 +126,10 @@
           {{ $t('layout.manageSiteSections.label.sectionsChoice') }}
         </div>
         <div class="d-flex align-center mb-2">
+          <v-card
+            class="flex-grow-0 flex-shrink-0 grey-background rounded-lg grey-lighten1-background opacity-9 me-2 mt-n2"
+            height="25"
+            width="25" />
           <div class="font-weight-bold me-auto mb-2">
             {{ $t('layout.manageSiteSections.label.leftSidebar') }}
           </div>
@@ -102,6 +138,22 @@
             class="ms-auto my-auto me-n2" />
         </div>
         <div class="d-flex align-center mb-2">
+          <v-card
+            class="flex-grow-0 flex-shrink-0 grey-background rounded-lg grey-lighten1-background opacity-7 me-2 mt-n2"
+            height="25"
+            width="25" />
+          <div class="font-weight-bold me-auto mb-2">
+            {{ $t('layout.manageSiteSections.label.internalLeftSidebar') }}
+          </div>
+          <v-switch
+            v-model="internalLeftSidebar"
+            class="ms-auto my-auto me-n2" />
+        </div>
+        <div class="d-flex align-center mb-2">
+          <v-card
+            class="flex-grow-0 flex-shrink-0 grey-background rounded-lg grey-lighten1-background opacity-8 me-2 mt-n2"
+            height="25"
+            width="25" />
           <div class="font-weight-bold me-auto mb-2">
             {{ $t('layout.manageSiteSections.label.topBanner') }}
           </div>
@@ -110,6 +162,10 @@
             class="ms-auto my-auto me-n2" />
         </div>
         <div class="d-flex align-center mb-2">
+          <v-card
+            class="flex-grow-0 flex-shrink-0 grey-background rounded-lg grey-lighten1-background opacity-9 me-2 mt-n2"
+            height="25"
+            width="25" />
           <div class="font-weight-bold me-auto mb-2">
             {{ $t('layout.manageSiteSections.label.rightSidebar') }}
           </div>
@@ -118,6 +174,22 @@
             class="ms-auto my-auto me-n2" />
         </div>
         <div class="d-flex align-center mb-2">
+          <v-card
+            class="flex-grow-0 flex-shrink-0 grey-background rounded-lg grey-lighten1-background opacity-7 me-2 mt-n2"
+            height="25"
+            width="25" />
+          <div class="font-weight-bold me-auto mb-2">
+            {{ $t('layout.manageSiteSections.label.internalRightSidebar') }}
+          </div>
+          <v-switch
+            v-model="internalRightSidebar"
+            class="ms-auto my-auto me-n2" />
+        </div>
+        <div class="d-flex align-center mb-2">
+          <v-card
+            class="flex-grow-0 flex-shrink-0 grey-background rounded-lg grey-lighten1-background opacity-8 me-2 mt-n2"
+            height="25"
+            width="25" />
           <div class="font-weight-bold me-auto mb-2">
             {{ $t('layout.manageSiteSections.label.bottomBanner') }}
           </div>
@@ -148,12 +220,27 @@
 export default {
   data: () => ({
     drawer: false,
-    leftSidebar: false,
+    /* Switch button */
     topBanner: false,
-    bottomBanner: false,
     rightSidebar: false,
+    internalRightSidebar: false,
+    bottomBanner: false,
+    leftSidebar: false,
+    internalLeftSidebar: false,
+    /* Hover */
+    topBannerHover: false,
+    rightSidebarHover: false,
+    internalRightSidebarHover: false,
+    bottomBannerHover: false,
+    leftSidebarHover: false,
+    internalLeftSidebarHover: false,
     width: 1320,
   }),
+  computed: {
+    minWidth() {
+      return (this.$root.internalLeftContainer?.children?.[0] ? (this.$root.internalRightContainer?.children?.[0]?.width || 310) : 0) + (this.$root.internalRightContainer?.children?.[0]?.width || 310);
+    },
+  },
   created() {
     this.$root.$on('layout-site-sections-open', this.open);
   },
@@ -163,26 +250,28 @@ export default {
   methods: {
     open() {
       const options = this.getCurrentOptions();
-      this.leftSidebar = options.left;
-      this.rightSidebar = options.right;
       this.topBanner = options.top;
+      this.rightSidebar = options.right;
+      this.internalRightSidebar = options.internalRight;
       this.bottomBanner = options.bottom;
-      this.width = this.$root.pageBodyContainer.width || 1320;
+      this.leftSidebar = options.left;
+      this.internalLeftSidebar = options.internalLeft;
+      this.width = this.$root.middleCenterContainer.width || 1320;
       this.$refs.drawer.open();
     },
     apply() {
       this.$root.$emit('layout-section-history-add');
       const options = this.getCurrentOptions();
-      if (options.left !== this.leftSidebar) {
-        if (this.leftSidebar) {
-          this.$root.layout.children[0] = {
-            ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
+      if (options.top !== this.topBanner) {
+        if (this.topBanner) {
+          this.$root.middleContainer.children.unshift({
+            ...this.$layoutUtils.newContainer(this.$layoutUtils.bannerTemplate),
             children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate),
             ]
-          };
+          });
         } else {
-          this.$root.layout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+          this.$root.middleContainer.children.splice(0, this.$root.middleCenterContainerIndex);
         }
       }
       if (options.right !== this.rightSidebar) {
@@ -197,16 +286,16 @@ export default {
           this.$root.layout.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
-      if (options.top !== this.topBanner) {
-        if (this.topBanner) {
-          this.$root.middleContainer.children.unshift({
-            ...this.$layoutUtils.newContainer(this.$layoutUtils.bannerTemplate),
+      if (options.internalRight !== this.internalRightSidebar) {
+        if (this.internalRightSidebar) {
+          this.$root.middleCenterContainer.children[2] = {
+            ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
             children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.bannerCellTemplate),
+              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
             ]
-          });
+          };
         } else {
-          this.$root.middleContainer.children.splice(0, this.$root.pageBodyIndex);
+          this.$root.middleCenterContainer.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
       if (options.bottom !== this.bottomBanner) {
@@ -218,20 +307,47 @@ export default {
             ]
           });
         } else {
-          this.$root.middleContainer.children.splice(this.$root.pageBodyIndex + 1, this.$root.middleContainer.children.length - this.$root.pageBodyIndex);
+          this.$root.middleContainer.children.splice(this.$root.middleCenterContainerIndex + 1, this.$root.middleContainer.children.length - this.$root.middleCenterContainerIndex);
         }
       }
-      this.$root.pageBodyContainer.width = this.width;
+      if (options.left !== this.leftSidebar) {
+        if (this.leftSidebar) {
+          this.$root.layout.children[0] = {
+            ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
+            children: [
+              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+            ]
+          };
+        } else {
+          this.$root.layout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+        }
+      }
+      if (options.internalLeft !== this.internalLeftSidebar) {
+        if (this.internalLeftSidebar) {
+          this.$root.middleCenterContainer.children[0] = {
+            ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
+            children: [
+              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+            ]
+          };
+        } else {
+          this.$root.middleCenterContainer.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
+        }
+      }
+      this.$set(this.$root.middleCenterContainer, 'width', this.width);
       this.$root.layout.children = this.$root.layout.children.slice();
-      this.$root.layout.children[1].children = this.$root.layout.children[1].children.slice();
+      this.$root.middleContainer.children = this.$root.middleContainer.children.slice();
+      this.$root.middleCenterContainer.children = this.$root.middleCenterContainer.children.slice();
       this.close();
     },
     getCurrentOptions() {
       return {
-        top: !!this.$root.middleContainer?.children?.[0]?.children?.length && this.$root.middleContainer?.children?.[0].template === this.$layoutUtils.bannerTemplate,
+        top: !!this.$root.middleContainer?.children?.[0]?.children?.length && this.$root.middleContainer?.children?.[0]?.template === this.$layoutUtils.bannerTemplate,
         right: !!this.$root.rightContainer?.children?.length,
+        internalRight: !!this.$root.internalRightContainer?.children?.length,
+        bottom: !!this.$root.middleContainer?.children?.find?.((c, index) => index > this.$root.middleCenterContainerIndex && c?.children?.length && c.template === this.$layoutUtils.bannerTemplate),
         left: !!this.$root.leftContainer?.children?.length,
-        bottom: !!this.$root.middleContainer?.children?.find?.((c, index) => index > this.$root.pageBodyIndex && c?.children?.length && c.template === this.$layoutUtils.bannerTemplate),
+        internalLeft: !!this.$root.internalLeftContainer?.children?.length,
       };
     },
     close() {
