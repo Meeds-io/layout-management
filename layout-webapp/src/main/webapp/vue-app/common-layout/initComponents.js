@@ -29,8 +29,6 @@ import BorderInput from './components/form/BorderInput.vue';
 import BorderRadiusInput from './components/form/BorderRadiusInput.vue';
 import SectionTemplate from './components/form/SectionTemplate.vue';
 
-import CellsDropBox from './components/content/base/CellsDropBox.vue';
-import CellsSelectionBox from './components/content/base/CellsSelectionBox.vue';
 import ContainerExtension from './components/content/base/ContainerExtension.vue';
 import ContainerBase from './components/content/base/ContainerBase.vue';
 
@@ -41,6 +39,8 @@ import ApplicationCategoryCard from './components/content/common/ApplicationCate
 import ApplicationCard from './components/content/common/ApplicationCard.vue';
 import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
 import CellResizeButton from './components/content/common/CellResizeButton.vue';
+import CellsDropBox from './components/content/common/CellsDropBox.vue';
+import CellsSelectionBox from './components/content/common/CellsSelectionBox.vue';
 
 import Container from './components/content/container/Container.vue';
 import Section from './components/content/container/Section.vue';
