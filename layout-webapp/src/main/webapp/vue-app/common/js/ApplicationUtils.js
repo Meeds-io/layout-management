@@ -100,7 +100,9 @@ export function getStyle(container, options) {
     } else if (container.width === 'singlePageApplication') {
       style['--allPagesWidth'] = '1320px';
     } else if (container.width) {
-      if (options.isApplicationStyle) {
+      if (options.isPageWidthStyle) {
+        style['--allPagesWidth'] = container.width === '100%' ? '100%' : `${container.width}px`;
+      } else if (options.isApplicationStyle) {
         if (options.isSectionStyle) {
           style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
           style['min-width'] = style['width'];
