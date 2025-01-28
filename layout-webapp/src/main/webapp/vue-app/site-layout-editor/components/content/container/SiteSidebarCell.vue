@@ -27,6 +27,7 @@
     :hide-children="moving"
     :class="{
       'z-index-two': hover && !$root.drawerOpened,
+      'elevation-2 border-color': $root.movingParentId,
     }"
     :style="cssStyle"
     class="position-relative display-flex flex-column full-height border-box-sizing"
@@ -36,10 +37,9 @@
     <template #footer>
       <v-hover v-if="$root.desktopDisplayMode" v-model="hoverAddApplication">
         <v-card
-          v-show="!movingChildren"
+          v-show="!$root.movingParentId"
           :class="[{
             'full-height': !hasApplication,
-            'invisible': moving,
           }, backgroundClass]"
           class="full-width layout-add-application-button"
           flat
