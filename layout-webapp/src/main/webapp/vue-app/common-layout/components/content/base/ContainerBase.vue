@@ -105,6 +105,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    noApplicationWidth: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     hover: false,
@@ -150,6 +154,7 @@ export default {
         isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
         isSectionStyle: this.container.template === this.$layoutUtils.bannerCellTemplate,
+        noApplicationWidth: this.noApplicationWidth,
         noBackgroundStyle: this.noBackgroundStyle
       });
     },

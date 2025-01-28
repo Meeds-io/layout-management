@@ -27,7 +27,7 @@
     right
     disable-pull-to-refresh>
     <template #title>
-      {{ $t('layout.editSitePagesProperties') }}
+      {{ $root.isSiteLayout && $t('layout.editSitePagesProperties') || $t('layout.editPageProperties') }}
     </template>
     <template v-if="drawer" #content>
       <v-card
@@ -54,13 +54,40 @@
             {{ $t('layout.globalPageDesign') }}
           </div>
         </div>
-        <div class="d-flex align-center mt-4">
+        <div class="d-flex flex-column mt-4">
           <div class="text-header me-auto mb-2">
-            {{ $t('layout.fullWindow') }}
+            {{ $t('layout.updateSitePagesWidth') }}
           </div>
-          <v-switch
-            v-model="fullWindow"
-            class="ms-auto my-auto me-n2" />
+          <v-radio-group
+            v-model="width"
+            class="ms-0 me-auto full-width text-no-wrap"
+            mandatory>
+            <v-radio
+              :value="customWidth"
+              class="mx-0">
+              <template #label>
+                <div class="d-flex full-width align-center">
+                  <span class="text-font-size">{{ $t('layout.fixedWidthCustom') }}</span>
+                  <number-input
+                    v-model="width"
+                    v-if="width === customWidth"
+                    :label="$t('layout.fixedWidth')"
+                    :min="minWidth"
+                    :max="maxWidth"
+                    :step="10"
+                    class="ms-auto my-n2"
+                    editable />
+                </div>
+              </template>
+            </v-radio>
+            <v-radio
+              value="100%"
+              class="mx-0">
+              <template #label>
+                <span class="text-font-size">{{ $t('layout.fullWindow') }}</span>
+              </template>
+            </v-radio>
+          </v-radio-group>
         </div>
         <layout-editor-background-input
           v-if="parentContainer"
@@ -95,7 +122,8 @@
           ref="appBackgroundInput"
           v-if="appBackgroundProperties"
           v-model="appBackgroundProperties"
-          class="mt-4" />
+          class="mt-4"
+          page-style />
         <layout-editor-text-input
           ref="appTextInput"
           v-model="parentContainer"
@@ -127,9 +155,13 @@ export default {
     pagePreview: '/layout/images/page-templates/DefaultPreview.webp',
     defaultBackgroundColor: '#F2F2F2FF',
     layout: null,
+    originalParentContainer: null,
     parentContainer: null,
     appBackgroundProperties: null,
     fullWindow: false,
+    width: 1320,
+    minWidth: 300,
+    maxWidth: 5000,
     drawer: false,
     saving: false,
   }),
@@ -138,6 +170,9 @@ export default {
       return this.$applicationUtils.getStyle(this.parentContainer, {
         onlyBackgroundStyle: true,
       });
+    },
+    customWidth() {
+      return this.width === '100%' ? 0 : this.width;
     },
   },
   watch: {
@@ -148,18 +183,19 @@ export default {
     },
   },
   created() {
-    this.$root.$on('layout-site-properties-open', this.open);
+    this.$root.$on('layout-page-properties-open', this.open);
     if (document.body.computedStyleMap().get('--allPagesLightGrey')) {
       this.defaultBackgroundColor = document.body.computedStyleMap().get('--allPagesLightGrey')[0] || this.defaultBackgroundColor;
     }
   },
   beforeDestroy() {
-    this.$root.$off('layout-site-properties-open', this.open);
+    this.$root.$off('layout-page-properties-open', this.open);
   },
   methods: {
-    open() {
-      this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(this.$root.layout)));
-      this.fullWindow = this.parentContainer.width !== 'singlePageApplication' && (this.parentContainer.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth'));
+    open(parentContainer) {
+      this.originalParentContainer = parentContainer;
+      this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
+      this.width = this.parentContainer.width || (!!document.body.style.getPropertyValue('--allPagesWidth') && '100%') || 1320;
       this.appBackgroundProperties = {
         storageId: 0,
         backgroundColor: this.parentContainer.appBackgroundColor || null,
@@ -173,25 +209,18 @@ export default {
     async apply() {
       this.saving = true;
       try {
-        if (this.fullWindow) {
-          this.parentContainer.width = 'fullWindow';
-        } else if (document.body.style.getPropertyValue('--allPagesWidth')) {
-          this.parentContainer.width = 'singlePageApplication';
-        } else {
-          this.parentContainer.width = null;
-        }
         await this.$refs.backgroundInput.apply();
         await this.$refs.appBackgroundInput.apply();
-        this.parentContainer.children = this.$root.layout.children;
-        Object.assign(this.$root.layout, this.parentContainer);
-        this.$set(this.$root.layout, 'appBackgroundColor', this.appBackgroundProperties.backgroundColor);
-        this.$set(this.$root.layout, 'appBackgroundImage', this.appBackgroundProperties.backgroundImage);
-        this.$set(this.$root.layout, 'appBackgroundEffect', this.appBackgroundProperties.backgroundEffect);
-        this.$set(this.$root.layout, 'appBackgroundRepeat', this.appBackgroundProperties.backgroundRepeat);
-        this.$set(this.$root.layout, 'appBackgroundSize', this.appBackgroundProperties.backgroundSize);
-        this.$set(this.$root.layout, 'width', this.parentContainer.width);
+        Object.assign(this.originalParentContainer, this.parentContainer);
+        this.$set(this.originalParentContainer, 'appBackgroundColor', this.appBackgroundProperties.backgroundColor);
+        this.$set(this.originalParentContainer, 'appBackgroundImage', this.appBackgroundProperties.backgroundImage);
+        this.$set(this.originalParentContainer, 'appBackgroundEffect', this.appBackgroundProperties.backgroundEffect);
+        this.$set(this.originalParentContainer, 'appBackgroundRepeat', this.appBackgroundProperties.backgroundRepeat);
+        this.$set(this.originalParentContainer, 'appBackgroundSize', this.appBackgroundProperties.backgroundSize);
+        this.$set(this.originalParentContainer, 'width', this.width);
+        this.$layoutUtils.applyContainerStyle(this.originalParentContainer, this.originalParentContainer);
         this.$root.pageFullWindow = this.fullWindow;
-        this.$root.layout = JSON.parse(JSON.stringify(this.$root.layout));
+        this.$root.$emit('layout-editor-page-design-updated');
         this.close();
       } finally {
         this.saving = false;

@@ -34,7 +34,6 @@ import Content from './components/content/Content.vue';
 
 import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
 import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
-import EditPageDrawer from './components/drawer/EditPageDrawer.vue';
 
 const components = {
   'layout-editor': LayoutEditor,
@@ -51,7 +50,6 @@ const components = {
   'layout-editor-content': Content,
   'layout-editor-section-add-drawer': AddSectionDrawer,
   'layout-editor-section-edit-drawer': EditSectionDrawer,
-  'layout-editor-page-edit-drawer': EditPageDrawer,
 };
 
 for (const key in components) {
