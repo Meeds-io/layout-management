@@ -38,28 +38,48 @@
       <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
       <template v-if="$slots.header">
         <slot name="header"></slot>
+        <template v-if="$slots.content">
+          <slot name="content"></slot>
+        </template>
+        <template v-else-if="hasChildren">
+          <layout-editor-container-extension
+            v-for="(child, i) in children"
+            :key="child.storageId"
+            :container="child"
+            :parent-id="storageId"
+            :index="i"
+            :length="childrenSize"
+            :class="{
+              'invisible': hideChildren,
+              'draggable-container-flex': draggable,
+            }"
+            @initialized="$emit('initialized', child)"
+            @move-start="moveStart"
+            @move-end="moveEnd" />
+        </template>
       </template>
       <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
-      <template v-if="$slots.content">
-        <slot name="content"></slot>
+      <template v-else>
+        <template v-if="$slots.content">
+          <slot name="content"></slot>
+        </template>
+        <template v-else-if="hasChildren">
+          <layout-editor-container-extension
+            v-for="(child, i) in children"
+            :key="child.storageId"
+            :container="child"
+            :parent-id="storageId"
+            :index="i"
+            :length="childrenSize"
+            :class="{
+              'invisible': hideChildren,
+              'draggable-container-flex': draggable,
+            }"
+            @initialized="$emit('initialized', child)"
+            @move-start="moveStart"
+            @move-end="moveEnd" />
+        </template>
       </template>
-      <template v-else-if="hasChildren">
-        <layout-editor-container-extension
-          v-for="(child, i) in children"
-          :key="child.storageId"
-          :container="child"
-          :parent-id="storageId"
-          :index="i"
-          :length="childrenSize"
-          :class="{
-            'invisible': hideChildren,
-            'draggable-container-flex': draggable,
-          }"
-          @initialized="$emit('initialized', child)"
-          @move-start="moveStart"
-          @move-end="moveEnd" />
-      </template>
-      <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
       <template v-if="$slots.footer">
         <slot name="footer"></slot>
       </template>
@@ -178,7 +198,7 @@ export default {
     },
     dragOptions() {
       return {
-        group: `${this.container.template}`,
+        group: `${this.type}`,
         draggable: '.draggable-container-flex',
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
