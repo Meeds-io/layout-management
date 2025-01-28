@@ -54,6 +54,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    pageWidthStyle: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     id() {
@@ -82,7 +86,8 @@ export default {
         isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === 'BannerCell',
         isSectionStyle: this.container.template === 'BannerCell',
-        noBackgroundStyle: this.noBackgroundStyle
+        noBackgroundStyle: this.noBackgroundStyle,
+        isPageWidthStyle: this.pageWidthStyle,
       });
     },
     cssClass() {
