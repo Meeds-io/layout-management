@@ -50,6 +50,7 @@ import Application from './components/content/container/Application.vue';
 import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicationCategoryDrawer.vue';
 import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
+import EditPageDrawer from './components/drawer/EditPageDrawer.vue';
 
 import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
 
@@ -71,6 +72,7 @@ const components = {
   'layout-editor-application-category-select-drawer': SelectApplicationCategoryDrawer,
   'layout-editor-application-add-drawer': AddApplicationDrawer,
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
+  'layout-editor-page-edit-drawer': EditPageDrawer,
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
   'layout-editor-background-image-attachment': BackgroundImageAttachment,
   'layout-editor-background-input': BackgroundInput,

@@ -354,7 +354,8 @@ export function parseSite(layout) {
         ...newContainer(sidebarTemplate),
         children: [{
           ...newContainer(sidebarCellTemplate),
-          children: applications,
+          children: applications || [],
+          width: 310
         }]
       },
       { // Middle
@@ -373,17 +374,19 @@ export function parseSite(layout) {
             children: [
               { // Internal Left
                 ...newContainer(sidebarTemplate),
-                children: [
-                  newContainer(sidebarCellTemplate),
-                ]
+                children: [{
+                  ...newContainer(sidebarCellTemplate),
+                  width: 310
+                }]
               },
               // Page Body
               newContainer(pageBodyTemplate),
               { // Internal Right
                 ...newContainer(sidebarTemplate),
-                children: [
-                  newContainer(sidebarCellTemplate),
-                ]
+                children: [{
+                  ...newContainer(sidebarCellTemplate),
+                  width: 310
+                }]
               },
             ]
           },
@@ -397,9 +400,10 @@ export function parseSite(layout) {
       },
       { // Right
         ...newContainer(sidebarTemplate),
-        children: [
-          newContainer(sidebarCellTemplate),
-        ]
+        children: [{
+          ...newContainer(sidebarCellTemplate),
+          width: 310
+        }],
       }
     ];
     return !applications?.length;
