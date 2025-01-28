@@ -106,7 +106,9 @@ export function getStyle(container, options) {
           style['min-width'] = style['width'];
           style['max-width'] = style['width'];
         }
-        style['--appWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+        if (!options.noApplicationWidth) {
+          style['--appWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+        }
       } else {
         style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
       }

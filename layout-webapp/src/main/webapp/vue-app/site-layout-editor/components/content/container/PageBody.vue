@@ -23,16 +23,17 @@
   <v-card
     :id="id"
     :data-storage-id="storageId"
-    class="position-relative d-flex flex-column flex-grow-1 flex-shrink-1 z-index-zero"
-    color="transparent"
-    :height="height"
     :min-height="minHeight"
-    width="100%"
+    :height="height"
+    class="position-relative d-flex flex-column flex-shrink-1 singlePageApplication z-index-zero pa-5"
+    color="transparent"
     flat>
     <v-card
-      class="flex-grow-1 overflow-hidden ma-5"
+      class="flex-grow-1 overflow-hidden mx-auto"
+      width="100%"
       flat>
       <v-card
+        :class="$vuetify.rtl && 'r-0' || 'l-0'"
         class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
         color="primary"
         min-height="30"
@@ -68,11 +69,11 @@ export default {
     height: 225,
   }),
   computed: {
+    storageId() {
+      return this.container.storageId;
+    },
     id() {
       return this.container.id || this.storageId;
-    },
-    storageId() {
-      return this.container?.storageId;
     },
     middleContainerMinHeight() {
       return this.$root.middleContainer?.children?.map?.(c => c.height && Number(c.height) || 57)?.reduce?.((acc, v) => acc + v, 0) || 0;
