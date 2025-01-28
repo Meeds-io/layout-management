@@ -25,10 +25,7 @@
     :parent-id="parentId"
     :index="index"
     :length="length"
-    :style="width && {
-      '--allPagesWidth': width
-    }"
-    no-application-width />
+    page-width-style />
 </template>
 <script>
 export default {
@@ -58,9 +55,6 @@ export default {
       return this.refresh > 0 && {
         ...this.container
       };
-    },
-    width() {
-      return this.container.width === '100%' ? '100%' : this.container.width && `${this.container.width}px`;
     },
   },
   created() {

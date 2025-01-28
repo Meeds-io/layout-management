@@ -105,7 +105,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    noApplicationWidth: {
+    pageWidthStyle: {
       type: Boolean,
       default: false,
     },
@@ -154,8 +154,8 @@ export default {
         isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
         isSectionStyle: this.container.template === this.$layoutUtils.bannerCellTemplate,
-        noApplicationWidth: this.noApplicationWidth,
-        noBackgroundStyle: this.noBackgroundStyle
+        noBackgroundStyle: this.noBackgroundStyle,
+        isPageWidthStyle: this.pageWidthStyle,
       });
     },
     containerCssClass() {
