@@ -47,8 +47,9 @@
       :container="container"
       :parent-id="parentId"
       :index="index"
-      class="position-relative overflow-initial layout-section-content full-height full-width display-flex flex-row"
-      type="section"
+      :class="rowIndexClass"
+      class="position-relative overflow-initial layout-banner-section layout-section-content full-height full-width display-flex flex-row"
+      type="banner-section"
       no-background-style
       draggable
       @hovered="hoverSection = $event && !drawerOpened" />
@@ -96,8 +97,8 @@ export default {
     isTopContainer() {
       return this.index < this.$root.middleCenterContainerIndex;
     },
-    cssClass() {
-      return [this.container.cssClass || '', `${this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section'}${this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : ''}`];
+    rowIndexClass() {
+      return this.index % 2 === 0 ? 'layout-banner-section-even' : 'layout-banner-section-odd';
     },
     cssStyle() {
       return {
