@@ -346,7 +346,9 @@ export function applyContainerStyle(container, containerStyle) {
 
 export function parseSite(layout) {
   const compatible = isSiteLayoutCompatible(layout);
-  if (!compatible) {
+  if (compatible) {
+    parseContainer(layout);
+  } else {
     const applications = getApplications(layout);
     layout.template = siteTemplate;
     layout.children = [
@@ -771,6 +773,24 @@ export function cleanAttributes(container, cleanStorage, cleanStyle) {
       delete container[key];
     }
   });
+  return container;
+}
+
+export function parseContainer(container) {
+  if (container.template) {
+    containerModelAttributes.forEach(key => {
+      if (!Object.hasOwn(container, key)) {
+        container[key] = containerModel[key];
+      }
+    });
+    container.children.forEach(parseContainer);
+  } else {
+    applicationModelAttributes.forEach(key => {
+      if (!Object.hasOwn(container, key)) {
+        container[key] = applicationModel[key];
+      }
+    });
+  }
   return container;
 }
 
