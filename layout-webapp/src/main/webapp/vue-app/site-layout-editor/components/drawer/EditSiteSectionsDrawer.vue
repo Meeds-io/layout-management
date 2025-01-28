@@ -51,7 +51,8 @@
             <v-card
               :width="leftSidebar && 50"
               class="flex-grow-0 flex-shrink-0 grey-lighten1-background opacity-7 no-border-radius"
-              flat />
+              flat
+              @click="leftSidebar = !leftSidebar" />
             <v-card
               class="d-flex flex-column flex-grow-1 flex-shrink-1 no-border-radius"
               color="transparent"
@@ -107,21 +108,6 @@
               @click="rightSidebar = !rightSidebar" />
           </div>
         </v-card>
-        <div class="text-header mb-4">
-          {{ $t('layout.editSiteSidebarSection.label.adjustPortalPageWidth') }}
-        </div>
-        <div class="d-flex align-center mb-2">
-          <div class="font-weight-bold me-auto">
-            {{ $t('layout.editSiteSidebarSection.label.portalPageWidth') }}
-          </div>
-          <number-input
-            v-model="width"
-            :min="minWidth"
-            :max="5000"
-            :step="10"
-            class="ms-auto my-n2"
-            editable />
-        </div>
         <div class="text-header mb-4">
           {{ $t('layout.manageSiteSections.label.sectionsChoice') }}
         </div>
@@ -234,13 +220,7 @@ export default {
     bottomBannerHover: false,
     leftSidebarHover: false,
     internalLeftSidebarHover: false,
-    width: 1320,
   }),
-  computed: {
-    minWidth() {
-      return (this.$root.internalLeftContainer?.children?.[0] ? (this.$root.internalRightContainer?.children?.[0]?.width || 310) : 0) + (this.$root.internalRightContainer?.children?.[0]?.width || 310) + 200;
-    },
-  },
   created() {
     this.$root.$on('layout-site-sections-open', this.open);
   },
@@ -256,7 +236,6 @@ export default {
       this.bottomBanner = options.bottom;
       this.leftSidebar = options.left;
       this.internalLeftSidebar = options.internalLeft;
-      this.width = this.$root.middleCenterContainer.width || 1320;
       this.$refs.drawer.open();
     },
     apply() {
@@ -278,9 +257,10 @@ export default {
         if (this.rightSidebar) {
           this.$root.layout.children[2] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
-            children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
-            ]
+            children: [{
+              ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              width: 310
+            }]
           };
         } else {
           this.$root.layout.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
@@ -290,9 +270,10 @@ export default {
         if (this.internalRightSidebar) {
           this.$root.middleCenterContainer.children[2] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
-            children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
-            ]
+            children: [{
+              ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              width: 310
+            }]
           };
         } else {
           this.$root.middleCenterContainer.children[2] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
@@ -314,9 +295,10 @@ export default {
         if (this.leftSidebar) {
           this.$root.layout.children[0] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
-            children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
-            ]
+            children: [{
+              ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              width: 310
+            }]
           };
         } else {
           this.$root.layout.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
@@ -326,15 +308,15 @@ export default {
         if (this.internalLeftSidebar) {
           this.$root.middleCenterContainer.children[0] = {
             ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate),
-            children: [
-              this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
-            ]
+            children: [{
+              ...this.$layoutUtils.newContainer(this.$layoutUtils.sidebarCellTemplate),
+              width: 310
+            }]
           };
         } else {
           this.$root.middleCenterContainer.children[0] = this.$layoutUtils.newContainer(this.$layoutUtils.sidebarTemplate);
         }
       }
-      this.$set(this.$root.middleCenterContainer, 'width', this.width);
       this.$root.layout.children = this.$root.layout.children.slice();
       this.$root.middleContainer.children = this.$root.middleContainer.children.slice();
       this.$root.middleCenterContainer.children = this.$root.middleCenterContainer.children.slice();

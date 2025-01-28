@@ -86,7 +86,7 @@ export default {
       return this.container.width || 1320;
     },
     maxWidth() {
-      return `calc(min(100vw - ${this.sidebarsContainerMinWidth}px, ${this.width}px))`;
+      return `min(100vw - ${this.sidebarsContainerMinWidth}px, ${this.width}px)`;
     },
     cssStyle() {
       return {
