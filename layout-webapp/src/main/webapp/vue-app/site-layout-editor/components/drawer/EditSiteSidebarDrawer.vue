@@ -139,6 +139,7 @@ export default {
     },
     removeSection() {
       this.$root.$emit('layout-section-history-add');
+      this.sidebarContainer.cssClass = null;
       this.sidebarContainer.children = [];
       this.close();
     },
