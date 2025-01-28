@@ -68,20 +68,17 @@
             :parent-id="parentId"
             :hover="hoverContainer"
             :moving="moving"
-            spacing-class="me-n3"
+            spacing-class="me-0"
             dynamic-section
             @move-start="moveStart" />
         </div>
         <v-hover v-if="$root.desktopDisplayMode && !hasApplication" v-model="hoverAddApplication">
           <v-card
             v-show="!moving"
-            :class="{
-              'grey-background': opaqueBackground,
-              'light-grey-background': !opaqueBackground,
-              'transparent': $root.movingCell && $root.selectedSectionId === parentId,
+            :class="[{
               'invisible': moving,
-            }"
-            class="full-width full-height layout-add-application-button"
+            }, backgroundClass]"
+            class="full-width full-height rounded-lg layout-add-application-button"
             flat
             @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
             <v-card
@@ -187,6 +184,15 @@ export default {
     },
     editablePortlet() {
       return this.portletInstance?.editable || false;
+    },
+    backgroundClass() {
+      if (this.$root.movingCell && this.$root.selectedSectionId === this.parentId) {
+        return 'transparent';
+      } else if (!this.opaqueBackground) {
+        return 'light-grey-background';
+      } else {
+        return 'layout-empty-cell grey-lighten1-background';
+      }
     },
     width() {
       return this.moving && this.movingStartX && (this.initialWidth + this.movingX - this.movingStartX) || null;

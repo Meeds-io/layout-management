@@ -403,7 +403,7 @@ export function parseSite(layout) {
         children: [{
           ...newContainer(sidebarCellTemplate),
           width: 310
-        }],
+        }]
       }
     ];
     return !applications?.length;
