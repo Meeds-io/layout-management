@@ -20,12 +20,12 @@
 export const breakpoints = ['md', 'lg', 'xl'];
 
 export const currentBreakpoint = 'xl';
+export const siteTemplate = 'system:/groovy/portal/webui/container/UISiteLayout.gtmpl';
 export const sectionsParentTemplate = 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl';
 export const simpleTemplate = 'system:/groovy/portal/webui/container/UIContainer.gtmpl';
 export const gridTemplate = 'GridContainer';
 export const flexTemplate = 'FlexContainer';
 export const cellTemplate = 'CellContainer';
-export const siteTemplate = 'Site';
 export const siteBodyMiddleTemplate = 'SiteMiddleBody';
 export const siteBodyMiddleCenterTemplate = 'SiteMiddleCenterBody';
 export const pageBodyTemplate = 'PageBody';
@@ -348,6 +348,20 @@ export function parseSite(layout) {
   const compatible = isSiteLayoutCompatible(layout);
   if (compatible) {
     parseContainer(layout);
+    if (layout.children[0]?.template !== sidebarTemplate) {
+      layout.children.unshift(newContainer(sidebarTemplate));
+    }
+    if (layout.children[2]?.template !== sidebarTemplate) {
+      layout.children.push(newContainer(sidebarTemplate));
+    }
+    const siteBodyMiddleCenterContainer = layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate);
+    if (siteBodyMiddleCenterContainer.children[0]?.template !== sidebarTemplate) {
+      siteBodyMiddleCenterContainer.children.unshift(newContainer(sidebarTemplate));
+    }
+    if (siteBodyMiddleCenterContainer.children[2]?.template !== sidebarTemplate) {
+      siteBodyMiddleCenterContainer.children.push(newContainer(sidebarTemplate));
+    }
+    return true;
   } else {
     const applications = getApplications(layout);
     layout.template = siteTemplate;
@@ -410,21 +424,20 @@ export function parseSite(layout) {
     ];
     return !applications?.length;
   }
-  return true;
 }
 
 export function isSiteLayoutCompatible(layout) {
   return layout.template === siteTemplate
     && layout.children?.length
+    && layout.children.length > 0
+    && layout.children.length <= 3
     && layout.children.every(c => c.template === sidebarTemplate || c.template === siteBodyMiddleTemplate)
-    && layout.children.find(c => c.template === siteBodyMiddleTemplate)
-    && layout.children[0]?.template === sidebarTemplate
-    && layout.children[1]?.template === siteBodyMiddleTemplate
-    && layout.children[2]?.template === sidebarTemplate
-    && layout.children[1].children?.find?.(c => c.template === siteBodyMiddleCenterTemplate)
-    && layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate)?.children[0]?.template === sidebarTemplate
-    && layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate)?.children[1]?.template === pageBodyTemplate
-    && layout.children[1].children.find(c => c.template === siteBodyMiddleCenterTemplate)?.children[2]?.template === sidebarTemplate;
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate)?.children?.length
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children?.length > 0
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children?.length <= 3
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children.
+      find?.(c => c.template === siteBodyMiddleCenterTemplate)?.children?.
+      find?.(c => c.template === pageBodyTemplate);
 }
 
 export function parseSections(layout) {
