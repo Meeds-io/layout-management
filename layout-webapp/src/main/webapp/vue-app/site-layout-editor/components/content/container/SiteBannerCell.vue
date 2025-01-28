@@ -28,6 +28,7 @@
       :class="{
         'position-relative': hasApplication,
         'z-index-two': hoverContainer && !$root.drawerOpened,
+        'elevation-2 border-color': $root.movingParentId,
       }"
       class="full-height flex-grow-1 flex-shrink-1">
       <template v-if="application" #header>
@@ -74,10 +75,8 @@
         </div>
         <v-hover v-if="$root.desktopDisplayMode && !hasApplication" v-model="hoverAddApplication">
           <v-card
-            v-show="!moving"
-            :class="[{
-              'invisible': moving,
-            }, backgroundClass]"
+            v-show="!$root.movingParentId"
+            :class="backgroundClass"
             class="full-width full-height rounded-lg layout-add-application-button"
             flat
             @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
@@ -196,6 +195,9 @@ export default {
     },
     width() {
       return this.moving && this.movingStartX && (this.initialWidth + this.movingX - this.movingStartX) || null;
+    },
+    anyCellMoving() {
+      return this.moving ;
     },
   },
   watch: {
