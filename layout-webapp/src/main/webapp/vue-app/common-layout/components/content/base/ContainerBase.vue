@@ -162,7 +162,11 @@ export default {
       return this.$root.mobileDisplayMode ? this.container.cssClass?.replace?.('d-md-grid', '') : this.container.cssClass;
     },
     cssClass() {
-      return `${this.containerCssClass?.replace?.('layout-sticky-application', '')?.replace?.('layout-sticky-section', '') || ''} ${this.draggable && 'v-draggable' || ''} ${this.noChildren && 'position-relative' || ''}`;
+      return [
+        this.containerCssClass?.replace?.('layout-sticky-application', '')?.replace?.('layout-sticky-section', ''),
+        this.draggable ? 'v-draggable' : '',
+        this.noChildren ? 'position-relative' : ''
+      ];
     },
     isCell() {
       return this.container.template === this.$layoutUtils.cellTemplate;

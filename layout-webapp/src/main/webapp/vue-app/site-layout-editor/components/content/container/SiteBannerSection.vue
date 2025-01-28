@@ -25,9 +25,9 @@
     v-if="childrenSize"
     ref="section"
     :id="id"
-    :class="cssClass"
     :style="cssStyle"
-    class="position-relative z-index-one layout-banner-section flex-grow-1 flex-shrink-1">
+    :class="cssClass"
+    class="position-relative layout-banner-section flex-grow-1 flex-shrink-1">
     <v-hover :disabled="$root.mobileDisplayMode">
       <div
         slot-scope="{ hover }"
@@ -97,6 +97,12 @@ export default {
     isTopContainer() {
       return this.index < this.$root.middleCenterContainerIndex;
     },
+    cssClass() {
+      return [
+        this.isTopContainer ? 'layout-banner-top-section' : 'layout-banner-bottom-section',
+        this.container.cssClass?.includes('layout-sticky-section') ? ' layout-sticky-section' : '',
+      ];
+    },
     rowIndexClass() {
       return this.index % 2 === 0 ? 'layout-banner-section-even' : 'layout-banner-section-odd';
     },
@@ -118,14 +124,14 @@ export default {
         const container = this.$layoutUtils.getContainerById(this.$root.layout, this.storageId);
         if (this.isTopContainer) {
           if (!container.cssClass?.includes?.('layout-banner-top-section')) {
-            container.cssClass = container.cssClass ? `${container.cssClass.trim()} layout-banner-top-section` : 'layout-banner-top-section';
+            container.cssClass = container.cssClass?.trim?.()?.length ? `${container.cssClass.trim()} layout-banner-top-section` : 'layout-banner-top-section';
           }
           if (container.cssClass?.includes?.('layout-banner-bottom-section')) {
             container.cssClass = container.cssClass.replace('layout-banner-bottom-section', '');
           }
         } else {
           if (!container.cssClass?.includes?.('layout-banner-bottom-section')) {
-            container.cssClass = container.cssClass ? `${container.cssClass.trim()} layout-banner-bottom-section` : 'layout-banner-bottom-section';
+            container.cssClass = container.cssClass?.trim?.()?.length ? `${container.cssClass.trim()} layout-banner-bottom-section` : 'layout-banner-bottom-section';
           }
           if (container.cssClass?.includes?.('layout-banner-top-section')) {
             container.cssClass = container.cssClass.replace('layout-banner-top-section', '');
