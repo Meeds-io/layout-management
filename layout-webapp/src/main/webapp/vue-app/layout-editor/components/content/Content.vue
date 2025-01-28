@@ -332,7 +332,7 @@ export default {
     },
     handleSectionUpdated(container, children, index, type) {
       container.children = children?.filter(c => !!c) || [];
-      if (type === 'section' && !container.children?.length) {
+      if ((type === 'section-grid' || type === 'section-columns') && !container.children?.length) {
         window.setTimeout(() => this.handleRemoveSection(index), 500);
       }
     },
