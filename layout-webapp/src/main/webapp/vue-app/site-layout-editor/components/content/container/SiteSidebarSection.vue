@@ -49,8 +49,8 @@
       :container="container"
       :parent-id="parentId"
       :index="index"
-      class="position-relative overflow-initial layout-section-content full-height z-index-zero"
-      type="site-section"
+      class="position-relative overflow-initial layout-sidebar-section layout-section-content full-height z-index-zero"
+      type="sidebar-section"
       no-background-style
       @hovered="hoverSection = $event && !drawerOpened" />
   </div>
