@@ -275,17 +275,8 @@ export default {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
     },
-    handleSectionUpdated(container, children, index, type) {
+    handleSectionUpdated(container, children) {
       container.children = children?.filter(c => !!c) || [];
-      if (type === 'section' && !container.children?.length) {
-        window.setTimeout(() => this.handleRemoveSection(index), 500);
-      }
-    },
-    handleRemoveSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children[index];
-      this.addSectionVersion(section.storageId);
-      parentContainer.children.splice(index, 1);
     },
     handleReplaceSection(index, section) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
