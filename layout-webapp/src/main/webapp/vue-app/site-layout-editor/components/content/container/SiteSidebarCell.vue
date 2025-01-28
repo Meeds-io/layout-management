@@ -37,13 +37,10 @@
       <v-hover v-if="$root.desktopDisplayMode" v-model="hoverAddApplication">
         <v-card
           v-show="!movingChildren"
-          :class="{
+          :class="[{
             'full-height': !hasApplication,
-            'grey-background': opaqueBackground,
-            'light-grey-background': !opaqueBackground,
-            'transparent': $root.movingCell && $root.selectedSectionId === parentId,
             'invisible': moving,
-          }"
+          }, backgroundClass]"
           class="full-width layout-add-application-button"
           flat
           @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
@@ -131,6 +128,18 @@ export default {
       return !this.hoverAddApplication
         && !this.hasBackground
         && (!this.$root.movingCell || this.$root.selectedSectionId !== this.parentId);
+    },
+    isInternalSidebar() {
+      return this.storageId === this.$root.internalLeftContainer?.children?.[0]?.storageId || this.storageId === this.$root.internalRightContainer?.children?.[0]?.storageId;
+    },
+    backgroundClass() {
+      if (this.$root.movingCell && this.$root.selectedSectionId === this.parentId) {
+        return 'transparent';
+      } else if (!this.opaqueBackground) {
+        return 'light-grey-background';
+      } else {
+        return `grey-lighten1-background ${this.isInternalSidebar && 'opacity-1' || 'opacity-4'}`;
+      }
     },
     width() {
       return this.container.width;
