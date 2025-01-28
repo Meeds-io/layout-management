@@ -28,7 +28,7 @@
             :aria-label="$t('layout.editSiteProperties')"
             target="_blank"
             icon
-            @click="$root.$emit('layout-site-properties-open')">
+            @click="$root.$emit('layout-page-properties-open', $root.layout)">
             <v-icon size="20" class="icon-default-color">fa-palette</v-icon>
           </v-btn>
         </div>

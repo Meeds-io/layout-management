@@ -20,10 +20,14 @@
 -->
 <template>
   <layout-editor-container-base
-    :container="container"
+    :container="containerToDisplay"
     :parent-id="parentId"
     :index="index"
-    :length="length" />
+    :length="length"
+    :style="width && {
+      '--allPagesWidth': width
+    }"
+    no-application-width />
 </template>
 <script>
 export default {
@@ -43,6 +47,30 @@ export default {
     length: {
       type: Number,
       default: null,
+    },
+  },
+  data: () => ({
+    refresh: 1,
+  }),
+  computed: {
+    containerToDisplay() {
+      return this.refresh > 0 && {
+        ...this.container
+      };
+    },
+    width() {
+      return this.container.width === '100%' ? '100%' : this.container.width && `${this.container.width}px`;
+    },
+  },
+  created() {
+    this.$root.$on('layout-editor-page-design-updated', this.refreshStyle);
+  },
+  beforeDestroy() {
+    this.$root.$off('layout-editor-page-design-updated', this.refreshStyle);
+  },
+  methods: {
+    refreshStyle() {
+      this.refresh++;
     },
   },
 };

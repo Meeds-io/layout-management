@@ -8,6 +8,7 @@
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 3 of the License, or (at your option) any later version.
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -27,7 +28,7 @@
             :aria-label="$t('layout.editPageProperties')"
             target="_blank"
             icon
-            @click="$root.$emit('layout-page-properties-open')">
+            @click="$root.$emit('layout-page-properties-open', parentContainer)">
             <v-icon size="20" class="icon-default-color">fa-palette</v-icon>
           </v-btn>
         </div>
@@ -36,3 +37,12 @@
     </v-tooltip>
   </div>
 </template>
+<script>
+export default {
+  computed: {
+    parentContainer() {
+      return this.$layoutUtils.getParentContainer(this.$root.layout);
+    },
+  },
+};
+</script>
