@@ -20,7 +20,9 @@
 
 -->
 <template>
-  <div class="mx-auto flex-grow-1 flex-shrink-1">
+  <div
+    :style="cssStyle"
+    class="flex-grow-1 flex-shrink-1">
     <layout-editor-container-base
       ref="container"
       :container="container"
@@ -66,6 +68,33 @@ export default {
         chosenClass: 'layout-moving-chosen-container',
         handle: '.draggable',
         dataIdAttr: 'data-storage-id',
+      };
+    },
+    sidebarsContainerMinWidth() {
+      return this.$root.layout?.children
+        ?.filter?.(c => c.template === this.$layoutUtils.sidebarTemplate
+          && c.children?.length
+          && (
+            !this.$root.mobileDisplayMode
+            || !c?.children?.[0].cssClass?.includes?.('hidden-sm-and-down')
+          )
+        )
+        ?.map?.(c => c.width
+          && Number(c.width)
+          || 310
+        )
+        ?.reduce?.((acc, v) => acc + v, 0) || 0;
+    },
+    width() {
+      return `max(100vw - ${this.sidebarsContainerMinWidth}px, 100%)`;
+    },
+    maxWidth() {
+      return `min(100vw - ${this.sidebarsContainerMinWidth}px, 100%)`;
+    },
+    cssStyle() {
+      return {
+        'width': this.width,
+        'max-width': this.maxWidth,
       };
     },
   },
