@@ -68,17 +68,25 @@ public class PageTemplateService {
   }
 
   public List<PageTemplate> getPageTemplates(Locale locale, boolean expand) {
+    return getPageTemplates(locale, expand, true);
+  }
+
+  public List<PageTemplate> getPageTemplates(Locale locale, boolean expand, boolean retrieveContent) {
     List<PageTemplate> pageTemplates = pageTemplateStorage.getPageTemplates();
     if (expand) {
-      pageTemplates.forEach(pageTemplate -> computePageTemplateAttributes(locale, pageTemplate));
+      pageTemplates.forEach(pageTemplate -> computePageTemplateAttributes(locale, pageTemplate, retrieveContent));
     }
     return pageTemplates;
   }
 
   public PageTemplate getPageTemplate(long id, Locale locale, boolean expand) {
+    return getPageTemplate(id, locale, expand, false);
+  }
+
+  public PageTemplate getPageTemplate(long id, Locale locale, boolean expand, boolean retrieveContent) {
     PageTemplate pageTemplate = pageTemplateStorage.getPageTemplate(id);
     if (expand) {
-      computePageTemplateAttributes(locale, pageTemplate);
+      computePageTemplateAttributes(locale, pageTemplate, retrieveContent);
     }
     return pageTemplate;
   }
@@ -164,13 +172,16 @@ public class PageTemplateService {
     }
   }
 
-  private void computePageTemplateAttributes(Locale locale, PageTemplate pageTemplate) {
+  private void computePageTemplateAttributes(Locale locale, PageTemplate pageTemplate, boolean retrieveContent) {
     pageTemplate.setName(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.TITLE_FIELD_NAME, locale));
     pageTemplate.setDescription(getLabel(pageTemplate.getId(), PageTemplateTranslationPlugin.DESCRIPTION_FIELD_NAME, locale));
     List<String> attachmentFileIds = attachmentService.getAttachmentFileIds(PageTemplateAttachmentPlugin.OBJECT_TYPE,
                                                                             String.valueOf(pageTemplate.getId()));
     if (CollectionUtils.isNotEmpty(attachmentFileIds)) {
       pageTemplate.setIllustrationId(Long.parseLong(attachmentFileIds.get(0)));
+    }
+    if (!retrieveContent) {
+      pageTemplate.setContent(null);
     }
   }
 
