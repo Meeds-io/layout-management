@@ -25,22 +25,22 @@ extensionRegistry.registerExtension('layout-editor', 'container', {
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 300,
+  rank: 100,
+  type: 'application',
+  isValid: container => !container.type && !container.template,
+  containerType: 'layout-editor-container-application',
+});
+
+extensionRegistry.registerExtension('layout-editor', 'container', {
+  rank: 200,
   type: 'grid-section',
   isValid: container => container?.template === 'GridContainer' || container?.template === 'FlexContainer',
   containerType: 'layout-editor-container-section',
 });
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 400,
+  rank: 300,
   type: 'cell',
   isValid: container => container?.template === 'CellContainer',
   containerType: 'layout-editor-container-cell',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 1500,
-  type: 'application',
-  isValid: container => !container.type && !container.template,
-  containerType: 'layout-editor-container-application',
 });
