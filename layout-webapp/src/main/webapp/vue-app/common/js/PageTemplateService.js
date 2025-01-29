@@ -17,8 +17,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function getPageTemplates() {
-  return fetch('/layout/rest/page/templates', {
+export function getPageTemplates(expandContent) {
+  return fetch(`/layout/rest/page/templates?expandContent=${expandContent || false}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {
@@ -30,8 +30,8 @@ export function getPageTemplates() {
   });
 }
 
-export function getPageTemplate(id) {
-  return fetch(`/layout/rest/page/templates/${id}`, {
+export function getPageTemplate(id, expandContent) {
+  return fetch(`/layout/rest/page/templates/${id}?expandContent=${expandContent || false}`, {
     method: 'GET',
     credentials: 'include',
   }).then(resp => {

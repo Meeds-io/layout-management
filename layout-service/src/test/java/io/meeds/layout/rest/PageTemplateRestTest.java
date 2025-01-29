@@ -103,7 +103,7 @@ public class PageTemplateRestTest {
   void getPageTemplatesWithUser() throws Exception {
     ResultActions response = mockMvc.perform(get(REST_PATH).with(testSimpleUser()));
     response.andExpect(status().isOk());
-    verify(pageTemplateService).getPageTemplates(any(), anyBoolean());
+    verify(pageTemplateService).getPageTemplates(any(), anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -117,7 +117,7 @@ public class PageTemplateRestTest {
   void getPageTemplateWithUser() throws Exception {
     ResultActions response = mockMvc.perform(get(REST_PATH + "/1").with(testSimpleUser()));
     response.andExpect(status().isOk());
-    verify(pageTemplateService).getPageTemplate(eq(1l), any(), eq(true));
+    verify(pageTemplateService).getPageTemplate(eq(1l), any(), eq(true), eq(false));
   }
 
   @Test
