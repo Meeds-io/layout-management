@@ -107,7 +107,7 @@ export default {
     },
     installApplication() {
       if (this.$refs.content) {
-        this.$applicationUtils.installApplication(this.nodeUri, this.applicationId, this.$refs.content, 'EDIT');
+        this.$applicationUtils.installApplication(this.nodeUri, this.applicationId, this.$refs.content, 'EDIT', this.$root.isSiteLayout);
       }
     },
   },
