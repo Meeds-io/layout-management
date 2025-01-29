@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -54,15 +53,14 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
-import org.exoplatform.portal.pom.spi.portlet.Preference;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.PortletInstancePreference;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.util.JsonUtils;
 
 import lombok.SneakyThrows;
@@ -142,8 +140,10 @@ public class PageLayoutService {
       throw new ObjectNotFoundException(String.format("Application with id %s wasn't found in page %s",
                                                       applicationId,
                                                       pageKey));
+    } else if (!aclService.hasAccessPermission(application, username)) {
+      throw new IllegalAccessException(String.format("Application with id %s access denied", applicationId));
     }
-    computeApplicationPreferences(application, username);
+    portletInstanceService.expandPortletPreferences(application);
     return application;
   }
 
@@ -167,21 +167,27 @@ public class PageLayoutService {
 
   public ModelObject getPageLayout(PageKey pageKey,
                                    long siteId,
+                                   String username) throws ObjectNotFoundException,
+                                                    IllegalAccessException {
+    return getPageLayout(pageKey, siteId, false, username);
+  }
+
+  public ModelObject getPageLayout(PageKey pageKey,
+                                   long siteId,
                                    boolean impersonate,
                                    String username) throws ObjectNotFoundException,
                                                     IllegalAccessException {
-    ModelObject page = getPageLayout(pageKey);
+    Container page = getPageLayout(pageKey);
     if (page == null) {
       throw new ObjectNotFoundException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
-    } else if (!aclService.canViewPage(pageKey, username)) {
+    } else if (!aclService.canViewPage(pageKey, username)
+               || !aclService.canViewSite(pageKey.getSite(), username)) {
       throw new IllegalAccessException(String.format(PAGE_NOT_ACCESSIBLE_MESSAGE, pageKey, username));
     }
     if (siteId > 0) {
       PortalConfig site = layoutService.getPortalConfig(siteId);
       if (site == null) {
         throw new ObjectNotFoundException(String.format("Site width id %s not found", siteId));
-      } else if (!aclService.canViewSite(new SiteKey(site.getType(), site.getName()), username)) {
-        throw new IllegalAccessException(String.format("Access denied for site width id %s", siteId));
       }
       Container portalLayout = site.getPortalLayout();
       replacePageBody(portalLayout, page);
@@ -190,7 +196,7 @@ public class PageLayoutService {
     if (impersonate) {
       impersonateModel(page);
     }
-    return page;
+    return filterByPermission(page, username);
   }
 
   public Page getPageLayout(PageKey pageKey) {
@@ -370,6 +376,18 @@ public class PageLayoutService {
     layoutService.save(pageContext);
   }
 
+  public void impersonateModel(ModelObject object) {
+    if (object instanceof Container container) {
+      ArrayList<ModelObject> children = container.getChildren();
+      if (CollectionUtils.isNotEmpty(children)) {
+        children.forEach(this::impersonateModel);
+      }
+    } else if (object instanceof Application application) {
+      Portlet preferences = portletInstanceService.getApplicationPortletPreferences(application);
+      application.setState(new TransientApplicationState(layoutService.getId(application.getState()), preferences));
+    }
+  }
+
   @SneakyThrows
   private Page createPageInstance(String siteType,
                                   String siteName,
@@ -502,12 +520,17 @@ public class PageLayoutService {
     }
   }
 
-  private void computeApplicationPreferences(Application application, String username) throws IllegalAccessException,
-                                                                                       ObjectNotFoundException {
-    String portletContentId = layoutService.getId(application.getState());
-    Portlet portletPreferences = getApplicationPreferences(Long.parseLong(application.getStorageId()), username);
-    TransientApplicationState applicationState = new TransientApplicationState(portletContentId, portletPreferences);
-    application.setState(applicationState);
+  private ModelObject filterByPermission(ModelObject modelObject, String username) {
+    if (!aclService.hasAccessPermission(modelObject, username)) {
+      return null;
+    } else if (modelObject instanceof Container container && CollectionUtils.isNotEmpty(container.getChildren())) {
+      container.setChildren(container.getChildren()
+                                     .stream()
+                                     .map(c -> filterByPermission(c, username))
+                                     .filter(Objects::nonNull)
+                                     .collect(Collectors.toCollection(ArrayList::new)));
+    }
+    return modelObject;
   }
 
   private void impersonateModel(ModelObject object, Page page) {
@@ -522,7 +545,7 @@ public class PageLayoutService {
                  e);
       }
       if (CollectionUtils.isNotEmpty(children)) {
-        children.forEach(c -> this.impersonateModel(c, page));
+        children.forEach(c -> impersonateModel(c, page));
       }
     } else if (object instanceof Application application) {
       Portlet preferences = portletInstanceService.getApplicationPortletPreferences(application);
@@ -532,30 +555,7 @@ public class PageLayoutService {
     }
   }
 
-  private void impersonateModel(ModelObject object) {
-    if (object instanceof Container container) {
-      ArrayList<ModelObject> children = container.getChildren();
-      if (CollectionUtils.isNotEmpty(children)) {
-        children.forEach(this::impersonateModel);
-      }
-    } else if (object instanceof Application application) {
-      Portlet preferences = portletInstanceService.getApplicationPortletPreferences(application);
-      application.setState(new TransientApplicationState(layoutService.getId(application.getState()), preferences));
-    }
-  }
-
-  private Portlet getApplicationPreferences(long applicationId, String username) throws IllegalAccessException,
-                                                                                 ObjectNotFoundException {
-    List<PortletInstancePreference> preferences = portletInstanceService.getApplicationPreferences(applicationId, username);
-    Map<String, Preference> preferencesMap = preferences.stream()
-                                                        .collect(Collectors.toMap(PortletInstancePreference::getName,
-                                                                                  p -> new Preference(p.getName(),
-                                                                                                      p.getValue(),
-                                                                                                      false)));
-    return new Portlet(preferencesMap);
-  }
-
-  private void replacePageBody(Container portalLayout, ModelObject page) {
+  private void replacePageBody(Container portalLayout, Container page) {
     if (portalLayout == null || CollectionUtils.isEmpty(portalLayout.getChildren())) {
       return;
     }
@@ -573,6 +573,9 @@ public class PageLayoutService {
     if (index >= 0) {
       children.remove(index);
       Container pageLayout = getPageBody(page);
+      if (pageLayout == null) {
+        pageLayout = page;
+      }
       if (pageLayout != null) {
         pageLayout.setTemplate(PAGE_BODY_TEMPLATE);
         children.add(index, pageLayout);
@@ -599,6 +602,9 @@ public class PageLayoutService {
   }
 
   private Application findApplication(ModelObject modelObject, long applicationId) {
+    if (modelObject == null) {
+      return null;
+    }
     return switch (modelObject) {
     case Container container -> {
       if (!CollectionUtils.isEmpty(container.getChildren())) {
@@ -622,6 +628,9 @@ public class PageLayoutService {
   }
 
   private Container findParentContainer(ModelObject modelObject, String containerStorageId) {
+    if (modelObject == null) {
+      return null;
+    }
     return switch (modelObject) {
     case Container container -> {
       if (CollectionUtils.isNotEmpty(container.getChildren())) {

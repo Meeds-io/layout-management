@@ -21,7 +21,7 @@
 -->
 <template>
   <v-card
-    class="d-flex align-center no-border-radius border-box-sizing absolute-vertical-center t-0 px-4"
+    class="d-flex align-center no-border-radius border-box-sizing px-4 layout-sticky-top-bar"
     height="57"
     min-width="100vw"
     width="100vw"
@@ -48,7 +48,7 @@ export default {
     },
   },
   mounted() {
-    document.querySelector('#layoutTopBarContentChildren').append(this.$el);
+    document.querySelector('#vuetify-apps').append(this.$el);
   },
 };
 </script>

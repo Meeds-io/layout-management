@@ -88,6 +88,9 @@ public class SiteLayoutServiceTest {
   @MockBean
   private LocaleConfigService     localeConfigService;
 
+  @MockBean
+  private PortletInstanceService  portletInstanceService;
+
   @Autowired
   private SiteLayoutService       siteLayoutService;
 

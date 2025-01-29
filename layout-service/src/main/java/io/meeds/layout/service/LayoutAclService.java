@@ -18,10 +18,16 @@
  */
 package io.meeds.layout.service;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
@@ -87,6 +93,21 @@ public class LayoutAclService {
     return userAcl.hasEditPermission(page, userAcl.getUserIdentity(username));
   }
 
+  public boolean hasAccessPermission(ModelObject modelObject, String username) {
+    return switch (modelObject) {
+    case Application application:
+      yield hasAccessPermission(application.getAccessPermissions(), username);
+    case Page page:
+      yield canViewPage(new PageKey(page.getOwnerType(), page.getOwnerId(), page.getName()), username);
+    case Container container:
+      yield hasAccessPermission(container.getAccessPermissions(), username);
+    case PortalConfig portalConfig:
+      yield canViewSite(new SiteKey(portalConfig.getType(), portalConfig.getName()), username);
+    default:
+      yield true;
+    };
+  }
+
   public boolean isAdministrator(String username) {
     return userAcl.isAdministrator(userAcl.getUserIdentity(username));
   }
@@ -106,6 +127,13 @@ public class LayoutAclService {
   public long getSuperUserIdentityId() {
     Identity userIdentity = identityManager.getOrCreateUserIdentity(userAcl.getSuperUser());
     return userIdentity == null ? 0l : Long.parseLong(userIdentity.getId());
+  }
+
+  private boolean hasAccessPermission(String[] accessPermissions, String username) {
+    return ArrayUtils.isEmpty(accessPermissions)
+           || isAdministrator(username)
+           || Arrays.stream(accessPermissions)
+                    .anyMatch(permission -> hasPermission(username, permission));
   }
 
 }

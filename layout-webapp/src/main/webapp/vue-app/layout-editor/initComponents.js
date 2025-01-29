@@ -32,7 +32,8 @@ import PagePropertiesButton from './components/toolbar/actions/PagePropertiesBut
 
 import Content from './components/content/Content.vue';
 
-import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
+import PageBody from './components/content/container/PageBody.vue';
+
 import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
 
 const components = {
@@ -49,7 +50,7 @@ const components = {
   'layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'layout-editor-content': Content,
   'layout-editor-section-add-drawer': AddSectionDrawer,
-  'layout-editor-section-edit-drawer': EditSectionDrawer,
+  'layout-editor-container-page-body': PageBody,
 };
 
 for (const key in components) {

@@ -23,8 +23,8 @@
   <page-layout-container-base
     :container="containerToDisplay"
     :parent-id="parentId"
-    class="layout-banner-section layout-section-content flex-grow-1 flex-shrink-1 full-width display-flex flex-row"
-    no-background-style
+    class="layout-banner-section layout-section-content flex-grow-1 flex-shrink-1 display-flex flex-row"
+    no-section-margins
     section-style />
 </template>
 <script>

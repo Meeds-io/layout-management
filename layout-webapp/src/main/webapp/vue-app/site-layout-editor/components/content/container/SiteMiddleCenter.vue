@@ -62,10 +62,10 @@ export default {
       return this.container?.storageId;
     },
     middleContainerMinHeight() {
-      return this.$root.middleContainer?.children?.map?.(c => c.height && Number(c.height) || 57)?.reduce?.((acc, v) => acc + v, 0) || 0;
+      return this.$root.middleContainer?.children?.map?.(c => (c.height && Number(c.height) || 57) + (c.marginTop || 0) + (c.marginBottom || 0))?.reduce?.((acc, v) => acc + v, 0) || 0;
     },
     minHeight() {
-      return `calc(100vh - ${this.middleContainerMinHeight}px`;
+      return `calc(100vh - ${this.middleContainerMinHeight + 10}px`;
     },
     sidebarsContainerMinWidth() {
       return this.$root.layout?.children

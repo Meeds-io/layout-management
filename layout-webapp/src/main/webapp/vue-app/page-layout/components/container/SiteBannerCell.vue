@@ -23,7 +23,7 @@
   <page-layout-container-base
     :container="container"
     :parent-id="parentId"
-    class="full-height flex-grow-1 flex-shrink-1 layout-banner-cell"
+    class="full-height flex-grow-1 flex-shrink-1 layout-banner-cell overflow-hidden"
     section-style />
 </template>
 <script>

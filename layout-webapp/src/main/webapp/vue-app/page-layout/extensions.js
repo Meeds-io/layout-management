@@ -55,7 +55,7 @@ extensionRegistry.registerExtension('page-layout', 'container', {
 extensionRegistry.registerExtension('page-layout', 'container', {
   rank: 500,
   type: 'PageBody',
-  isValid: container => container?.template === 'PageBody',
+  isValid: container => container?.template === 'PageBody' || container?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl',
   containerType: 'page-layout-page-body-container',
 });
 

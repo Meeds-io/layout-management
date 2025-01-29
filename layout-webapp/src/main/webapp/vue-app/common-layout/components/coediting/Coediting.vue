@@ -19,7 +19,7 @@
       persistent
       @ok="confirmDraft"
       @dialog-closed="cancelDraft" />
-    <div v-if="outdatedRevision" class="mask-color absolute-full-size d-flex align-center justify-center">
+    <div v-if="outdatedRevision" class="mask-color absolute-full-size z-index-two d-flex align-center justify-center">
       <v-icon size="24" color="white">fa-lock</v-icon>
       <v-card
         max-width="200px"
