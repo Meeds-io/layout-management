@@ -24,7 +24,8 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 
 export function getStyle(container, options) {
   const style = {};
-  if (options.sectionStyle && (container.marginTop || container.marginBottom)) {
+  if (options.sectionStyle
+      && (container.marginTop || container.marginBottom || container.marginLeft || container.marginRight)) {
     const diff = container.template === 'Banner' ? 0 : 10;
     if (container.marginTop) {
       style['--sectionMarginTop'] = `${container.marginTop + diff}px`;
@@ -89,7 +90,18 @@ export function getStyle(container, options) {
   }
   if (!options.onlyBackgroundStyle) {
     if (container.height) {
-      style[options.isApplicationStyle && '--appHeight' || 'height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+      if (options.isApplicationStyle) {
+        if (options.sectionStyle) {
+          style['height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+          style['min-height'] = style['height'];
+          style['max-height'] = style['height'];
+        }
+        if (!options.noApplicationHeight) {
+          style['--appHeight'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+        }
+      } else {
+        style['height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+      }
       if (options.isApplicationScroll) {
         style['--appHeightScroll'] = 'auto';
         style['--appWidthScroll'] = 'hidden';
@@ -103,7 +115,7 @@ export function getStyle(container, options) {
       if (options.isPageWidthStyle) {
         style['--allPagesWidth'] = container.width === '100%' ? '100%' : `${container.width}px`;
       } else if (options.isApplicationStyle) {
-        if (options.isSectionStyle) {
+        if (options.sectionStyle) {
           style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
           style['min-width'] = style['width'];
           style['max-width'] = style['width'];
@@ -215,13 +227,13 @@ export function getApplicationContent(navUri, applicationStorageId, applicationM
 }
 
 export function handleApplicationContent(applicationContent, applicationElement) {
-  const newHeadContent = applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>'));
+  const newHeadContent = applicationContent.search('<head') > -1 && applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>')) || '';
   let newBodyContent = applicationContent.substring(applicationContent.search('<body') + applicationContent.match(/<body.*>/g)[0].length, applicationContent.lastIndexOf('</body>'));
   newBodyContent = installNewCSS(newHeadContent, newBodyContent);
 
   const newHtmlDocument = document.createElement('div');
   newHtmlDocument.innerHTML = newBodyContent;
-  const portletContent = newHtmlDocument.querySelector('.UIWorkingWorkspace .PORTLET-FRAGMENT');
+  const portletContent = newHtmlDocument.querySelector('.PORTLET-FRAGMENT');
   if (!portletContent) {
     applicationElement.classList.add('hidden');
     return;
@@ -266,8 +278,6 @@ function installNewCSS(newHeadContent, newBodyContent) {
         }
       }
     });
-  } else {
-    throw new Error('The application content does not seem to have been loaded correctly with CSS links');
   }
   const bodyCSSLinks = newBodyContent.match(/<link.*id=".*".*>/g);
   if (bodyCSSLinks && bodyCSSLinks.length) {
