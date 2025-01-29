@@ -18,7 +18,7 @@
  */
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 500,
+  rank: 400,
   type: 'Site',
   isValid: container => container?.template === 'system:/groovy/portal/webui/container/UISiteLayout.gtmpl',
   containerType: 'site-layout-editor-container-site',

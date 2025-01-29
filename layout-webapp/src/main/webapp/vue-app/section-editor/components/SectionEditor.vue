@@ -83,8 +83,10 @@ export default {
       handler() {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
-          this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
-            .then(draftLayout => this.setDraftLayout(draftLayout));
+          this.$pageLayoutService.getPageLayout({
+            pageRef: this.draftPageRef,
+            expand: 'contentId',
+          }).then(draftLayout => this.setDraftLayout(draftLayout));
         }
       },
     },

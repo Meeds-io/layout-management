@@ -1,0 +1,32 @@
+<%
+  import java.util.List;
+  import java.util.ArrayList;
+  import org.exoplatform.portal.application.PortalRequestContext;
+  import org.exoplatform.portal.webui.application.UIPortlet;
+
+  PortalRequestContext rcontext = PortalRequestContext.getCurrentInstance();
+
+  String pageRef = rcontext.getUiPage().getPageId();
+  long siteId = rcontext.getSiteId();
+
+  def jsManager = _ctx.getRequestContext().getJavascriptManager();
+  jsManager.require("PORTLET/layout/PageLayout");
+
+  List<UIPortlet> portlets = new ArrayList<>();
+  rcontext.getUiPortal().findComponentOfType(portlets, UIPortlet.class);
+  for (int i =0; i < portlets.size(); i++) {
+    def portletId = portlets.get(i).getId();
+    if (portletId != null) {
+      %>
+      <link rel="preload" as="fetch" href="<%=rcontext.getRequest().getRequestURI()%>?maximizedPortletId=<%=portletId%>&showMaxWindow=false&hideSharedLayout=true&maximizedPortletMode=VIEW" crossorigin="use-credentials"><%
+    }
+  }
+  String cssClass = uicomponent.getCssClass() == null ? "" : " class='" + uicomponent.getCssClass() + "'";
+%>
+<div class="VuetifyApp">
+  <div id="PageLayout"<%=cssClass%>>
+    <script type="text/javascript">
+      require(['PORTLET/layout/PageLayout'], app => app.init('<%=pageRef%>', <%=siteId%>));
+    </script>
+  </div>
+</div>

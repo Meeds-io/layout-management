@@ -32,23 +32,41 @@ if (extensionRegistry) {
 }
 
 const appId = 'PageLayout';
-export function init(pageRef) {
+export function init(pageRef, siteId) {
   const containerTypes = extensionRegistry.loadExtensions('page-layout', 'container');
   Vue.createApp({
     template: `<page-layout id="${appId}"/>`,
     vuetify: Vue.prototype.vuetifyOptions,
     data: () => ({
       pageRef,
+      siteId,
       containerTypes,
       nodeUri: window.location.pathname.replace('/portal/', '/'),
+      page: null,
     }),
     computed: {
       defaultContainer() {
         return this.containerTypes.find(extension => extension.type === 'default');
       },
+      layout() {
+        if (this.page?.template === 'system:/groovy/portal/webui/container/UISiteLayout.gtmpl') {
+          return this.page;
+        } else if (this.page?.children?.[0]?.children?.[0]?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl') {
+          return this.page?.children?.[0]?.children?.[0];
+        } else {
+          return this.page?.children?.[0];
+        }
+      },
+      isMobile() {
+        return this.$vuetify.breakpoint.smAndDown;
+      },
     },
-    created() {
+    async created() {
       document.addEventListener('extension-page-layout-container-updated', this.refreshContainerTypes);
+      this.$root.page = await this.$pageLayoutService.getPageLayout({
+        pageRef: this.$root.pageRef,
+        siteId: this.$root.siteId,
+      });
     },
     mounted() {
       this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');

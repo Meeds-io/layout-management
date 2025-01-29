@@ -105,6 +105,9 @@ public class PageLayoutRest {
                                    @Parameter(description = "page reference", required = true)
                                    @RequestParam("pageRef")
                                    String pageRef,
+                                   @Parameter(description = "Site Id to include its associated layout", required = false)
+                                   @RequestParam(name = "siteId", required = false, defaultValue = "0")
+                                   long siteId,
                                    @Parameter(description = "Application Storage Id", required = false)
                                    @RequestParam(name = "applicationId", required = false, defaultValue = "0")
                                    long applicationId,
@@ -119,6 +122,7 @@ public class PageLayoutRest {
                                                                                                applicationId,
                                                                                                request.getRemoteUser()) :
                                                   pageLayoutService.getPageLayout(PageKey.parse(pageRef),
+                                                                                  siteId,
                                                                                   impersonate,
                                                                                   request.getRemoteUser());
       return RestEntityBuilder.toLayoutModel(modelObject, layoutService, expand);
@@ -198,7 +202,7 @@ public class PageLayoutRest {
                                          layoutModel.toPage(),
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
-      return getPageLayout(request, pageRef, 0, false, expand);
+      return getPageLayout(request, pageRef, 0, 0, false, expand);
     } catch (IllegalArgumentException | IllegalStateException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ObjectNotFoundException e) {

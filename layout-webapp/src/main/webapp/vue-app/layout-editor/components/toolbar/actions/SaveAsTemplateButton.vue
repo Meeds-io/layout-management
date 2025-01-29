@@ -71,7 +71,10 @@ export default {
       if (success) {
         try {
           document.addEventListener('drawerOpened', this.endLoading);
-          const draftPageLayout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, null, true);
+          const draftPageLayout = await this.$pageLayoutService.getPageLayout({
+            pageRef: this.$root.draftPageRef,
+            impersonate: true,
+          });
           this.$layoutUtils.parseSections(draftPageLayout);
           const pageLayout = this.$layoutUtils.cleanAttributes(draftPageLayout, true, true);
           this.$root.$emit('layout-page-template-drawer-open', {

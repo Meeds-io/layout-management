@@ -102,7 +102,7 @@ export default {
     retrieveData() {
       if (this.portletId && this.nodeUri && !this.contentRetrieved) {
         this.contentRetrieved = true;
-        this.$applicationUtils.getApplicationContent(this.nodeUri, this.portletId)
+        this.$applicationUtils.getApplicationContent(this.nodeUri, this.portletId, 'VIEW', this.$root.siteId)
           .then(applicationContent => this.applicationContent = applicationContent);
       }
     },
