@@ -123,12 +123,12 @@ export default {
       if (this.interceptEvents) {
         document.addEventListener('mouseup', this.endMoving);
         this.sectionElement.addEventListener('mousemove', this.updateMoving);
-        document.querySelector('.page-scroll-content').addEventListener('scroll', this.updateScrollPosition);
+        document.querySelector('.site-scroll-parent').addEventListener('scroll', this.updateScrollPosition);
         this.computingSelectionInterval = window.setInterval(() => this.updateSelection(), 50);
       } else {
         document.removeEventListener('mouseup', this.endMoving);
         this.sectionElement.removeEventListener('mousemove', this.updateMoving);
-        document.querySelector('.page-scroll-content').removeEventListener('scroll', this.updateScrollPosition);
+        document.querySelector('.site-scroll-parent').removeEventListener('scroll', this.updateScrollPosition);
         window.clearInterval(this.computingSelectionInterval);
         this.$nextTick().then(() => {
           this.$root.movingCell = null;

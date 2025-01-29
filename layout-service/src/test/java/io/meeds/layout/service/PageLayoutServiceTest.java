@@ -21,6 +21,7 @@ package io.meeds.layout.service;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -48,8 +49,10 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.QueryResult;
@@ -115,6 +118,9 @@ public class PageLayoutServiceTest {
   @Mock
   private Page                    page;
 
+  @Mock
+  private PortalConfig            site;
+
   @Test
   @SuppressWarnings("unchecked")
   public void getPages() {
@@ -164,7 +170,40 @@ public class PageLayoutServiceTest {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
     when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+    when(aclService.canViewSite(PAGE_KEY.getSite(), TEST_USER)).thenReturn(true);
+    assertNull(pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+    when(aclService.hasAccessPermission(page, TEST_USER)).thenReturn(true);
     assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+  }
+
+  @Test
+  public void getPageLayoutWithSite() throws IllegalAccessException, ObjectNotFoundException {
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    when(aclService.canViewSite(PAGE_KEY.getSite(), TEST_USER)).thenReturn(true);
+    when(aclService.hasAccessPermission(page, TEST_USER)).thenReturn(true);
+    assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+
+    assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER));
+    when(layoutService.getPortalConfig(2l)).thenReturn(site);
+    assertNull(pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER));
+
+    Container container = mock(Container.class);
+    Application application = mock(Application.class);
+    when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
+
+    PageBody pageBody = mock(PageBody.class);
+    Container pageBodyContainer = mock(Container.class);
+    when(site.getPortalLayout()).thenReturn(pageBodyContainer);
+    when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(pageBody)));
+
+    assertNull(pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER));
+
+    when(aclService.hasAccessPermission(any(), eq(TEST_USER))).thenReturn(true);
+    ModelObject pageLayout = pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER);
+    assertNotNull(pageLayout);
   }
 
   @Test
@@ -173,6 +212,7 @@ public class PageLayoutServiceTest {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
     when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    when(aclService.canViewSite(PAGE_KEY.getSite(), TEST_USER)).thenReturn(true);
     assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
 
     Container container = mock(Container.class);
@@ -180,6 +220,12 @@ public class PageLayoutServiceTest {
     Application application = mock(Application.class);
     when(application.getStorageId()).thenReturn("2");
     when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.hasAccessPermission(page, TEST_USER)).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.hasAccessPermission(container, TEST_USER)).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.hasAccessPermission(application, TEST_USER)).thenReturn(true);
     assertNotNull(pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
   }
 

@@ -59,8 +59,8 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.NodeLabel;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.util.RestEntityBuilder;
 import io.meeds.layout.service.SiteLayoutService;
 import io.meeds.spring.web.security.PortalAuthenticationManager;

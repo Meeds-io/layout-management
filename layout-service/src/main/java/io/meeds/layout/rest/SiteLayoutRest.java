@@ -47,11 +47,11 @@ import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
 import io.meeds.layout.model.SiteUpdateModel;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.util.RestEntityBuilder;
 import io.meeds.layout.service.SiteLayoutService;
 

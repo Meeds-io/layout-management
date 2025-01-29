@@ -23,8 +23,9 @@
   <v-app
     class="transparent"
     flat>
-    <main class="content-box-sizing">
+    <main>
       <site-layout-editor-toolbar />
+      <v-divider />
       <coediting
         v-if="$root.site"
         v-model="$root.draftSiteId"
@@ -53,7 +54,6 @@
     <site-layout-editor-edit-sections-drawer />
     <site-layout-editor-sidebar-section-drawer />
     <site-layout-editor-banner-section-drawer />
-    <site-layout-editor-edit-application-drawer />
     <layout-editor-page-edit-drawer />
     <layout-analytics application-name="siteLayoutEditor" />
   </v-app>

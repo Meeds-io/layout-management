@@ -25,7 +25,7 @@
     :data-storage-id="storageId"
     :min-height="minHeight"
     :height="height"
-    class="position-relative d-flex flex-column flex-shrink-1 singlePageApplication z-index-zero pa-5"
+    class="position-relative d-flex flex-column flex-shrink-1 width-page-content z-index-zero pa-5"
     color="transparent"
     flat>
     <v-card
@@ -76,10 +76,10 @@ export default {
       return this.container.id || this.storageId;
     },
     middleContainerMinHeight() {
-      return this.$root.middleContainer?.children?.map?.(c => c.height && Number(c.height) || 57)?.reduce?.((acc, v) => acc + v, 0) || 0;
+      return this.$root.middleContainer?.children?.map?.(c => (c.height && Number(c.height) || 57) + (c.marginTop || 0) + (c.marginBottom || 0))?.reduce?.((acc, v) => acc + v, 0) || 0;
     },
     minHeight() {
-      return `calc(100vh - ${this.middleContainerMinHeight}px`;
+      return `calc(100vh - ${this.middleContainerMinHeight + 10}px`;
     },
   },
 };

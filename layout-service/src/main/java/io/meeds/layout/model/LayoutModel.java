@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-package io.meeds.layout.rest.model;
+package io.meeds.layout.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +47,7 @@ import org.exoplatform.portal.config.model.TransientApplicationState;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
-import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.service.PortletInstanceService;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -200,10 +200,14 @@ public class LayoutModel {
   private String                          link;
 
   public LayoutModel(ModelObject model) {
-    init(model);
+    this(model, null);
   }
 
-  private void init(ModelObject model) { // NOSONAR
+  public LayoutModel(ModelObject model, PortletInstanceService portletInstanceService) {
+    init(model, portletInstanceService);
+  }
+
+  private void init(ModelObject model, PortletInstanceService portletInstanceService) { // NOSONAR
     ModelStyle cssStyle = model.getCssStyle();
     if (cssStyle != null) {
       this.borderColor = cssStyle.getBorderColor();
@@ -266,7 +270,10 @@ public class LayoutModel {
       this.cssClass = container.getCssClass();
       this.profiles = container.getProfiles();
       this.accessPermissions = container.getAccessPermissions();
-      this.children = container.getChildren().stream().map(LayoutModel::new).toList();
+      this.children = container.getChildren()
+                               .stream()
+                               .map(c -> new LayoutModel(c, portletInstanceService))
+                               .toList();
 
       ApplicationBackgroundStyle appCssStyle = container.getAppBackgroundStyle();
       if (appCssStyle != null) {
@@ -303,10 +310,20 @@ public class LayoutModel {
       this.accessPermissions = application.getAccessPermissions();
 
       ApplicationState state = application.getState();
+      if (portletInstanceService != null) {
+        portletInstanceService.expandPortletPreferences(application);
+        TransientApplicationState transientState = (TransientApplicationState) application.getState();
+        this.contentId = transientState.getContentId();
+        Portlet portlet = transientState.getContentState();
+        this.preferences = portlet == null ? Collections.emptyList() :
+                                           StreamSupport.stream(portlet.spliterator(), false)
+                                                        .map(p -> new PortletInstancePreference(p.getName(), p.getValue()))
+                                                        .toList();
+      }
       switch (state) {
       case PersistentApplicationState persistentState -> this.storageId = persistentState.getStorageId();
       case CloneApplicationState persistentState -> this.storageId = persistentState.getStorageId();
-      case TransientApplicationState transientState -> {
+      case TransientApplicationState transientState when portletInstanceService == null -> {
         this.contentId = transientState.getContentId();
         Portlet portlet = transientState.getContentState();
         this.preferences = portlet == null ? Collections.emptyList() :

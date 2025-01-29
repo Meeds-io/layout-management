@@ -21,9 +21,10 @@
 -->
 <template>
   <page-layout-container-base
-    :container="container"
+    :container="containerToDisplay"
     :parent-id="parentId"
-    class="display-flex flex-column full-height border-box-sizing" />
+    class="display-flex flex-column full-height border-box-sizing overflow-hidden"
+    section-style />
 </template>
 <script>
 export default {
@@ -35,6 +36,14 @@ export default {
     parentId: {
       type: String,
       default: null,
+    },
+  },
+  computed: {
+    containerToDisplay() {
+      return this.container.width ? this.container : {
+        ...this.container,
+        width: '310px',
+      };
     },
   },
 };

@@ -62,8 +62,8 @@
           <v-expand-transition>
             <v-card
               v-if="hover"
-              :class="isDynamicSection && 'mb-5'"
-              :height="isDynamicSection && 'calc(100% - 20px)' || '100%'"
+              :class="isFlexSection && 'mb-5'"
+              :height="isFlexSection && 'calc(100% - 20px)' || '100%'"
               class="d-flex align-center justify-center full-width transition-fast-in-fast-out mask-color darken-2 v-card--reveal white--text">
               <v-icon size="22" class="white--text me-2 mt-1">fab fa-readme</v-icon>
               <span>{{ $t('layout.readonlyPortletContent') }}</span>
@@ -116,6 +116,9 @@ export default {
     },
     ignoreMenu() {
       return this.section?.template === this.$layoutUtils.bannerCellTemplate;
+    },
+    isFlexSection() {
+      return this.section?.template === this.$layoutUtils.flexTemplate;
     },
     isDynamicSection() {
       return this.section?.template === this.$layoutUtils.flexTemplate

@@ -144,7 +144,7 @@ export default {
         return;
       }
       this.initContainer(layout);
-      const compatible = this.$layoutUtils.parseSite(layout);
+      const compatible = !!this.$root.layout || this.$layoutUtils.parseSite(layout);
       if (this.$root.layout) {
         Object.assign(this.$root.layout, layout);
       } else {

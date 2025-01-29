@@ -20,18 +20,23 @@
 
 -->
 <template>
-  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-  <div
-    v-if="childrenSize"
-    ref="section"
-    :id="id"
-    :style="cssStyle"
-    :class="cssClass"
-    class="position-relative layout-banner-section flex-grow-1 flex-shrink-1">
-    <v-hover :disabled="$root.mobileDisplayMode">
-      <div
-        slot-scope="{ hover }"
-        class="full-width">
+  <v-hover v-model="hoverSection" :disabled="$root.mobileDisplayMode">
+    <layout-editor-container-base
+      ref="container"
+      :container="container"
+      :parent-id="parentId"
+      :index="index"
+      :class="rowIndexClass"
+      :style="{
+        'z-index': hoverSection ? 2 : 1
+      }"
+      class="position-relative overflow-initial layout-banner-section layout-section-content display-flex flex-row"
+      type="banner-section"
+      no-section-margins
+      section-style
+      draggable
+      @hovered="hoverSection = $event && !drawerOpened">
+      <template #footer>
         <site-layout-editor-banner-section-menu
           :container="container"
           :hover="!drawerOpened && (hover || hoverSection || movingSection)"
@@ -40,20 +45,9 @@
           :moving="movingSection"
           @move-start="movingSection = true"
           @move-end="movingSection = false" />
-      </div>
-    </v-hover>
-    <layout-editor-container-base
-      ref="container"
-      :container="container"
-      :parent-id="parentId"
-      :index="index"
-      :class="rowIndexClass"
-      class="position-relative overflow-initial layout-banner-section layout-section-content full-height full-width display-flex flex-row"
-      type="banner-section"
-      no-background-style
-      draggable
-      @hovered="hoverSection = $event && !drawerOpened" />
-  </div>
+      </template>
+    </layout-editor-container-base>
+  </v-hover>
 </template>
 <script>
 export default {
@@ -105,16 +99,6 @@ export default {
     },
     rowIndexClass() {
       return this.index % 2 === 0 ? 'layout-banner-section-even' : 'layout-banner-section-odd';
-    },
-    cssStyle() {
-      return {
-        ...this.$applicationUtils.getStyle(this.container, {
-          onlyBackgroundStyle: true,
-          sectionStyle: true,
-        }),
-        'height': `${this.container?.height || this.defaultHeight}px`,
-        'max-height': `${this.container?.height || this.defaultHeight}px`,
-      };
     },
   },
   watch: {

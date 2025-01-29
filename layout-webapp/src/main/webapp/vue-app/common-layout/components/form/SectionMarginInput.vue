@@ -169,7 +169,10 @@ export default {
     this.marginRight = this.right && this.container.marginRight || 0;
     this.marginBottom = this.container.marginBottom;
     this.marginLeft = this.left && this.container.marginLeft || 0;
-    this.enabled = (this.marginTop || this.marginTop === 0) && (this.marginBottom || this.marginBottom === 0) ? true : false;
+    this.enabled = (this.marginTop || this.container.marginTop === 0)
+      || (this.marginBottom || this.container.marginBottom === 0)
+      || (this.marginLeft || this.container.marginLeft === 0)
+      || (this.marginRight || this.container.marginRight === 0) ? true : false;
     this.$nextTick().then(() => this.initialized = true);
   },
 };
