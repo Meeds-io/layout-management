@@ -21,7 +21,7 @@
 -->
 <template>
   <page-layout-container-base
-    :container="container"
+    :container="containerToDisplay"
     :parent-id="parentId"
     class="layout-banner-section layout-section-content flex-grow-1 flex-shrink-1 full-width display-flex flex-row"
     no-background-style
@@ -39,10 +39,13 @@ export default {
       default: null,
     },
   },
-  created() {
-    if (!this.container.height) {
-      this.container.height = '57px';
-    }
+  computed: {
+    containerToDisplay() {
+      return this.container.height ? this.container : {
+        ...this.container,
+        height: '57px',
+      };
+    },
   },
 };
 </script>
