@@ -36,7 +36,7 @@ import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.api.EntityBuilder;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
-import io.meeds.layout.rest.model.LayoutModel;
+import io.meeds.layout.model.LayoutModel;
 
 import jakarta.servlet.http.HttpServletRequest;
 

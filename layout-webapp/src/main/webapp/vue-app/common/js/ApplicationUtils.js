@@ -24,20 +24,34 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 
 export function getStyle(container, options) {
   const style = {};
-  if (options.sectionStyle
-      && (container.marginTop || container.marginBottom || container.marginLeft || container.marginRight)) {
-    const diff = container.template === 'Banner' ? 0 : 10;
-    if (container.marginTop) {
-      style['--sectionMarginTop'] = `${container.marginTop + diff}px`;
-    }
-    if (container.marginBottom) {
-      style['--sectionMarginBottom'] = `${container.marginBottom + diff}px`;
-    }
-    if (container.marginRight) {
-      style['--sectionMarginRight'] = `${container.marginRight + diff}px`;
-    }
-    if (container.marginLeft) {
-      style['--sectionMarginLeft'] = `${container.marginLeft + diff}px`;
+  if (container.marginTop || container.marginBottom || container.marginLeft || container.marginRight) {
+    if (options.isPageWidthStyle) {
+      if (container.marginTop) {
+        style['--allPagesMarginTop'] = `${container.marginTop}px`;
+      }
+      if (container.marginRight) {
+        style['--allPagesMarginRight'] = `${container.marginRight}px`;
+      }
+      if (container.marginBottom) {
+        style['--allPagesMarginBottom'] = `${container.marginBottom}px`;
+      }
+      if (container.marginLeft) {
+        style['--allPagesMarginLeft'] = `${container.marginLeft}px`;
+      }
+    } else if (options.sectionStyle && !options.noSectionMargins) {
+      const diff = container.template === 'Banner' || container.template === 'BannerCell' || container.template === 'Sidebar' || container.template === 'SidebarCell' ? 0 : 10;
+      if (container.marginTop) {
+        style['--sectionMarginTop'] = `${container.marginTop + diff}px`;
+      }
+      if (container.marginBottom) {
+        style['--sectionMarginBottom'] = `${container.marginBottom + diff}px`;
+      }
+      if (container.marginRight) {
+        style['--sectionMarginRight'] = `${container.marginRight + diff}px`;
+      }
+      if (container.marginLeft) {
+        style['--sectionMarginLeft'] = `${container.marginLeft + diff}px`;
+      }
     }
   }
   if (container.textTitleColor) {
@@ -107,13 +121,15 @@ export function getStyle(container, options) {
         style['--appWidthScroll'] = 'hidden';
       }
     }
-    if (container.width === 'fullWindow') {
-      style['--allPagesWidth'] = '100%';
-    } else if (container.width === 'singlePageApplication') {
-      style['--allPagesWidth'] = '1320px';
-    } else if (container.width) {
+    if (container.width) {
       if (options.isPageWidthStyle) {
-        style['--allPagesWidth'] = container.width === '100%' ? '100%' : `${container.width}px`;
+        if (container.width === 'fullWindow') {
+          style['--allPagesWidth'] = '100%';
+        } else if (container.width === 'singlePageApplication') {
+          style['--allPagesWidth'] = '1320px';
+        } else {
+          style['--allPagesWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+        }
       } else if (options.isApplicationStyle) {
         if (options.sectionStyle) {
           style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;

@@ -21,13 +21,11 @@
 <template>
   <div
     v-show="displayBorder"
-    :class="moving && 'layout-section-moving' || 'layout-section-hover'"
-    class="border-radius full-width">
-    <v-slide-y-transition>
+    :class="moving && 'layout-section-moving' || 'layout-section-hover'">
+    <v-fade-transition>
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <div
-        v-if="open"
-        class="d-flex flex-column full-width"
+        v-show="open"
         @focusin="hoverArea = true"
         @mouseover="hoverArea = true"
         @focusout="hoverArea = false"
@@ -58,6 +56,16 @@
             </v-tooltip>
           </div>
         </v-hover>
+      </div>
+    </v-fade-transition>
+    <v-fade-transition>
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div
+        v-show="open"
+        @focusin="hoverArea = true"
+        @mouseover="hoverArea = true"
+        @focusout="hoverArea = false"
+        @mouseout="hoverArea = false">
         <v-hover
           v-if="displayMoveButton"
           v-model="hoverButton2">
@@ -65,7 +73,7 @@
             :class="{
               'r-0': $vuetify.rtl,
               'l-0': !$vuetify.rtl,
-              'ms-n4': translateSideButtons,
+              'ms-n4': translateLeftButton,
             }"
             :style="leftButtonStyle"
             class="position-absolute t-10 z-index-two">
@@ -92,12 +100,22 @@
             </v-tooltip>
           </div>
         </v-hover>
+      </div>
+    </v-fade-transition>
+    <v-fade-transition>
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div
+        v-show="open"
+        @focusin="hoverArea = true"
+        @mouseover="hoverArea = true"
+        @focusout="hoverArea = false"
+        @mouseout="hoverArea = false">
         <v-hover v-model="hoverButton3">
           <div
             :class="{
               'l-0': $vuetify.rtl,
               'r-0': !$vuetify.rtl,
-              'me-n4': translateSideButtons,
+              'me-n4': translateRightButton,
             }"
             class="position-absolute t-10 z-index-two">
             <v-tooltip bottom>
@@ -119,6 +137,16 @@
             </v-tooltip>
           </div>
         </v-hover>
+      </div>
+    </v-fade-transition>
+    <v-fade-transition>
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div
+        v-show="open"
+        @focusin="hoverArea = true"
+        @mouseover="hoverArea = true"
+        @focusout="hoverArea = false"
+        @mouseout="hoverArea = false">
         <v-hover v-if="index < (length - 1)" v-model="hoverButton4">
           <div class="absolute-horizontal-center b-0 z-index-two d-flex justify-center mb-n4">
             <v-tooltip top>
@@ -142,7 +170,7 @@
           </div>
         </v-hover>
       </div>
-    </v-slide-y-transition>
+    </v-fade-transition>
   </div>
 </template>
 <script>
@@ -186,7 +214,7 @@ export default {
       return this.length > 1;
     },
     displayBorder() {
-      return this.open || this.hover;
+      return this.open || this.hover || this.hoverButton;
     },
     hoveredSectionMenu() {
       return this.hoverButton || (!this.hoverArea && !this.hoveredApplication);
@@ -194,8 +222,11 @@ export default {
     hoveredApplication() {
       return !!this.$root.hoveredApplication;
     },
-    translateSideButtons() {
-      return !this.$root.pageFullWindow;
+    translateLeftButton() {
+      return !!this.$root.leftContainer?.children?.length;
+    },
+    translateRightButton() {
+      return !!this.$root.rightContainer?.children?.length;
     },
     rightButtonStyle() {
       return {

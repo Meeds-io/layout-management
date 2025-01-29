@@ -23,7 +23,7 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="transparent layout-sections-parent singlePageApplication mx-auto"
+    class="transparent layout-sections-parent width-page-content mx-auto"
     flat>
     <layout-editor-container-extension
       :container="pageLayout"

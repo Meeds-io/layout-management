@@ -30,7 +30,8 @@
         'z-index-two': hoverContainer && !$root.drawerOpened,
         'elevation-2 border-color': $root.movingParentId,
       }"
-      class="full-height flex-grow-1 flex-shrink-1">
+      class="full-height flex-grow-1 flex-shrink-1 layout-banner-cell"
+      section-style>
       <template v-if="application" #header>
         <v-hover v-model="hoverMenu">
           <layout-editor-application-menu

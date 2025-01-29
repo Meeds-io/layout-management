@@ -372,6 +372,18 @@ public class PortletInstanceService {
     return new Portlet(preferencesMap);
   }
 
+  public void expandPortletPreferences(Application application) {
+    String portletContentId = layoutService.getId(application.getState());
+    List<PortletInstancePreference> preferences = getApplicationPreferences(application);
+    Map<String, Preference> preferencesMap = preferences.stream()
+                                                        .collect(Collectors.toMap(PortletInstancePreference::getName,
+                                                                                  p -> new Preference(p.getName(),
+                                                                                                      p.getValue(),
+                                                                                                      false)));
+    TransientApplicationState applicationState = new TransientApplicationState(portletContentId, new Portlet(preferencesMap));
+    application.setState(applicationState);
+  }
+
   private void deletePortletInstanceFromStore(long id) throws ObjectNotFoundException {
     try {
       attachmentService.deleteAttachments(PortletInstanceAttachmentPlugin.OBJECT_TYPE, String.valueOf(id));

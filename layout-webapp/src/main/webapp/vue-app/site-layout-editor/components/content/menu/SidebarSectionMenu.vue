@@ -21,43 +21,32 @@
 -->
 <template>
   <div
-    v-show="displayBorder"
-    :class="moving && 'layout-section-moving' || 'layout-section-hover'"
-    class="absolute-full-size layout-no-multi-select border-radius">
-    <v-slide-y-transition>
+    v-show="open"
+    class="layout-section-hover">
+    <v-fade-transition>
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-      <div
-        v-if="open"
-        class="position-relative full-width d-flex flex-column"
-        @focusin="hoverArea = true"
-        @mouseover="hoverArea = true"
-        @focusout="hoverArea = false"
-        @mouseout="hoverArea = false">
-        <v-hover v-model="hoverButton">
-          <div class="position-absolute t-10 r-0 z-index-one full-height">
-            <div class="position-sticky t-10 z-index-one me-3">
-              <v-tooltip bottom>
-                <template #activator="{on, attrs}">
-                  <div
-                    v-on="on"
-                    v-bind="attrs">
-                    <v-btn
-                      class="white text-color border-color elevation-2"
-                      height="32"
-                      width="32"
-                      icon
-                      @click="$root.$emit('layout-site-sidebar-section-open', cellContainer, container.storageId)">
-                      <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
-                    </v-btn>
-                  </div>
-                </template>
-                {{ $t('layout.editSection') }}
-              </v-tooltip>
-            </div>
-          </div>
-        </v-hover>
-      </div>
-    </v-slide-y-transition>
+      <v-hover v-model="hoverButton">
+        <div class="position-absolute t-10 r-0 me-2 z-index-two">
+          <v-tooltip bottom>
+            <template #activator="{on, attrs}">
+              <div
+                v-on="on"
+                v-bind="attrs">
+                <v-btn
+                  class="white text-color border-color elevation-2"
+                  height="32"
+                  width="32"
+                  icon
+                  @click="$root.$emit('layout-site-sidebar-section-open', cellContainer, container.storageId)">
+                  <v-icon class="icon-default-color" size="20">fa-edit</v-icon>
+                </v-btn>
+              </div>
+            </template>
+            {{ $t('layout.editSection') }}
+          </v-tooltip>
+        </div>
+      </v-hover>
+    </v-fade-transition>
   </div>
 </template>
 <script>
@@ -90,23 +79,9 @@ export default {
   },
   data: () => ({
     open: false,
-    savingAsTemplate: false,
     hoverButton: false,
-    hoverArea: false,
   }),
   computed: {
-    displayMoveButton() {
-      return this.length > 1;
-    },
-    displayBorder() {
-      return this.open || this.hover;
-    },
-    hoveredSectionMenu() {
-      return this.hoverButton || (!this.hoverArea && !this.hoveredApplication);
-    },
-    hoveredApplication() {
-      return this.$root.hoveredApplication;
-    },
     cellContainer() {
       return this.container?.children?.[0];
     },
@@ -119,8 +94,8 @@ export default {
         }
       }, 200);
     },
-    hoveredSectionMenu() {
-      this.$emit('hover-button', this.hoveredSectionMenu);
+    hoverButton() {
+      this.$emit('hover-button', this.hoverButton);
     },
     moving() {
       window.setTimeout(() => {

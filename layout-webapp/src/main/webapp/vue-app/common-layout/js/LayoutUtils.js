@@ -280,10 +280,10 @@ export function applyContainerStyle(container, containerStyle) {
   } else {
     container.cssClass = container.cssClass.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '').replace(/  +/g, ' ');
     if (containerStyle.marginTop === 0 || containerStyle.marginTop) {
-      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginTop || 0, 20)) / 4))}`;
-      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginRight || 0, 20)) / 4))}`;
-      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginBottom || 0, 20)) / 4))}`;
-      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-20, Math.min(containerStyle.marginLeft || 0, 20)) / 4))}`;
+      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginTop || 0, 240)) / 4))}`;
+      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginRight || 0, 240)) / 4))}`;
+      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginBottom || 0, 240)) / 4))}`;
+      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginLeft || 0, 240)) / 4))}`;
     }
   }
 
@@ -432,12 +432,11 @@ export function isSiteLayoutCompatible(layout) {
     && layout.children.length > 0
     && layout.children.length <= 3
     && layout.children.every(c => c.template === sidebarTemplate || c.template === siteBodyMiddleTemplate)
-    && layout.children.find(c => c.template === siteBodyMiddleTemplate)?.children?.length
-    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children?.length > 0
-    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children?.length <= 3
-    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children.
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate)?.children?.
       find?.(c => c.template === siteBodyMiddleCenterTemplate)?.children?.
-      find?.(c => c.template === pageBodyTemplate);
+      find?.(c => c.template === pageBodyTemplate)
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children.find(c => c.template === siteBodyMiddleCenterTemplate).children.length > 0
+    && layout.children.find(c => c.template === siteBodyMiddleTemplate).children.find(c => c.template === siteBodyMiddleCenterTemplate).children.length <= 3;
 }
 
 export function parseSections(layout) {
@@ -836,10 +835,7 @@ export function newContainer(template, cssClass, parentContainer, index) {
 }
 
 function parseSection(section) {
-  if ((section.template !== gridTemplate
-       && section.template !== flexTemplate
-       && section.template !== sidebarTemplate
-       && section.template !== bannerTemplate)
+  if ((section.template !== gridTemplate && section.template !== flexTemplate)
     || !section.children.length) {
     return;
   }
@@ -855,14 +851,17 @@ function parseSection(section) {
   section.gap = parseGapClasses(section, 'grid-gap');
   section.colsCount = section.colBreakpoints[currentBreakpoint];
   section.rowsCount = section.rowBreakpoints[currentBreakpoint];
-  if (section.template !== gridTemplate && section.template !== flexTemplate) {
+  if (section.template === gridTemplate || section.template === flexTemplate) {
     // Compute cell indexes
     parseMatrix(section);
   }
 }
 
 export function parseContainerStyle(container) {
-  if (container.template !== flexTemplate && container.template !== gridTemplate) {
+  if (container.template !== flexTemplate
+    && container.template !== gridTemplate
+    && container.template !== sidebarTemplate
+    && container.template !== bannerTemplate) {
     const marginMatches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
     if (marginMatches?.length) {
       container.marginTop = parseInt(marginMatches.find(c => c.search(/mt-n?\d+/) >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
