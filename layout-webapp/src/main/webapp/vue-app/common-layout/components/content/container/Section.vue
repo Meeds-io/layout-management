@@ -129,14 +129,14 @@ export default {
   },
   created() {
     window.addEventListener('resize', this.refreshDimensions);
-    document.querySelector('.page-scroll-content').addEventListener('scroll', this.refreshDimensions);
+    document.querySelector('.site-scroll-parent').addEventListener('scroll', this.refreshDimensions);
   },
   mounted() {
     this.refreshDimensions();
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.refreshDimensions);
-    document.querySelector('.page-scroll-content').removeEventListener('scroll', this.refreshDimensions);
+    document.querySelector('.site-scroll-parent').removeEventListener('scroll', this.refreshDimensions);
   },
   methods: {
     refreshDimensions() {

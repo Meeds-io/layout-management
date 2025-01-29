@@ -62,6 +62,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    noSectionMargins: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     id() {
@@ -89,6 +93,7 @@ export default {
       return this.$applicationUtils.getStyle(this.container, {
         isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === 'BannerCell',
+        noSectionMargins: this.noSectionMargins,
         sectionStyle: this.sectionStyle,
         noBackgroundStyle: this.noBackgroundStyle,
         isPageWidthStyle: this.pageWidthStyle,

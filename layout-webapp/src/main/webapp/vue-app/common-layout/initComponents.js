@@ -51,6 +51,7 @@ import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicati
 import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
 import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
 import EditPageDrawer from './components/drawer/EditPageDrawer.vue';
+import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
 
 import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
 
@@ -73,6 +74,7 @@ const components = {
   'layout-editor-application-add-drawer': AddApplicationDrawer,
   'layout-editor-application-edit-drawer': EditApplicationDrawer,
   'layout-editor-page-edit-drawer': EditPageDrawer,
+  'layout-editor-section-edit-drawer': EditSectionDrawer,
   'layout-editor-portlet-edit-dialog': EditPortletDialog,
   'layout-editor-background-image-attachment': BackgroundImageAttachment,
   'layout-editor-background-input': BackgroundInput,

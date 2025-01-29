@@ -55,7 +55,7 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
-import io.meeds.layout.rest.model.LayoutModel;
+import io.meeds.layout.model.LayoutModel;
 
 import lombok.SneakyThrows;
 

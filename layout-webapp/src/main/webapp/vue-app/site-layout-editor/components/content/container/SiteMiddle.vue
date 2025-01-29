@@ -59,17 +59,6 @@ export default {
     storageId() {
       return this.container?.storageId;
     },
-    dragOptions() {
-      return {
-        group: `${this.container.template}`,
-        draggable: '.draggable-container-flex',
-        animation: 200,
-        ghostClass: 'layout-moving-ghost-container',
-        chosenClass: 'layout-moving-chosen-container',
-        handle: '.draggable',
-        dataIdAttr: 'data-storage-id',
-      };
-    },
     sidebarsContainerMinWidth() {
       return this.$root.layout?.children
         ?.filter?.(c => c.template === this.$layoutUtils.sidebarTemplate

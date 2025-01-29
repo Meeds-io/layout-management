@@ -38,9 +38,9 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.NavigationCreateModel;
 import io.meeds.layout.model.SectionTemplate;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.service.ContainerLayoutService;
 import io.meeds.layout.service.NavigationLayoutService;
 import io.meeds.layout.service.PageLayoutService;

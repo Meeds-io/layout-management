@@ -24,7 +24,7 @@
     :container="container"
     :parent-id="parentId"
     :style="cssStyle"
-    class="d-flex flex-row z-index-one site-middle-center-container"
+    class="d-flex flex-row site-middle-center-container"
     no-application-style
     no-background-style />
 </template>
@@ -46,7 +46,7 @@ export default {
         ?.filter?.(c => c.template === 'Sidebar'
           && c.children?.length
           && (
-            !this.$root.mobileDisplayMode
+            !this.$root.isMobile
             || !c?.children?.[0].cssClass?.includes?.('hidden-sm-and-down')
           )
         )

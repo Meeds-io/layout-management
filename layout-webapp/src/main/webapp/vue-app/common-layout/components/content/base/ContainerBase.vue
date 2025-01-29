@@ -129,6 +129,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    sectionStyle: {
+      type: Boolean,
+      default: false,
+    },
+    noSectionMargins: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     hover: false,
@@ -173,7 +181,8 @@ export default {
       return this.$applicationUtils.getStyle(this.container, {
         isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
-        isSectionStyle: this.container.template === this.$layoutUtils.bannerCellTemplate,
+        sectionStyle: this.sectionStyle,
+        noSectionMargins: this.noSectionMargins,
         noBackgroundStyle: this.noBackgroundStyle,
         isPageWidthStyle: this.pageWidthStyle,
       });
@@ -191,14 +200,22 @@ export default {
     isCell() {
       return this.container.template === this.$layoutUtils.cellTemplate;
     },
+    sectionType() {
+      if (this.$root.isSiteLayout) {
+        return this.container.type;
+      } else {
+        const section = this.$layoutUtils.getSection(this.$root.layout, this.parentId);
+        return section?.template || 'page';
+      }
+    },
     isDraggableCell() {
       return this.container.template === this.$layoutUtils.cellTemplate
         || this.container.template === this.$layoutUtils.bannerTemplate
         || this.container.template === this.$layoutUtils.sidebarCellTemplate;
     },
     dragOptions() {
-      return {
-        group: `${this.type}`,
+      return this.sectionType && {
+        group: `${this.sectionType}`,
         draggable: '.draggable-container-flex',
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
