@@ -116,7 +116,7 @@ export default {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
           if (this.pageTemplateId) {
-            this.$pageTemplateService.getPageTemplate(this.pageTemplateId)
+            this.$pageTemplateService.getPageTemplate(this.pageTemplateId, true)
               .then(pageTemplate => this.$root.pageTemplate = pageTemplate)
               .then(() => this.$pageLayoutService.updatePageLayout(
                 this.draftPageRef,
