@@ -20,31 +20,9 @@
 
 -->
 <template>
-  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-  <div
-    v-if="childrenSize"
-    :class="container.cssClass"
-    :style="cssStyle"
-    class="position-relative flex-grow-0 flex-shrink-0">
-    <v-hover :disabled="$root.mobileDisplayMode">
-      <div
-        slot-scope="{ hover }"
-        class="position-absolute full-width z-index-two">
-        <div class="position-relative full-width">
-          <site-layout-editor-sidebar-section-menu
-            :container="container"
-            :parent-id="parentId"
-            :hover="!drawerOpened && (hover || hoverSection || movingSection)"
-            :index="index"
-            :length="length"
-            :moving="movingSection"
-            @hover-button="hoverSectionMenuButton = $event"
-            @move-start="movingSection = true"
-            @move-end="movingSection = false" />
-        </div>
-      </div>
-    </v-hover>
+  <v-hover v-if="childrenSize" :disabled="$root.mobileDisplayMode">
     <layout-editor-container-base
+      slot-scope="{ hover }"
       ref="container"
       :container="container"
       :parent-id="parentId"
@@ -52,8 +30,22 @@
       class="position-relative overflow-initial layout-sidebar-section layout-section-content full-height z-index-zero"
       type="sidebar-section"
       no-background-style
-      @hovered="hoverSection = $event && !drawerOpened" />
-  </div>
+      section-style
+      @hovered="hoverSection = $event && !drawerOpened">
+      <template #footer>
+        <site-layout-editor-sidebar-section-menu
+          :container="container"
+          :parent-id="parentId"
+          :hover="!drawerOpened && (hover || hoverSection || movingSection)"
+          :index="index"
+          :length="length"
+          :moving="movingSection"
+          @hover-button="hoverSectionMenuButton = $event"
+          @move-start="movingSection = true"
+          @move-end="movingSection = false" />
+      </template>
+    </layout-editor-container-base>
+  </v-hover>
 </template>
 <script>
 export default {
@@ -90,12 +82,6 @@ export default {
     },
     drawerOpened() {
       return this.$root.drawerOpened;
-    },
-    cssStyle() {
-      return this.$applicationUtils.getStyle(this.container, {
-        onlyBackgroundStyle: true,
-        sectionStyle: true,
-      });
     },
     childrenSize() {
       return this.container?.children?.length;

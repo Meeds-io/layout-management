@@ -23,7 +23,8 @@
   <page-layout-container-base
     :container="container"
     :parent-id="parentId"
-    class="d-flex flex-column flex-shrink-1 width-page-content" />
+    class="layout-page-parent"
+    page-width-style />
 </template>
 <script>
 export default {

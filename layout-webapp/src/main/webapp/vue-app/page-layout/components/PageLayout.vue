@@ -20,7 +20,7 @@
 -->
 <template>
   <v-app
-    :class="!$root.siteId && 'singlePageApplication'"
+    :class="!$root.siteId && 'layout-page-parent'"
     class="layout-sections-parent transparent"
     role="main"
     flat>

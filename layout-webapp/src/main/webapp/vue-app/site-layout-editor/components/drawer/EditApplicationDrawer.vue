@@ -474,7 +474,6 @@ export default {
       this.$layoutUtils.parseContainerStyle(container);
       this.section = section;
       this.container = container;
-      this.section = section;
       this.height = container.height;
       this.width = container.width;
       this.$set(container, 'cssClass', container?.cssClass?.trim?.() || '');

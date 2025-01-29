@@ -195,7 +195,10 @@ export default {
     open(parentContainer) {
       this.originalParentContainer = parentContainer;
       this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
-      this.width = this.parentContainer.width || (!!document.body.style.getPropertyValue('--allPagesWidth') && '100%') || 1320;
+      this.width = (this.parentContainer.width === 'fullWindow' ? '100%' : this.parentContainer.width)
+        || (this.parentContainer.width === 'singlePageApplication' ? 1320 : this.parentContainer.width)
+        || (!!document.body.style.getPropertyValue('--allPagesWidth') && '100%')
+        || 1320;
       this.appBackgroundProperties = {
         storageId: 0,
         backgroundColor: this.parentContainer.appBackgroundColor || null,

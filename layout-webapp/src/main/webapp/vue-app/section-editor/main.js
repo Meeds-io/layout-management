@@ -71,7 +71,6 @@ export function init() {
           pageRef: null,
           pageTemplate: null,
           pageTemplateId: null,
-          pageFullWindow: false,
           nodeId: null,
           draftPageRef: null,
           draftNode: null,
@@ -164,8 +163,6 @@ export function init() {
             if (!oldVal) {
               window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
             }
-            const parentContainer = this.$layoutUtils.getParentContainer(newVal);
-            this.pageFullWindow = parentContainer?.width !== 'singlePageApplication' && (parentContainer?.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth'));
           },
         },
         async created() {

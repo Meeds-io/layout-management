@@ -53,6 +53,7 @@
         <number-input
           v-model="marginTop"
           :diff="diff"
+          :max="max"
           :class="marginChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
           class="me-n3" />
       </v-list-item>
@@ -66,6 +67,7 @@
         <number-input
           v-model="marginRight"
           :diff="diff"
+          :max="max"
           class="my-auto me-n3" />
       </v-list-item>
       <v-list-item
@@ -78,6 +80,7 @@
         <number-input
           v-model="marginBottom"
           :diff="diff"
+          :max="max"
           class="my-auto me-n3" />
       </v-list-item>
       <v-list-item
@@ -90,6 +93,7 @@
         <number-input
           v-model="marginLeft"
           :diff="diff"
+          :max="max"
           class="my-auto me-n3" />
       </v-list-item>
     </div>
@@ -105,6 +109,10 @@ export default {
     diff: {
       type: Number,
       default: () => -20,
+    },
+    max: {
+      type: Number,
+      default: () => 200,
     },
     textBold: {
       type: Boolean,

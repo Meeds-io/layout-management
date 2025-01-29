@@ -75,7 +75,7 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
       return layoutAclService.canEditSite(siteKey, getUsername(userIdentity));
     } else {
       PageKey pageKey = getPageKey(entityId);
-      return layoutAclService.canEditPage(pageKey, getUsername(userIdentity));
+      return pageKey != null && layoutAclService.canEditPage(pageKey, getUsername(userIdentity));
     }
   }
 
@@ -88,10 +88,14 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
              || layoutAclService.canViewSite(siteKey, getUsername(userIdentity));
     } else {
       PageKey pageKey = getPageKey(entityId);
-      SiteKey siteKey = pageKey.getSite();
-      return siteKey.getType() == SiteType.GROUP_TEMPLATE
-             || siteKey.getType() == SiteType.PORTAL_TEMPLATE
-             || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
+      if (pageKey == null) {
+        return false;
+      } else {
+        SiteKey siteKey = pageKey.getSite();
+        return siteKey.getType() == SiteType.GROUP_TEMPLATE
+               || siteKey.getType() == SiteType.PORTAL_TEMPLATE
+               || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
+      }
     }
   }
 
@@ -108,8 +112,16 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
   private PageKey getPageKey(String entityId) {
     String pageUuid = entityId.split("_")[0].replace(PAGE_PREFIX, "");
     long pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
-    Page page = layoutService.getPage(pageId);
-    return page.getPageKey();
+    if (pageId == 0) {
+      pageUuid = entityId.replace(PAGE_PREFIX, "").split("_")[0];
+      pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
+    }
+    if (pageId == 0) {
+      return null;
+    } else {
+      Page page = layoutService.getPage(pageId);
+      return page.getPageKey();
+    }
   }
 
   private SiteKey getSiteKey(String entityId) {

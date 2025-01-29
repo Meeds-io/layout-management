@@ -90,11 +90,11 @@ export default {
       if (val) {
         document.addEventListener('mousemove', this.updateSelection);
         document.addEventListener('mouseup', this.endSelection);
-        document.querySelector('.page-scroll-content').addEventListener('scroll', this.updateScrollPosition);
+        document.querySelector('.site-scroll-parent').addEventListener('scroll', this.updateScrollPosition);
       } else {
         document.removeEventListener('mousemove', this.updateSelection);
         document.removeEventListener('mouseup', this.endSelection);
-        document.querySelector('.page-scroll-content').removeEventListener('scroll', this.updateScrollPosition);
+        document.querySelector('.site-scroll-parent').removeEventListener('scroll', this.updateScrollPosition);
         this.reset();
       }
     },
