@@ -154,10 +154,13 @@ export function getPage(pageRef) {
   });
 }
 
-export function getPageLayout(pageRef, expand, impersonate) {
+export function getPageLayout({pageRef, siteId, expand, impersonate}) {
   const formData = new FormData();
   if (pageRef) {
     formData.append('pageRef', pageRef);
+  }
+  if (siteId) {
+    formData.append('siteId', siteId);
   }
   if (impersonate) {
     formData.append('impersonate', !!impersonate);

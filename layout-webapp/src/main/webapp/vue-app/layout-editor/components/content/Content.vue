@@ -408,7 +408,10 @@ export default {
       try {
         await this.saveDraft();
         await this.$pageLayoutService.cloneSection(this.$root.draftPageRef, section.storageId);
-        const layout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, 'contentId');
+        const layout = await this.$pageLayoutService.getPageLayout({
+          pageRef: this.$root.draftPageRef,
+          expand: 'contentId',
+        });
         this.setLayout(layout);
         this.$root.$emit('layout-draft-saved');
       } finally {
