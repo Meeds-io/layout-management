@@ -22,7 +22,7 @@
 <template>
   <page-layout-container-base
     v-if="childrenSize"
-    :container="container"
+    :container="containerToDisplay"
     :parent-id="parentId"
     class="flex-grow-0 flex-shrink-0 layout-sidebar-section layout-section-content"
     no-background-style
@@ -44,11 +44,12 @@ export default {
     childrenSize() {
       return this.container?.children?.length;
     },
-  },
-  created() {
-    if (!this.container.width) {
-      this.container.width = '310px';
-    }
+    containerToDisplay() {
+      return this.container.width ? this.container : {
+        ...this.container,
+        width: '310px',
+      };
+    },
   },
 };
 </script>

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -57,31 +58,36 @@ public class PageTemplateRest {
   @Secured("users")
   @Operation(summary = "Retrieve page templates", method = "GET", description = "This retrieves page templates")
   @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Request fulfilled"), })
-  public List<PageTemplate> getPageTemplates(HttpServletRequest request) {
-    return pageTemplateService.getPageTemplates(request.getLocale(), true);
+  public List<PageTemplate> getPageTemplates(HttpServletRequest request,
+                                             @Parameter(description = "Whether to retrieve page template content or not", required = false)
+                                             @RequestParam(name = "expandContent", required = false, defaultValue = "false")
+                                             boolean expandContent) {
+    return pageTemplateService.getPageTemplates(request.getLocale(), true, expandContent);
   }
 
   @GetMapping("{id}")
   @Secured("users")
-  @Operation(summary = "Retrieve a page template designated by its id", method = "GET",
-             description = "This will retrieve a page template designated by its id")
+  @Operation(summary = "Retrieve a page template designated by its id", method = "GET", description = "This will retrieve a page template designated by its id")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
   })
   public PageTemplate getPageTemplate(
                                       HttpServletRequest request,
                                       @Parameter(description = "Page template identifier")
                                       @PathVariable("id")
-                                      long id) {
-    return pageTemplateService.getPageTemplate(id, request.getLocale(), true);
+                                      long id,
+                                      @Parameter(description = "Whether to retrieve page template content or not", required = false)
+                                      @RequestParam(name = "expandContent", required = false, defaultValue = "false")
+                                      boolean expandContent) {
+    return pageTemplateService.getPageTemplate(id, request.getLocale(), true, expandContent);
   }
 
   @PostMapping
   @Secured("users")
   @Operation(summary = "Create a page template", method = "POST", description = "This creates a new page template")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
   })
   public PageTemplate createPageTemplate(
                                          HttpServletRequest request,
@@ -98,9 +104,9 @@ public class PageTemplateRest {
   @Secured("users")
   @Operation(summary = "Update a page template", method = "PUT", description = "This updates an existing page template")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public void updatePageTemplate(
                                  HttpServletRequest request,
@@ -123,9 +129,9 @@ public class PageTemplateRest {
   @Secured("users")
   @Operation(summary = "Deletes a page template", method = "DELETE", description = "This deletes an existing page template")
   @ApiResponses(value = {
-                          @ApiResponse(responseCode = "200", description = "Request fulfilled"),
-                          @ApiResponse(responseCode = "403", description = "Forbidden"),
-                          @ApiResponse(responseCode = "404", description = "Not found"),
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
   })
   public void deletePageTemplate(
                                  HttpServletRequest request,
