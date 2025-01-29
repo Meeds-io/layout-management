@@ -27,6 +27,7 @@
       <section-editor-toolbar
         :page="pageContext"
         :node="node" />
+      <v-divider />
       <section-editor-content
         :page="pageContext"
         :node="draftNode"

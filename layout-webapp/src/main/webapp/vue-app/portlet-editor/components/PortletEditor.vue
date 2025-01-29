@@ -24,6 +24,7 @@
     flat>
     <main class="content-box-sizing">
       <portlet-editor-toolbar />
+      <v-divider />
       <portlet-editor-content />
     </main>
   </v-app>

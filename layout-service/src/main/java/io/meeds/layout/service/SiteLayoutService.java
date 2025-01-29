@@ -44,6 +44,7 @@ import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
@@ -67,6 +68,9 @@ public class SiteLayoutService {
 
   @Autowired
   private UserPortalConfigService portalConfigService;
+
+  @Autowired
+  private PortletInstanceService  portletInstanceService;
 
   @Autowired
   private LayoutAclService        aclService;
@@ -155,7 +159,9 @@ public class SiteLayoutService {
     PortalConfig draftSite = site.clone();
     draftSite.setType(PortalConfig.DRAFT);
     draftSite.setName(clonedSiteName);
-    draftSite.resetStorage();
+    LayoutModel siteLayoutModel = new LayoutModel(site.getPortalLayout(), portletInstanceService);
+    siteLayoutModel.resetStorage();
+    draftSite.setPortalLayout(siteLayoutModel.toSite().getPortalLayout());
     SiteKey draftSiteKey = new SiteKey(draftSite.getType(), draftSite.getName());
     PortalConfig existingDraftSite = layoutService.getPortalConfig(draftSiteKey);
     if (existingDraftSite != null) {

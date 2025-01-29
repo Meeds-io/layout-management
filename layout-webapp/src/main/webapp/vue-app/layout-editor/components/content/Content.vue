@@ -22,7 +22,7 @@
   <v-card
     :max-width="maxWidth"
     :class="parentClass"
-    class="transparent layout-sections-parent singlePageApplication mx-auto"
+    class="transparent layout-sections-parent mx-auto"
     flat>
     <layout-editor-container-extension
       :container="pageLayout"
@@ -332,7 +332,7 @@ export default {
     },
     handleSectionUpdated(container, children, index, type) {
       container.children = children?.filter(c => !!c) || [];
-      if ((type === 'section-grid' || type === 'section-columns') && !container.children?.length) {
+      if ((type === 'section' || type === 'section-grid' || type === 'section-columns') && !container.children?.length) {
         window.setTimeout(() => this.handleRemoveSection(index), 500);
       }
     },

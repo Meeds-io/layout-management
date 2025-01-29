@@ -27,6 +27,7 @@
         :page="pageContext"
         :node="node"
         :node-labels="nodeLabels" />
+      <v-divider />
       <coediting
         v-model="draftNodeId"
         :object-id="nodeId"

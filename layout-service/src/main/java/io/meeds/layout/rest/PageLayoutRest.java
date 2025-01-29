@@ -45,10 +45,10 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.PortletPreferenceList;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.util.RestEntityBuilder;
 import io.meeds.layout.service.PageLayoutService;
 
