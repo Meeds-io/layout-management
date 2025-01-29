@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SpaceBannerHomePageUpgradePlugin extends LayoutApplicationReferenceUpgradePlugin {
 
@@ -66,7 +67,7 @@ public class SpaceBannerHomePageUpgradePlugin extends LayoutApplicationReference
     log.info("Start:: Update Space Home Page banner content id");
 
     List<Long> spaceHomePagesId = getSpaceHomePages();
-    spaceHomePagesId.forEach(pageId -> {
+    spaceHomePagesId.stream().filter(Objects::nonNull).forEach(pageId -> {
 
       PageEntity page = pageDAO.find(pageId);
       JSONArray jsonArray = new JSONArray(page.getPageBody());

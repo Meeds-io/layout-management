@@ -94,6 +94,7 @@ public class SpaceBannerHomePageUpgradePluginTest {
     ArrayList<Long> pageIdList = new ArrayList<>();
     pageIdList.add(1L);
     pageIdList.add(2L);
+    pageIdList.add(null);
     when(query.getResultList()).thenReturn(pageIdList);
     when(entityManager.createNativeQuery(anyString(), ArgumentMatchers.<Class<Long>>any())).thenReturn(query);
     when(entityManager.createNativeQuery(anyString())).thenReturn(query);
@@ -116,7 +117,6 @@ public class SpaceBannerHomePageUpgradePluginTest {
 
     when(windowDAO.find(1L)).thenReturn(windowEntity1);
     when(windowDAO.find(2L)).thenReturn(windowEntity2);
-
 
 
     SpaceBannerHomePageUpgradePlugin spaceBannerHomePageUpgradePlugin = new SpaceBannerHomePageUpgradePlugin(settingService,
