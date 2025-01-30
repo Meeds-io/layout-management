@@ -291,6 +291,7 @@
   <portlet>
     <name>SiteManagement</name>
     <module>
+      <load-group>SiteManagementGRP</load-group>
       <script>
         <minify>false</minify>
         <path>/js/siteManagement.bundle.js</path>

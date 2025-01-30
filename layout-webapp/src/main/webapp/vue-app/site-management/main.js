@@ -61,5 +61,6 @@ export function init() {
           },
         },
       }, `#${appId}`, 'site-management');
-    });
+    }).finally(() => Vue.prototype.$utils?.includeExtensions?.('SiteManagementExtension'));
+
 }

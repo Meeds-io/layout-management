@@ -45,6 +45,9 @@
     <manage-permissions-drawer />
     <site-template-drawer />
     <layout-analytics application-name="siteManagement" />
+    <extension-registry-components
+      :name="extensionApp"
+      :type="extensionDrawerType" />
   </v-app>
 </template>
 
@@ -57,18 +60,26 @@ export default {
       siteToDelete: null,
       keyword: null,
       deleteConfirmMessage: '',
+      extensionApp: 'site-management',
+      extensionActionType: 'action',
+      extensionDrawerType: 'site-management-drawers'
     };
   },
   created() {
     this.$root.$on('site-created', this.handleSiteCreation);
     this.$root.$on('site-updated', this.refreshSites);
     this.$root.$on('delete-site', this.confirmDelete);
+    document.addEventListener(`component-${this.extensionApp}-${this.extensionDrawerType}-updated`, this.refreshActionExtensions);
+    document.addEventListener(`extension-${this.extensionApp}-${this.extensionActionType}-updated`, this.refreshActionExtensions);
     this.refreshSites();
+    this.refreshActionExtensions();
   },
-  beforDestroy() {
+  beforeDestroy() {
     this.$root.$off('site-created', this.handleSiteCreation);
     this.$root.$off('site-updated', this.refreshSites);
     this.$root.$on('delete-site', this.confirmDelete);
+    document.removeEventListener(`component-${this.extensionApp}-${this.extensionDrawerType}-updated`, this.refreshActionExtensions);
+    document.removeEventListener(`component-${this.extensionApp}-${this.extensionActionType}-updated`, this.refreshActionExtensions);
   },
   methods: {
     handleSiteCreation(site) {
@@ -86,6 +97,9 @@ export default {
       return this.$siteService.getSites('PORTAL', null, 'public', true, true, false, false, false, null, true)
         .then(sites => this.sites = sites?.filter(s => !s?.properties?.IS_SPACE_PUBLIC_SITE) || [])
         .finally(() => this.loading--);
+    },
+    refreshActionExtensions() {
+      this.$root.siteActionExtensions = extensionRegistry.loadExtensions(this.extensionApp, this.extensionActionType) || [];
     },
     confirmDelete(siteToDelete) {
       this.siteToDelete = siteToDelete;

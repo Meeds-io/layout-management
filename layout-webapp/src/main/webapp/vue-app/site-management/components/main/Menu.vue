@@ -39,6 +39,25 @@
     </template>
     <v-list class="pa-0" dense>
       <v-list-item
+        v-for="extension in extensions"
+        :key="extension.id"
+        class="px-3"
+        @click="handelAction(extension)">
+        <v-card
+          color="transparent"
+          min-width="15"
+          class="me-2"
+          flat>
+          <v-icon size="13">
+            {{ extension?.icon }}
+          </v-icon>
+        </v-card>
+        <v-list-item-title
+          class="subtitle-2">
+          <span class="ps-1">{{ $t(extension.labelKey) }}</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
         v-if="isPortalSite && !isGlobalSite"
         :aria-label="$t('siteManagement.label.properties')"
         role="button"
@@ -166,15 +185,12 @@ export default {
     site: {
       type: Object,
       default: null,
-    }
+    },
   },
   data: () => ({
     displayActionMenu: false,
   }),
   computed: {
-    isMetaSite() {
-      return this.site.name === eXo.env.portal.defaultPortal;
-    },
     isGlobalSite() {
       return this.site.name === 'global';
     },
@@ -187,6 +203,9 @@ export default {
     canDelete() {
       return this.canEditSite && this.site?.properties?.removable !== 'false';
     },
+    extensions() {
+      return this.$root.siteActionExtensions || [];
+    }
   },
   watch: {
     displayActionMenu() {
@@ -228,6 +247,9 @@ export default {
         name: null,
       }, this.site.siteId);
     },
+    handelAction(extension) {
+      return extension?.action(this, this.site);
+    }
   }
 };
 </script>
