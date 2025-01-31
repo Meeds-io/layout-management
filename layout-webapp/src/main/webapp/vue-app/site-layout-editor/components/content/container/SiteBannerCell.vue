@@ -62,7 +62,7 @@
       </template>
       <template #footer>
         <div
-          v-if="$root.desktopDisplayMode"
+          v-if="displayResizer"
           :class="$vuetify.rtl && 'l-0' || 'r-0'"
           class="position-absolute full-height t-0">
           <layout-editor-cell-resize-button
@@ -197,8 +197,8 @@ export default {
     width() {
       return this.moving && this.movingStartX && (this.initialWidth + this.movingX - this.movingStartX) || null;
     },
-    anyCellMoving() {
-      return this.moving ;
+    displayResizer() {
+      return this.$root.desktopDisplayMode && this.index < (this.length - 1);
     },
   },
   watch: {

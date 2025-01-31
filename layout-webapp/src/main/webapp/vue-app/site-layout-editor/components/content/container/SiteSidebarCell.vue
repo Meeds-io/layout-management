@@ -30,7 +30,7 @@
       'elevation-2 border-color': $root.movingParentId,
     }"
     :style="cssStyle"
-    class="position-relative display-flex flex-column full-height border-box-sizing"
+    class="position-relative display-flex flex-column border-box-sizing"
     draggable
     @hovered="hover = $event"
     @move-start="moveStart">
@@ -38,10 +38,8 @@
       <v-hover v-if="$root.desktopDisplayMode" v-model="hoverAddApplication">
         <v-card
           v-show="!$root.movingParentId"
-          :class="[{
-            'full-height': !hasApplication,
-          }, backgroundClass]"
-          class="full-width layout-add-application-button"
+          :class="backgroundClass"
+          class="full-width fill-height layout-add-application-button flex-grow-1 d-flex align-center justify-center"
           flat
           @click="$root.$emit('layout-add-application-category-drawer', storageId, container)">
           <v-card
@@ -144,6 +142,9 @@ export default {
     width() {
       return this.container.width;
     },
+    minHeight() {
+      return this.isInternalSidebar ? this.$root.middleCenterContainersMinHeight : 'calc(var(--100vh, 100vh) - 57px)';
+    },
     cssStyle() {
       const cssStyle = this.$applicationUtils.getStyle(this.container, {
         onlyBackgroundStyle: true,
@@ -152,6 +153,8 @@ export default {
       cssStyle['min-width'] = `${this.width || 310}px`;
       cssStyle['width'] = `${this.width || 310}px`;
       cssStyle['max-width'] = `${this.width || 310}px`;
+      cssStyle['min-height'] = this.minHeight;
+      cssStyle['height'] = this.isInternalSidebar ? '100%' : this.minHeight;
       return cssStyle;
     },
   },

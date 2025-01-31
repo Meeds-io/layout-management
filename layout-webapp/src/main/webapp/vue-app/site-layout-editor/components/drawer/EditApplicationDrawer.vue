@@ -54,6 +54,7 @@
           ref="marginInput"
           v-model="container"
           :max="60"
+          :min="-60"
           :diff="0"
           class="mt-4"
           @refresh="refresh++" />
