@@ -73,6 +73,7 @@
           ref="marginInput"
           v-model="container"
           :max="60"
+          :min="-60"
           :top="false"
           :bottom="false"
           class="mb-2"

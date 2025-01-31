@@ -68,7 +68,7 @@
               v-model="cols"
               :thumb-size="24"
               :min="1"
-              :max="60"
+              :max="64"
               thumb-label="always">
               <template #prepend>
                 <v-btn
@@ -136,6 +136,7 @@
           ref="marginInput"
           v-model="container"
           :max="60"
+          :min="-60"
           class="mb-2"
           text-bold
           right

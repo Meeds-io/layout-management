@@ -54,6 +54,7 @@
           v-model="marginTop"
           :diff="diff"
           :max="max"
+          :min="min"
           :class="marginChoice === 'different' && 'my-auto' || 'mb-auto ms-auto'"
           class="me-n3" />
       </v-list-item>
@@ -68,6 +69,7 @@
           v-model="marginRight"
           :diff="diff"
           :max="max"
+          :min="min"
           class="my-auto me-n3" />
       </v-list-item>
       <v-list-item
@@ -81,6 +83,7 @@
           v-model="marginBottom"
           :diff="diff"
           :max="max"
+          :min="min"
           class="my-auto me-n3" />
       </v-list-item>
       <v-list-item
@@ -94,6 +97,7 @@
           v-model="marginLeft"
           :diff="diff"
           :max="max"
+          :min="min"
           class="my-auto me-n3" />
       </v-list-item>
     </div>
@@ -112,7 +116,11 @@ export default {
     },
     max: {
       type: Number,
-      default: () => 200,
+      default: () => 80,
+    },
+    min: {
+      type: Number,
+      default: () => -40,
     },
     textBold: {
       type: Boolean,

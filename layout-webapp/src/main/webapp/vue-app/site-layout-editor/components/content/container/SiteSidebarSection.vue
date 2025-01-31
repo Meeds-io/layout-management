@@ -27,6 +27,7 @@
       :container="container"
       :parent-id="parentId"
       :index="index"
+      style="height: inherit;"
       class="position-relative overflow-initial layout-sidebar-section layout-section-content full-height z-index-zero"
       type="sidebar-section"
       no-background-style
