@@ -209,7 +209,7 @@ export default {
           && this.$refs?.content
           && this.nodeUri
           && this.storageId) {
-        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs?.content, null, this.$root.isSiteLayout)
+        this.$applicationUtils.installApplication(this.nodeUri, this.storageId, this.$refs?.content, null, this.$root.isSiteLayout, true)
           .then(() => window.setTimeout(() => this.applicationInstalled = true, 200));
       }
     },
