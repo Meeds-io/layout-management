@@ -43,6 +43,7 @@
         <number-input
           v-model="marginTop"
           :max="max"
+          :min="min"
           class="my-auto"
           editable />
       </v-list-item>
@@ -56,6 +57,7 @@
         <number-input
           v-model="marginRight"
           :max="max"
+          :min="min"
           class="my-auto"
           editable />
       </v-list-item>
@@ -69,6 +71,7 @@
         <number-input
           v-model="marginBottom"
           :max="max"
+          :min="min"
           class="my-auto"
           editable />
       </v-list-item>
@@ -82,6 +85,7 @@
         <number-input
           v-model="marginLeft"
           :max="max"
+          :min="min"
           class="my-auto"
           editable />
       </v-list-item>
@@ -97,7 +101,11 @@ export default {
     },
     max: {
       type: Number,
-      default: () => 48,
+      default: () => 60,
+    },
+    min: {
+      type: Number,
+      default: () => -60,
     },
     top: {
       type: Boolean,

@@ -86,6 +86,7 @@ export function init() {
           diffScrollY: 0,
           gap: 20,
           isAdministrator: eXo.env.portal.isAdministrator,
+          middleCenterContainersMinHeight: 0,
         }),
         computed: {
           parentAppX() {
@@ -133,6 +134,9 @@ export function init() {
           middleContainer() {
             return this.layout?.children?.find(c => c.template === this.$layoutUtils.siteBodyMiddleTemplate);
           },
+          middleContainerBannersHeight() {
+            return this.$root.middleContainer?.children?.map?.(c => (c.height && Number(c.height) || 57) + (c.marginTop || 0) + (c.marginBottom || 0))?.reduce?.((acc, v) => acc + v, 0) || 0;
+          },
           rightContainer() {
             return this.layout?.children?.[2];
           },
@@ -141,6 +145,9 @@ export function init() {
           },
           middleCenterContainerIndex() {
             return this.middleContainer?.children?.findIndex(c => c.template === this.$layoutUtils.siteBodyMiddleCenterTemplate);
+          },
+          fixedMiddleCenterContainerMinHeight() {
+            return `${document.body.clientHeight - this.middleContainerBannersHeight + 2}px`;
           },
           internalLeftContainer() {
             return this.middleCenterContainer?.children?.[0];
@@ -174,6 +181,12 @@ export function init() {
         },
         mounted() {
           this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
+          if (!this.$root.middleCenterContainersMinHeight) {
+            this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight;
+            window.setTimeout(() => this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight, 200);
+            window.setTimeout(() => this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight, 500);
+            window.setTimeout(() => this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight, 2000);
+          }
         },
         methods: {
           setDrawerOpened() {

@@ -51,21 +51,12 @@ export default {
       default: null,
     },
   },
-  data: () => ({
-    height: 225,
-  }),
   computed: {
     id() {
       return this.container.id || this.storageId;
     },
     storageId() {
       return this.container?.storageId;
-    },
-    middleContainerMinHeight() {
-      return this.$root.middleContainer?.children?.map?.(c => (c.height && Number(c.height) || 57) + (c.marginTop || 0) + (c.marginBottom || 0))?.reduce?.((acc, v) => acc + v, 0) || 0;
-    },
-    minHeight() {
-      return `calc(100vh - ${this.middleContainerMinHeight + 10}px`;
     },
     sidebarsContainerMinWidth() {
       return this.$root.layout?.children
@@ -90,8 +81,8 @@ export default {
     },
     cssStyle() {
       return {
-        'height': `${this.height}px`,
-        'min-height': this.minHeight,
+        'height': 'auto',
+        'min-height': this.$root.middleCenterContainersMinHeight,
         'width': this.width,
         'max-width': this.maxWidth,
       };
