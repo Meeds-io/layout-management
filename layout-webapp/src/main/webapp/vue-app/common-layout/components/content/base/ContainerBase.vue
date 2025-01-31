@@ -202,7 +202,7 @@ export default {
     },
     sectionType() {
       if (this.$root.isSiteLayout) {
-        return this.container.type;
+        return this.container.template;
       } else {
         const section = this.$layoutUtils.getSection(this.$root.layout, this.parentId);
         return section?.template || 'page';
