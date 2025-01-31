@@ -17,8 +17,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode, showSite) {
-  return getApplicationContent(navUri, applicationStorageId, applicationMode, showSite)
+export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode, showSite, fullRender) {
+  return getApplicationContent(navUri, applicationStorageId, applicationMode, showSite, fullRender)
     .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
 }
 
@@ -226,9 +226,10 @@ export function getStyle(container, options) {
   return style;
 }
 
-export function getApplicationContent(navUri, applicationStorageId, applicationMode, showSite) {
-  const options = eXo.env.portal.previewSpaceId && `&previewSpaceId=${eXo.env.portal.previewSpaceId}` || '';
-  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=${!showSite}&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${options}`, {
+export function getApplicationContent(navUri, applicationStorageId, applicationMode, showSite, fullRender) {
+  const spaceOption = eXo.env.portal.previewSpaceId && `&previewSpaceId=${eXo.env.portal.previewSpaceId}` || '';
+  const fullRenderOption = fullRender && '&fullRender=true' || '';
+  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=${!showSite}&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${spaceOption}${fullRenderOption}`, {
     credentials: 'include',
     method: 'GET',
     redirect: 'manual'
