@@ -107,7 +107,7 @@ export default {
     },
     retrieveData() {
       this.contentRetrieved = 0;
-      fetch(`/portal/${eXo.env.portal.portalName}/portlet-viewer?portletInstanceId=${this.portletInstanceId}&noCache=true&maximizedPortletMode=${this.portletMode}`, {
+      fetch(`/portal/${eXo.env.portal.portalName}/portlet-viewer?portletInstanceId=${this.portletInstanceId}&noCache=true&maximizedPortletMode=${this.portletMode}&fullRender=true`, {
         credentials: 'include',
         method: 'GET',
         redirect: 'manual'
