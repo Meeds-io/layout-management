@@ -209,17 +209,11 @@ export default {
     isGlobalSite() {
       return this.site.name === 'global';
     },
-    isAdministrationSite() {
-      return this.site.name === 'administration';
-    },
     isPortalSite() {
       return this.site.siteType === 'PORTAL';
     },
     canEditSite() {
       return this.site.canEdit;
-    },
-    canEditSiteLayout() {
-      return this.canEditSite && !this.isMetaSite && !this.isGlobalSite && !this.isAdministrationSite && !this.site.displayed;
     },
     siteId() {
       return this.site.siteId;
@@ -230,8 +224,16 @@ export default {
     editSiteLayoutLink() {
       return this.canEditSite && `${eXo.env.portal.context}/${eXo.env.portal.portalName}/site-layout-editor?siteId=${this.siteId}`;
     },
+    canEditSiteLayout() {
+      return this.canEditSite
+        && !this.isMetaSite
+        && !this.isGlobalSite
+        && !this.site.displayed;
+    },
     noLayoutEditTooltip() {
-      return (this.isMetaSite || this.isGlobalSite || this.isAdministrationSite) && this.$t('sites.label.system.noLayoutEdit') || this.$t('sites.label.meta.noLayoutEdit');
+      return (this.isMetaSite || this.isGlobalSite)
+        ? this.$t('sites.label.system.noLayoutEdit')
+        : this.$t('sites.label.meta.noLayoutEdit');
     },
   },
   watch: {
