@@ -20,7 +20,8 @@
 -->
 <template>
   <div>
-    <div class="d-flex align-center mb-2">
+    <slot name="title"></slot>
+    <div v-if="!$slots.title" class="d-flex align-center mb-2">
       <div
         :class="textBold && 'font-weight-bold' || 'text-header'"
         class="me-auto">
@@ -31,7 +32,7 @@
         class="ms-auto my-auto me-n2" />
     </div>
     <div
-      v-if="enabled"
+      v-if="canUpdateValue"
       class="d-flex flex-column">
       <v-list-item
         v-if="top"
@@ -137,37 +138,47 @@ export default {
     marginBottom: null,
     marginLeft: null,
   }),
+  computed: {
+    canUpdateValue() {
+      return this.enabled || this.$slots.title;
+    },
+  },
   watch: {
+    value() {
+      if (!this.container) {
+        this.container = this.value;
+      }
+    },
     marginTop() {
       if (this.initialized) {
-        this.$set(this.container, 'marginTop', this.enabled ? this.marginTop || 0 : null);
+        this.$set(this.container, 'marginTop', this.canUpdateValue ? this.marginTop || 0 : null);
         this.$emit('refresh');
       }
     },
     marginRight() {
       if (this.initialized && this.right) {
-        this.$set(this.container, 'marginRight', this.enabled ? this.marginRight || 0 : null);
+        this.$set(this.container, 'marginRight', this.canUpdateValue ? this.marginRight || 0 : null);
         this.$emit('refresh');
       }
     },
     marginBottom() {
       if (this.initialized) {
-        this.$set(this.container, 'marginBottom', this.enabled ? this.marginBottom || 0 : null);
+        this.$set(this.container, 'marginBottom', this.canUpdateValue ? this.marginBottom || 0 : null);
         this.$emit('refresh');
       }
     },
     marginLeft() {
       if (this.initialized && this.left) {
-        this.$set(this.container, 'marginLeft', this.enabled ? this.marginLeft || 0 : null);
+        this.$set(this.container, 'marginLeft', this.canUpdateValue ? this.marginLeft || 0 : null);
         this.$emit('refresh');
       }
     },
-    enabled() {
+    canUpdateValue() {
       if (this.initialized) {
-        this.marginTop = this.enabled ? 0 : null;
-        this.marginRight = this.enabled ? 0 : null;
-        this.marginBottom = this.enabled ? 0 : null;
-        this.marginLeft = this.enabled ? 0 : null;
+        this.marginTop = this.canUpdateValue ? 0 : null;
+        this.marginRight = this.canUpdateValue ? 0 : null;
+        this.marginBottom = this.canUpdateValue ? 0 : null;
+        this.marginLeft = this.canUpdateValue ? 0 : null;
       }
     },
   },
