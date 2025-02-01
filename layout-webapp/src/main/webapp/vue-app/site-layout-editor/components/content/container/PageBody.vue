@@ -23,7 +23,7 @@
   <v-card
     :id="id"
     :data-storage-id="storageId"
-    class="position-relative width-page-content d-flex flex-column flex-shrink-1 z-index-zero"
+    class="position-relative page-content d-flex flex-column flex-shrink-1 z-index-zero"
     color="transparent"
     flat>
     <v-card

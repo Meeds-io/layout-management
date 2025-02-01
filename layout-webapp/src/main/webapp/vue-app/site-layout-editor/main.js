@@ -154,9 +154,6 @@ export function init() {
           middleCenterContainerIndex() {
             return this.middleContainer?.children?.findIndex(c => c.template === this.$layoutUtils.siteBodyMiddleCenterTemplate);
           },
-          fixedMiddleCenterContainerMinHeight() {
-            return `${document.body.clientHeight - this.middleContainerBannersHeight + 2}px`;
-          },
           internalLeftContainer() {
             return this.middleCenterContainer?.children?.[0];
           },
@@ -194,12 +191,6 @@ export function init() {
         },
         mounted() {
           this.$el?.closest?.('.PORTLET-FRAGMENT')?.classList?.remove?.('PORTLET-FRAGMENT');
-          if (!this.$root.middleCenterContainersMinHeight) {
-            this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight;
-            window.setTimeout(() => this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight, 200);
-            window.setTimeout(() => this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight, 500);
-            window.setTimeout(() => this.$root.middleCenterContainersMinHeight = this.$root.fixedMiddleCenterContainerMinHeight, 2000);
-          }
         },
         methods: {
           setDrawerOpened() {

@@ -81,12 +81,16 @@ export default {
     },
     cssStyle() {
       return {
-        'height': 'auto',
-        'min-height': this.$root.middleCenterContainersMinHeight,
+        'height': this.$root.middleCenterContainersMinHeight,
         'width': this.width,
         'max-width': this.maxWidth,
       };
     },
+  },
+  mounted() {
+    if (!this.$root.middleCenterContainersMinHeight) {
+      this.$root.middleCenterContainersMinHeight = `${document.body.scrollHeight - this.$root.middleContainerBannersHeight + 2}px`;
+    }
   },
 };
 </script>
