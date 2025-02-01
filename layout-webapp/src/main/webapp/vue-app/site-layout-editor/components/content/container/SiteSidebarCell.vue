@@ -154,7 +154,7 @@ export default {
       cssStyle['width'] = `${this.width || 310}px`;
       cssStyle['max-width'] = `${this.width || 310}px`;
       cssStyle['min-height'] = this.minHeight;
-      cssStyle['height'] = this.isInternalSidebar ? '100%' : this.minHeight;
+      cssStyle['height'] = '100%';
       return cssStyle;
     },
   },
