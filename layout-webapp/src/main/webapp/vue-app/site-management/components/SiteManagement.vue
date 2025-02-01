@@ -83,7 +83,7 @@ export default {
     },
     refreshSites() {
       this.loading++;
-      return this.$siteService.getSites('PORTAL', null, 'public', true, true, false, false, false, null, true)
+      return this.$siteService.getSites('PORTAL', null, null, true, true, false, false, false, null, true)
         .then(sites => this.sites = sites?.filter(s => !s?.properties?.IS_SPACE_PUBLIC_SITE) || [])
         .finally(() => this.loading--);
     },
