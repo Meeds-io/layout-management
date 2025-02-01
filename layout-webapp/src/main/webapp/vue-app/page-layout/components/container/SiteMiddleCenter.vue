@@ -23,7 +23,6 @@
   <page-layout-container-base
     :container="container"
     :parent-id="parentId"
-    :style="cssStyle"
     class="d-flex flex-row site-middle-center-container"
     no-application-style
     no-background-style />
@@ -38,35 +37,6 @@ export default {
     parentId: {
       type: String,
       default: null,
-    },
-  },
-  computed: {
-    sidebarsContainerMinWidth() {
-      return this.$root.layout?.children
-        ?.filter?.(c => c.template === 'Sidebar'
-          && c.children?.length
-          && (
-            !this.$root.isMobile
-            || !c?.children?.[0].cssClass?.includes?.('hidden-sm-and-down')
-          )
-        )
-        ?.map?.(c => c.width
-          && Number(c.width)
-          || 310
-        )
-        ?.reduce?.((acc, v) => acc + v, 0) || 0;
-    },
-    width() {
-      return `max(100vw - ${this.sidebarsContainerMinWidth}px, 100%)`;
-    },
-    maxWidth() {
-      return `min(100vw - ${this.sidebarsContainerMinWidth}px, 100%)`;
-    },
-    cssStyle() {
-      return {
-        'width': this.width,
-        'max-width': this.maxWidth,
-      };
     },
   },
 };
