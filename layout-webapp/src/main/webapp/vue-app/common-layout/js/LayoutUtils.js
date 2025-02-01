@@ -363,67 +363,74 @@ export function parseSite(layout) {
     }
     return true;
   } else {
-    const applications = getApplications(layout);
-    layout.template = siteTemplate;
-    layout.children = [
-      { // Left
-        ...newContainer(sidebarTemplate),
-        children: [{
-          ...newContainer(sidebarCellTemplate),
-          children: applications || [],
-          width: 310
-        }]
-      },
-      { // Middle
-        ...newContainer(siteBodyMiddleTemplate),
-        children: [
-          { // Top Banner
-            ...newContainer(bannerTemplate),
-            children: [
-              newContainer(bannerCellTemplate),
-              newContainer(bannerCellTemplate),
-              newContainer(bannerCellTemplate),
-            ]
-          },
-          { // Middle - Center
-            ...newContainer(siteBodyMiddleCenterTemplate),
-            children: [
-              { // Internal Left
-                ...newContainer(sidebarTemplate),
-                children: [{
-                  ...newContainer(sidebarCellTemplate),
-                  width: 310
-                }]
-              },
-              // Page Body
-              newContainer(pageBodyTemplate),
-              { // Internal Right
-                ...newContainer(sidebarTemplate),
-                children: [{
-                  ...newContainer(sidebarCellTemplate),
-                  width: 310
-                }]
-              },
-            ]
-          },
-          { // Bottom Banner
-            ...newContainer(bannerTemplate),
-            children: [
-              newContainer(bannerCellTemplate),
-            ]
-          }
-        ]
-      },
-      { // Right
-        ...newContainer(sidebarTemplate),
-        children: [{
-          ...newContainer(sidebarCellTemplate),
-          width: 310
-        }]
-      }
-    ];
-    return !applications?.length;
+    return newSite(layout);
   }
+}
+
+export function newSite(layout) {
+  if (!layout) {
+    layout = {};
+  }
+  const applications = getApplications(layout);
+  layout.template = siteTemplate;
+  layout.children = [
+    { // Left
+      ...newContainer(sidebarTemplate),
+      children: [{
+        ...newContainer(sidebarCellTemplate),
+        children: applications || [],
+        width: 310
+      }]
+    },
+    { // Middle
+      ...newContainer(siteBodyMiddleTemplate),
+      children: [
+        { // Top Banner
+          ...newContainer(bannerTemplate),
+          children: [
+            newContainer(bannerCellTemplate),
+            newContainer(bannerCellTemplate),
+            newContainer(bannerCellTemplate),
+          ]
+        },
+        { // Middle - Center
+          ...newContainer(siteBodyMiddleCenterTemplate),
+          children: [
+            { // Internal Left
+              ...newContainer(sidebarTemplate),
+              children: [{
+                ...newContainer(sidebarCellTemplate),
+                width: 310
+              }]
+            },
+            // Page Body
+            newContainer(pageBodyTemplate),
+            { // Internal Right
+              ...newContainer(sidebarTemplate),
+              children: [{
+                ...newContainer(sidebarCellTemplate),
+                width: 310
+              }]
+            },
+          ]
+        },
+        { // Bottom Banner
+          ...newContainer(bannerTemplate),
+          children: [
+            newContainer(bannerCellTemplate),
+          ]
+        }
+      ]
+    },
+    { // Right
+      ...newContainer(sidebarTemplate),
+      children: [{
+        ...newContainer(sidebarCellTemplate),
+        width: 310
+      }]
+    }
+  ];
+  return !applications?.length;
 }
 
 export function isSiteLayoutCompatible(layout) {
