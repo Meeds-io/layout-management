@@ -59,6 +59,14 @@
         <div class="text-header mb-4">
           {{ $t('layout.editSiteSidebarSection.label.updateStyle') }}
         </div>
+        <div class="d-flex align-center mb-2">
+          <div class="me-auto mb-2">
+            {{ $t('layout.fixPositionWhenScrolling') }}
+          </div>
+          <v-switch
+            v-model="stickySection"
+            class="ms-auto my-auto me-n2" />
+        </div>
         <layout-editor-background-input
           ref="backgroundInput"
           v-model="container"
@@ -113,6 +121,7 @@
 export default {
   data: () => ({
     drawer: false,
+    stickySection: false,
     hiddenOnMobile: false,
     saving: false,
     width: null,
@@ -136,6 +145,7 @@ export default {
       this.parentId = parentId;
       this.width = this.container.width || 310;
       this.hiddenOnMobile = this.container.cssClass?.includes?.('hidden-sm-and-down');
+      this.stickySection = this.sidebarContainer?.cssClass?.includes?.('layout-sticky-section');
       this.$refs.drawer.open();
     },
     removeSection() {
@@ -158,6 +168,11 @@ export default {
           this.$set(this.container, 'cssClass', this.container.cssClass ? `${this.container.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down');
         } else if (!this.hiddenOnMobile && this.container.cssClass?.includes?.('hidden-sm-and-down')) {
           this.$set(this.container, 'cssClass', this.container.cssClass.replace('hidden-sm-and-down', ''));
+        }
+        if (this.stickySection && !this.sidebarContainer.cssClass?.includes?.('layout-sticky-section')) {
+          this.sidebarContainer.cssClass = this.sidebarContainer.cssClass ? `${this.sidebarContainer.cssClass} layout-sticky-section` : 'layout-sticky-section';
+        } else if (!this.stickySection && this.sidebarContainer.cssClass?.includes?.('layout-sticky-section')) {
+          this.sidebarContainer.cssClass = this.sidebarContainer.cssClass.replace('layout-sticky-section', '');
         }
         this.close();
       } finally {
