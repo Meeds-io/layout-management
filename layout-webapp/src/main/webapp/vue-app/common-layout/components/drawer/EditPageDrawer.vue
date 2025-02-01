@@ -55,7 +55,7 @@
           </div>
         </div>
         <div class="d-flex flex-column mt-4">
-          <div class="text-header me-auto mb-2">
+          <div class="text-header mb-2">
             {{ $t('layout.updateSitePagesWidth') }}
           </div>
           <v-radio-group

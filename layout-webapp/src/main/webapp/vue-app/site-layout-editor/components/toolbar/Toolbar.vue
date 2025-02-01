@@ -44,7 +44,7 @@ export default {
       return !this.$root.sectionHistory?.length && !this.$root.sectionRedo?.length;
     },
     siteLabel() {
-      return this.$root.site?.displayName;
+      return this.$root.isSiteTemplate ? this.$root.siteTemplate?.name : this.$root.site?.displayName;
     },
   },
   mounted() {
