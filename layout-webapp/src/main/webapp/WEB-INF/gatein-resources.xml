@@ -509,6 +509,9 @@
         <module>translationField</module>
       </depends>
       <depends>
+        <module>html2canvas</module>
+      </depends>
+      <depends>
         <module>applicationToolbarComponent</module>
       </depends>
     </module>

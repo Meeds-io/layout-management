@@ -22,7 +22,7 @@
 <template>
   <div class="pt-4">
     <div class="d-flex pb-2">
-      <div class="text-subtitle-1">
+      <div class="text-header">
         {{ $t('siteTemplates.preview') }}
       </div>
       <v-spacer />

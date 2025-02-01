@@ -39,6 +39,23 @@
             <span v-sanitized-html="$t(information)"></span>
           </div>
         </v-alert>
+        <div v-if="displayEditLayout" class="mt-4 mx-4">
+          <div class="d-flex align-center mb-4">
+            <div class="text-header me-auto">
+              {{ $t('layout.editSiteLayout') }}
+            </div>
+            <v-btn
+              :aria-label="$t('siteManagement.label.editLayout')"
+              :href="editSiteLayoutLink"
+              target="_blank"
+              icon>
+              <v-icon size="20">fa-edit</v-icon>
+            </v-btn>
+          </div>
+          <div class="text-header">
+            {{ $t('layout.editSiteNavigation') }}
+          </div>
+        </div>
         <v-toolbar
           color="white"
           flat
@@ -93,6 +110,7 @@ export default {
     navigationNodes: [],
     navigationNodesToDisplay: [],
     displayCloseFooter: false,
+    displayEditLayout: false,
     drawer: false,
     siteType: null,
     siteId: null,
@@ -129,6 +147,9 @@ export default {
     label() {
       return this.siteLabel || this.siteName;
     },
+    editSiteLayoutLink() {
+      return `${eXo.env.portal.context}/${eXo.env.portal.portalName}/site-layout-editor?siteId=${this.siteId}`;
+    },
   },
   watch: {
     filter() {
@@ -150,6 +171,7 @@ export default {
       this.information = event?.information;
       this.includeGlobal = event?.includeGlobal || false;
       this.displayCloseFooter = event?.displayCloseFooter || false;
+      this.displayEditLayout = event?.displayEditLayout || false;
       this.getNavigationNodes();
       this.$refs.drawer.open();
       this.$nextTick().then(() =>  this.$root.$emit('site-navigation-drawer-opened'));
