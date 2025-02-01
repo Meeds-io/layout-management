@@ -22,6 +22,7 @@ import SiteTemplatePreview from './components/SiteTemplatePreview.vue';
 import SiteTemplateDrawer from './components/SiteTemplateDrawer.vue';
 import SiteTemplateSaveAsDrawer from './components/SiteTemplateSaveAsDrawer.vue';
 
+import SiteTemplateLayout from './components/SiteTemplateLayout.vue';
 import SiteTemplateNavigationHandler from './components/SiteTemplateNavigationHandler.vue';
 
 const components = {
@@ -30,6 +31,7 @@ const components = {
   'site-template-drawer': SiteTemplateDrawer,
   'site-template-save-as-drawer': SiteTemplateSaveAsDrawer,
 
+  'site-template-layout': SiteTemplateLayout,
   'site-template-navigation-handler': SiteTemplateNavigationHandler,
 };
 
