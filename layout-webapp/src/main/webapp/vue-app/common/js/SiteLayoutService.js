@@ -215,6 +215,48 @@ export function updateSiteLayout(siteType, siteName, layout, expand, publish) {
   });
 }
 
+export function restoreSite({
+  siteName,
+  siteType,
+  importMode,
+  siteLayout,
+  sitePages,
+  siteNavigation
+}) {
+  const formData = new FormData();
+  if (siteName) {
+    formData.append('siteName', siteName);
+  }
+  if (siteType) {
+    formData.append('siteType', siteType);
+  }
+  if (importMode) {
+    formData.append('importMode', importMode);
+  }
+  if (siteLayout) {
+    formData.append('siteLayout', siteLayout);
+  }
+  if (sitePages) {
+    formData.append('pagesLayout', sitePages);
+  }
+  if (siteNavigation) {
+    formData.append('navigation', siteNavigation);
+  }
+  const params = new URLSearchParams(formData).toString();
+  return fetch('/layout/rest/sites/restore', {
+    credentials: 'include',
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params
+  }).then((resp) => {
+    if (!resp?.ok) {
+      throw new Error('Error when updating site');
+    }
+  });
+}
+
 export function deleteSite(siteType, siteName) {
   const formData = new FormData();
   formData.append('siteName', siteName);

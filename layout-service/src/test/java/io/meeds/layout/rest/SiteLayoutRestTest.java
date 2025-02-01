@@ -56,6 +56,7 @@ import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
@@ -95,6 +96,11 @@ public class SiteLayoutRestTest {
   private static final String   DELETE_LAYOUT_REST_PATH       = REST_PATH + "?siteType=DRAFT&siteName=" + SITE_NAME;
 
   private static final String   CREATE_DRAFT_LAYOUT_REST_PATH = REST_PATH + "/draft?siteType=DRAFT&siteName=" + SITE_NAME;
+
+  private static final String   RESTORE_LAYOUT_REST_PATH      = REST_PATH + "/restore";
+
+  private static final String   RESTORE_LAYOUT_PARAMS         = "siteType=DRAFT&siteName=" + SITE_NAME +
+      "&importMode=INSERT&siteLayout=true&pagesLayout=true&navigation=true";
 
   @MockBean
   private SiteLayoutService     siteLayoutService;
@@ -257,6 +263,52 @@ public class SiteLayoutRestTest {
     ResultActions response = mockMvc.perform(put(REST_PATH).content("{}")
                                                            .contentType(MediaType.APPLICATION_JSON)
                                                            .with(testSimpleUser()));
+    response.andExpect(status().isOk());
+  }
+
+  @Test
+  @SneakyThrows
+  void restoreSiteWhenNotFound() {
+    doThrow(ObjectNotFoundException.class).when(siteLayoutService)
+                                          .restoreSite(SITE_KEY, ImportMode.INSERT, true, true, true, SIMPLE_USER);
+    ResultActions response =
+                           mockMvc.perform(put(RESTORE_LAYOUT_REST_PATH).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                                                                        .content(RESTORE_LAYOUT_PARAMS)
+                                                                        .with(testSimpleUser()));
+    response.andExpect(status().isNotFound());
+  }
+
+  @Test
+  @SneakyThrows
+  void restoreSiteWhenIllegalAccess() {
+    doThrow(IllegalAccessException.class).when(siteLayoutService)
+                                         .restoreSite(SITE_KEY, ImportMode.INSERT, true, true, true, SIMPLE_USER);
+    ResultActions response =
+                           mockMvc.perform(put(RESTORE_LAYOUT_REST_PATH).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                                                                        .content(RESTORE_LAYOUT_PARAMS)
+                                                                        .with(testSimpleUser()));
+    response.andExpect(status().isForbidden());
+  }
+
+  @Test
+  @SneakyThrows
+  void restoreSiteWhenIllegalState() {
+    doThrow(IllegalStateException.class).when(siteLayoutService)
+                                        .restoreSite(SITE_KEY, ImportMode.INSERT, true, true, true, SIMPLE_USER);
+    ResultActions response =
+                           mockMvc.perform(put(RESTORE_LAYOUT_REST_PATH).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                                                                        .content(RESTORE_LAYOUT_PARAMS)
+                                                                        .with(testSimpleUser()));
+    response.andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @SneakyThrows
+  void restoreSite() {
+    ResultActions response =
+                           mockMvc.perform(put(RESTORE_LAYOUT_REST_PATH).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                                                                        .content(RESTORE_LAYOUT_PARAMS)
+                                                                        .with(testSimpleUser()));
     response.andExpect(status().isOk());
   }
 
