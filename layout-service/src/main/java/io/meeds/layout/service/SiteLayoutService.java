@@ -40,6 +40,8 @@ import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
@@ -56,6 +58,8 @@ import lombok.SneakyThrows;
 public class SiteLayoutService {
 
   private static final String     SITE_DOESNT_EXIST_MSG = "Site %s doesn't exist";
+
+  private static final Log        LOG                   = ExoLogger.getLogger(SiteLayoutService.class);
 
   @Autowired
   private LayoutService           layoutService;
@@ -228,6 +232,7 @@ public class SiteLayoutService {
 
   public void updateSiteLayout(SiteKey siteKey,
                                PortalConfig site,
+                               boolean publish,
                                String username) throws IllegalAccessException, ObjectNotFoundException {
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
@@ -238,6 +243,18 @@ public class SiteLayoutService {
                                                      username));
     }
     portalConfig.setPortalLayout(site.getPortalLayout());
+    try {
+      if (publish) {
+        // Update Site Layout only without resetting preferences
+        portalConfig.resetStorage();
+      } else {
+        // Check Site Layout consistency before saving
+        portalConfig.checkStorage();
+      }
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("Error while accessing Site applications storage information", e);
+      throw new IllegalStateException("layout.siteOutdatedError");
+    }
     layoutService.save(portalConfig);
   }
 

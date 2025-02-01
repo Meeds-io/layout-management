@@ -24,8 +24,7 @@
     :class="cssClass"
     :style="cssStyle">
     <slot name="header"></slot>
-    <slot v-if="$slots.content" name="content"></slot>
-    <template v-else-if="hasChildren">
+    <template v-if="hasChildren">
       <page-layout-container-extension
         v-for="child in children"
         :key="child.storageId"
