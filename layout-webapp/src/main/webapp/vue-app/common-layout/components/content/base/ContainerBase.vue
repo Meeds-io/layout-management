@@ -21,20 +21,19 @@
 <template>
   <v-hover v-model="hover" :disabled="$root.mobileDisplayMode">
     <component
-      :is="draggable && 'draggable' || 'div'"
       v-model="children"
-      :id="id"
-      :class="cssClass"
-      :style="cssStyle"
-      :data-storage-id="storageId"
       v-bind="draggable && {
         'options': dragOptions,
-        'class': 'position-relative'
       }"
       v-on="draggable && {
         start: startMoving,
         end: endMoving,
-      }">
+      }"
+      :is="draggable && 'draggable' || 'div'"
+      :id="id"
+      :class="cssClass"
+      :style="cssStyle"
+      :data-storage-id="storageId">
       <!-- Added in a template on purpose to workaround a 'draggable' component bug -->
       <template v-if="$slots.header">
         <slot name="header"></slot>
@@ -194,7 +193,7 @@ export default {
       return [
         this.containerCssClass?.replace?.('layout-sticky-application', '')?.replace?.('layout-sticky-section', ''),
         this.draggable ? 'v-draggable' : '',
-        this.noChildren ? 'position-relative' : ''
+        (this.noChildren || this.draggable) ? 'position-relative' : ''
       ];
     },
     isCell() {
@@ -213,6 +212,9 @@ export default {
         || this.container.template === this.$layoutUtils.bannerTemplate
         || this.container.template === this.$layoutUtils.sidebarCellTemplate;
     },
+    dragSelectionClass() {
+      return this.isDraggableCell && '.draggable-cell' || '.draggable';
+    },
     dragOptions() {
       return this.sectionType && {
         group: `${this.sectionType}`,
@@ -220,7 +222,7 @@ export default {
         animation: 200,
         ghostClass: 'layout-moving-ghost-container',
         chosenClass: 'layout-moving-chosen-container',
-        handle: this.isDraggableCell && '.draggable-cell' || '.draggable',
+        handle: this.dragSelectionClass,
         dataIdAttr: 'data-storage-id',
       };
     },

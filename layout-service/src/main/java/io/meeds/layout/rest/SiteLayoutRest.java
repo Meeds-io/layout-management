@@ -20,6 +20,7 @@
 package io.meeds.layout.rest;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -329,6 +330,9 @@ public class SiteLayoutRest {
                                                       @Parameter(description = "site name")
                                                       @RequestParam("siteName")
                                                       String siteName,
+                                                      @Parameter(description = "Whether the page layout update is a draft page publication or not", required = false)
+                                                      @RequestParam(name = "publish", required = false)
+                                                      Optional<Boolean> publish,
                                                       @Parameter(description = "expand options", required = false)
                                                       @RequestParam(name = "expand", required = false)
                                                       String expand,
@@ -337,6 +341,7 @@ public class SiteLayoutRest {
     try {
       siteLayoutService.updateSiteLayout(new SiteKey(siteType, siteName),
                                          layoutModel.toSite(),
+                                         publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
       return getSiteLayout(webRequest, request, siteType, siteName, expand);
     } catch (ObjectNotFoundException e) {

@@ -20,20 +20,16 @@
 
 -->
 <template>
-  <div
-    :style="cssStyle"
-    class="flex-grow-1 flex-shrink-1">
-    <layout-editor-container-base
-      ref="container"
-      :container="container"
-      :parent-id="parentId"
-      :index="index"
-      :length="length"
-      class="d-flex flex-column layout-site-middle-container"
-      type="site-middle-container"
-      no-background-style
-      draggable />
-  </div>
+  <layout-editor-container-base
+    ref="container"
+    :container="container"
+    :parent-id="parentId"
+    :index="index"
+    :length="length"
+    class="d-flex flex-column flex-grow-1 flex-shrink-1 overflow-hidden layout-site-middle-container"
+    type="site-middle-container"
+    no-background-style
+    draggable />
 </template>
 <script>
 export default {
