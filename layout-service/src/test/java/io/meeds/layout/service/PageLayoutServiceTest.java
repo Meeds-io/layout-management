@@ -54,6 +54,7 @@ import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.serialize.model.SiteLayout;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
@@ -195,7 +196,7 @@ public class PageLayoutServiceTest {
     when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
 
     PageBody pageBody = mock(PageBody.class);
-    Container pageBodyContainer = mock(Container.class);
+    SiteLayout pageBodyContainer = mock(SiteLayout.class);
     when(site.getPortalLayout()).thenReturn(pageBodyContainer);
     when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(pageBody)));
 
