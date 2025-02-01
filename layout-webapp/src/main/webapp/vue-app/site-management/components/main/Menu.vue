@@ -157,6 +157,40 @@
           {{ $t('sites.saveAsSiteTemplate') }}
         </v-list-item-title>
       </v-list-item>
+      <v-list-item
+        v-if="canRestore"
+        class="px-3"
+        @click="restoreSiteLayout">
+        <v-card
+          class="d-flex align-center justify-center"
+          color="transparent"
+          min-width="15"
+          flat>
+          <v-icon size="13">
+            fa-undo
+          </v-icon>
+        </v-card>
+        <v-list-item-title class="ps-2">
+          {{ $t('siteManagement.label.restoreSiteLayout') }}
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        v-if="canRestore"
+        class="px-3"
+        @click="restoreSitePages">
+        <v-card
+          class="d-flex align-center justify-center"
+          color="transparent"
+          min-width="15"
+          flat>
+          <v-icon size="13">
+            fa-undo
+          </v-icon>
+        </v-card>
+        <v-list-item-title class="ps-2">
+          {{ $t('siteManagement.label.restoreSitePages') }}
+        </v-list-item-title>
+      </v-list-item>
       <v-tooltip
         v-if="canEditSite"
         :disabled="canDelete"
@@ -197,10 +231,11 @@ export default {
     site: {
       type: Object,
       default: null,
-    }
+    },
   },
   data: () => ({
     displayActionMenu: false,
+    loading: false,
   }),
   computed: {
     isMetaSite() {
@@ -217,6 +252,9 @@ export default {
     },
     siteId() {
       return this.site.siteId;
+    },
+    canRestore() {
+      return this.site.canRestore;
     },
     canDelete() {
       return this.canEditSite && this.site?.properties?.removable !== 'false';
@@ -275,6 +313,42 @@ export default {
         siteId: null,
         name: null,
       }, this.site.siteId);
+    },
+    async restoreSitePages() {
+      this.loading = true;
+      try {
+        await this.$siteLayoutService.restoreSite({
+          siteName: this.site.name,
+          siteType: this.site.siteType,
+          importMode: 'MERGE',
+          siteLayout: false,
+          sitePages: true,
+          siteNavigation: true,
+        });
+        this.$root.$emit('alert-message', this.$t('siteManagement.label.restoreSitePages.success'), 'success');
+      } catch (e) {
+        this.$root.$emit('alert-message', this.$t('siteManagement.label.restoreSitePages.error'), 'error');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async restoreSiteLayout() {
+      this.loading = true;
+      try {
+        await this.$siteLayoutService.restoreSite({
+          siteName: this.site.name,
+          siteType: this.site.siteType,
+          importMode: 'MERGE',
+          siteLayout: true,
+          sitePages: false,
+          siteNavigation: false,
+        });
+        this.$root.$emit('alert-message', this.$t('siteManagement.label.restoreSiteLayout.success'), 'success');
+      } catch (e) {
+        this.$root.$emit('alert-message', this.$t('siteManagement.label.restoreSiteLayout.error'), 'error');
+      } finally {
+        this.loading = false;
+      }
     },
   }
 };
