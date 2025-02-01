@@ -196,7 +196,7 @@ export default {
     },
     handleSiteSaved() {
       document.dispatchEvent(new CustomEvent('alert-message', {detail: {
-        alertLink: `/portal/${this.$root.siteName}`,
+        alertLink: this.$root.siteUri,
         alertMessage: this.$t('layout.siteSavedSuccessfully'),
         alertLinkText: this.$t('layout.view'),
         alertLinkTarget: '_blank',
