@@ -193,8 +193,8 @@ export function updateSite(siteName, siteType, siteLabel, siteDescription, displ
   });
 }
 
-export function updateSiteLayout(siteType, siteName, layout, expand) {
-  return fetch(`/layout/rest/sites/layout?siteType=${siteType}&siteName=${siteName}&expand=${expand || ''}`, {
+export function updateSiteLayout(siteType, siteName, layout, expand, publish) {
+  return fetch(`/layout/rest/sites/layout?siteType=${siteType}&siteName=${siteName}&expand=${expand || ''}&publish=${publish || false}`, {
     method: 'PUT',
     credentials: 'include',
     headers: {

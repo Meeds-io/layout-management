@@ -329,7 +329,7 @@ public class SiteLayoutRestTest {
   @SneakyThrows
   void updateSiteLayoutWhenNotFound() {
     doThrow(ObjectNotFoundException.class).when(siteLayoutService)
-                                          .updateSiteLayout(eq(SITE_KEY), any(), eq(SIMPLE_USER));
+                                          .updateSiteLayout(eq(SITE_KEY), any(), anyBoolean(), eq(SIMPLE_USER));
     ResultActions response = mockMvc.perform(put(LAYOUT_REST_PATH_WITH_PARAMS).content("{}")
                                                                               .contentType(MediaType.APPLICATION_JSON)
                                                                               .with(testSimpleUser()));
@@ -340,7 +340,7 @@ public class SiteLayoutRestTest {
   @SneakyThrows
   void updateSiteLayoutWhenIllegalAccess() {
     doThrow(IllegalAccessException.class).when(siteLayoutService)
-                                         .updateSiteLayout(eq(SITE_KEY), any(), eq(SIMPLE_USER));
+                                         .updateSiteLayout(eq(SITE_KEY), any(), anyBoolean(), eq(SIMPLE_USER));
     ResultActions response = mockMvc.perform(put(LAYOUT_REST_PATH_WITH_PARAMS).content("{}")
                                                                               .contentType(MediaType.APPLICATION_JSON)
                                                                               .with(testSimpleUser()));
