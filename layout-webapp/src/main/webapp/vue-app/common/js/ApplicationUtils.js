@@ -24,18 +24,27 @@ export function installApplication(navUri, applicationStorageId, applicationElem
 
 export function getStyle(container, options) {
   const style = {};
-  if (container.marginTop || container.marginBottom || container.marginLeft || container.marginRight) {
+  if (container.marginTop === 0
+    || container.marginTop
+    || container.marginBottom === 0
+    || container.marginBottom
+    || container.marginLeft === 0
+    || container.marginLeft
+    || container.marginRight === 0
+    || container.marginRight) {
     if (options.isPageWidthStyle) {
-      if (container.marginTop) {
+      if (container.marginTop === 0 || container.marginTop) {
         style['--allPagesMarginTop'] = `${container.marginTop}px`;
+        style['--allPagesNoMarginTop'] = '0px';
       }
-      if (container.marginRight) {
+      if (container.marginRight === 0 || container.marginRight) {
         style['--allPagesMarginRight'] = `${container.marginRight}px`;
       }
-      if (container.marginBottom) {
+      if (container.marginBottom === 0 || container.marginBottom) {
         style['--allPagesMarginBottom'] = `${container.marginBottom}px`;
+        style['--allPagesNoMarginBottom'] = '0px';
       }
-      if (container.marginLeft) {
+      if (container.marginLeft === 0 || container.marginLeft) {
         style['--allPagesMarginLeft'] = `${container.marginLeft}px`;
       }
     } else if (options.sectionStyle && !options.noSectionMargins) {
@@ -43,11 +52,11 @@ export function getStyle(container, options) {
       if (container.marginTop) {
         style['--sectionMarginTop'] = `${container.marginTop + diff}px`;
       }
-      if (container.marginBottom) {
-        style['--sectionMarginBottom'] = `${container.marginBottom + diff}px`;
-      }
       if (container.marginRight) {
         style['--sectionMarginRight'] = `${container.marginRight + diff}px`;
+      }
+      if (container.marginBottom) {
+        style['--sectionMarginBottom'] = `${container.marginBottom + diff}px`;
       }
       if (container.marginLeft) {
         style['--sectionMarginLeft'] = `${container.marginLeft + diff}px`;
