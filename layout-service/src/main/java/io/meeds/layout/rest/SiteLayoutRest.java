@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,6 +46,7 @@ import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
@@ -232,6 +234,50 @@ public class SiteLayoutRest {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+  }
+
+  @PutMapping(value = "/restore", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  @Secured("users")
+  @Operation(summary = "Restore a builtin site layout, pages and navigation", method = "PUT", description = "This restores a builtin site layout, pages and navigation from builtin configuration")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "400", description = "Bad Request"),
+    @ApiResponse(responseCode = "403", description = "Forbidden"),
+    @ApiResponse(responseCode = "404", description = "Not found"),
+  })
+  public void restoreSite(
+                          HttpServletRequest request,
+                          @RequestParam("siteType")
+                          String siteType,
+                          @Parameter(description = "site name")
+                          @RequestParam("siteName")
+                          String siteName,
+                          @Parameter(description = "Import Mode")
+                          @RequestParam(name = "importMode", defaultValue = "MERGE", required = false)
+                          ImportMode importMode,
+                          @Parameter(description = "Whether restore the site layout or not", required = false)
+                          @RequestParam(name = "siteLayout", defaultValue = "false", required = false)
+                          Optional<Boolean> siteLayout,
+                          @Parameter(description = "Whether restore site page layouts or not", required = false)
+                          @RequestParam(name = "pagesLayout", defaultValue = "false", required = false)
+                          Optional<Boolean> pagesLayout,
+                          @Parameter(description = "Whether restore site navigation tree or not", required = false)
+                          @RequestParam(name = "navigation", defaultValue = "false", required = false)
+                          Optional<Boolean> navigationTree) {
+    try {
+      siteLayoutService.restoreSite(new SiteKey(siteType, siteName),
+                                    importMode,
+                                    siteLayout.orElse(false).booleanValue(),
+                                    pagesLayout.orElse(false).booleanValue(),
+                                    navigationTree.orElse(false).booleanValue(),
+                                    request.getRemoteUser());
+    } catch (ObjectNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    } catch (IllegalAccessException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    } catch (IllegalStateException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
 
