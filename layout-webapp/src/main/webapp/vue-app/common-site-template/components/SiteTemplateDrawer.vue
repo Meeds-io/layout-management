@@ -47,7 +47,7 @@
           back-icon
           required>
           <template #title>
-            <div class="text-subtitle-1">
+            <div class="text-header">
               {{ $t('layout.siteTemplate.name') }}
             </div>
           </template>
@@ -65,7 +65,7 @@
           back-icon
           rich-editor>
           <template #title>
-            <div class="text-subtitle-1">
+            <div class="text-header">
               {{ $t('layout.siteTemplate.description') }}
             </div>
           </template>
@@ -82,8 +82,14 @@
         </translation-text-field>
         <font-icon-input
           v-model="siteTemplate.icon"
+          class="text-header mt-4" />
+        <site-template-layout
+          v-if="isNew"
+          ref="siteTemplateLayout"
+          :site-template="siteTemplate"
           class="mt-4" />
         <site-template-preview
+          v-else
           ref="siteTemplatePreview"
           v-model="illustrationUploadId"
           :preview-image="illustrationData"
@@ -178,6 +184,7 @@ export default {
             siteTemplate = await this.$siteTemplateService.saveAsSiteTemplate(this.siteTemplate, this.sourceSiteId);
           } else {
             siteTemplate = await this.$siteTemplateService.createSiteTemplate(this.siteTemplate);
+            this.siteTemplate.id = siteTemplate.id;
           }
         } else {
           siteTemplate = await this.$siteTemplateService.updateSiteTemplate(this.siteTemplate);
@@ -189,11 +196,12 @@ export default {
 
         await this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'title', this.titleTranslations);
         await this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'description', this.descriptionTranslations);
-        await this.$refs?.siteTemplatePreview?.save();
         if (this.isNew) {
+          await this.$refs?.siteTemplateLayout?.save();
           this.$root.$emit('alert-message', this.$t('layout.siteTemplateCreatedSuccessfully'), 'success');
           this.$root.$emit('site-template-created', siteTemplate);
         } else {
+          await this.$refs?.siteTemplatePreview?.save();
           this.$root.$emit('alert-message', this.$t('layout.siteTemplateUpdatedSuccessfully'), 'success');
           this.$root.$emit('site-template-updated', siteTemplate);
         }
