@@ -114,10 +114,16 @@ export function init() {
             return this.$layoutUtils.getQueryParam('siteId');
           },
           siteType() {
-            return this.site?.siteType;
+            return this.site?.siteType?.toUpperCase?.();
           },
           siteName() {
             return this.site?.name;
+          },
+          isSiteTemplate() {
+            return this.siteType === 'PORTAL_TEMPLATE' || this.siteType === 'GROUP_TEMPLATE';
+          },
+          siteUri() {
+            return this.isSiteTemplate ? `${eXo.env.portal.context}/t/${this.siteId}` : `${eXo.env.portal.context}/${this.siteName}`;
           },
           draftSiteType() {
             return this.draftSite?.siteType;
