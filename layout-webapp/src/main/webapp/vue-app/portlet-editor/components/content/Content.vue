@@ -20,7 +20,7 @@
 -->
 <template>
   <v-card
-    class="transparent width-page-content no-applications-spacing mx-auto d-flex justify-center"
+    class="transparent page-content no-applications-spacing mx-auto d-flex justify-center"
     flat>
     <portlet-editor-cell />
   </v-card>
