@@ -25,6 +25,7 @@ import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 import '../common-illustration/main.js';
+import '../common-site-template/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
@@ -65,6 +66,7 @@ export function init() {
           loadingPortletInstances: false,
           branding: null,
           displayMode: 'desktop',
+          siteTemplate: null,
           layout: null,
           site: null,
           draftSite: null,
@@ -171,6 +173,11 @@ export function init() {
               this.$root.$emit('layout-editor-moving-start', this.movingParentId);
             } else {
               this.$root.$emit('layout-editor-moving-end', this.movingParentId);
+            }
+          },
+          async siteType() {
+            if (this.isSiteTemplate) {
+              this.siteTemplate = await this.$siteTemplateService.getSiteTemplate(this.siteId);
             }
           },
         },
