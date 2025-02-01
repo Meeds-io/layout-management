@@ -73,7 +73,6 @@
             :class="{
               'r-0': $vuetify.rtl,
               'l-0': !$vuetify.rtl,
-              'ms-n4': translateLeftButton,
             }"
             :style="leftButtonStyle"
             class="position-absolute t-10 z-index-two">
@@ -115,7 +114,6 @@
             :class="{
               'l-0': $vuetify.rtl,
               'r-0': !$vuetify.rtl,
-              'me-n4': translateRightButton,
             }"
             class="position-absolute t-10 z-index-two">
             <v-tooltip bottom>
@@ -221,12 +219,6 @@ export default {
     },
     hoveredApplication() {
       return !!this.$root.hoveredApplication;
-    },
-    translateLeftButton() {
-      return !!this.$root.leftContainer?.children?.length;
-    },
-    translateRightButton() {
-      return !!this.$root.rightContainer?.children?.length;
     },
     rightButtonStyle() {
       return {

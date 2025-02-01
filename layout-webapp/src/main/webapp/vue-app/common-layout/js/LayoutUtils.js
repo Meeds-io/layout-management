@@ -280,10 +280,10 @@ export function applyContainerStyle(container, containerStyle) {
   } else {
     container.cssClass = container.cssClass.replace(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g'), '').replace(/  +/g, ' ');
     if (containerStyle.marginTop === 0 || containerStyle.marginTop) {
-      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginTop || 0, 240)) / 4))}`;
-      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginRight || 0, 240)) / 4))}`;
-      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginBottom || 0, 240)) / 4))}`;
-      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-240, Math.min(containerStyle.marginLeft || 0, 240)) / 4))}`;
+      container.cssClass += ` mt-${containerStyle.marginTop >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-64, Math.min(containerStyle.marginTop || 0, 64)) / 4))}`;
+      container.cssClass += ` me-${containerStyle.marginRight >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-64, Math.min(containerStyle.marginRight || 0, 64)) / 4))}`;
+      container.cssClass += ` mb-${containerStyle.marginBottom >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-64, Math.min(containerStyle.marginBottom || 0, 64)) / 4))}`;
+      container.cssClass += ` ms-${containerStyle.marginLeft >= 0 ? '' : 'n'}${Math.abs(parseInt(Math.max(-64, Math.min(containerStyle.marginLeft || 0, 64)) / 4))}`;
     }
   }
 
