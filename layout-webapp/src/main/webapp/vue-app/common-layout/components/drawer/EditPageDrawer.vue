@@ -60,7 +60,7 @@
           </div>
           <v-radio-group
             v-model="width"
-            class="ms-0 me-auto full-width text-no-wrap"
+            class="ms-0 mt-0 me-auto full-width text-no-wrap"
             mandatory>
             <v-radio
               :value="customWidth"
@@ -89,6 +89,20 @@
             </v-radio>
           </v-radio-group>
         </div>
+        <layout-editor-section-margin-input
+          v-model="parentContainer"
+          :max="80"
+          :min="0"
+          left
+          right
+          top
+          bottom>
+          <template #title>
+            <div class="text-header mt-4">
+              {{ $t('layout.pageMargins') }}
+            </div>
+          </template>
+        </layout-editor-section-margin-input>
         <layout-editor-background-input
           v-if="parentContainer"
           ref="backgroundInput"
@@ -164,6 +178,10 @@ export default {
     maxWidth: 5000,
     drawer: false,
     saving: false,
+    defaultMarginTop: 20,
+    defaultMarginRight: 20,
+    defaultMarginBottom: 20,
+    defaultMarginLeft: 20,
   }),
   computed: {
     cssStyle() {
@@ -195,6 +213,18 @@ export default {
     open(parentContainer) {
       this.originalParentContainer = parentContainer;
       this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
+      if (this.parentContainer.marginTop !== 0 && !this.parentContainer.marginTop) {
+        this.parentContainer.marginTop = this.defaultMarginTop;
+      }
+      if (this.parentContainer.marginRight !== 0 && !this.parentContainer.marginRight) {
+        this.parentContainer.marginRight = this.defaultMarginRight;
+      }
+      if (this.parentContainer.marginBottom !== 0 && !this.parentContainer.marginBottom) {
+        this.parentContainer.marginBottom = this.defaultMarginBottom;
+      }
+      if (this.parentContainer.marginLeft !== 0 && !this.parentContainer.marginLeft) {
+        this.parentContainer.marginLeft = this.defaultMarginLeft;
+      }
       this.width = (this.parentContainer.width === 'fullWindow' ? '100%' : this.parentContainer.width)
         || (this.parentContainer.width === 'singlePageApplication' ? 1320 : this.parentContainer.width)
         || (!!document.body.style.getPropertyValue('--allPagesWidth') && '100%')
@@ -221,6 +251,20 @@ export default {
         this.$set(this.originalParentContainer, 'appBackgroundRepeat', this.appBackgroundProperties.backgroundRepeat);
         this.$set(this.originalParentContainer, 'appBackgroundSize', this.appBackgroundProperties.backgroundSize);
         this.$set(this.originalParentContainer, 'width', this.width);
+
+        if (this.parentContainer.marginTop === this.defaultMarginTop) {
+          this.parentContainer.marginTop = null;
+        }
+        if (this.parentContainer.marginRight === this.defaultMarginRight) {
+          this.parentContainer.marginRight = null;
+        }
+        if (this.parentContainer.marginBottom === this.defaultMarginBottom) {
+          this.parentContainer.marginBottom = null;
+        }
+        if (this.parentContainer.marginLeft === this.defaultMarginLeft) {
+          this.parentContainer.marginLeft = null;
+        }
+
         this.$layoutUtils.applyContainerStyle(this.originalParentContainer, this.originalParentContainer);
         this.$root.pageFullWindow = this.fullWindow;
         this.$root.$emit('layout-editor-page-design-updated');
