@@ -272,7 +272,13 @@ export function applyContainerStyle(container, containerStyle) {
   }
 
   // Apply new Classes on Section or applications
-  if (container.template === flexTemplate || container.template === gridTemplate) {
+  if (container.template === flexTemplate
+      || container.template === gridTemplate
+      || container.template === siteTemplate
+      || container.template === bannerTemplate
+      || container.template === sidebarTemplate
+      || container.template === pageBodyTemplate
+      || container.template === sectionsParentTemplate) {
     Vue.set(container, 'marginTop', containerStyle.marginTop === 0 || containerStyle.marginTop ? containerStyle.marginTop : null);
     Vue.set(container, 'marginRight', containerStyle.marginRight === 0 || containerStyle.marginRight ? containerStyle.marginRight : null);
     Vue.set(container, 'marginBottom', containerStyle.marginBottom === 0 || containerStyle.marginBottom ? containerStyle.marginBottom : null);
@@ -865,10 +871,13 @@ function parseSection(section) {
 }
 
 export function parseContainerStyle(container) {
-  if (container.template !== flexTemplate
+  if (container.template !== siteTemplate
+    && container.template !== flexTemplate
     && container.template !== gridTemplate
+    && container.template !== bannerTemplate
     && container.template !== sidebarTemplate
-    && container.template !== bannerTemplate) {
+    && container.template !== pageBodyTemplate
+    && container.template !== sectionsParentTemplate) {
     const marginMatches = container?.cssClass?.match?.(new RegExp('(^| )(mt|mr|mb|ml|ms|me)-((md|lg|xl)-)?n?[0-9]{1,2}', 'g')) || [];
     if (marginMatches?.length) {
       container.marginTop = parseInt(marginMatches.find(c => c.search(/mt-n?\d+/) >= 0)?.replace?.('mt-n', '-')?.replace?.('mt-', '') || 0) * 4;
