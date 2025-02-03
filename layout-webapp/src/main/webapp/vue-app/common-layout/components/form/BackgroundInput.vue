@@ -58,12 +58,22 @@
         </v-radio-group>
       </v-list-item-content>
       <v-list-item-action
-        :class="choice === 'color' && 'mb-auto' || 'my-auto'"
+        :class="choice === 'color' && !scrollColor && 'mb-auto' || 'my-auto'"
         class="me-0 ms-auto">
         <layout-editor-color-picker
-          v-if="choice === 'color'"
+          v-if="choice === 'color' && !scrollColor"
           v-model="container.backgroundColor"
           class="my-auto" />
+        <div v-else-if="choice === 'color' && scrollColor">
+          <layout-editor-color-picker
+            v-model="backgroundScrollTop"
+            :label="$t('layout.scrollTopColor')"
+            class="my-auto" />
+          <layout-editor-color-picker
+            v-model="backgroundScrollMiddle"
+            :label="$t('layout.scrollMiddleColor')"
+            class="my-auto" />
+        </div>
         <div v-else>
           <layout-editor-color-picker
             v-model="backgroundGradientFrom"
@@ -178,6 +188,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    scrollColor: {
+      type: Boolean,
+      default: false,
+    },
     pageStyle: {
       type: Boolean,
       default: false,
@@ -192,6 +206,8 @@ export default {
     enabled: false,
     choice: null,
     backgroundImageStyle: null,
+    backgroundScrollTop: null,
+    backgroundScrollMiddle: null,
     backgroundGradientFrom: null,
     backgroundGradientTo: null,
     initialized: false,
@@ -199,6 +215,31 @@ export default {
   computed: {
     objectId() {
       return this.$root.isSiteLayout ? `site_${this.$root.siteId}_${this.pageStyle && this.$root.layout.storageId || 0}` : `page_${this.$root.pageId}_${this.container.storageId}`;
+    },
+    backgroundColor() {
+      return this.container.backgroundColor;
+    },
+    backgroundColorChoice() {
+      if (!this.enabled) {
+        return null;
+      } else if (this.choice === 'color'
+        && !this.scrollColor) {
+        return this.backgroundColor?.includes?.('@') ? this.backgroundColor.split('@')[0] : this.backgroundColor;
+      } else if (this.choice === 'color'
+        && this.scrollColor) {
+        return `${this.backgroundScrollTop}@${this.backgroundScrollMiddle}`;
+      } else {
+        return '#FFFFFF00';
+      }
+    },
+    backgroundEffect() {
+      if (this.choice === 'gradient'
+          && this.backgroundGradientFrom
+          && this.backgroundGradientTo) {
+        return `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
+      } else {
+        return null;
+      }
     },
   },
   watch: {
@@ -210,11 +251,21 @@ export default {
         }
       },
     },
-    enabled() {
+    scrollColor() {
       if (this.initialized) {
         this.container.backgroundColor = this.enabled && this.defaultBackgroundColor || null;
+        this.backgroundScrollTop = this.enabled && this.scrollColor && this.defaultBackgroundColor || null;
+        this.backgroundScrollMiddle = this.enabled && this.scrollColor && this.defaultBackgroundColor || null;
+      }
+    },
+    enabled() {
+      if (this.initialized) {
         this.container.backgroundImage = null;
         this.backgroundImageStyle = null;
+
+        this.container.backgroundColor = this.enabled && this.defaultBackgroundColor || null;
+        this.backgroundScrollTop = this.enabled && this.scrollColor && this.defaultBackgroundColor || null;
+        this.backgroundScrollMiddle = this.enabled && this.scrollColor && this.defaultBackgroundColor || null;
         this.backgroundGradientFrom = null;
         this.backgroundGradientTo = null;
       }
@@ -230,31 +281,34 @@ export default {
         }
       }
     },
-    backgroundGradientFrom() {
-      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.choice === 'gradient') {
-        this.container.backgroundEffect = `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
-      } else {
-        this.container.backgroundEffect = null;
-      }
+    backgroundColorChoice: {
+      immediate: true,
+      handler(newVal, oldVal) {
+        if (this.initialized && newVal !== oldVal) {
+          this.container.backgroundColor = this.backgroundColorChoice;
+        }
+      },
     },
-    backgroundGradientTo() {
-      if (this.backgroundGradientFrom && this.backgroundGradientTo && this.choice === 'gradient') {
-        this.container.backgroundEffect = `linear-gradient(${this.backgroundGradientFrom}, ${this.backgroundGradientTo})`;
-      } else {
-        this.container.backgroundEffect = null;
-      }
+    backgroundEffect: {
+      immediate: true,
+      handler(newVal, oldVal) {
+        if (this.initialized && newVal !== oldVal) {
+          this.container.backgroundEffect = this.backgroundEffect;
+        }
+      },
     },
     choice() {
       if (this.initialized) {
         if (this.choice === 'color') {
-          this.container.backgroundColor = this.backgroundColor || this.defaultBackgroundColor;
           this.backgroundGradientFrom = null;
           this.backgroundGradientTo = null;
         } else if (this.choice === 'gradient') {
-          this.backgroundGradientFrom = this.container.backgroundColor;
+          this.backgroundGradientFrom = this.defaultBackgroundColor;
           this.backgroundGradientTo = '#999999FF';
-          this.container.backgroundColor = '#FFFFFF00';
         }
+        this.container.backgroundColor = this.enabled && this.defaultBackgroundColor || null;
+        this.backgroundScrollTop = this.enabled && this.scrollColor && this.defaultBackgroundColor || null;
+        this.backgroundScrollMiddle = this.enabled && this.scrollColor && this.defaultBackgroundColor || null;
       }
     },
   },
@@ -277,8 +331,21 @@ export default {
     }
 
     this.enabled = !!this.container.backgroundColor || !!this.container.backgroundImage;
-    if (this.enabled && !this.container.backgroundColor) {
-      this.container.backgroundColor = this.defaultBackgroundColor;
+    if (this.enabled) {
+      if (!this.container.backgroundColor) {
+        this.container.backgroundColor = this.defaultBackgroundColor;
+      } else if (this.scrollColor) {
+        if (this.backgroundColor?.includes?.('@')) {
+          this.backgroundScrollTop = this.container.backgroundColor.split('@')[0];
+          this.backgroundScrollMiddle = this.container.backgroundColor.split('@')[1];
+        } else {
+          this.backgroundScrollTop = this.container.backgroundColor;
+          this.backgroundScrollMiddle = this.container.backgroundColor;
+        }
+      } else {
+        this.backgroundScrollTop = null;
+        this.backgroundScrollMiddle = null;
+      }
     }
     this.$nextTick().then(() => this.initialized = true);
   },
