@@ -222,8 +222,8 @@ export default {
       this.cssClass = this.container.cssClass || '';
       this.cssStyle = this.$applicationUtils.getStyle(this.container, {
         isApplicationBackground: true,
-        isApplicationStyle: true,
         isApplicationScroll: true,
+        appStyle: true,
       });
     },
     moveEnd() {
