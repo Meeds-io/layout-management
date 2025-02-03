@@ -26,7 +26,7 @@
     :parent-id="parentId"
     :index="index"
     :length="length"
-    class="d-flex flex-column flex-grow-1 flex-shrink-1 overflow-hidden layout-site-middle-container"
+    class="d-flex flex-column flex-grow-1 flex-shrink-1 layout-site-middle-container"
     type="site-middle-container"
     no-background-style
     draggable />

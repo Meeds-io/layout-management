@@ -24,7 +24,7 @@
     :container="container"
     :parent-id="parentId"
     class="layout-page-parent"
-    page-width-style />
+    page-style />
 </template>
 <script>
 export default {
