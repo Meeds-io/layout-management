@@ -125,6 +125,7 @@
         <layout-editor-background-input
           ref="backgroundInput"
           v-model="container"
+          :scroll-color="stickySection"
           class="mb-2"
           text-bold />
         <layout-editor-text-input
@@ -232,6 +233,7 @@ export default {
         }
         const container = this.$layoutUtils.getContainerById(this.$root.layout, this.container.storageId);
         Object.assign(container, this.container);
+        this.container.hiddenOnMobile = this.hiddenOnMobile;
         this.$layoutUtils.applyContainerStyle(container, this.container);
         if (this.hiddenOnMobile && !container.cssClass?.includes?.('hidden-sm-and-down')) {
           this.$set(container, 'cssClass', container.cssClass ? `${container.cssClass} hidden-sm-and-down` : 'hidden-sm-and-down');
