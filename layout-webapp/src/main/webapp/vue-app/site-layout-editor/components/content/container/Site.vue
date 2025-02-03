@@ -25,7 +25,7 @@
     :parent-id="parentId"
     :index="index"
     :length="length"
-    page-width-style />
+    page-style />
 </template>
 <script>
 export default {

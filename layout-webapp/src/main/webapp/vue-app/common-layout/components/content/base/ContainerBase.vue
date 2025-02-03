@@ -124,7 +124,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    pageWidthStyle: {
+    pageStyle: {
       type: Boolean,
       default: false,
     },
@@ -178,12 +178,12 @@ export default {
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
-        isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
-        sectionStyle: this.sectionStyle,
         noSectionMargins: this.noSectionMargins,
         noBackgroundStyle: this.noBackgroundStyle,
-        isPageWidthStyle: this.pageWidthStyle,
+        pageStyle: this.pageStyle,
+        sectionStyle: this.sectionStyle,
+        appStyle: !this.noApplicationStyle,
       });
     },
     containerCssClass() {
