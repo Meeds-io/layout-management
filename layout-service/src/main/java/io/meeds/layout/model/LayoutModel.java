@@ -21,11 +21,9 @@ package io.meeds.layout.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -48,6 +46,7 @@ import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 import io.meeds.layout.service.PortletInstanceService;
+import io.meeds.layout.util.EntityMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -58,8 +57,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(value = Include.NON_EMPTY)
 public class LayoutModel {
-
-  private static final String             PAGE_BODY_TEMPLATE   = "PageBody";
 
   protected String                        id;
 
@@ -254,7 +251,7 @@ public class LayoutModel {
       this.width = pageBody.getWidth();
       this.height = pageBody.getHeight();
       this.cssClass = pageBody.getCssClass();
-      this.template = PAGE_BODY_TEMPLATE;
+      this.template = EntityMapper.PAGE_BODY_TEMPLATE;
     } else if (model instanceof Container container) {
       this.id = container.getId();
       this.storageId = container.getStorageId();
@@ -350,7 +347,8 @@ public class LayoutModel {
     Page page = new Page(storageId);
     ArrayList<ModelObject> pageContainers = this.children == null ? new ArrayList<>() :
                                                                   this.children.stream()
-                                                                               .map(LayoutModel::toModelObject)
+                                                                               .map(EntityMapper::toModelObject)
+                                                                               .filter(Objects::nonNull)
                                                                                .collect(Collectors.toCollection(ArrayList::new));
     page.setChildren(pageContainers);
     return page;
@@ -359,7 +357,7 @@ public class LayoutModel {
   public PortalConfig toSite() {
     PortalConfig site = new PortalConfig(storageId);
     ModelObject modelObject = this.children == null ? new PageBody() :
-                                                    toModelObject(this);
+                                                    EntityMapper.toModelObject(this);
     if (modelObject instanceof Container container) {
       site.setPortalLayout(container);
     } else {
@@ -369,153 +367,6 @@ public class LayoutModel {
       site.setPortalLayout(container);
     }
     return site;
-  }
-
-  public static ModelObject toModelObject(LayoutModel layoutModel) { // NOSONAR
-    ModelStyle cssStyle = mapToStyle(layoutModel);
-
-    if (StringUtils.equals(layoutModel.template, PAGE_BODY_TEMPLATE)) {
-      PageBody pageBody = new PageBody();
-      pageBody.setStorageId(layoutModel.getStorageId());
-      pageBody.setStorageName(layoutModel.getStorageName());
-      pageBody.setWidth(layoutModel.getWidth());
-      pageBody.setHeight(layoutModel.getHeight());
-      pageBody.setCssClass(layoutModel.getCssClass());
-      pageBody.setCssStyle(cssStyle);
-      return pageBody;
-    } else if (StringUtils.isNotBlank(layoutModel.template)) {
-      Container container = new Container(layoutModel.getStorageId());
-      container.setId(layoutModel.getId());
-      container.setStorageName(layoutModel.getStorageName());
-      container.setName(layoutModel.getName());
-      container.setIcon(layoutModel.getIcon());
-      container.setTemplate(layoutModel.getTemplate());
-      container.setFactoryId(layoutModel.getFactoryId());
-      container.setTitle(layoutModel.getTitle());
-      container.setDescription(layoutModel.getDescription());
-      container.setWidth(layoutModel.getWidth());
-      container.setHeight(layoutModel.getHeight());
-      container.setCssClass(layoutModel.getCssClass());
-      container.setProfiles(layoutModel.getProfiles());
-      container.setAccessPermissions(layoutModel.getAccessPermissions());
-      container.setCssStyle(cssStyle);
-      container.setAppBackgroundStyle(mapToAppStyle(layoutModel));
-      if (layoutModel.getChildren() != null) {
-        container.setChildren(layoutModel.getChildren()
-                                         .stream()
-                                         .map(LayoutModel::toModelObject)
-                                         .collect(Collectors.toCollection(ArrayList::new)));
-      }
-      return container;
-    } else { // NOSONAR
-      Application application = new Application(layoutModel.getStorageId());
-      application.setId(layoutModel.getId());
-      application.setStorageName(layoutModel.getStorageName());
-      application.setIcon(layoutModel.getIcon());
-      application.setTitle(layoutModel.getTitle());
-      application.setDescription(layoutModel.getDescription());
-      application.setWidth(layoutModel.getWidth());
-      application.setHeight(layoutModel.getHeight());
-      application.setCssClass(layoutModel.getCssClass());
-      application.setShowInfoBar(layoutModel.isShowInfoBar());
-      application.setShowApplicationState(layoutModel.isShowApplicationState());
-      application.setShowApplicationMode(layoutModel.isShowApplicationMode());
-      application.setAccessPermissions(layoutModel.getAccessPermissions());
-      application.setCssStyle(cssStyle);
-
-      ApplicationState state;
-      if (StringUtils.isNotBlank(layoutModel.getStorageId())) {
-        state = new PersistentApplicationState(layoutModel.getStorageId());
-      } else if (StringUtils.isNotBlank(layoutModel.getContentId())) {
-        TransientApplicationState transientState = new TransientApplicationState(layoutModel.getContentId());
-        transientState.setOwnerId(layoutModel.getOwnerId());
-        transientState.setOwnerType(layoutModel.getOwnerType());
-        if (CollectionUtils.isNotEmpty(layoutModel.getPreferences())) {
-          Portlet portlet = new Portlet();
-          layoutModel.getPreferences()
-                     .forEach(p -> portlet.setValue(p.getName(), p.getValue()));
-          transientState.setContentState(portlet);
-        }
-        state = transientState;
-      } else {
-        throw new IllegalStateException("PortletInstance should either has a storageId or a contentId");
-      }
-      application.setState(state);
-      return application;
-    }
-  }
-
-  private static ModelStyle mapToStyle(LayoutModel layoutModel) {
-    ModelStyle cssStyle = null;
-    boolean hasStyle = StringUtils.isNotBlank(layoutModel.getBorderColor())
-                       || layoutModel.getRadiusTopRight() != null
-                       || layoutModel.getRadiusTopLeft() != null
-                       || layoutModel.getRadiusBottomLeft() != null
-                       || layoutModel.getRadiusBottomRight() != null
-                       || layoutModel.getMarginTop() != null
-                       || layoutModel.getMarginBottom() != null
-                       || layoutModel.getMarginLeft() != null
-                       || layoutModel.getMarginRight() != null
-                       || StringUtils.isNotBlank(layoutModel.getBorderSize())
-                       || StringUtils.isNotBlank(layoutModel.getBoxShadow())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundColor())
-                       || StringUtils.isNotBlank(layoutModel.getBackgroundImage())
-                       || StringUtils.isNotBlank(layoutModel.getTextTitleColor())
-                       || StringUtils.isNotBlank(layoutModel.getTextColor())
-                       || StringUtils.isNotBlank(layoutModel.getTextHeaderColor())
-                       || StringUtils.isNotBlank(layoutModel.getTextSubtitleColor());
-    if (hasStyle) {
-      cssStyle = new ModelStyle();
-      cssStyle.setBorderColor(layoutModel.getBorderColor());
-      cssStyle.setBorderSize(layoutModel.getBorderSize());
-      cssStyle.setBoxShadow(layoutModel.getBoxShadow());
-      cssStyle.setMarginTop(layoutModel.getMarginTop());
-      cssStyle.setMarginBottom(layoutModel.getMarginBottom());
-      cssStyle.setMarginRight(layoutModel.getMarginRight());
-      cssStyle.setMarginLeft(layoutModel.getMarginLeft());
-      cssStyle.setRadiusTopRight(layoutModel.getRadiusTopRight());
-      cssStyle.setRadiusTopLeft(layoutModel.getRadiusTopLeft());
-      cssStyle.setRadiusBottomRight(layoutModel.getRadiusBottomRight());
-      cssStyle.setRadiusBottomLeft(layoutModel.getRadiusBottomLeft());
-      cssStyle.setBackgroundColor(layoutModel.getBackgroundColor());
-      cssStyle.setBackgroundImage(layoutModel.getBackgroundImage());
-      cssStyle.setBackgroundEffect(layoutModel.getBackgroundEffect());
-      cssStyle.setBackgroundPosition(layoutModel.getBackgroundPosition());
-      cssStyle.setBackgroundSize(layoutModel.getBackgroundSize());
-      cssStyle.setBackgroundRepeat(layoutModel.getBackgroundRepeat());
-      cssStyle.setTextTitleColor(layoutModel.getTextTitleColor());
-      cssStyle.setTextTitleFontSize(layoutModel.getTextTitleFontSize());
-      cssStyle.setTextTitleFontWeight(layoutModel.getTextTitleFontWeight());
-      cssStyle.setTextTitleFontStyle(layoutModel.getTextTitleFontStyle());
-      cssStyle.setTextHeaderColor(layoutModel.getTextHeaderColor());
-      cssStyle.setTextHeaderFontSize(layoutModel.getTextHeaderFontSize());
-      cssStyle.setTextHeaderFontWeight(layoutModel.getTextHeaderFontWeight());
-      cssStyle.setTextHeaderFontStyle(layoutModel.getTextHeaderFontStyle());
-      cssStyle.setTextColor(layoutModel.getTextColor());
-      cssStyle.setTextFontSize(layoutModel.getTextFontSize());
-      cssStyle.setTextFontWeight(layoutModel.getTextFontWeight());
-      cssStyle.setTextFontStyle(layoutModel.getTextFontStyle());
-      cssStyle.setTextSubtitleColor(layoutModel.getTextSubtitleColor());
-      cssStyle.setTextSubtitleFontSize(layoutModel.getTextSubtitleFontSize());
-      cssStyle.setTextSubtitleFontWeight(layoutModel.getTextSubtitleFontWeight());
-      cssStyle.setTextSubtitleFontStyle(layoutModel.getTextSubtitleFontStyle());
-    }
-    return cssStyle;
-  }
-
-  private static ApplicationBackgroundStyle mapToAppStyle(LayoutModel layoutModel) {
-    ApplicationBackgroundStyle cssStyle = null;
-    if (StringUtils.isNotBlank(layoutModel.getAppBackgroundColor())
-        || StringUtils.isNotBlank(layoutModel.getAppBackgroundImage())) {
-      cssStyle = new ApplicationBackgroundStyle();
-      cssStyle.setBackgroundColor(layoutModel.getAppBackgroundColor());
-      cssStyle.setBackgroundImage(layoutModel.getAppBackgroundImage());
-      cssStyle.setBackgroundEffect(layoutModel.getAppBackgroundEffect());
-      cssStyle.setBackgroundPosition(layoutModel.getAppBackgroundPosition());
-      cssStyle.setBackgroundSize(layoutModel.getAppBackgroundSize());
-      cssStyle.setBackgroundRepeat(layoutModel.getAppBackgroundRepeat());
-    }
-    return cssStyle;
   }
 
 }
