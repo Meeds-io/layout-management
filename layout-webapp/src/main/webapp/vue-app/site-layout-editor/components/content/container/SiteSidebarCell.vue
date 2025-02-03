@@ -30,7 +30,7 @@
       'elevation-2 border-color': $root.movingParentId,
     }"
     :style="cssStyle"
-    class="position-relative display-flex flex-column border-box-sizing"
+    class="position-relative display-flex flex-column border-box-sizing layout-sidebar-cell"
     draggable
     @hovered="hover = $event"
     @move-start="moveStart">

@@ -70,6 +70,7 @@
         <layout-editor-background-input
           ref="backgroundInput"
           v-model="container"
+          :scroll-color="stickySection"
           class="mb-4"
           text-bold />
         <layout-editor-text-input
