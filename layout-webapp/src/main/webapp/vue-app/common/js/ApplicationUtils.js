@@ -32,7 +32,7 @@ export function getStyle(container, options) {
     || container.marginLeft
     || container.marginRight === 0
     || container.marginRight) {
-    if (options.isPageWidthStyle) {
+    if (options.pageStyle) {
       if (container.marginTop === 0 || container.marginTop) {
         style['--allPagesMarginTop'] = `${container.marginTop}px`;
         style['--allPagesNoMarginTop'] = '0px';
@@ -113,7 +113,7 @@ export function getStyle(container, options) {
   }
   if (!options.onlyBackgroundStyle) {
     if (container.height) {
-      if (options.isApplicationStyle) {
+      if (options.appStyle) {
         if (options.sectionStyle) {
           style['height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
           style['min-height'] = style['height'];
@@ -131,7 +131,7 @@ export function getStyle(container, options) {
       }
     }
     if (container.width) {
-      if (options.isPageWidthStyle) {
+      if (options.pageStyle) {
         if (container.width === 'fullWindow') {
           style['--allPagesWidth'] = '100%';
         } else if (container.width === 'singlePageApplication') {
@@ -139,7 +139,7 @@ export function getStyle(container, options) {
         } else {
           style['--allPagesWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
         }
-      } else if (options.isApplicationStyle) {
+      } else if (options.appStyle) {
         if (options.sectionStyle) {
           style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
           style['min-width'] = style['width'];
@@ -156,13 +156,13 @@ export function getStyle(container, options) {
       }
     }
     if (container.borderColor) {
-      style[options.isApplicationStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
+      style[options.appStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
       if (container.borderSize) {
-        style[options.isApplicationStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
+        style[options.appStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
       }
     }
     if (container.boxShadow === 'true') {
-      style[options.isApplicationStyle && '--appBoxShadow' || 'box-shadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
+      style[options.appStyle && '--appBoxShadow' || 'box-shadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
     }
   }
   if (!options.noBackgroundStyle
@@ -170,44 +170,80 @@ export function getStyle(container, options) {
       || container.backgroundColor
       || container.backgroundEffect)) {
     if (container.backgroundColor) {
-      if (options.isApplicationBackground) {
+      if (options.pageStyle) {
+        style['--allPagesBackgroundColor'] = container.backgroundColor;
+      } else if (options.isApplicationBackground) {
         style['--appBackgroundColor'] = container.backgroundColor;
       } else if (options.sectionStyle) {
         if (container.backgroundColor?.includes?.('@')) {
           const colors = container.backgroundColor.split('@');
           style['background-color'] = colors[0];
           style['--sectionBackgroundColorScroll'] = colors[1];
-        } else if (container.cssClass?.includes?.('layout-sticky-section')) {
-          style['--sectionBackgroundColorScroll'] = container.backgroundColor;
         } else {
           style['background-color'] = container.backgroundColor;
+          if (container.cssClass?.includes?.('layout-sticky-section')) {
+            style['--sectionBackgroundColorScroll'] = container.backgroundColor;
+          }
         }
       }
     } else if (container.backgroundEffect || container.backgroundImage) {
-      style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = 'transparent';
+      if (options.pageStyle) {
+        style['--allPagesBackgroundColor'] = 'transparent';
+      } else if (options.sectionStyle) {
+        style['background-color'] = 'transparent';
+      } else {
+        style['--appBackgroundColor'] = 'transparent';
+      }
     }
 
     if (container.backgroundEffect && container.backgroundImage) {
       style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage}),${container.backgroundEffect}`;
     } else if (container.backgroundImage) {
-      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
+      if (options.pageStyle) {
+        style['--allPagesBackgroundImage'] = `url(${container.backgroundImage})`;
+      } else {
+        style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
+      }
     } else if (container.backgroundEffect) {
-      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
+      if (options.pageStyle) {
+        style['--allPagesBackgroundImage'] = container.backgroundEffect;
+      } else {
+        style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
+      }
     } else if (container.backgroundColor) {
-      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = 'none';
-      style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = 'no-repeat';
-      style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = 'unset';
-      style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = 'unset';
+      if (options.pageStyle) {
+        style['--allPagesBackgroundImage'] = 'none';
+        style['--allPagesBackgroundRepeat'] = 'no-repeat';
+        style['--allPagesBackgroundSize'] = 'unset';
+        style['--allPagesBackgroundPosition'] = 'unset';
+      } else {
+        style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = 'none';
+        style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = 'no-repeat';
+        style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = 'unset';
+        style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = 'unset';
+      }
     }
     if (container.backgroundImage) {
       if (container.backgroundRepeat) {
-        style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = container.backgroundRepeat;
+        if (options.pageStyle) {
+          style['--allPagesBackgroundRepeat'] = container.backgroundRepeat;
+        } else {
+          style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = container.backgroundRepeat;
+        }
       }
       if (container.backgroundSize) {
-        style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = container.backgroundSize;
+        if (options.pageStyle) {
+          style['--allPagesBackgroundSize'] = container.backgroundSize;
+        } else {
+          style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = container.backgroundSize;
+        }
       }
       if (container.backgroundPosition) {
-        style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
+        if (options.pageStyle) {
+          style['--allPagesBackgroundPosition'] = container.backgroundPosition;
+        } else {
+          style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
+        }
       }
     }
   }
