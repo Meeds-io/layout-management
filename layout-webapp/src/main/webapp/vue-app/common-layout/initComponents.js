@@ -55,8 +55,6 @@ import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
 
 import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
 
-import Coediting from './components/coediting/Coediting.vue';
-
 const components = {
   'layout-editor-color-picker': ColorPicker,
   'layout-editor-border-radius-selector': BorderRadiusSelector,
@@ -89,8 +87,6 @@ const components = {
   'layout-editor-cell-resize-button': CellResizeButton,
   'layout-editor-cells-selection-box': CellsSelectionBox,
   'layout-editor-cells-drop-box': CellsDropBox,
-  // TODO : to define in social to be a reusable component
-  'coediting': Coediting,
 };
 
 for (const key in components) {
