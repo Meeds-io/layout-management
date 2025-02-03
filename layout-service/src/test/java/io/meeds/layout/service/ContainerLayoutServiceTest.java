@@ -115,17 +115,17 @@ class ContainerLayoutServiceTest {
   private Identity                   identity;
 
   @Autowired
-  private ContainerLayoutService     containerLayoutSrvice;
+  private ContainerLayoutService     containerLayoutService;
 
   @Test
   void testImpersonateContainerWithNullPage() throws Exception {
-    containerLayoutSrvice.impersonateContainer(container, null);
+    containerLayoutService.impersonateContainer(container, null);
     verifyNoInteractions(container);
   }
 
   @Test
   void testImpersonateContainerWithNullContainer() throws Exception {
-    containerLayoutSrvice.impersonateContainer(null, page);
+    containerLayoutService.impersonateContainer(null, page);
     verifyNoInteractions(page);
   }
 
@@ -133,7 +133,7 @@ class ContainerLayoutServiceTest {
   void testImpersonateContainerWithCssStyleNoAttachment() throws Exception {
     when(container.getCssStyle()).thenReturn(modelStyle);
     when(modelStyle.getBackgroundImage()).thenReturn("fake/url");
-    containerLayoutSrvice.impersonateContainer(container, page);
+    containerLayoutService.impersonateContainer(container, page);
     verify(modelStyle).setBackgroundImage(null);
   }
 
@@ -141,7 +141,7 @@ class ContainerLayoutServiceTest {
   void testImpersonateContainerWithAppBackgroundStyleNoAttachment() throws Exception {
     when(container.getAppBackgroundStyle()).thenReturn(appBackgroundStyle);
     when(appBackgroundStyle.getBackgroundImage()).thenReturn("fake/url");
-    containerLayoutSrvice.impersonateContainer(container, page);
+    containerLayoutService.impersonateContainer(container, page);
     verify(appBackgroundStyle).setBackgroundImage(null);
   }
 
@@ -182,7 +182,7 @@ class ContainerLayoutServiceTest {
                       any(),
                       any(),
                       anyLong());
-    containerLayoutSrvice.impersonateContainer(container, page);
+    containerLayoutService.impersonateContainer(container, page);
     verify(modelStyle).setBackgroundImage(String.format("/portal/rest/v1/social/attachments/%s/%s_%s/%s",
                                                         OBJECT_TYPE,
                                                         PAGE_ID,
@@ -227,7 +227,7 @@ class ContainerLayoutServiceTest {
                       any(),
                       any(),
                       anyLong());
-    containerLayoutSrvice.impersonateContainer(container, page);
+    containerLayoutService.impersonateContainer(container, page);
     verify(appBackgroundStyle).setBackgroundImage(String.format("/portal/rest/v1/social/attachments/%s/%s_%s/%s",
                                                                 OBJECT_TYPE,
                                                                 PAGE_ID,

@@ -213,6 +213,9 @@
         <module>html2canvas</module>
       </depends>
       <depends>
+        <module>coediting</module>
+      </depends>
+      <depends>
         <module>vue</module>
       </depends>
       <depends>
@@ -252,6 +255,9 @@
       </depends>
       <depends>
         <module>html2canvas</module>
+      </depends>
+      <depends>
+        <module>coediting</module>
       </depends>
       <depends>
         <module>vue</module>
