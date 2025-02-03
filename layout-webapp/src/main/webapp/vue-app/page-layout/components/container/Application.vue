@@ -61,8 +61,8 @@ export default {
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
         isApplicationBackground: true,
-        isApplicationStyle: true,
         isApplicationScroll: true,
+        appStyle: true,
       });
     },
     cssClass() {
