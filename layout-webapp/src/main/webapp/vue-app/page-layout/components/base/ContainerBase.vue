@@ -53,7 +53,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    pageWidthStyle: {
+    pageStyle: {
       type: Boolean,
       default: false,
     },
@@ -90,12 +90,12 @@ export default {
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
-        isApplicationStyle: !this.noApplicationStyle,
         isApplicationBackground: this.container.template === 'BannerCell',
         noSectionMargins: this.noSectionMargins,
-        sectionStyle: this.sectionStyle,
         noBackgroundStyle: this.noBackgroundStyle,
-        isPageWidthStyle: this.pageWidthStyle,
+        pageStyle: this.pageStyle,
+        sectionStyle: this.sectionStyle,
+        appStyle: !this.noApplicationStyle,
       });
     },
     cssClass() {
