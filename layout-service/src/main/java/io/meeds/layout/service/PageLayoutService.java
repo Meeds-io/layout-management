@@ -61,18 +61,13 @@ import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.PortletInstancePreference;
+import io.meeds.layout.util.EntityMapper;
 import io.meeds.layout.util.JsonUtils;
 
 import lombok.SneakyThrows;
 
 @Service
 public class PageLayoutService {
-
-  public static final String     PAGE_LAYOUT_TEMPLATE            = "system:/groovy/portal/webui/container/UIPageLayout.gtmpl";
-
-  public static final String     PAGE_BODY_TEMPLATE              = "PageBody";
-
-  public static final String     EMPTY_PAGE_TEMPLATE             = "empty";
 
   private static final Log       LOG                             = ExoLogger.getLogger(PageLayoutService.class);
 
@@ -577,7 +572,7 @@ public class PageLayoutService {
         pageLayout = page;
       }
       if (pageLayout != null) {
-        pageLayout.setTemplate(PAGE_BODY_TEMPLATE);
+        pageLayout.setTemplate(EntityMapper.PAGE_BODY_TEMPLATE);
         children.add(index, pageLayout);
       } else {
         children.add(index, page);
@@ -588,7 +583,7 @@ public class PageLayoutService {
   private Container getPageBody(ModelObject page) {
     if (page == null || !(page instanceof Container container)) {
       return null;
-    } else if (StringUtils.equals(container.getTemplate(), PAGE_LAYOUT_TEMPLATE)) {
+    } else if (StringUtils.equals(container.getTemplate(), EntityMapper.PAGE_LAYOUT_TEMPLATE)) {
       return container;
     } else if (CollectionUtils.isEmpty(container.getChildren())) {
       return null;
