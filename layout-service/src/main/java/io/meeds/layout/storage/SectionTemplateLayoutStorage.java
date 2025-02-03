@@ -44,6 +44,7 @@ import io.meeds.layout.model.SectionTemplate;
 import io.meeds.layout.service.ContainerLayoutService;
 import io.meeds.layout.service.NavigationLayoutService;
 import io.meeds.layout.service.PageLayoutService;
+import io.meeds.layout.util.EntityMapper;
 import io.meeds.social.util.JsonUtils;
 
 import lombok.Synchronized;
@@ -131,11 +132,11 @@ public class SectionTemplateLayoutStorage {
                                             String sectionTemplateContent,
                                             String username) {
     Container parentContainer = new Container();
-    parentContainer.setTemplate("system:/groovy/portal/webui/container/UIPageLayout.gtmpl");
+    parentContainer.setTemplate(EntityMapper.PAGE_LAYOUT_TEMPLATE);
     parentContainer.setChildren(new ArrayList<>());
     LayoutModel layoutModel = JsonUtils.fromJsonString(sectionTemplateContent, LayoutModel.class);
     layoutModel.resetStorage();
-    parentContainer.getChildren().add(LayoutModel.toModelObject(layoutModel));
+    parentContainer.getChildren().add(EntityMapper.toModelObject(layoutModel));
 
     Page sectionDraftPage = new Page();
     sectionDraftPage.setAccessPermissions(EVERYONE_PERMISSIONS);
