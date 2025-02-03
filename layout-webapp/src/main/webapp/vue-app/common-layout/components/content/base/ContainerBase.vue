@@ -191,7 +191,7 @@ export default {
     },
     cssClass() {
       return [
-        this.containerCssClass?.replace?.('layout-sticky-application', '')?.replace?.('layout-sticky-section', ''),
+        this.containerCssClass?.replace?.('layout-sticky-application', ''),
         this.draggable ? 'v-draggable' : '',
         (this.noChildren || this.draggable) ? 'position-relative' : ''
       ];
