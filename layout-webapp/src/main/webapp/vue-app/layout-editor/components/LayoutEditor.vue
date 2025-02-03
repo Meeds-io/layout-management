@@ -32,6 +32,7 @@
         v-model="draftNodeId"
         :object-id="nodeId"
         :messages="{
+          editingInOtherWindow: 'layout.pageBeingEditedByYouInOther',
           lockConfirmTitle: 'layout.lockConfirmTitle',
           lockConfirmMessage: 'layout.lockConfirmMessage',
           lockConfirmQuestion: 'layout.lockConfirmQuestion',

@@ -177,11 +177,10 @@ export function getStyle(container, options) {
           const colors = container.backgroundColor.split('@');
           style['background-color'] = colors[0];
           style['--sectionBackgroundColorScroll'] = colors[1];
+        } else if (container.cssClass?.includes?.('layout-sticky-section')) {
+          style['--sectionBackgroundColorScroll'] = container.backgroundColor;
         } else {
           style['background-color'] = container.backgroundColor;
-          if (container.cssClass?.includes?.('layout-sticky-section')) {
-            style['--sectionBackgroundColorScroll'] = container.backgroundColor;
-          }
         }
       }
     } else if (container.backgroundEffect || container.backgroundImage) {
