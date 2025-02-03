@@ -170,7 +170,20 @@ export function getStyle(container, options) {
       || container.backgroundColor
       || container.backgroundEffect)) {
     if (container.backgroundColor) {
-      style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = container.backgroundColor;
+      if (options.isApplicationBackground) {
+        style['--appBackgroundColor'] = container.backgroundColor;
+      } else if (options.sectionStyle) {
+        if (container.backgroundColor?.includes?.('@')) {
+          const colors = container.backgroundColor.split('@');
+          style['background-color'] = colors[0];
+          style['--sectionBackgroundColorScroll'] = colors[1];
+        } else {
+          style['background-color'] = container.backgroundColor;
+          if (container.cssClass?.includes?.('layout-sticky-section')) {
+            style['--sectionBackgroundColorScroll'] = container.backgroundColor;
+          }
+        }
+      }
     } else if (container.backgroundEffect || container.backgroundImage) {
       style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = 'transparent';
     }

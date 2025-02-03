@@ -23,7 +23,7 @@
   <page-layout-container-base
     :container="containerToDisplay"
     :parent-id="parentId"
-    class="display-flex flex-column border-box-sizing overflow-hidden"
+    class="display-flex flex-column border-box-sizing layout-sidebar-cell overflow-hidden"
     section-style />
 </template>
 <script>
