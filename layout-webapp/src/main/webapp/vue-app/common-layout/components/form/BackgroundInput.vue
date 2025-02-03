@@ -213,8 +213,11 @@ export default {
     initialized: false,
   }),
   computed: {
+    id() {
+      return this.container.storageId || this.container.id;
+    },
     objectId() {
-      return this.$root.isSiteLayout ? `site_${this.$root.siteId}_${this.pageStyle && this.$root.layout.storageId || 0}` : `page_${this.$root.pageId}_${this.container.storageId}`;
+      return this.$root.isSiteLayout ? `site_${this.$root.siteId}_${this.pageStyle && this.$root.layout.storageId || this.id}` : `page_${this.$root.pageId}_${this.id}`;
     },
     backgroundColor() {
       return this.container.backgroundColor;
