@@ -20,7 +20,6 @@
 -->
 <template>
   <v-card
-    :max-width="maxWidth"
     :class="parentClass"
     class="transparent layout-sections-parent mx-auto"
     flat>
@@ -85,9 +84,6 @@ export default {
     },
     mobileDisplayMode() {
       return this.$root.mobileDisplayMode;
-    },
-    maxWidth() {
-      return this.mobileDisplayMode && '500px !important' || 'initial';
     },
     parentClass() {
       return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
