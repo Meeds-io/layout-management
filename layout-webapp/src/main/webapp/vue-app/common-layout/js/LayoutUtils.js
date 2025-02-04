@@ -277,6 +277,7 @@ export function applyContainerStyle(container, containerStyle) {
       || container.template === siteTemplate
       || container.template === bannerTemplate
       || container.template === sidebarTemplate
+      || container.template === siteBodyMiddleCenterTemplate
       || container.template === pageBodyTemplate
       || container.template === sectionsParentTemplate) {
     Vue.set(container, 'marginTop', containerStyle.marginTop === 0 || containerStyle.marginTop ? containerStyle.marginTop : null);

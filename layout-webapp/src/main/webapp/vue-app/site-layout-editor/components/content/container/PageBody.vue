@@ -20,28 +20,27 @@
 
 -->
 <template>
-  <v-card
+  <div
     :id="id"
     :data-storage-id="storageId"
-    class="position-relative page-content d-flex flex-column flex-shrink-1 z-index-zero"
-    color="transparent"
-    flat>
-    <v-card
-      class="flex-grow-1 overflow-hidden mx-auto"
-      width="100%"
-      flat>
-      <v-card
-        :class="$vuetify.rtl && 'r-0' || 'l-0'"
-        class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
-        color="primary"
-        min-height="30"
-        min-width="220"
-        dark
-        flat>
-        {{ $t('layout.editSite.portalPage') }}
-      </v-card>
-    </v-card>
-  </v-card>
+    class="position-relative layout-page-parent d-flex flex-column flex-shrink-1 z-index-zero">
+    <div class="layout-section fill-height">
+      <div class="layout-section-content fill-height">
+        <div class="full-width fill-height position-relative overflow-hidden white">
+          <v-card
+            :class="$vuetify.rtl && 'r-0' || 'l-0'"
+            class="d-flex align-center justify-center text-title d-flex position-absolute z-index-one t-0 fa-rotate-315 ms-n12 mt-12"
+            color="primary"
+            min-height="30"
+            min-width="220"
+            dark
+            flat>
+            {{ $t('layout.editSite.portalPage') }}
+          </v-card>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 export default {
