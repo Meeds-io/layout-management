@@ -26,7 +26,7 @@
     :index="index"
     :length="childrenSize"
     :draggable="childrenSize > 1"
-    page-style />
+    site-style />
 </template>
 <script>
 export default {

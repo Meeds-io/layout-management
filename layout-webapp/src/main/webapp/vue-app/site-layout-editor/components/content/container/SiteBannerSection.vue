@@ -27,8 +27,8 @@
       :parent-id="parentId"
       :index="index"
       :class="rowIndexClass"
-      :style="{
-        'z-index': hoverSection ? 2 : 1
+      :style="hoverSection && {
+        'z-index': 2
       }"
       class="position-relative overflow-initial layout-banner-section layout-section-content display-flex flex-row"
       type="banner-section"

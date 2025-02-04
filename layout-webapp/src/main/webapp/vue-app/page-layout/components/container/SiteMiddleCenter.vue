@@ -24,8 +24,7 @@
     :container="container"
     :parent-id="parentId"
     class="d-flex flex-row site-middle-center-container"
-    no-application-style
-    no-background-style />
+    page-style />
 </template>
 <script>
 export default {
