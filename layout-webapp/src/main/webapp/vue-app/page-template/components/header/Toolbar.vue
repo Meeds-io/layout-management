@@ -33,6 +33,7 @@
         id="applicationToolbarLeftButton"
         :aria-label="$t('pageTemplates.add')"
         :class="$root.isMobile && 'px-0'"
+        :loading="creating"
         class="btn btn-primary text-truncate"
         @click="$root.$emit('page-templates-create')">
         <v-icon
@@ -50,6 +51,12 @@
 </template>
 <script>
 export default {
+  props: {
+    creating: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data: () => ({
     pageTemplates: null,
   }),

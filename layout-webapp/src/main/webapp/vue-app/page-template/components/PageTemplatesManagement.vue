@@ -26,10 +26,12 @@
       </h4>
       <page-templates-management-toolbar
         ref="toolbar"
+        :creating="creating"
         @page-templates-filter="keyword = $event" />
       <page-templates-management-list
         ref="list"
-        :keyword="keyword" />
+        :keyword="keyword"
+        @creating="creating = $event" />
     </v-card>
     <layout-editor-page-template-drawer />
     <layout-image-illustration-preview />
@@ -40,6 +42,7 @@
 export default {
   data: () => ({
     keyword: null,
+    creating: false,
   }),
 };
 </script>
