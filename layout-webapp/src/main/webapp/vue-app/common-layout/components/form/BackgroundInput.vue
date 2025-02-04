@@ -192,10 +192,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    pageStyle: {
-      type: Boolean,
-      default: false,
-    },
     textBold: {
       type: Boolean,
       default: false,
@@ -217,7 +213,7 @@ export default {
       return this.container.storageId || this.container.id;
     },
     objectId() {
-      return this.$root.isSiteLayout ? `site_${this.$root.siteId}_${this.pageStyle && this.$root.layout.storageId || this.id}` : `page_${this.$root.pageId}_${this.id}`;
+      return this.$root.isSiteLayout ? `site_${this.$root.siteId}_${this.id}` : `page_${this.$root.pageId}_${this.id}`;
     },
     backgroundColor() {
       return this.container.backgroundColor;
