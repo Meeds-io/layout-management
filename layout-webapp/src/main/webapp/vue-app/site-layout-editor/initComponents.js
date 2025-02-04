@@ -26,6 +26,7 @@ import HistoryButtons from './components/toolbar/actions/HistoryButtons.vue';
 import MobilePreviewButton from './components/toolbar/actions/MobilePreviewButton.vue';
 import SitePropertiesButton from './components/toolbar/actions/SitePropertiesButton.vue';
 import SiteEditSectionsButton from './components/toolbar/actions/SiteEditSectionsButton.vue';
+import SitePreviewButton from './components/toolbar/actions/SitePreviewButton.vue';
 
 import Site from './components/content/container/Site.vue';
 import SiteBannerSection from './components/content/container/SiteBannerSection.vue';
@@ -55,6 +56,7 @@ const components = {
   'site-layout-editor-toolbar-properties-button': SitePropertiesButton,
   'site-layout-editor-toolbar-edit-sections-button': SiteEditSectionsButton,
   'site-layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
+  'site-layout-editor-toolbar-site-preview-button': SitePreviewButton,
 
   'site-layout-editor-content': Content,
   'site-layout-editor-sidebar-section-menu': SidebarSectionMenu,
