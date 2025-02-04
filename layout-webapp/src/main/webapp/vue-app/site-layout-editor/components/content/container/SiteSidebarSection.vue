@@ -30,7 +30,6 @@
       style="height: inherit;"
       class="position-relative overflow-initial layout-sidebar-section layout-section-content z-index-zero"
       type="sidebar-section"
-      no-background-style
       section-style
       @hovered="hoverSection = $event && !drawerOpened">
       <template #footer>
