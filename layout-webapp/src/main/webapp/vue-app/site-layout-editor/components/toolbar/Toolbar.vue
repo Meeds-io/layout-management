@@ -33,6 +33,7 @@
     <site-layout-editor-toolbar-edit-sections-button class="me-3" />
     <site-layout-editor-toolbar-properties-button class="me-3" />
     <site-layout-editor-toolbar-mobile-preview-button class="me-3" />
+    <site-layout-editor-toolbar-site-preview-button class="me-3" />
     <site-layout-editor-toolbar-save-draft-button />
     <site-layout-editor-toolbar-save-button />
   </v-card>
