@@ -195,11 +195,17 @@ export default {
         .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.delete.error'), 'error'))
         .finally(() => this.loading = false);
     },
-    createPageTemplate() {
-      const columnsTemplate = this.pageTemplates.find(t => t.system && t.content.includes('FlexContainer'));
-      const columnsTemplateContent = columnsTemplate?.content || '{}';
-      this.$pageTemplateService.createPageTemplate(columnsTemplateContent, true)
-        .then(pageTemplate => window.open(`/portal/administration/layout-editor?pageTemplateId=${pageTemplate.id}`, '_blank'));
+    async createPageTemplate() {
+      this.loading = true;
+      try {
+        const pageTemplates = await this.$pageTemplateService.getPageTemplates(true);
+        const columnsTemplate = pageTemplates.find(t => t.system && t.content.includes('FlexContainer'));
+        const columnsTemplateContent = columnsTemplate?.content || '{}';
+        this.$pageTemplateService.createPageTemplate(columnsTemplateContent, true)
+          .then(pageTemplate => window.open(`/portal/administration/layout-editor?pageTemplateId=${pageTemplate.id}`, '_blank'));
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };
