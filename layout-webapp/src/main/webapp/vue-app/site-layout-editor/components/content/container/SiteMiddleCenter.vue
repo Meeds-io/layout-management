@@ -28,8 +28,7 @@
     :style="cssStyle"
     class="d-flex flex-row z-index-one site-middle-center-container"
     type="site-middle-center-container"
-    no-application-style
-    no-background-style />
+    page-style />
 </template>
 <script>
 export default {
@@ -82,7 +81,6 @@ export default {
     cssStyle() {
       return {
         'height': this.$root.middleCenterContainersMinHeight,
-        'width': this.width,
         'max-width': this.maxWidth,
       };
     },
