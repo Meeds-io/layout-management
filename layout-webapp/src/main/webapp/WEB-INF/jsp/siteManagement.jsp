@@ -6,7 +6,7 @@
   String defaultPortalName = userPortalConfigService.getMetaPortal();
   String globalPortalName = userPortalConfigService.getGlobalPortal();
 %>
-<div class="VuetifyApp singlePageApplication">
+<div class="VuetifyApp">
   <div id="siteManagement">
     <script type="text/javascript">
       eXo.env.portal.defaultPortalName = '<%=defaultPortalName%>';
