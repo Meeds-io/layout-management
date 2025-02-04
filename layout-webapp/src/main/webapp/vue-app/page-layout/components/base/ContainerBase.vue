@@ -53,6 +53,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    siteStyle: {
+      type: Boolean,
+      default: false,
+    },
     pageStyle: {
       type: Boolean,
       default: false,
@@ -93,6 +97,7 @@ export default {
         isApplicationBackground: this.container.template === 'BannerCell',
         noSectionMargins: this.noSectionMargins,
         noBackgroundStyle: this.noBackgroundStyle,
+        siteStyle: this.siteStyle,
         pageStyle: this.pageStyle,
         sectionStyle: this.sectionStyle,
         appStyle: !this.noApplicationStyle,
