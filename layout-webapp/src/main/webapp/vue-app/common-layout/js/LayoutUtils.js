@@ -297,14 +297,28 @@ export function applyContainerStyle(container, containerStyle) {
   container.cssClass = container.cssClass.replace(new RegExp('(^| )(brtr|brtl|brbr|brbl)-[0-9]', 'g'), '').replace(/  +/g, ' ');
   Vue.set(container, 'cssClass', container.cssClass);
 
-  const borderRadiusEnabled = containerStyle.radiusTopRight === 0 || containerStyle.radiusTopRight;
+  const borderRadiusEnabled = containerStyle.radiusTopRight === 0
+    || containerStyle.radiusTopRight
+    || containerStyle.radiusTopLeft === 0
+    || containerStyle.radiusTopLeft
+    || containerStyle.radiusBottomRight === 0
+    || containerStyle.radiusBottomRight
+    || containerStyle.radiusBottomLeft === 0
+    || containerStyle.radiusBottomLeft;
 
   Vue.set(container, 'radiusTopRight', borderRadiusEnabled ? containerStyle.radiusTopRight : null);
   Vue.set(container, 'radiusTopLeft', borderRadiusEnabled ? containerStyle.radiusTopLeft : null);
   Vue.set(container, 'radiusBottomRight', borderRadiusEnabled ? containerStyle.radiusBottomRight : null);
   Vue.set(container, 'radiusBottomLeft', borderRadiusEnabled ? containerStyle.radiusBottomLeft : null);
 
-  if (container.radiusTopRight === 0 || container.radiusTopRight) {
+  if (container.radiusTopRight === 0
+    || container.radiusTopRight
+    || container.radiusTopLeft === 0
+    || container.radiusTopLeft
+    || container.radiusBottomRight === 0
+    || container.radiusBottomRight
+    || container.radiusBottomLeft === 0
+    || container.radiusBottomLeft) {
     container.cssClass += ` brtr-${parseInt(Math.min(20, Math.max(containerStyle.radiusTopRight, 0)) / 4)}`;
     container.cssClass += ` brtl-${parseInt(Math.min(20, Math.max(containerStyle.radiusTopLeft, 0)) / 4)}`;
     container.cssClass += ` brbr-${parseInt(Math.min(20, Math.max(containerStyle.radiusBottomRight, 0)) / 4)}`;
