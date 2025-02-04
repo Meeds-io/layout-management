@@ -124,6 +124,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    siteStyle: {
+      type: Boolean,
+      default: false,
+    },
     pageStyle: {
       type: Boolean,
       default: false,
@@ -181,6 +185,7 @@ export default {
         isApplicationBackground: this.container.template === this.$layoutUtils.bannerCellTemplate,
         noSectionMargins: this.noSectionMargins,
         noBackgroundStyle: this.noBackgroundStyle,
+        siteStyle: this.siteStyle,
         pageStyle: this.pageStyle,
         sectionStyle: this.sectionStyle,
         appStyle: !this.noApplicationStyle,

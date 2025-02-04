@@ -48,6 +48,21 @@
             eager
             cover />
         </v-card>
+        <div class="text-title me-auto mt-4 mb-2">
+          {{ $t('layout.siteDesign') }}
+        </div>
+        <layout-editor-background-input
+          v-if="$root.isSiteLayout && parentContainer"
+          ref="backgroundInput"
+          v-model="parentContainer"
+          :default-background-color="defaultBackgroundColor"
+          class="mt-2">
+          <template #title>
+            <div class="text-header me-auto mb-2">
+              {{ $t('layout.siteBackground') }}
+            </div>
+          </template>
+        </layout-editor-background-input>
 
         <div class="d-flex align-center mt-4">
           <div class="text-title me-auto mb-2">
@@ -90,7 +105,7 @@
           </v-radio-group>
         </div>
         <layout-editor-section-margin-input
-          v-model="parentContainer"
+          v-model="pageContainer"
           :max="80"
           :min="0"
           left
@@ -104,9 +119,9 @@
           </template>
         </layout-editor-section-margin-input>
         <layout-editor-background-input
-          v-if="parentContainer"
+          v-if="pageContainer"
           ref="backgroundInput"
-          v-model="parentContainer"
+          v-model="pageContainer"
           :default-background-color="defaultBackgroundColor"
           class="mt-2"
           page-style>
@@ -124,12 +139,12 @@
         </div>
         <layout-editor-border-input
           ref="appBorderInput"
-          v-model="parentContainer"
+          v-model="pageContainer"
           class="mt-4"
           page-style />
         <layout-editor-border-radius-input
           ref="appBorderRadiusInput"
-          v-model="parentContainer"
+          v-model="pageContainer"
           class="mt-4"
           page-style />
         <layout-editor-background-input
@@ -140,7 +155,7 @@
           page-style />
         <layout-editor-text-input
           ref="appTextInput"
-          v-model="parentContainer"
+          v-model="pageContainer"
           class="mt-4"
           page-style />
       </v-card>
@@ -170,7 +185,9 @@ export default {
     defaultBackgroundColor: '#F2F2F2FF',
     layout: null,
     originalParentContainer: null,
+    originalPageContainer: null,
     parentContainer: null,
+    pageContainer: null,
     appBackgroundProperties: null,
     fullWindow: false,
     width: 1320,
@@ -185,7 +202,7 @@ export default {
   }),
   computed: {
     cssStyle() {
-      return this.$applicationUtils.getStyle(this.parentContainer, {
+      return this.$applicationUtils.getStyle(this.pageContainer, {
         onlyBackgroundStyle: true,
       });
     },
@@ -194,7 +211,7 @@ export default {
     },
   },
   watch: {
-    parentContainer() {
+    pageContainer() {
       if (this.drawer) {
         this.optionsModified = true;
       }
@@ -210,32 +227,34 @@ export default {
     this.$root.$off('layout-page-properties-open', this.open);
   },
   methods: {
-    open(parentContainer) {
+    open(pageContainer, parentContainer) {
       this.originalParentContainer = parentContainer;
-      this.parentContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
-      if (this.parentContainer.marginTop !== 0 && !this.parentContainer.marginTop) {
-        this.parentContainer.marginTop = this.defaultMarginTop;
+      this.originalPageContainer = pageContainer;
+      this.parentContainer = parentContainer && Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(parentContainer)));
+      this.pageContainer = Object.assign({...this.$layoutUtils.containerModel}, JSON.parse(JSON.stringify(pageContainer)));
+      if (this.pageContainer.marginTop !== 0 && !this.pageContainer.marginTop) {
+        this.pageContainer.marginTop = this.defaultMarginTop;
       }
-      if (this.parentContainer.marginRight !== 0 && !this.parentContainer.marginRight) {
-        this.parentContainer.marginRight = this.defaultMarginRight;
+      if (this.pageContainer.marginRight !== 0 && !this.pageContainer.marginRight) {
+        this.pageContainer.marginRight = this.defaultMarginRight;
       }
-      if (this.parentContainer.marginBottom !== 0 && !this.parentContainer.marginBottom) {
-        this.parentContainer.marginBottom = this.defaultMarginBottom;
+      if (this.pageContainer.marginBottom !== 0 && !this.pageContainer.marginBottom) {
+        this.pageContainer.marginBottom = this.defaultMarginBottom;
       }
-      if (this.parentContainer.marginLeft !== 0 && !this.parentContainer.marginLeft) {
-        this.parentContainer.marginLeft = this.defaultMarginLeft;
+      if (this.pageContainer.marginLeft !== 0 && !this.pageContainer.marginLeft) {
+        this.pageContainer.marginLeft = this.defaultMarginLeft;
       }
-      this.width = (this.parentContainer.width === 'fullWindow' ? '100%' : this.parentContainer.width)
-        || (this.parentContainer.width === 'singlePageApplication' ? 1320 : this.parentContainer.width)
+      this.width = (this.pageContainer.width === 'fullWindow' ? '100%' : this.pageContainer.width)
+        || (this.pageContainer.width === 'singlePageApplication' ? 1320 : this.pageContainer.width)
         || (!!document.body.style.getPropertyValue('--allPagesWidth') && '100%')
         || 1320;
       this.appBackgroundProperties = {
         storageId: 0,
-        backgroundColor: this.parentContainer.appBackgroundColor || null,
-        backgroundImage: this.parentContainer.appBackgroundImage || null,
-        backgroundEffect: this.parentContainer.appBackgroundEffect || null,
-        backgroundRepeat: this.parentContainer.appBackgroundRepeat || null,
-        backgroundSize: this.parentContainer.appBackgroundSize || null,
+        backgroundColor: this.pageContainer.appBackgroundColor || null,
+        backgroundImage: this.pageContainer.appBackgroundImage || null,
+        backgroundEffect: this.pageContainer.appBackgroundEffect || null,
+        backgroundRepeat: this.pageContainer.appBackgroundRepeat || null,
+        backgroundSize: this.pageContainer.appBackgroundSize || null,
       };
       this.$refs.drawer.open();
     },
@@ -244,28 +263,34 @@ export default {
       try {
         await this.$refs.backgroundInput.apply();
         await this.$refs.appBackgroundInput.apply();
-        Object.assign(this.originalParentContainer, this.parentContainer);
-        this.$set(this.originalParentContainer, 'appBackgroundColor', this.appBackgroundProperties.backgroundColor);
-        this.$set(this.originalParentContainer, 'appBackgroundImage', this.appBackgroundProperties.backgroundImage);
-        this.$set(this.originalParentContainer, 'appBackgroundEffect', this.appBackgroundProperties.backgroundEffect);
-        this.$set(this.originalParentContainer, 'appBackgroundRepeat', this.appBackgroundProperties.backgroundRepeat);
-        this.$set(this.originalParentContainer, 'appBackgroundSize', this.appBackgroundProperties.backgroundSize);
-        this.$set(this.originalParentContainer, 'width', this.width);
+        Object.assign(this.originalPageContainer, this.pageContainer);
+        this.$set(this.originalPageContainer, 'appBackgroundColor', this.appBackgroundProperties.backgroundColor);
+        this.$set(this.originalPageContainer, 'appBackgroundImage', this.appBackgroundProperties.backgroundImage);
+        this.$set(this.originalPageContainer, 'appBackgroundEffect', this.appBackgroundProperties.backgroundEffect);
+        this.$set(this.originalPageContainer, 'appBackgroundRepeat', this.appBackgroundProperties.backgroundRepeat);
+        this.$set(this.originalPageContainer, 'appBackgroundSize', this.appBackgroundProperties.backgroundSize);
+        this.$set(this.originalPageContainer, 'width', this.width);
 
-        if (this.parentContainer.marginTop === this.defaultMarginTop) {
-          this.parentContainer.marginTop = null;
+        if (this.pageContainer.marginTop === this.defaultMarginTop) {
+          this.pageContainer.marginTop = null;
         }
-        if (this.parentContainer.marginRight === this.defaultMarginRight) {
-          this.parentContainer.marginRight = null;
+        if (this.pageContainer.marginRight === this.defaultMarginRight) {
+          this.pageContainer.marginRight = null;
         }
-        if (this.parentContainer.marginBottom === this.defaultMarginBottom) {
-          this.parentContainer.marginBottom = null;
+        if (this.pageContainer.marginBottom === this.defaultMarginBottom) {
+          this.pageContainer.marginBottom = null;
         }
-        if (this.parentContainer.marginLeft === this.defaultMarginLeft) {
-          this.parentContainer.marginLeft = null;
+        if (this.pageContainer.marginLeft === this.defaultMarginLeft) {
+          this.pageContainer.marginLeft = null;
         }
 
-        this.$layoutUtils.applyContainerStyle(this.originalParentContainer, this.originalParentContainer);
+        this.$layoutUtils.applyContainerStyle(this.originalPageContainer, this.originalPageContainer);
+        if (this.parentContainer) {
+          Object.assign(this.originalParentContainer, {
+            ...this.parentContainer,
+            children: this.originalParentContainer.children,
+          });
+        }
         this.$root.pageFullWindow = this.fullWindow;
         this.$root.$emit('layout-editor-page-design-updated');
         this.close();

@@ -32,7 +32,22 @@ export function getStyle(container, options) {
     || container.marginLeft
     || container.marginRight === 0
     || container.marginRight) {
-    if (options.pageStyle) {
+    if (options.siteStyle) {
+      if (container.marginTop === 0 || container.marginTop) {
+        document.body.style.setProperty('--allPagesMarginTop', `${container.marginTop}px`);
+        document.body.style.setProperty('--allPagesNoMarginTop', '0px');
+      }
+      if (container.marginRight === 0 || container.marginRight) {
+        document.body.style.setProperty('--allPagesMarginRight', `${container.marginRight}px`);
+      }
+      if (container.marginBottom === 0 || container.marginBottom) {
+        document.body.style.setProperty('--allPagesMarginBottom', `${container.marginBottom}px`);
+        document.body.style.setProperty('--allPagesNoMarginBottom', '0px');
+      }
+      if (container.marginLeft === 0 || container.marginLeft) {
+        document.body.style.setProperty('--allPagesMarginLeft', `${container.marginLeft}px`);
+      }
+    } else if (options.pageStyle) {
       if (container.marginTop === 0 || container.marginTop) {
         style['--allPagesMarginTop'] = `${container.marginTop}px`;
         style['--allPagesNoMarginTop'] = '0px';
@@ -131,7 +146,15 @@ export function getStyle(container, options) {
       }
     }
     if (container.width) {
-      if (options.pageStyle) {
+      if (options.siteStyle) {
+        if (container.width === 'fullWindow') {
+          document.body.style.setProperty('--allPagesWidth', '100%');
+        } else if (container.width === 'singlePageApplication') {
+          document.body.style.setProperty('--allPagesWidth', '1320px');
+        } else {
+          document.body.style.setProperty('--allPagesWidth', hasUnit(container.width) ? container.width : `${container.width}px`);
+        }
+      } else if (options.pageStyle) {
         if (container.width === 'fullWindow') {
           style['--allPagesWidth'] = '100%';
         } else if (container.width === 'singlePageApplication') {
@@ -170,8 +193,10 @@ export function getStyle(container, options) {
       || container.backgroundColor
       || container.backgroundEffect)) {
     if (container.backgroundColor) {
-      if (options.pageStyle) {
-        style['--allPagesBackgroundColor'] = container.backgroundColor;
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundColor', container.backgroundColor);
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundColor'] = container.backgroundColor;
       } else if (options.isApplicationBackground) {
         style['--appBackgroundColor'] = container.backgroundColor;
       } else if (options.sectionStyle) {
@@ -187,8 +212,10 @@ export function getStyle(container, options) {
         }
       }
     } else if (container.backgroundEffect || container.backgroundImage) {
-      if (options.pageStyle) {
-        style['--allPagesBackgroundColor'] = 'transparent';
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundColor', 'transparent');
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundColor'] = 'transparent';
       } else if (options.sectionStyle) {
         style['background-color'] = 'transparent';
       } else {
@@ -199,23 +226,32 @@ export function getStyle(container, options) {
     if (container.backgroundEffect && container.backgroundImage) {
       style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage}),${container.backgroundEffect}`;
     } else if (container.backgroundImage) {
-      if (options.pageStyle) {
-        style['--allPagesBackgroundImage'] = `url(${container.backgroundImage})`;
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundImage', `url(${container.backgroundImage})`);
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundImage'] = `url(${container.backgroundImage})`;
       } else {
         style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
       }
     } else if (container.backgroundEffect) {
-      if (options.pageStyle) {
-        style['--allPagesBackgroundImage'] = container.backgroundEffect;
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundImage', container.backgroundEffect);
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundImage'] = container.backgroundEffect;
       } else {
         style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
       }
     } else if (container.backgroundColor) {
-      if (options.pageStyle) {
-        style['--allPagesBackgroundImage'] = 'none';
-        style['--allPagesBackgroundRepeat'] = 'no-repeat';
-        style['--allPagesBackgroundSize'] = 'unset';
-        style['--allPagesBackgroundPosition'] = 'unset';
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundImage', 'none');
+        document.body.style.setProperty('--allPagesBackgroundRepeat', 'no-repeat');
+        document.body.style.setProperty('--allPagesBackgroundSize', 'unset');
+        document.body.style.setProperty('--allPagesBackgroundPosition', 'unset');
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundImage'] = 'none';
+        style['--pageBodyBackgroundRepeat'] = 'no-repeat';
+        style['--pageBodyBackgroundSize'] = 'unset';
+        style['--pageBodyBackgroundPosition'] = 'unset';
       } else {
         style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = 'none';
         style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = 'no-repeat';
@@ -225,22 +261,28 @@ export function getStyle(container, options) {
     }
     if (container.backgroundImage) {
       if (container.backgroundRepeat) {
-        if (options.pageStyle) {
-          style['--allPagesBackgroundRepeat'] = container.backgroundRepeat;
+        if (options.siteStyle) {
+          document.body.style.setProperty('--allPagesBackgroundRepeat', container.backgroundRepeat);
+        } else if (options.pageStyle) {
+          style['--pageBodyBackgroundRepeat'] = container.backgroundRepeat;
         } else {
           style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = container.backgroundRepeat;
         }
       }
       if (container.backgroundSize) {
-        if (options.pageStyle) {
-          style['--allPagesBackgroundSize'] = container.backgroundSize;
+        if (options.siteStyle) {
+          document.body.style.setProperty('--allPagesBackgroundSize', container.backgroundSize);
+        } else if (options.pageStyle) {
+          style['--pageBodyBackgroundSize'] = container.backgroundSize;
         } else {
           style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = container.backgroundSize;
         }
       }
       if (container.backgroundPosition) {
-        if (options.pageStyle) {
-          style['--allPagesBackgroundPosition'] = container.backgroundPosition;
+        if (options.siteStyle) {
+          document.body.style.setProperty('--allPagesBackgroundPosition', container.backgroundPosition);
+        } else if (options.pageStyle) {
+          style['--pageBodyBackgroundPosition'] = container.backgroundPosition;
         } else {
           style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
         }
