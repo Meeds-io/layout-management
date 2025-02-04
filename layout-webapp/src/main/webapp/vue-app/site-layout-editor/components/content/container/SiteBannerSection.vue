@@ -32,7 +32,6 @@
       }"
       class="position-relative overflow-initial layout-banner-section layout-section-content display-flex flex-row"
       type="banner-section"
-      no-section-margins
       section-style
       draggable
       @hovered="hoverSection = $event && !drawerOpened">
