@@ -140,6 +140,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    dynamicWidth: {
+      type: String,
+      default: null,
+    },
   },
   data: () => ({
     hover: false,
@@ -189,6 +193,7 @@ export default {
         pageStyle: this.pageStyle,
         sectionStyle: this.sectionStyle,
         appStyle: !this.noApplicationStyle,
+        dynamicWidth: this.dynamicWidth,
       });
     },
     containerCssClass() {
