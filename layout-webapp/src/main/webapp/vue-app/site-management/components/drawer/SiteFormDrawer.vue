@@ -274,7 +274,7 @@ export default {
     saveDisabled() {
       return !this.siteLabel
         || !this.siteName
-        || this.sites?.find?.(s => s.name === this.siteName)
+        || (this.isNew && this.sites?.find?.(s => s.name === this.siteName))
         || !(/^[a-zA-Z0-9_-]*$/).test(this.siteName);
     },
     sortedTemplates() {
