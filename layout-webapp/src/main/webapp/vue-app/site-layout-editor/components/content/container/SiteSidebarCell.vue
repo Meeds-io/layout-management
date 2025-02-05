@@ -31,6 +31,7 @@
     }"
     :style="cssStyle"
     class="position-relative display-flex flex-column border-box-sizing layout-sidebar-cell"
+    dynamic-width="20vw"
     draggable
     @hovered="hover = $event"
     @move-start="moveStart">
@@ -146,13 +147,14 @@ export default {
       return this.isInternalSidebar ? this.$root.middleCenterContainersMinHeight : 'calc(var(--100vh, 100vh) - 57px)';
     },
     cssStyle() {
-      const cssStyle = this.$applicationUtils.getStyle(this.container, {
-        onlyBackgroundStyle: true,
+      const cssStyle = this.$applicationUtils.getStyle(this.container.width ? this.container : {
+        ...this.container,
+        width: '310px',
+      }, {
         sectionStyle: true,
+        appStyle: true,
+        dynamicWidth: '20vw',
       });
-      cssStyle['min-width'] = `${this.width || 310}px`;
-      cssStyle['width'] = `${this.width || 310}px`;
-      cssStyle['max-width'] = `${this.width || 310}px`;
       cssStyle['min-height'] = this.minHeight;
       cssStyle['height'] = '100%';
       return cssStyle;
