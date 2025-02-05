@@ -69,6 +69,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    dynamicWidth: {
+      type: String,
+      default: null,
+    },
   },
   computed: {
     id() {
@@ -101,6 +105,7 @@ export default {
         pageStyle: this.pageStyle,
         sectionStyle: this.sectionStyle,
         appStyle: !this.noApplicationStyle,
+        dynamicWidth: this.dynamicWidth,
       });
     },
     cssClass() {

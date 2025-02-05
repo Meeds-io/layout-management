@@ -163,13 +163,20 @@ export function getStyle(container, options) {
           style['--allPagesWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
         }
       } else if (options.appStyle) {
-        if (options.sectionStyle) {
+        if (options.dynamicWidth) {
+          style['min-width'] = 'auto';
           style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
-          style['min-width'] = style['width'];
-          style['max-width'] = style['width'];
-        }
-        if (!options.noApplicationWidth) {
-          style['--appWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+          style['max-width'] = `min(${options.dynamicWidth}, ${style['width']})`;
+          style['--appWidth'] = '100%';
+        } else {
+          if (options.sectionStyle) {
+            style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+            style['min-width'] = style['width'];
+            style['max-width'] = style['width'];
+          }
+          if (!options.noApplicationWidth) {
+            style['--appWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+          }
         }
       } else {
         style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
