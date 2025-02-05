@@ -24,6 +24,7 @@
     :container="containerToDisplay"
     :parent-id="parentId"
     class="display-flex flex-column border-box-sizing layout-sidebar-cell fill-height"
+    dynamic-width="20vw"
     section-style />
 </template>
 <script>
