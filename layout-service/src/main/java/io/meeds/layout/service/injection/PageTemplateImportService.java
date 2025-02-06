@@ -56,12 +56,12 @@ import org.exoplatform.social.attachment.model.UploadedAttachmentDetail;
 import org.exoplatform.upload.UploadResource;
 
 import io.meeds.common.ContainerTransactional;
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.PageTemplate;
 import io.meeds.layout.model.PageTemplateDescriptor;
 import io.meeds.layout.model.PageTemplateDescriptorList;
 import io.meeds.layout.plugin.attachment.PageTemplateAttachmentPlugin;
 import io.meeds.layout.plugin.translation.PageTemplateTranslationPlugin;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.service.LayoutAclService;
 import io.meeds.layout.service.PageTemplateService;
 import io.meeds.layout.util.JsonUtils;

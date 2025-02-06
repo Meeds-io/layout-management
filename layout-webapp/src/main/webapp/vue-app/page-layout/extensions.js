@@ -18,14 +18,14 @@
  */
 
 extensionRegistry.registerExtension('page-layout', 'container', {
-  rank: 1000,
+  rank: 1500,
   type: 'default',
   isValid: container => container?.template === 'Container',
   containerType: 'page-layout-container',
 });
 
 extensionRegistry.registerExtension('page-layout', 'container', {
-  rank: 400,
+  rank: 100,
   type: 'cell',
   isValid: container => container.template === 'CellContainer',
   containerType: 'page-layout-cell-container',
@@ -46,8 +46,64 @@ extensionRegistry.registerExtension('page-layout', 'container', {
 });
 
 extensionRegistry.registerExtension('page-layout', 'container', {
-  rank: 600,
+  rank: 400,
   type: 'application',
   isValid: container => !container.template,
   containerType: 'page-layout-application',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 500,
+  type: 'PageBody',
+  isValid: container => container?.template === 'PageBody' || container?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl',
+  containerType: 'page-layout-page-body-container',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 600,
+  type: 'Sibebar',
+  isValid: container => container?.template === 'Sidebar',
+  containerType: 'page-layout-sidebar-section',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 700,
+  type: 'SidebarCell',
+  isValid: container => container?.template === 'SidebarCell',
+  containerType: 'page-layout-sidebar-cell',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 800,
+  type: 'Banner',
+  isValid: container => container?.template === 'Banner',
+  containerType: 'page-layout-banner-section',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 900,
+  type: 'BannerCell',
+  isValid: container => container?.template === 'BannerCell',
+  containerType: 'page-layout-banner-cell',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 1000,
+  type: 'SiteMiddleBody',
+  isValid: container => container?.template === 'SiteMiddleBody',
+  containerType: 'page-layout-site-middle-container',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 1100,
+  type: 'SiteMiddleCenterBody',
+  isValid: container => container?.template === 'SiteMiddleCenterBody',
+  containerType: 'page-layout-site-middle-center-container',
+});
+
+extensionRegistry.registerExtension('page-layout', 'container', {
+  rank: 1200,
+  type: 'Site',
+  isValid: container => container?.template === 'system:/groovy/portal/webui/container/UISiteLayout.gtmpl',
+  containerType: 'page-layout-site-container',
 });

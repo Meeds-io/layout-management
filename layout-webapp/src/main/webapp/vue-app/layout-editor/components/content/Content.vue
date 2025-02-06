@@ -20,9 +20,8 @@
 -->
 <template>
   <v-card
-    :max-width="maxWidth"
     :class="parentClass"
-    class="transparent layout-sections-parent singlePageApplication mx-auto"
+    class="transparent layout-sections-parent mx-auto"
     flat>
     <layout-editor-container-extension
       :container="pageLayout"
@@ -85,9 +84,6 @@ export default {
     },
     mobileDisplayMode() {
       return this.$root.mobileDisplayMode;
-    },
-    maxWidth() {
-      return this.mobileDisplayMode && '500px !important' || 'initial';
     },
     parentClass() {
       return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
@@ -332,7 +328,7 @@ export default {
     },
     handleSectionUpdated(container, children, index, type) {
       container.children = children?.filter(c => !!c) || [];
-      if (type === 'section' && !container.children?.length) {
+      if ((type === 'section' || type === 'section-grid' || type === 'section-columns') && !container.children?.length) {
         window.setTimeout(() => this.handleRemoveSection(index), 500);
       }
     },
@@ -408,7 +404,10 @@ export default {
       try {
         await this.saveDraft();
         await this.$pageLayoutService.cloneSection(this.$root.draftPageRef, section.storageId);
-        const layout = await this.$pageLayoutService.getPageLayout(this.$root.draftPageRef, 'contentId');
+        const layout = await this.$pageLayoutService.getPageLayout({
+          pageRef: this.$root.draftPageRef,
+          expand: 'contentId',
+        });
         this.setLayout(layout);
         this.$root.$emit('layout-draft-saved');
       } finally {

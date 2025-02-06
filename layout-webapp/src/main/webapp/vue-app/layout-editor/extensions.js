@@ -1,7 +1,7 @@
 /*
  * This file is part of the Meeds project (https://meeds.io/).
  * 
- * Copyright (C) 2020 - 2024 Meeds Association contact@meeds.io
+ * Copyright (C) 2020 - 2025 Meeds Association contact@meeds.io
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,29 +18,8 @@
  */
 
 extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 1000,
-  type: 'default',
-  isValid: container => container?.template === 'Container',
-  containerType: 'layout-editor-container',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 300,
-  type: 'grid-section',
-  isValid: container => container?.template === 'GridContainer' || container?.template === 'FlexContainer',
-  containerType: 'layout-editor-container-section',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 500,
-  type: 'cell',
-  isValid: container => container?.template === 'CellContainer',
-  containerType: 'layout-editor-container-cell',
-});
-
-extensionRegistry.registerExtension('layout-editor', 'container', {
-  rank: 600,
-  type: 'application',
-  isValid: container => !container.type && !container.template,
-  containerType: 'layout-editor-container-application',
+  rank: 150,
+  type: 'page-body',
+  isValid: container => container?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl',
+  containerType: 'layout-editor-container-page-body',
 });

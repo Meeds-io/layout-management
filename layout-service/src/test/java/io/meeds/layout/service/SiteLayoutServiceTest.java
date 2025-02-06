@@ -49,6 +49,7 @@ import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.user.UserPortal;
@@ -87,6 +88,9 @@ public class SiteLayoutServiceTest {
 
   @MockBean
   private LocaleConfigService     localeConfigService;
+
+  @MockBean
+  private PortletInstanceService  portletInstanceService;
 
   @Autowired
   private SiteLayoutService       siteLayoutService;
@@ -220,6 +224,30 @@ public class SiteLayoutServiceTest {
     verify(layoutService, times(2)).save(portalConfig);
     verify(layoutService).removeSiteBanner(SITE_KEY.getName());
     verify(portalConfig).setDisplayOrder(0);
+  }
+
+  @Test
+  @SneakyThrows
+  public void restoreSite() {
+    assertThrows(ObjectNotFoundException.class,
+                 () -> siteLayoutService.restoreSite(SITE_KEY, ImportMode.CONSERVE, true, true, true, TEST_USER));
+
+    when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(portalConfig);
+    assertThrows(IllegalAccessException.class,
+                 () -> siteLayoutService.restoreSite(SITE_KEY, ImportMode.CONSERVE, true, true, true, TEST_USER));
+    when(aclService.canEditSite(SITE_KEY, TEST_USER)).thenReturn(true);
+
+    assertThrows(IllegalStateException.class,
+                 () -> siteLayoutService.restoreSite(SITE_KEY, ImportMode.CONSERVE, true, true, true, TEST_USER));
+    when(portalConfigService.canRestore(SITE_KEY.getTypeName(), SITE_KEY.getName())).thenReturn(true);
+
+    siteLayoutService.restoreSite(SITE_KEY, ImportMode.OVERWRITE, true, false, true, TEST_USER);
+    verify(portalConfigService).restoreSite(SITE_KEY.getTypeName(),
+                                            SITE_KEY.getName(),
+                                            ImportMode.OVERWRITE,
+                                            true,
+                                            false,
+                                            true);
   }
 
   @Test

@@ -30,47 +30,11 @@ import PagePreviewButton from './components/toolbar/actions/PagePreviewButton.vu
 import PageSpacePreviewButton from './components/toolbar/actions/PageSpacePreviewButton.vue';
 import PagePropertiesButton from './components/toolbar/actions/PagePropertiesButton.vue';
 
-import BorderRadiusSelector from './components/form/BorderRadiusSelector.vue';
-import ColorPicker from './components/form/ColorPicker.vue';
-import BackgroundImageAttachment from './components/form/BackgroundImageAttachment.vue';
-import BackgroundInput from './components/form/BackgroundInput.vue';
-import TextInput from './components/form/TextInput.vue';
-import MarginInput from './components/form/MarginInput.vue';
-import SectionMarginInput from './components/form/SectionMarginInput.vue';
-import BorderInput from './components/form/BorderInput.vue';
-import BorderRadiusInput from './components/form/BorderRadiusInput.vue';
-import SectionTemplate from './components/form/SectionTemplate.vue';
-
 import Content from './components/content/Content.vue';
 
-import CellsDropBox from './components/content/base/CellsDropBox.vue';
-import CellsSelectionBox from './components/content/base/CellsSelectionBox.vue';
-import ContainerExtension from './components/content/base/ContainerExtension.vue';
-import ContainerBase from './components/content/base/ContainerBase.vue';
+import PageBody from './components/content/container/PageBody.vue';
 
-import SectionMenu from './components/content/common/SectionMenu.vue';
-import SectionSelectionGrid from './components/content/common/SectionSelectionGrid.vue';
-import SectionSelectionGridCell from './components/content/common/SectionSelectionGridCell.vue';
-import ApplicationCategoryCard from './components/content/common/ApplicationCategoryCard.vue';
-import ApplicationCard from './components/content/common/ApplicationCard.vue';
-import ApplicationMenu from './components/content/common/ApplicationMenu.vue';
-import CellResizeButton from './components/content/common/CellResizeButton.vue';
-
-import Container from './components/content/container/Container.vue';
-import Section from './components/content/container/Section.vue';
-import Cell from './components/content/container/Cell.vue';
-import Application from './components/content/container/Application.vue';
-
-import EditSectionDrawer from './components/drawer/EditSectionDrawer.vue';
 import AddSectionDrawer from './components/drawer/AddSectionDrawer.vue';
-import SelectApplicationCategoryDrawer from './components/drawer/SelectApplicationCategoryDrawer.vue';
-import AddApplicationDrawer from './components/drawer/AddApplicationDrawer.vue';
-import EditApplicationDrawer from './components/drawer/EditApplicationDrawer.vue';
-import EditPageDrawer from './components/drawer/EditPageDrawer.vue';
-
-import EditPortletDialog from './components/dialog/EditPortletDialog.vue';
-
-import Coediting from './components/coediting/Coediting.vue';
 
 const components = {
   'layout-editor': LayoutEditor,
@@ -85,40 +49,8 @@ const components = {
   'layout-editor-toolbar-page-properties-button': PagePropertiesButton,
   'layout-editor-toolbar-mobile-preview-button': MobilePreviewButton,
   'layout-editor-content': Content,
-  'layout-editor-color-picker': ColorPicker,
-  'layout-editor-border-radius-selector': BorderRadiusSelector,
-  'layout-editor-container': Container,
-  'layout-editor-container-extension': ContainerExtension,
-  'layout-editor-container-base': ContainerBase,
-  'layout-editor-container-section': Section,
-  'layout-editor-section-template': SectionTemplate,
-  'layout-editor-container-cell': Cell,
-  'layout-editor-container-application': Application,
-  'layout-editor-section-selection-grid': SectionSelectionGrid,
-  'layout-editor-section-selection-grid-cell': SectionSelectionGridCell,
   'layout-editor-section-add-drawer': AddSectionDrawer,
-  'layout-editor-section-edit-drawer': EditSectionDrawer,
-  'layout-editor-section-menu': SectionMenu,
-  'layout-editor-application-category-select-drawer': SelectApplicationCategoryDrawer,
-  'layout-editor-application-add-drawer': AddApplicationDrawer,
-  'layout-editor-application-edit-drawer': EditApplicationDrawer,
-  'layout-editor-page-edit-drawer': EditPageDrawer,
-  'layout-editor-portlet-edit-dialog': EditPortletDialog,
-  'layout-editor-background-image-attachment': BackgroundImageAttachment,
-  'layout-editor-background-input': BackgroundInput,
-  'layout-editor-text-input': TextInput,
-  'layout-editor-margin-input': MarginInput,
-  'layout-editor-section-margin-input': SectionMarginInput,
-  'layout-editor-border-input': BorderInput,
-  'layout-editor-border-radius-input': BorderRadiusInput,
-  'layout-editor-application-card': ApplicationCard,
-  'layout-editor-application-category-card': ApplicationCategoryCard,
-  'layout-editor-application-menu': ApplicationMenu,
-  'layout-editor-cell-resize-button': CellResizeButton,
-  'layout-editor-cells-selection-box': CellsSelectionBox,
-  'layout-editor-cells-drop-box': CellsDropBox,
-  // TODO : to define in social to be a reusable component
-  'coediting': Coediting,
+  'layout-editor-container-page-body': PageBody,
 };
 
 for (const key in components) {

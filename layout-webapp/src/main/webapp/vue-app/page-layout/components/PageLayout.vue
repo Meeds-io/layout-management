@@ -20,31 +20,13 @@
 -->
 <template>
   <v-app
-    class="layout-sections-parent singlePageApplication transparent"
+    :class="!$root.siteId && 'layout-page-parent'"
+    class="layout-sections-parent transparent"
     role="main"
     flat>
     <page-layout-page-container
-      v-if="pageLayout"
-      :container="pageLayout" />
+      v-if="$root.page"
+      :container="$root.layout" />
   </v-app>
 </template>
-<script>
-export default {
-  data: () => ({
-    page: null,
-  }),
-  computed: {
-    pageLayout() {
-      if (this.page?.children?.[0]?.children?.[0]?.template === 'system:/groovy/portal/webui/container/UIPageLayout.gtmpl') {
-        return this.page?.children?.[0]?.children?.[0];
-      } else {
-        return this.page?.children?.[0];
-      }
-    },
-  },
-  created() {
-    this.$pageLayoutService.getPageLayout(this.$root.pageRef)
-      .then(page => this.page = page);
-  },
-};
-</script>
+<script></script>

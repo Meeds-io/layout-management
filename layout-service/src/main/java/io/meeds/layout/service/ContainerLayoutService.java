@@ -55,7 +55,8 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.upload.UploadResource;
 import org.exoplatform.upload.UploadService;
 
-import io.meeds.layout.rest.model.LayoutModel;
+import io.meeds.layout.model.LayoutModel;
+import io.meeds.layout.util.EntityMapper;
 
 import lombok.SneakyThrows;
 
@@ -91,7 +92,7 @@ public class ContainerLayoutService {
     exportPortletPreferences(container);
     LayoutModel sectionLayoutModel = new LayoutModel(container);
     sectionLayoutModel.resetStorage();
-    return (Container) LayoutModel.toModelObject(sectionLayoutModel);
+    return (Container) EntityMapper.toModelObject(sectionLayoutModel);
   }
 
   public void exportPortletPreferences(ModelObject object) {

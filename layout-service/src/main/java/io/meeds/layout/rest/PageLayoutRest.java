@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
@@ -43,10 +45,10 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.PortletPreferenceList;
-import io.meeds.layout.rest.model.LayoutModel;
 import io.meeds.layout.rest.util.RestEntityBuilder;
 import io.meeds.layout.service.PageLayoutService;
 
@@ -97,31 +99,38 @@ public class PageLayoutRest {
   @Operation(summary = "Retrieve page layout by reference", method = "GET", description = "This retrieves page by reference")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "Request fulfilled"),
+    @ApiResponse(responseCode = "304", description = "Not modified"),
     @ApiResponse(responseCode = "403", description = "Forbidden"),
     @ApiResponse(responseCode = "404", description = "Not found"),
   })
-  public LayoutModel getPageLayout(
-                                   HttpServletRequest request,
-                                   @Parameter(description = "page reference", required = true)
-                                   @RequestParam("pageRef")
-                                   String pageRef,
-                                   @Parameter(description = "Application Storage Id", required = false)
-                                   @RequestParam(name = "applicationId", required = false, defaultValue = "0")
-                                   long applicationId,
-                                   @Parameter(description = "Generate Page Data And Preferences to allow cloning the page", required = false)
-                                   @RequestParam(name = "impersonate", required = false, defaultValue = "false")
-                                   boolean impersonate,
-                                   @Parameter(description = "expand options", required = true)
-                                   @RequestParam(name = "expand", required = false)
-                                   String expand) {
+  public ResponseEntity<LayoutModel> getPageLayout(
+                                                   WebRequest webRequest,
+                                                   HttpServletRequest request,
+                                                   @Parameter(description = "page reference", required = true)
+                                                   @RequestParam("pageRef")
+                                                   String pageRef,
+                                                   @Parameter(description = "Site Id to include its associated layout", required = false)
+                                                   @RequestParam(name = "siteId", required = false, defaultValue = "0")
+                                                   long siteId,
+                                                   @Parameter(description = "Application Storage Id", required = false)
+                                                   @RequestParam(name = "applicationId", required = false, defaultValue = "0")
+                                                   long applicationId,
+                                                   @Parameter(description = "Generate Page Data And Preferences to allow cloning the page", required = false)
+                                                   @RequestParam(name = "impersonate", required = false, defaultValue = "false")
+                                                   boolean impersonate,
+                                                   @Parameter(description = "expand options", required = true)
+                                                   @RequestParam(name = "expand", required = false)
+                                                   String expand) {
     try {
-      ModelObject modelObject = applicationId > 0 ? pageLayoutService.getPageApplicationLayout(PageKey.parse(pageRef),
-                                                                                               applicationId,
-                                                                                               request.getRemoteUser()) :
-                                                  pageLayoutService.getPageLayout(PageKey.parse(pageRef),
-                                                                                  impersonate,
-                                                                                  request.getRemoteUser());
-      return RestEntityBuilder.toLayoutModel(modelObject, layoutService, expand);
+      LayoutModel pageLayout = getPageLayout(request, pageRef, siteId, applicationId, impersonate, expand);
+      String eTag = String.valueOf(pageLayout.hashCode());
+      if (webRequest.checkNotModified(eTag)) {
+        return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+      } else {
+        return ResponseEntity.ok()
+                             .eTag(eTag)
+                             .body(pageLayout);
+      }
     } catch (ObjectNotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -195,10 +204,10 @@ public class PageLayoutRest {
                                       LayoutModel layoutModel) {
     try {
       pageLayoutService.updatePageLayout(pageRef,
-                                         RestEntityBuilder.fromLayoutModel(layoutModel),
+                                         layoutModel.toPage(),
                                          publish.orElse(false).booleanValue(),
                                          request.getRemoteUser());
-      return getPageLayout(request, pageRef, 0, false, expand);
+      return getPageLayout(request, pageRef, 0, 0, false, expand);
     } catch (IllegalArgumentException | IllegalStateException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ObjectNotFoundException e) {
@@ -310,6 +319,22 @@ public class PageLayoutRest {
     } catch (IllegalAccessException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
     }
+  }
+
+  private LayoutModel getPageLayout(HttpServletRequest request,
+                                    String pageRef,
+                                    long siteId,
+                                    long applicationId,
+                                    boolean impersonate,
+                                    String expand) throws ObjectNotFoundException, IllegalAccessException {
+    ModelObject modelObject = applicationId > 0 ? pageLayoutService.getPageApplicationLayout(PageKey.parse(pageRef),
+                                                                                             applicationId,
+                                                                                             request.getRemoteUser()) :
+                                                pageLayoutService.getPageLayout(PageKey.parse(pageRef),
+                                                                                siteId,
+                                                                                impersonate,
+                                                                                request.getRemoteUser());
+    return RestEntityBuilder.toLayoutModel(modelObject, layoutService, expand);
   }
 
 }

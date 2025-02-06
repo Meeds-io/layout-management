@@ -39,6 +39,8 @@ export default {
     pageTemplates: [],
     pageTemplateToDelete: null,
     loading: false,
+    creating: false,
+    contentLoaded: false,
     collator: new Intl.Collator(eXo.env.portal.language, {numeric: true, sensitivity: 'base'}),
   }),
   computed: {
@@ -128,6 +130,11 @@ export default {
       return this.pageTemplateToDelete && this.$te(this.pageTemplateToDelete?.name) ? this.$t(this.pageTemplateToDelete?.name) : this.pageTemplateToDelete?.name;
     },
   },
+  watch: {
+    creating() {
+      this.$emit('creating', this.creating);
+    },
+  },
   created() {
     this.$root.$on('page-templates-deleted', this.refreshPageTemplates);
     this.$root.$on('page-templates-created', this.refreshPageTemplates);
@@ -138,6 +145,7 @@ export default {
     this.$root.$on('page-templates-delete', this.deletePageTemplateConfirm);
     this.$root.$on('page-templates-create', this.createPageTemplate);
     this.refreshPageTemplates();
+    this.retrieveColumnsTemplate();
   },
   beforeDestroy() {
     this.$root.$off('page-templates-deleted', this.refreshPageTemplates);
@@ -185,6 +193,13 @@ export default {
         .then(pageTemplates => this.pageTemplates = pageTemplates || [])
         .finally(() => this.loading = false);
     },
+    retrieveColumnsTemplate() {
+      return this.$pageTemplateService.getPageTemplates(true)
+        .then(pageTemplates => {
+          this.columnsTemplate = pageTemplates?.find?.(t => t.system && t.content.includes('FlexContainer'));
+        })
+        .finally(() => this.contentLoaded = true);
+    },
     deletePageTemplate(pageTemplate) {
       this.loading = true;
       this.$pageTemplateService.deletePageTemplate(pageTemplate.id)
@@ -195,11 +210,15 @@ export default {
         .catch(() => this.$root.$emit('alert-message', this.$t('pageTemplate.delete.error'), 'error'))
         .finally(() => this.loading = false);
     },
-    createPageTemplate() {
-      const columnsTemplate = this.pageTemplates.find(t => t.system && t.content.includes('FlexContainer'));
-      const columnsTemplateContent = columnsTemplate?.content || '{}';
-      this.$pageTemplateService.createPageTemplate(columnsTemplateContent, true)
-        .then(pageTemplate => window.open(`/portal/administration/layout-editor?pageTemplateId=${pageTemplate.id}`, '_blank'));
+    async createPageTemplate() {
+      this.creating = true;
+      try {
+        const columnsTemplateContent = this.columnsTemplate?.content || '{}';
+        const pageTemplate = await this.$pageTemplateService.createPageTemplate(columnsTemplateContent, true);
+        window.open(`/portal/administration/layout-editor?pageTemplateId=${pageTemplate.id}`, '_blank');
+      } finally {
+        this.creating = false;
+      }
     },
   },
 };

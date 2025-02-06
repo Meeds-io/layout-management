@@ -197,7 +197,7 @@ public class PageTemplateServiceTest {
     when(translationService.getTranslationField(PageTemplateTranslationPlugin.OBJECT_TYPE,
                                                 template.getId(),
                                                 PageTemplateTranslationPlugin.TITLE_FIELD_NAME)).thenThrow(ObjectNotFoundException.class);
-    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.FRENCH, true);
+    retrievedPageTemplate = pageTemplateService.getPageTemplate(2l, Locale.FRENCH, true, true);
     assertNotNull(retrievedPageTemplate);
 
     reset(translationService);

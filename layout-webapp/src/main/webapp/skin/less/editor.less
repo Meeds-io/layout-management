@@ -41,6 +41,9 @@
   .specific-scrollbar();
   height: ~"calc(100vh - 82px)";
   max-height: ~"calc(100vh - 82px)";
+  min-width: unset !important;
+  width: 500px !important;
+  max-width: 500px !important;
   overflow-y: auto;
   overflow-x: hidden;
 
@@ -80,6 +83,12 @@
   margin-left: -1px;
   padding-top: 1px;
 }
+.layout-banner-section-even .layout-empty-cell {
+  opacity: 0.2;
+}
+.layout-banner-section-odd .layout-empty-cell {
+  opacity: 0.3;
+}
 
 .t-10 {
   top: 10px;
@@ -113,7 +122,7 @@
     margin-top: 12px;
   }
   &:last-of-type {
-    padding-bottom: 20px !important;
+    padding-bottom: var(--allPagesMarginBottom, 20px) !important;
   }
   &.layout-moving-chosen-container {
     > div {

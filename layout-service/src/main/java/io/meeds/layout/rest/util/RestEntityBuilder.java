@@ -31,13 +31,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.portal.config.model.Application;
 import org.exoplatform.portal.config.model.Container;
 import org.exoplatform.portal.config.model.ModelObject;
-import org.exoplatform.portal.config.model.Page;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.social.rest.api.EntityBuilder;
 import org.exoplatform.social.rest.entity.SiteEntity;
 
-import io.meeds.layout.rest.model.LayoutModel;
+import io.meeds.layout.model.LayoutModel;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -53,7 +52,7 @@ public class RestEntityBuilder {
                                          request,
                                          true,
                                          null,
-                                         true,
+                                         false,
                                          false,
                                          false,
                                          locale);
@@ -103,10 +102,6 @@ public class RestEntityBuilder {
         applyApplicationContentId(layoutModel.getChildren(), contentIds);
       }
     }
-  }
-
-  public static Page fromLayoutModel(LayoutModel layoutModel) {
-    return layoutModel.toPage();
   }
 
 }

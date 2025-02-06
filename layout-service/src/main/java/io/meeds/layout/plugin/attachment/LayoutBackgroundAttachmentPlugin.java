@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.service.LayoutService;
@@ -41,16 +43,20 @@ import jakarta.annotation.PostConstruct;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
 
-  public static final String OBJECT_TYPE = "containerBackground";
+  public static final String  OBJECT_TYPE = "containerBackground";
+
+  private static final String PAGE_PREFIX = "page_";
+
+  private static final String SITE_PREFIX = "site_";
 
   @Autowired
-  private LayoutAclService   layoutAclService;
+  private LayoutAclService    layoutAclService;
 
   @Autowired
-  private LayoutService      layoutService;
+  private LayoutService       layoutService;
 
   @Autowired
-  private AttachmentService  attachmentService;
+  private AttachmentService   attachmentService;
 
   @PostConstruct
   public void init() {
@@ -64,15 +70,33 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
 
   @Override
   public boolean hasEditPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    return layoutAclService.canEditPage(getPageKey(entityId), getUsername(userIdentity));
+    if (StringUtils.contains(entityId, SITE_PREFIX)) {
+      SiteKey siteKey = getSiteKey(entityId);
+      return layoutAclService.canEditSite(siteKey, getUsername(userIdentity));
+    } else {
+      PageKey pageKey = getPageKey(entityId);
+      return pageKey != null && layoutAclService.canEditPage(pageKey, getUsername(userIdentity));
+    }
   }
 
   @Override
   public boolean hasAccessPermission(Identity userIdentity, String entityId) throws ObjectNotFoundException {
-    PageKey pageKey = getPageKey(entityId);
-    return pageKey.getSite().getType() == SiteType.GROUP_TEMPLATE
-           || pageKey.getSite().getType() == SiteType.PORTAL_TEMPLATE
-           || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
+    if (StringUtils.contains(entityId, SITE_PREFIX)) {
+      SiteKey siteKey = getSiteKey(entityId);
+      return siteKey.getType() == SiteType.GROUP_TEMPLATE
+             || siteKey.getType() == SiteType.PORTAL_TEMPLATE
+             || layoutAclService.canViewSite(siteKey, getUsername(userIdentity));
+    } else {
+      PageKey pageKey = getPageKey(entityId);
+      if (pageKey == null) {
+        return false;
+      } else {
+        SiteKey siteKey = pageKey.getSite();
+        return siteKey.getType() == SiteType.GROUP_TEMPLATE
+               || siteKey.getType() == SiteType.PORTAL_TEMPLATE
+               || layoutAclService.canViewPage(pageKey, getUsername(userIdentity));
+      }
+    }
   }
 
   @Override
@@ -86,10 +110,25 @@ public class LayoutBackgroundAttachmentPlugin extends AttachmentPlugin {
   }
 
   private PageKey getPageKey(String entityId) {
-    String pageUuid = entityId.split("_")[0].replace("page_", "");
+    String pageUuid = entityId.split("_")[0].replace(PAGE_PREFIX, "");
     long pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
-    Page page = layoutService.getPage(pageId);
-    return page.getPageKey();
+    if (pageId == 0) {
+      pageUuid = entityId.replace(PAGE_PREFIX, "").split("_")[0];
+      pageId = StringUtils.isNumeric(pageUuid) ? Long.parseLong(pageUuid) : 0;
+    }
+    if (pageId == 0) {
+      return null;
+    } else {
+      Page page = layoutService.getPage(pageId);
+      return page.getPageKey();
+    }
+  }
+
+  private SiteKey getSiteKey(String entityId) {
+    String siteUuid = entityId.replace(SITE_PREFIX, "").split("_")[0];
+    long siteId = StringUtils.isNumeric(siteUuid) ? Long.parseLong(siteUuid) : 0;
+    PortalConfig site = layoutService.getPortalConfig(siteId);
+    return new SiteKey(site.getType(), site.getName());
   }
 
   private String getUsername(Identity userIdentity) {

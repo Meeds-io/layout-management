@@ -17,19 +17,65 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode) {
-  return getApplicationContent(navUri, applicationStorageId, applicationMode)
+export function installApplication(navUri, applicationStorageId, applicationElement, applicationMode, showSite, fullRender) {
+  return getApplicationContent(navUri, applicationStorageId, applicationMode, showSite, fullRender)
     .then(applicationContent => handleApplicationContent(applicationContent, applicationElement, applicationMode));
 }
 
 export function getStyle(container, options) {
   const style = {};
-  if (options.sectionStyle && (container.marginTop || container.marginBottom)) {
-    if (container.marginTop) {
-      style['--sectionMarginTop'] = `${container.marginTop + 10}px`;
-    }
-    if (container.marginBottom) {
-      style['--sectionMarginBottom'] = `${container.marginBottom + 10}px`;
+  if (container.marginTop === 0
+    || container.marginTop
+    || container.marginBottom === 0
+    || container.marginBottom
+    || container.marginLeft === 0
+    || container.marginLeft
+    || container.marginRight === 0
+    || container.marginRight) {
+    if (options.siteStyle) {
+      if (container.marginTop === 0 || container.marginTop) {
+        document.body.style.setProperty('--allPagesMarginTop', `${container.marginTop}px`);
+        document.body.style.setProperty('--allPagesNoMarginTop', '0px');
+      }
+      if (container.marginRight === 0 || container.marginRight) {
+        document.body.style.setProperty('--allPagesMarginRight', `${container.marginRight}px`);
+      }
+      if (container.marginBottom === 0 || container.marginBottom) {
+        document.body.style.setProperty('--allPagesMarginBottom', `${container.marginBottom}px`);
+        document.body.style.setProperty('--allPagesNoMarginBottom', '0px');
+      }
+      if (container.marginLeft === 0 || container.marginLeft) {
+        document.body.style.setProperty('--allPagesMarginLeft', `${container.marginLeft}px`);
+      }
+    } else if (options.pageStyle) {
+      if (container.marginTop === 0 || container.marginTop) {
+        style['--allPagesMarginTop'] = `${container.marginTop}px`;
+        style['--allPagesNoMarginTop'] = '0px';
+      }
+      if (container.marginRight === 0 || container.marginRight) {
+        style['--allPagesMarginRight'] = `${container.marginRight}px`;
+      }
+      if (container.marginBottom === 0 || container.marginBottom) {
+        style['--allPagesMarginBottom'] = `${container.marginBottom}px`;
+        style['--allPagesNoMarginBottom'] = '0px';
+      }
+      if (container.marginLeft === 0 || container.marginLeft) {
+        style['--allPagesMarginLeft'] = `${container.marginLeft}px`;
+      }
+    } else if (options.sectionStyle && !options.noSectionMargins) {
+      const diff = container.template === 'Banner' || container.template === 'BannerCell' || container.template === 'Sidebar' || container.template === 'SidebarCell' ? 0 : 10;
+      if (container.marginTop) {
+        style['--sectionMarginTop'] = `${container.marginTop + diff}px`;
+      }
+      if (container.marginRight) {
+        style['--sectionMarginRight'] = `${container.marginRight + diff}px`;
+      }
+      if (container.marginBottom) {
+        style['--sectionMarginBottom'] = `${container.marginBottom + diff}px`;
+      }
+      if (container.marginLeft) {
+        style['--sectionMarginLeft'] = `${container.marginLeft + diff}px`;
+      }
     }
   }
   if (container.textTitleColor) {
@@ -82,30 +128,71 @@ export function getStyle(container, options) {
   }
   if (!options.onlyBackgroundStyle) {
     if (container.height) {
-      style[options.isApplicationStyle && '--appHeight' || 'height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+      if (options.appStyle) {
+        if (options.sectionStyle) {
+          style['height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+          style['min-height'] = style['height'];
+          style['max-height'] = style['height'];
+        }
+        if (!options.noApplicationHeight) {
+          style['--appHeight'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+        }
+      } else {
+        style['height'] = hasUnit(container.height) ? container.height : `${container.height}px`;
+      }
       if (options.isApplicationScroll) {
         style['--appHeightScroll'] = 'auto';
         style['--appWidthScroll'] = 'hidden';
       }
     }
-    if (container.width === 'fullWindow') {
-      style['--allPagesWidth'] = '100%';
-    } else if (container.width === 'singlePageApplication') {
-      style['--allPagesWidth'] = '1320px';
-    } else if (container.width) {
-      style[options.isApplicationStyle && '--appWidth' || 'width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+    if (container.width) {
+      if (options.siteStyle) {
+        if (container.width === 'fullWindow') {
+          document.body.style.setProperty('--allPagesWidth', '100%');
+        } else if (container.width === 'singlePageApplication') {
+          document.body.style.setProperty('--allPagesWidth', '1320px');
+        } else {
+          document.body.style.setProperty('--allPagesWidth', hasUnit(container.width) ? container.width : `${container.width}px`);
+        }
+      } else if (options.pageStyle) {
+        if (container.width === 'fullWindow') {
+          style['--allPagesWidth'] = '100%';
+        } else if (container.width === 'singlePageApplication') {
+          style['--allPagesWidth'] = '1320px';
+        } else {
+          style['--allPagesWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+        }
+      } else if (options.appStyle) {
+        if (options.dynamicWidth) {
+          style['min-width'] = 'auto';
+          style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+          style['max-width'] = `min(${options.dynamicWidth}, ${style['width']})`;
+          style['--appWidth'] = '100%';
+        } else {
+          if (options.sectionStyle) {
+            style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+            style['min-width'] = style['width'];
+            style['max-width'] = style['width'];
+          }
+          if (!options.noApplicationWidth) {
+            style['--appWidth'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+          }
+        }
+      } else {
+        style['width'] = hasUnit(container.width) ? container.width : `${container.width}px`;
+      }
       if (options.isApplicationScroll) {
         style['--appWidthScroll'] = 'auto';
       }
     }
     if (container.borderColor) {
-      style[options.isApplicationStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
+      style[options.appStyle && '--appBorderColor' || 'border-color'] = container.borderColor;
       if (container.borderSize) {
-        style[options.isApplicationStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
+        style[options.appStyle && '--appBorderSize' || 'border-size'] = `${container.borderSize}px`;
       }
     }
     if (container.boxShadow === 'true') {
-      style[options.isApplicationStyle && '--appBoxShadow' || 'box-shadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
+      style[options.appStyle && '--appBoxShadow' || 'box-shadow'] = '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)';
     }
   }
   if (!options.noBackgroundStyle
@@ -113,32 +200,99 @@ export function getStyle(container, options) {
       || container.backgroundColor
       || container.backgroundEffect)) {
     if (container.backgroundColor) {
-      style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = container.backgroundColor;
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundColor', container.backgroundColor);
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundColor'] = container.backgroundColor;
+      } else if (options.isApplicationBackground) {
+        style['--appBackgroundColor'] = container.backgroundColor;
+      } else if (options.sectionStyle) {
+        if (container.backgroundColor?.includes?.('@')) {
+          const colors = container.backgroundColor.split('@');
+          style['background-color'] = colors[0];
+          style['--sectionBackgroundColorScroll'] = colors[1];
+        } else {
+          style['background-color'] = container.backgroundColor;
+          if (container.cssClass?.includes?.('layout-sticky-section')) {
+            style['--sectionBackgroundColorScroll'] = container.backgroundColor;
+          }
+        }
+      }
     } else if (container.backgroundEffect || container.backgroundImage) {
-      style[options.isApplicationBackground && '--appBackgroundColor' || 'background-color'] = 'transparent';
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundColor', 'transparent');
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundColor'] = 'transparent';
+      } else if (options.sectionStyle) {
+        style['background-color'] = 'transparent';
+      } else {
+        style['--appBackgroundColor'] = 'transparent';
+      }
     }
 
     if (container.backgroundEffect && container.backgroundImage) {
       style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage}),${container.backgroundEffect}`;
     } else if (container.backgroundImage) {
-      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundImage', `url(${container.backgroundImage})`);
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundImage'] = `url(${container.backgroundImage})`;
+      } else {
+        style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = `url(${container.backgroundImage})`;
+      }
     } else if (container.backgroundEffect) {
-      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundImage', container.backgroundEffect);
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundImage'] = container.backgroundEffect;
+      } else {
+        style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = container.backgroundEffect;
+      }
     } else if (container.backgroundColor) {
-      style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = 'none';
-      style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = 'no-repeat';
-      style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = 'unset';
-      style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = 'unset';
+      if (options.siteStyle) {
+        document.body.style.setProperty('--allPagesBackgroundImage', 'none');
+        document.body.style.setProperty('--allPagesBackgroundRepeat', 'no-repeat');
+        document.body.style.setProperty('--allPagesBackgroundSize', 'unset');
+        document.body.style.setProperty('--allPagesBackgroundPosition', 'unset');
+      } else if (options.pageStyle) {
+        style['--pageBodyBackgroundImage'] = 'none';
+        style['--pageBodyBackgroundRepeat'] = 'no-repeat';
+        style['--pageBodyBackgroundSize'] = 'unset';
+        style['--pageBodyBackgroundPosition'] = 'unset';
+      } else {
+        style[options.isApplicationBackground && '--appBackgroundImage' || 'background-image'] = 'none';
+        style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = 'no-repeat';
+        style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = 'unset';
+        style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = 'unset';
+      }
     }
     if (container.backgroundImage) {
       if (container.backgroundRepeat) {
-        style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = container.backgroundRepeat;
+        if (options.siteStyle) {
+          document.body.style.setProperty('--allPagesBackgroundRepeat', container.backgroundRepeat);
+        } else if (options.pageStyle) {
+          style['--pageBodyBackgroundRepeat'] = container.backgroundRepeat;
+        } else {
+          style[options.isApplicationBackground && '--appBackgroundRepeat' || 'background-repeat'] = container.backgroundRepeat;
+        }
       }
       if (container.backgroundSize) {
-        style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = container.backgroundSize;
+        if (options.siteStyle) {
+          document.body.style.setProperty('--allPagesBackgroundSize', container.backgroundSize);
+        } else if (options.pageStyle) {
+          style['--pageBodyBackgroundSize'] = container.backgroundSize;
+        } else {
+          style[options.isApplicationBackground && '--appBackgroundSize' || 'background-size'] = container.backgroundSize;
+        }
       }
       if (container.backgroundPosition) {
-        style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
+        if (options.siteStyle) {
+          document.body.style.setProperty('--allPagesBackgroundPosition', container.backgroundPosition);
+        } else if (options.pageStyle) {
+          style['--pageBodyBackgroundPosition'] = container.backgroundPosition;
+        } else {
+          style[options.isApplicationBackground && '--appBackgroundPosition' || 'background-position'] = container.backgroundPosition;
+        }
       }
     }
   }
@@ -178,9 +332,10 @@ export function getStyle(container, options) {
   return style;
 }
 
-export function getApplicationContent(navUri, applicationStorageId, applicationMode) {
-  const options = eXo.env.portal.previewSpaceId && `&previewSpaceId=${eXo.env.portal.previewSpaceId}` || '';
-  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=true&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${options}`, {
+export function getApplicationContent(navUri, applicationStorageId, applicationMode, showSite, fullRender) {
+  const spaceOption = eXo.env.portal.previewSpaceId && `&previewSpaceId=${eXo.env.portal.previewSpaceId}` || '';
+  const fullRenderOption = fullRender && '&fullRender=true' || '';
+  return fetch(`/portal${navUri}?maximizedPortletId=${applicationStorageId}&showMaxWindow=${!showSite}&hideSharedLayout=true&maximizedPortletMode=${applicationMode || 'VIEW'}${spaceOption}${fullRenderOption}`, {
     credentials: 'include',
     method: 'GET',
     redirect: 'manual'
@@ -195,13 +350,13 @@ export function getApplicationContent(navUri, applicationStorageId, applicationM
 }
 
 export function handleApplicationContent(applicationContent, applicationElement) {
-  const newHeadContent = applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>'));
+  const newHeadContent = applicationContent.search('<head') > -1 && applicationContent.substring(applicationContent.search('<head') + applicationContent.match(/<head.*>/g)[0].length, applicationContent.search('</head>')) || '';
   let newBodyContent = applicationContent.substring(applicationContent.search('<body') + applicationContent.match(/<body.*>/g)[0].length, applicationContent.lastIndexOf('</body>'));
   newBodyContent = installNewCSS(newHeadContent, newBodyContent);
 
   const newHtmlDocument = document.createElement('div');
   newHtmlDocument.innerHTML = newBodyContent;
-  const portletContent = newHtmlDocument.querySelector('.UIWorkingWorkspace .PORTLET-FRAGMENT');
+  const portletContent = newHtmlDocument.querySelector('.PORTLET-FRAGMENT');
   if (!portletContent) {
     applicationElement.classList.add('hidden');
     return;
@@ -246,8 +401,6 @@ function installNewCSS(newHeadContent, newBodyContent) {
         }
       }
     });
-  } else {
-    throw new Error('The application content does not seem to have been loaded correctly with CSS links');
   }
   const bodyCSSLinks = newBodyContent.match(/<link.*id=".*".*>/g);
   if (bodyCSSLinks && bodyCSSLinks.length) {

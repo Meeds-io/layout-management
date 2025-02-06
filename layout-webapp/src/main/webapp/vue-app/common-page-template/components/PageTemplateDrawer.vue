@@ -167,6 +167,7 @@ export default {
   methods: {
     async open(pageTemplate, duplicate, generateIllustration) {
       this.templateId = pageTemplate.id || this.$root.pageTemplate?.id || null;
+      pageTemplate = await this.$pageTemplateService.getPageTemplate(this.templateId, true);
       this.pageLayoutContent = pageTemplate.content;
       this.description = pageTemplate?.description || '';
       this.duplicate = duplicate;
@@ -200,7 +201,7 @@ export default {
       this.saving = true;
       const savePageRequest =
         (!this.duplicate && this.templateId) ?
-          this.$pageTemplateService.getPageTemplate(this.templateId)
+          this.$pageTemplateService.getPageTemplate(this.templateId, true)
             .then(pageTemplate => {
               const newTemplate = (this.$root.pageTemplate && !this.$root.pageTemplate.name);
               pageTemplate.disabled = newTemplate ? false : pageTemplate.disabled;
@@ -231,7 +232,7 @@ export default {
         .then(() => this.$refs?.pagePreview?.save())
         .then(() => {
           if (this.$root.pageTemplate) {
-            return this.$pageTemplateService.getPageTemplate(this.templateId)
+            return this.$pageTemplateService.getPageTemplate(this.templateId, true)
               .then(pageTemplate => this.$root.pageTemplate = pageTemplate);
           }
         })

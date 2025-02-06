@@ -19,16 +19,13 @@
  */
 
 import './initComponents.js';
-import '../layout-editor/initComponents.js';
 
 import '../common-page-layout/main.js';
 import '../common-page-template/main.js';
 import '../common-portlets/main.js';
 import '../common-section-template/main.js';
 import '../common-illustration/main.js';
-
-import '../layout-editor/extensions.js';
-import '../layout-editor/services.js';
+import '../common-layout/main.js';
 
 // get overridden components if exists
 if (extensionRegistry) {
@@ -74,7 +71,6 @@ export function init() {
           pageRef: null,
           pageTemplate: null,
           pageTemplateId: null,
-          pageFullWindow: false,
           nodeId: null,
           draftPageRef: null,
           draftNode: null,
@@ -167,8 +163,6 @@ export function init() {
             if (!oldVal) {
               window.setTimeout(() => document.dispatchEvent(new CustomEvent('hideTopBarLoading')), 200);
             }
-            const parentContainer = this.$layoutUtils.getParentContainer(newVal);
-            this.pageFullWindow = parentContainer?.width !== 'singlePageApplication' && (parentContainer?.width === 'fullWindow' || !!document.body.style.getPropertyValue('--allPagesWidth'));
           },
         },
         async created() {

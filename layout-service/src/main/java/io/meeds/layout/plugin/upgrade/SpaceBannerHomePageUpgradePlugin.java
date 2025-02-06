@@ -99,6 +99,7 @@ public class SpaceBannerHomePageUpgradePlugin extends LayoutApplicationReference
     }
   }
 
+  @SuppressWarnings("unchecked")
   private List<Long> getSpaceHomePages() {
     RequestLifeCycle.begin(this.entityManagerService);
     EntityManager entityManager = this.entityManagerService.getEntityManager();

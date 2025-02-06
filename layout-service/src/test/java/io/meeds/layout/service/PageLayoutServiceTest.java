@@ -21,6 +21,7 @@ package io.meeds.layout.service;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,10 +49,15 @@ import org.exoplatform.commons.addons.AddOnService;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfigService;
 import org.exoplatform.portal.config.model.Application;
+import org.exoplatform.portal.config.model.ApplicationState;
 import org.exoplatform.portal.config.model.Container;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.ModelStyle;
 import org.exoplatform.portal.config.model.Page;
+import org.exoplatform.portal.config.model.PageBody;
 import org.exoplatform.portal.config.model.PortalConfig;
+import org.exoplatform.portal.config.model.TransientApplicationState;
+import org.exoplatform.portal.config.serialize.model.SiteLayout;
 import org.exoplatform.portal.mop.PageType;
 import org.exoplatform.portal.mop.QueryResult;
 import org.exoplatform.portal.mop.SiteKey;
@@ -58,10 +65,12 @@ import org.exoplatform.portal.mop.page.PageContext;
 import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageState;
 import org.exoplatform.portal.mop.service.LayoutService;
+import org.exoplatform.portal.pom.spi.portlet.Portlet;
 
 import io.meeds.layout.model.PageCreateModel;
 import io.meeds.layout.model.PageTemplate;
 import io.meeds.layout.model.PermissionUpdateModel;
+import io.meeds.layout.model.PortletInstancePreference;
 
 import lombok.SneakyThrows;
 
@@ -95,7 +104,7 @@ public class PageLayoutServiceTest {
   private AddOnService            addOnService;
 
   @MockBean
-  private ContainerLayoutService  containerLayoutSrvice;
+  private ContainerLayoutService  containerLayoutService;
 
   @MockBean
   private PortletInstanceService  portletInstanceService;
@@ -114,6 +123,9 @@ public class PageLayoutServiceTest {
 
   @Mock
   private Page                    page;
+
+  @Mock
+  private PortalConfig            site;
 
   @Test
   @SuppressWarnings("unchecked")
@@ -150,6 +162,32 @@ public class PageLayoutServiceTest {
   }
 
   @Test
+  @SneakyThrows
+  public void impersonateSite() {
+    SiteLayout pageBodyContainer = mock(SiteLayout.class);
+    when(site.getPortalLayout()).thenReturn(pageBodyContainer);
+    when(layoutService.getPortalConfig(SITE_KEY)).thenReturn(site);
+    assertDoesNotThrow(() -> pageLayoutService.impersonateSite(SITE_KEY));
+
+    when(layoutService.findPages(SITE_KEY)).thenReturn(Collections.singletonList(pageContext));
+    when(pageContext.getKey()).thenReturn(PAGE_KEY);
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    Container container = mock(Container.class);
+    Application application = mock(Application.class);
+    Portlet preferences = mock(Portlet.class);
+    when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
+    when(portletInstanceService.getApplicationPortletPreferences(application)).thenReturn(preferences);
+    ApplicationState state = mock(ApplicationState.class);
+    when(application.getState()).thenReturn(state);
+
+    pageLayoutService.impersonateSite(SITE_KEY);
+
+    verify(containerLayoutService).impersonateContainer(container, page);
+    verify(layoutService).save(state, preferences);
+  }
+
+  @Test
   public void getPage() throws IllegalAccessException, ObjectNotFoundException {
     assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPage(PAGE_KEY, TEST_USER));
     when(layoutService.getPageContext(PAGE_KEY)).thenReturn(pageContext);
@@ -164,7 +202,48 @@ public class PageLayoutServiceTest {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
     when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+    when(aclService.canViewSite(PAGE_KEY.getSite(), TEST_USER)).thenReturn(true);
+    assertNull(pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+    when(aclService.hasAccessPermission(page, TEST_USER)).thenReturn(true);
     assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+  }
+
+  @Test
+  public void getPageLayoutWithSite() throws IllegalAccessException, ObjectNotFoundException {
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    when(aclService.canViewSite(PAGE_KEY.getSite(), TEST_USER)).thenReturn(true);
+    when(aclService.hasAccessPermission(page, TEST_USER)).thenReturn(true);
+    assertEquals(page, pageLayoutService.getPageLayout(PAGE_KEY, TEST_USER));
+
+    assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER));
+    when(layoutService.getPortalConfig(2l)).thenReturn(site);
+    assertNull(pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER));
+
+    Container container = mock(Container.class);
+    Application application = mock(Application.class);
+    Portlet preferences = mock(Portlet.class);
+    when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    when(portletInstanceService.getApplicationPortletPreferences(application)).thenReturn(preferences);
+
+    PageBody pageBody = mock(PageBody.class);
+    SiteLayout pageBodyContainer = mock(SiteLayout.class);
+    when(site.getPortalLayout()).thenReturn(pageBodyContainer);
+    when(pageBodyContainer.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(pageBody)));
+
+    assertNull(pageLayoutService.getPageLayout(PAGE_KEY, 2l, TEST_USER));
+
+    when(aclService.hasAccessPermission(any(), eq(TEST_USER))).thenReturn(true);
+
+    ModelObject pageLayout = pageLayoutService.getPageLayout(PAGE_KEY, 2l, true, TEST_USER);
+    assertNotNull(pageLayout);
+
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
+    pageLayout = pageLayoutService.getPageLayout(PAGE_KEY, 2l, true, TEST_USER);
+    assertNotNull(pageLayout);
+    verify(application).setState(argThat(state -> state instanceof TransientApplicationState transientState
+                                                  && Objects.equals(transientState.getContentState(), preferences)));
   }
 
   @Test
@@ -173,6 +252,7 @@ public class PageLayoutServiceTest {
     when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
     assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
     when(aclService.canViewPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    when(aclService.canViewSite(PAGE_KEY.getSite(), TEST_USER)).thenReturn(true);
     assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
 
     Container container = mock(Container.class);
@@ -180,6 +260,12 @@ public class PageLayoutServiceTest {
     Application application = mock(Application.class);
     when(application.getStorageId()).thenReturn("2");
     when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    assertThrows(ObjectNotFoundException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.hasAccessPermission(page, TEST_USER)).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.hasAccessPermission(container, TEST_USER)).thenReturn(true);
+    assertThrows(IllegalAccessException.class, () -> pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
+    when(aclService.hasAccessPermission(application, TEST_USER)).thenReturn(true);
     assertNotNull(pageLayoutService.getPageApplicationLayout(PAGE_KEY, 2l, TEST_USER));
   }
 
@@ -296,6 +382,33 @@ public class PageLayoutServiceTest {
 
     pageLayoutService.clonePage(PAGE_KEY, TEST_USER);
     verify(page).setChildren(argThat(children -> children != null && children.size() == 1 && children.get(0) == application));
+  }
+
+  @Test
+  public void updatePageApplicationPreferences() throws IllegalAccessException, ObjectNotFoundException {
+    PortletInstancePreference portletInstancePreference = mock(PortletInstancePreference.class);
+    List<PortletInstancePreference> preferences = Collections.singletonList(portletInstancePreference);
+    assertThrows(ObjectNotFoundException.class,
+                 () -> pageLayoutService.updatePageApplicationPreferences(PAGE_KEY, 2l, preferences, TEST_USER));
+    when(layoutService.getPage(PAGE_KEY)).thenReturn(page);
+    assertThrows(IllegalAccessException.class,
+                 () -> pageLayoutService.updatePageApplicationPreferences(PAGE_KEY, 2l, preferences, TEST_USER));
+    when(aclService.canEditPage(PAGE_KEY, TEST_USER)).thenReturn(true);
+    assertThrows(ObjectNotFoundException.class,
+                 () -> pageLayoutService.updatePageApplicationPreferences(PAGE_KEY, 2l, preferences, TEST_USER));
+
+    Container container = mock(Container.class);
+    Application application = mock(Application.class);
+    when(container.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(application)));
+    when(page.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(container)));
+    when(application.getStorageId()).thenReturn("2");
+    ApplicationState state = mock(ApplicationState.class);
+    when(application.getState()).thenReturn(state);
+    when(portletInstancePreference.getName()).thenReturn("name");
+    when(portletInstancePreference.getValue()).thenReturn("value");
+
+    pageLayoutService.updatePageApplicationPreferences(PAGE_KEY, 2l, preferences, TEST_USER);
+    verify(layoutService).save(eq(state), argThat(prefs -> prefs.getValue("name").equals("value")));
   }
 
   @Test

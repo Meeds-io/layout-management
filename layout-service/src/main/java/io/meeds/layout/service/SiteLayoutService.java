@@ -33,16 +33,21 @@ import org.exoplatform.commons.ObjectAlreadyExistsException;
 import org.exoplatform.commons.exception.ObjectNotFoundException;
 import org.exoplatform.portal.config.UserPortalConfig;
 import org.exoplatform.portal.config.UserPortalConfigService;
+import org.exoplatform.portal.config.model.ModelObject;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
+import org.exoplatform.portal.mop.importer.ImportMode;
 import org.exoplatform.portal.mop.service.LayoutService;
 import org.exoplatform.portal.mop.service.NavigationService;
 import org.exoplatform.portal.mop.user.UserPortal;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.resources.LocaleConfig;
 import org.exoplatform.services.resources.LocaleConfigService;
 import org.exoplatform.services.resources.LocaleContextInfo;
 
+import io.meeds.layout.model.LayoutModel;
 import io.meeds.layout.model.NodeLabel;
 import io.meeds.layout.model.PermissionUpdateModel;
 import io.meeds.layout.model.SiteCreateModel;
@@ -52,6 +57,14 @@ import lombok.SneakyThrows;
 
 @Service
 public class SiteLayoutService {
+
+  private static final String     SITE_NOT_FOUND_MESSAGE = "Site with key %s doesn't exist";
+
+  private static final String     EDIT_DENIED_MESSAGE    = "Site with key %s can't be edited by user %s";
+
+  private static final String     SITE_DOESNT_EXIST_MSG  = "Site %s doesn't exist";
+
+  private static final Log        LOG                    = ExoLogger.getLogger(SiteLayoutService.class);
 
   @Autowired
   private LayoutService           layoutService;
@@ -64,6 +77,9 @@ public class SiteLayoutService {
 
   @Autowired
   private UserPortalConfigService portalConfigService;
+
+  @Autowired
+  private PortletInstanceService  portletInstanceService;
 
   @Autowired
   private LayoutAclService        aclService;
@@ -80,6 +96,11 @@ public class SiteLayoutService {
       throw new IllegalAccessException();
     }
     return portalConfig;
+  }
+
+  public ModelObject getSiteLayout(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
+    PortalConfig site = getSite(siteKey, username);
+    return site.getPortalLayout();
   }
 
   public PortalConfig getSite(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
@@ -136,14 +157,37 @@ public class SiteLayoutService {
     return createdPortalConfig;
   }
 
+  public SiteKey createDraftSite(SiteKey siteKey, String username) throws ObjectNotFoundException, IllegalAccessException {
+    if (!aclService.canEditSite(siteKey, username)) {
+      throw new IllegalAccessException(String.format("Not allowed to edit site %s", siteKey));
+    }
+    PortalConfig site = getSite(siteKey, username);
+
+    String clonedSiteName = site.getType() + "_" + site.getName() + "_draft_" + username;
+
+    PortalConfig draftSite = site.clone();
+    draftSite.setType(PortalConfig.DRAFT);
+    draftSite.setName(clonedSiteName);
+    LayoutModel siteLayoutModel = new LayoutModel(site.getPortalLayout(), portletInstanceService);
+    siteLayoutModel.resetStorage();
+    draftSite.setPortalLayout(siteLayoutModel.toSite().getPortalLayout());
+    SiteKey draftSiteKey = new SiteKey(draftSite.getType(), draftSite.getName());
+    PortalConfig existingDraftSite = layoutService.getPortalConfig(draftSiteKey);
+    if (existingDraftSite != null) {
+      layoutService.remove(existingDraftSite);
+    }
+    layoutService.create(draftSite);
+    return draftSiteKey;
+  }
+
   public void updateSite(SiteUpdateModel updateModel, String username) throws IllegalAccessException,
                                                                        ObjectNotFoundException {
     SiteKey siteKey = new SiteKey(updateModel.getSiteType(), updateModel.getSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
-      throw new ObjectNotFoundException(String.format("Site with key %s doesn't exist", siteKey));
+      throw new ObjectNotFoundException(String.format(SITE_NOT_FOUND_MESSAGE, siteKey));
     } else if (!aclService.canEditSite(siteKey, username)) {
-      throw new IllegalAccessException(String.format("Site with key %s can't be edited by user %s", siteKey, username));
+      throw new IllegalAccessException(String.format(EDIT_DENIED_MESSAGE, siteKey, username));
     }
     portalConfig.setDescription(updateModel.getSiteDescription());
     portalConfig.setLabel(updateModel.getSiteLabel());
@@ -159,10 +203,32 @@ public class SiteLayoutService {
     layoutService.save(portalConfig);
   }
 
+  public void restoreSite(SiteKey siteKey,
+                          ImportMode importMode,
+                          boolean restoreSiteConfig,
+                          boolean restorePages,
+                          boolean restoreNavigationTree,
+                          String username) throws ObjectNotFoundException, IllegalAccessException {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException(String.format(SITE_NOT_FOUND_MESSAGE, siteKey));
+    } else if (!aclService.canEditSite(siteKey, username)) {
+      throw new IllegalAccessException(String.format(EDIT_DENIED_MESSAGE, siteKey, username));
+    } else if (!portalConfigService.canRestore(siteKey.getTypeName(), siteKey.getName())) {
+      throw new IllegalStateException(String.format("Site %s can't be restored since it isn't a default site ", siteKey));
+    }
+    portalConfigService.restoreSite(siteKey.getTypeName(),
+                                    siteKey.getName(),
+                                    importMode,
+                                    restoreSiteConfig,
+                                    restorePages,
+                                    restoreNavigationTree);
+  }
+
   public void deleteSite(SiteKey siteKey, String username) throws IllegalAccessException, ObjectNotFoundException {
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
-      throw new ObjectNotFoundException(String.format("Site with key %s doesn't exist", siteKey));
+      throw new ObjectNotFoundException(String.format(SITE_NOT_FOUND_MESSAGE, siteKey));
     } else if (!aclService.canEditSite(siteKey, username)) {
       throw new IllegalAccessException(String.format("Site with key %s can't be deleted by user %s", siteKey, username));
     }
@@ -176,7 +242,7 @@ public class SiteLayoutService {
     SiteKey siteKey = new SiteKey(permissionUpdateModel.getSiteType(), permissionUpdateModel.getSiteName());
     PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
     if (portalConfig == null) {
-      throw new ObjectNotFoundException(String.format("Site %s doesn't exist", siteKey));
+      throw new ObjectNotFoundException(String.format(SITE_DOESNT_EXIST_MSG, siteKey));
     } else if (!aclService.canEditSite(siteKey, username)) {
       throw new IllegalAccessException(String.format("Site permissions with key %s can't be edited by user %s",
                                                      siteKey,
@@ -187,6 +253,34 @@ public class SiteLayoutService {
     }
     if (permissionUpdateModel.getAccessPermissions() != null) {
       portalConfig.setAccessPermissions(permissionUpdateModel.getAccessPermissions().toArray(new String[0]));
+    }
+    layoutService.save(portalConfig);
+  }
+
+  public void updateSiteLayout(SiteKey siteKey,
+                               PortalConfig site,
+                               boolean publish,
+                               String username) throws IllegalAccessException, ObjectNotFoundException {
+    PortalConfig portalConfig = layoutService.getPortalConfig(siteKey);
+    if (portalConfig == null) {
+      throw new ObjectNotFoundException(String.format(SITE_DOESNT_EXIST_MSG, siteKey));
+    } else if (!aclService.canEditSite(siteKey, username)) {
+      throw new IllegalAccessException(String.format("Site layout with key %s can't be edited by user %s",
+                                                     siteKey,
+                                                     username));
+    }
+    portalConfig.setPortalLayout(site.getPortalLayout());
+    try {
+      if (publish) {
+        // Update Site Layout only without resetting preferences
+        portalConfig.resetStorage();
+      } else {
+        // Check Site Layout consistency before saving
+        portalConfig.checkStorage();
+      }
+    } catch (ObjectNotFoundException e) {
+      LOG.debug("Error while accessing Site applications storage information", e);
+      throw new IllegalStateException("layout.siteOutdatedError");
     }
     layoutService.save(portalConfig);
   }

@@ -27,10 +27,12 @@
         :page="pageContext"
         :node="node"
         :node-labels="nodeLabels" />
+      <v-divider />
       <coediting
         v-model="draftNodeId"
         :object-id="nodeId"
         :messages="{
+          editingInOtherWindow: 'layout.pageBeingEditedByYouInOther',
           lockConfirmTitle: 'layout.lockConfirmTitle',
           lockConfirmMessage: 'layout.lockConfirmMessage',
           lockConfirmQuestion: 'layout.lockConfirmQuestion',
@@ -116,7 +118,7 @@ export default {
         if (this.draftPageRef) {
           this.$root.draftPageRef = this.draftPageRef;
           if (this.pageTemplateId) {
-            this.$pageTemplateService.getPageTemplate(this.pageTemplateId)
+            this.$pageTemplateService.getPageTemplate(this.pageTemplateId, true)
               .then(pageTemplate => this.$root.pageTemplate = pageTemplate)
               .then(() => this.$pageLayoutService.updatePageLayout(
                 this.draftPageRef,
@@ -125,8 +127,10 @@ export default {
               .then(draftLayout => this.setDraftLayout(draftLayout))
               .catch(e => this.$root.$emit('alert-message', this.$te(e.message) ? this.$t(e.message) : this.$t('layout.pageSavingError'), 'error'));
           } else {
-            this.$pageLayoutService.getPageLayout(this.draftPageRef, 'contentId')
-              .then(draftLayout => this.setDraftLayout(draftLayout));
+            this.$pageLayoutService.getPageLayout({
+              pageRef: this.draftPageRef,
+              expand: 'contentId',
+            }).then(draftLayout => this.setDraftLayout(draftLayout));
           }
         }
       },

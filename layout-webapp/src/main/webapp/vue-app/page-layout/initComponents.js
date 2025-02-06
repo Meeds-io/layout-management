@@ -29,6 +29,15 @@ import CellContainer from './components/container/CellContainer.vue';
 import Container from './components/container/Container.vue';
 import Application from './components/container/Application.vue';
 
+import PageBody from './components/container/PageBody.vue';
+import Site from './components/container/Site.vue';
+import SiteBannerCell from './components/container/SiteBannerCell.vue';
+import SiteBannerSection from './components/container/SiteBannerSection.vue';
+import SiteMiddle from './components/container/SiteMiddle.vue';
+import SiteMiddleCenter from './components/container/SiteMiddleCenter.vue';
+import SiteSidebarCell from './components/container/SiteSidebarCell.vue';
+import SiteSidebarSection from './components/container/SiteSidebarSection.vue';
+
 const components = {
   'page-layout': PageLayout,
 
@@ -41,6 +50,14 @@ const components = {
   'page-layout-cell-container': CellContainer,
   'page-layout-container': Container,
   'page-layout-application': Application,
+  'page-layout-site-container': Site,
+  'page-layout-site-middle-container': SiteMiddle,
+  'page-layout-site-middle-center-container': SiteMiddleCenter,
+  'page-layout-page-body-container': PageBody,
+  'page-layout-banner-cell': SiteBannerCell,
+  'page-layout-banner-section': SiteBannerSection,
+  'page-layout-sidebar-cell': SiteSidebarCell,
+  'page-layout-sidebar-section': SiteSidebarSection,
 };
 
 for (const key in components) {

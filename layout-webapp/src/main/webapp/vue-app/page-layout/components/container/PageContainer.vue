@@ -21,7 +21,8 @@
 <template>
   <page-layout-container-extension
     :container="container"
-    class="layout-page-body no-border-radius" />
+    :class="!$root.siteId && 'layout-page-body'"
+    class="no-border-radius" />
 </template>
 <script>
 export default {

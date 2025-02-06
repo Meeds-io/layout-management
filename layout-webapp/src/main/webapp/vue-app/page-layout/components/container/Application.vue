@@ -61,8 +61,8 @@ export default {
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
         isApplicationBackground: true,
-        isApplicationStyle: true,
         isApplicationScroll: true,
+        appStyle: true,
       });
     },
     cssClass() {
@@ -102,7 +102,7 @@ export default {
     retrieveData() {
       if (this.portletId && this.nodeUri && !this.contentRetrieved) {
         this.contentRetrieved = true;
-        this.$applicationUtils.getApplicationContent(this.nodeUri, this.portletId)
+        this.$applicationUtils.getApplicationContent(this.nodeUri, this.portletId, 'VIEW', this.$root.siteId)
           .then(applicationContent => this.applicationContent = applicationContent);
       }
     },

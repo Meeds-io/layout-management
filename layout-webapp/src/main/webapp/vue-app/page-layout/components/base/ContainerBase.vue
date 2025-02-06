@@ -24,8 +24,7 @@
     :class="cssClass"
     :style="cssStyle">
     <slot name="header"></slot>
-    <slot v-if="$slots.content" name="content"></slot>
-    <template v-else-if="hasChildren">
+    <template v-if="hasChildren">
       <page-layout-container-extension
         v-for="child in children"
         :key="child.storageId"
@@ -49,6 +48,30 @@ export default {
     noBackgroundStyle: {
       type: Boolean,
       default: false,
+    },
+    noApplicationStyle: {
+      type: Boolean,
+      default: false,
+    },
+    siteStyle: {
+      type: Boolean,
+      default: false,
+    },
+    pageStyle: {
+      type: Boolean,
+      default: false,
+    },
+    sectionStyle: {
+      type: Boolean,
+      default: false,
+    },
+    noSectionMargins: {
+      type: Boolean,
+      default: false,
+    },
+    dynamicWidth: {
+      type: String,
+      default: null,
     },
   },
   computed: {
@@ -75,8 +98,14 @@ export default {
     },
     cssStyle() {
       return this.$applicationUtils.getStyle(this.container, {
-        isApplicationStyle: true,
-        noBackgroundStyle: this.noBackgroundStyle
+        isApplicationBackground: this.container.template === 'BannerCell',
+        noSectionMargins: this.noSectionMargins,
+        noBackgroundStyle: this.noBackgroundStyle,
+        siteStyle: this.siteStyle,
+        pageStyle: this.pageStyle,
+        sectionStyle: this.sectionStyle,
+        appStyle: !this.noApplicationStyle,
+        dynamicWidth: this.dynamicWidth,
       });
     },
     cssClass() {

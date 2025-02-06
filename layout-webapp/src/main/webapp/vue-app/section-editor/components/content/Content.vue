@@ -21,9 +21,8 @@
 -->
 <template>
   <v-card
-    :max-width="maxWidth"
     :class="parentClass"
-    class="transparent layout-sections-parent singlePageApplication mx-auto"
+    class="transparent layout-sections-parent page-content mx-auto"
     flat>
     <layout-editor-container-extension
       :container="pageLayout"
@@ -70,9 +69,6 @@ export default {
     },
     mobileDisplayMode() {
       return this.$root.mobileDisplayMode;
-    },
-    maxWidth() {
-      return this.mobileDisplayMode && '500px !important' || 'initial';
     },
     parentClass() {
       return this.mobileDisplayMode && 'layout-mobile-view elevation-3 mt-3' || 'layout-desktop-view';
@@ -275,17 +271,8 @@ export default {
         console.warn(`Can't find section with id ${sectionId}`); // eslint-disable-line no-console
       }
     },
-    handleSectionUpdated(container, children, index, type) {
+    handleSectionUpdated(container, children) {
       container.children = children?.filter(c => !!c) || [];
-      if (type === 'section' && !container.children?.length) {
-        window.setTimeout(() => this.handleRemoveSection(index), 500);
-      }
-    },
-    handleRemoveSection(index) {
-      const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);
-      const section = parentContainer.children[index];
-      this.addSectionVersion(section.storageId);
-      parentContainer.children.splice(index, 1);
     },
     handleReplaceSection(index, section) {
       const parentContainer = this.$layoutUtils.getParentContainer(this.layoutToEdit);

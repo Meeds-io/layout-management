@@ -43,9 +43,9 @@ export default {
       this.openSiteNavigationDrawer(event?.detail);
     },
     openCreatedSiteNavigationDrawer(siteTemplate) {
-      this.openSiteNavigationDrawer(siteTemplate, 'siteTemplate.label.editCreatedNavigation.information');
+      this.openSiteNavigationDrawer(siteTemplate, 'siteTemplate.label.editCreatedNavigation.information', true);
     },
-    async openSiteNavigationDrawer(siteTemplate, information) {
+    async openSiteNavigationDrawer(siteTemplate, information, displayEditLayout) {
       try {
         const site = await this.$siteService.getSite('portal_template', siteTemplate?.layout, {
           expandNavigations: false,
@@ -56,6 +56,7 @@ export default {
           siteId: site.siteId,
           siteLabel: siteTemplate?.name,
           information: information || 'siteTemplate.label.editNavigation.information',
+          displayEditLayout,
           displayCloseFooter: true,
           includeGlobal: false,
         });
