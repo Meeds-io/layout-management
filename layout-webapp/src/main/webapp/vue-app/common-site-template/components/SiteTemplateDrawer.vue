@@ -84,7 +84,7 @@
           v-model="siteTemplate.icon"
           class="text-header mt-4" />
         <site-template-layout
-          v-if="isNew"
+          v-if="isNewNoDuplication"
           ref="siteTemplateLayout"
           :site-template="siteTemplate"
           class="mt-4" />
@@ -137,6 +137,9 @@ export default {
     disabled() {
       return !this.title?.length;
     },
+    isNewNoDuplication() {
+      return this.isNew && !this.sourceSiteId;
+    },
   },
   watch: {
     description() {
@@ -184,8 +187,8 @@ export default {
             siteTemplate = await this.$siteTemplateService.saveAsSiteTemplate(this.siteTemplate, this.sourceSiteId);
           } else {
             siteTemplate = await this.$siteTemplateService.createSiteTemplate(this.siteTemplate);
-            this.siteTemplate.id = siteTemplate.id;
           }
+          this.siteTemplate.id = siteTemplate.id;
         } else {
           siteTemplate = await this.$siteTemplateService.updateSiteTemplate(this.siteTemplate);
         }
@@ -196,7 +199,7 @@ export default {
 
         await this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'title', this.titleTranslations);
         await this.$translationService.saveTranslations('siteTemplate', siteTemplate.id, 'description', this.descriptionTranslations);
-        if (this.isNew) {
+        if (this.isNewNoDuplication) {
           await this.$refs?.siteTemplateLayout?.save();
           this.$root.$emit('alert-message', this.$t('layout.siteTemplateCreatedSuccessfully'), 'success');
           this.$root.$emit('site-template-created', siteTemplate);
