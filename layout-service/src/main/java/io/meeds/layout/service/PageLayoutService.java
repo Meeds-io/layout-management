@@ -69,6 +69,8 @@ import lombok.SneakyThrows;
 @Service
 public class PageLayoutService {
 
+  private static final String    ADDON_CONTAINER_FACTORY_ID      = "addonContainer";
+
   private static final Log       LOG                             = ExoLogger.getLogger(PageLayoutService.class);
 
   private static final Pattern   GENERIC_STYLE_MATCHER_VALIDATOR = Pattern.compile("[#0-9a-zA-Z\\(\\),\\./\"'\\-%_ ]+");
@@ -427,7 +429,7 @@ public class PageLayoutService {
   }
 
   private void expandAddonContainerChildren(Container container) {
-    if (StringUtils.equals(container.getFactoryId(), "addonContainer")) {
+    if (StringUtils.equals(container.getFactoryId(), ADDON_CONTAINER_FACTORY_ID)) {
       List<Application> applications = addOnService.getApplications(container.getName());
       if (CollectionUtils.isNotEmpty(applications)) {
         container.setChildren(new ArrayList<>(applications));
@@ -451,7 +453,7 @@ public class PageLayoutService {
     for (int i = subContainers.size() - 1; i >= 0; i--) {
       ModelObject modelObject = subContainers.get(i);
       if (modelObject instanceof Container subContainer) {
-        if (StringUtils.equals(subContainer.getFactoryId(), "addonContainer")) {
+        if (StringUtils.equals(subContainer.getFactoryId(), ADDON_CONTAINER_FACTORY_ID)) {
           List<Application> applications = addOnService.getApplications(subContainer.getName());
           if (CollectionUtils.isNotEmpty(applications)) {
             addonContainerChildren.put(i, applications);
@@ -529,7 +531,9 @@ public class PageLayoutService {
   }
 
   private void impersonateModel(ModelObject object, Page page) {
-    if (object instanceof Container container) {
+    if (object instanceof Container container
+        // Keep the addonContainer reference instead of storing its children
+        && !StringUtils.equals(container.getFactoryId(), ADDON_CONTAINER_FACTORY_ID)) {
       ArrayList<ModelObject> children = container.getChildren();
       try {
         containerLayoutService.impersonateContainer(container, page);
@@ -544,7 +548,7 @@ public class PageLayoutService {
       }
     } else if (object instanceof Application application) {
       Portlet preferences = portletInstanceService.getApplicationPortletPreferences(application);
-      if (preferences != null) {
+      if (preferences != null && StringUtils.isNotBlank(application.getStorageId())) {
         layoutService.save(application.getState(), preferences);
       }
     }
