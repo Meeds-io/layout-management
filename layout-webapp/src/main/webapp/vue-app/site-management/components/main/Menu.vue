@@ -72,6 +72,25 @@
         <span>{{ noLayoutEditTooltip }}</span>
       </v-tooltip>
       <v-list-item
+        v-for="extension in extensions"
+        :key="extension.id"
+        class="px-3"
+        @click="handelAction(extension)">
+        <v-card
+          color="transparent"
+          min-width="15"
+          class="me-2"
+          flat>
+          <v-icon size="13">
+            {{ extension?.icon }}
+          </v-icon>
+        </v-card>
+        <v-list-item-title
+          class="subtitle-2">
+          <span class="ps-1">{{ $t(extension.labelKey) }}</span>
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
         v-if="isPortalSite && !isGlobalSite"
         :aria-label="$t('siteManagement.label.properties')"
         role="button"
@@ -238,9 +257,6 @@ export default {
     loading: false,
   }),
   computed: {
-    isMetaSite() {
-      return this.site.name === eXo.env.portal.defaultPortal;
-    },
     isGlobalSite() {
       return this.site.name === 'global';
     },
@@ -272,6 +288,9 @@ export default {
       return (this.isMetaSite || this.isGlobalSite)
         ? this.$t('sites.label.system.noLayoutEdit')
         : this.$t('sites.label.meta.noLayoutEdit');
+    },
+    extensions() {
+      return this.$root.siteActionExtensions || [];
     },
   },
   watch: {
@@ -350,6 +369,9 @@ export default {
         this.loading = false;
       }
     },
+    handelAction(extension) {
+      return extension?.action(this, this.site);
+    }
   }
 };
 </script>
