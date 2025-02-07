@@ -18,7 +18,6 @@
  */
 package io.meeds.layout.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -445,18 +445,24 @@ public class PortletInstanceService {
 
   private List<PortletInstancePreference> getApplicationPreferences(Application application) {
     String portletName = portletInstanceLayoutStorage.getApplicationPortletName(application);
-    Portlet preferences = portletInstanceLayoutStorage.getApplicationPreferences(Long.parseLong(application.getStorageId()));
-    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletName);
-    if (plugin == null) {
-      if (preferences == null) {
-        return Collections.emptyList();
-      } else {
-        List<PortletInstancePreference> instancePreferences = new ArrayList<>();
-        preferences.forEach(p -> instancePreferences.add(new PortletInstancePreference(p.getName(), p.getValue())));
-        return instancePreferences;
-      }
+    Portlet preferences;
+    if (StringUtils.isNumeric(application.getStorageId())) {
+      preferences = portletInstanceLayoutStorage.getApplicationPreferences(Long.parseLong(application.getStorageId()));
+    } else if (application.getState() instanceof TransientApplicationState transientState) {
+      // Can happen when application is coming from AddonContainer
+      preferences = transientState.getContentState();
     } else {
+      preferences = null;
+    }
+    PortletInstancePreferencePlugin plugin = preferencePlugins.get(portletName);
+    if (plugin == null && preferences == null) {
+      return Collections.emptyList();
+    } else if (plugin != null) {
       return plugin.generatePreferences(application, preferences);
+    } else {
+      return StreamSupport.stream(preferences.spliterator(), false)
+                          .map(p -> new PortletInstancePreference(p.getName(), p.getValue()))
+                          .toList();
     }
   }
 

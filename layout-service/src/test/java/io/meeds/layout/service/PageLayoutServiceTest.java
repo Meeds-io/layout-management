@@ -184,6 +184,10 @@ public class PageLayoutServiceTest {
     pageLayoutService.impersonateSite(SITE_KEY);
 
     verify(containerLayoutService).impersonateContainer(container, page);
+    verify(layoutService, never()).save(state, preferences);
+
+    when(application.getStorageId()).thenReturn("2");
+    pageLayoutService.impersonateSite(SITE_KEY);
     verify(layoutService).save(state, preferences);
   }
 
