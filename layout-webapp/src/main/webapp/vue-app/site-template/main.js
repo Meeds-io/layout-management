@@ -19,7 +19,7 @@
 
 import './initComponents.js';
 import '../common-layout/services.js';
-
+import '../common-sites/main.js';
 import '../common-illustration/main.js';
 import '../common-site-template/main.js';
 
