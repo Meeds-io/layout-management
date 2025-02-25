@@ -168,11 +168,13 @@ export default {
     async open(template, duplicate, generateIllustration) {
       this.templateId = template.id || this.$root.pageTemplate?.id || null;
       this.pageLayoutContent = template.content;
-      const pageTemplate = await this.$pageTemplateService.getPageTemplate(this.templateId, true);
-      this.description = pageTemplate?.description || '';
-      this.duplicate = duplicate;
-      if (this.duplicate) {
-        this.pageLayoutContent = pageTemplate.content;
+      if (this.templateId) {
+        const pageTemplate = await this.$pageTemplateService.getPageTemplate(this.templateId, true);
+        this.description = pageTemplate?.description || '';
+        this.duplicate = duplicate;
+        if (this.duplicate) {
+          this.pageLayoutContent = pageTemplate.content;
+        }
       }
       if (generateIllustration) {
         const parentElement = document.querySelector('.layout-sections-parent .layout-page-body').parentElement;
